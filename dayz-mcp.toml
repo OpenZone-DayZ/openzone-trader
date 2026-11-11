@@ -1,23 +1,38 @@
 # Portable half of the profile for dayz-agentic-modding-mcp.
 # Machine paths live in dayz-mcp.local.toml, which is not committed.
+#
+# OpenZone_Trader REQUIRES @OpenZone_Core (requiredAddons): the configs, the
+# service registry and the log are the core's, and the core requires CF.
 
 [project]
 name = "openzone-trader"
 
 [build]
-# Phase 0 (2026-11-11): only the measurement probe exists. The mod itself, OpenZone_Trader,
-# joins this list in phase 1.
-#
-# OpenZone_TraderProbe        -- client + server: the stand-in wallet, banknote and wear slot,
-#                                the op engine and the client's inventory dump.
-# OpenZone_TraderProbe_Bridge -- server only: the `ozt_probe` verb for the MCP bridge
-#                                (world_exec). Requires @DZMCP_Bridge.
-mods = ["OpenZone_TraderProbe", "OpenZone_TraderProbe_Bridge"]
+# OpenZone_Trader             -- the mod. Phase 1: the server half for plain items.
+# OpenZone_Trader_Bridge      -- server only: the `oz_trader` verb for the MCP bridge
+#                                (scripted deals). A stand tool, never published.
+#                                It joins `mods` when its folder exists: the MCP
+#                                refuses a project that names a missing one.
+# OpenZone_TraderProbe        -- client + server stand tool of phase 0: scenes, the two
+#                                inventory dumps, the stand's wallet and notes.
+# OpenZone_TraderProbe_Bridge -- server only: the `ozt_probe` verb.
+mods = ["OpenZone_Trader", "OpenZone_TraderProbe", "OpenZone_TraderProbe_Bridge"]
 
 [expect]
-# Printed by the probe's MissionServer.OnInit.
-ready_line   = "trader probe loaded"
+# Printed by OZT_Module one tick after the mission starts.
+ready_line   = "trader loaded"
 max_warnings = 0
 forbid       = ["Bad type", "Can't compile", "NULL pointer to instance"]
-error_regex  = ["SCRIPT\\s+\\(E\\).*OZT_"]
-noise        = []
+# The engine's errors about our classes, and the mod's own ERROR lines:
+# OZT_Log.Error prints a plain `SCRIPT :` line, which the first pattern misses.
+error_regex  = ["SCRIPT\\s+\\(E\\).*OZT_", "\\[OpenZone/Trader\\] ERROR"]
+# The stand's shared profile has the core's Discord bridge switched on, and no
+# bridge process runs for this project: the core says so on every boot. A state
+# of this stand, not an event.
+noise        = ["Bridge.Url is not https", "bridge: "]
+
+# Read from the ready line. The stand's own files (examples/stand) set them.
+[expect.counters]
+traders  = 0
+goods    = 0
+problems = 0

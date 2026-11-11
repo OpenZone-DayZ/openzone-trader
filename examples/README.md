@@ -20,4 +20,12 @@ dressed by `Outfit` in the shape of the core's loadout preset (`ClassName`, `Slo
 `Quantity`, `Health01`, `Inside`), standing on the runway at `Pos` and facing `Yaw`.
 It does not change notes, to show the tab missing.
 
+The gates (design §8.2) are there to be tried: the helmet 20 % off with the stand's flag
+`vip`, the goggles locked without `nvg`, the canteen off by the percent `rep` gives (at most
+30), Ostap's `Access` behind `friend` -- the family `stand` exists only with the stand's
+bridge pbo, so on a real server these pass and give nothing. Weapons are 10 % off for the
+post `quartermaster` and ammo is locked to `duty` (the factions family: off without a
+faction mod), food to `reputation 50`, a kind nobody answers. `GatesOff` in the settings,
+`GatesOn` and `GatesOff` on a trader, switch a family by its name.
+
 They are not a starting point for a real server: the note classes exist on the stand only.

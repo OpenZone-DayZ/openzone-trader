@@ -327,6 +327,8 @@ class OZT_Deal
             return OZT_Const.NO_CLOSED;
         if (away > m_Trader.Radius)
             return OZT_Const.NO_TOO_FAR;
+        if (!OZT_Gates.Admits(m_Player, m_Trader))
+            return OZT_Const.NO_ACCESS;
 
         m_Money = OZT_Money.Of(m_Trader);
         if (!m_Money)
@@ -510,7 +512,11 @@ class OZT_Deal
 
             // Goods this trader does not sell: the catalogue the client holds
             // is stale.
-            int price = OZT_Book.BuyPrice(m_Trader, entry, line.Count);
+            // Locked for this player: said so; not sold here at all: the
+            // catalogue the client holds is stale.
+            if (OZT_Book.Locked(m_Player, m_Trader, entry))
+                return OZT_Const.NO_LOCKED;
+            int price = OZT_Book.BuyFor(m_Player, m_Trader, entry, line.Count);
             if (price <= 0)
                 return OZT_Const.NO_CHANGED;
 
@@ -598,7 +604,7 @@ class OZT_Deal
 
         // What the goods come with at this trader, each for every piece.
         array<string> comes;
-        OZT_Book.Comes(m_Trader, entry, comes);
+        OZT_Book.Comes(m_Player, m_Trader, entry, comes);
         for (int c = 0; c < comes.Count(); c++)
         {
             why = AddPart(parts, comes[c], "", root, entry.ClassName);
@@ -607,7 +613,7 @@ class OZT_Deal
                 OZT_Log.Error("deal: '" + entry.ClassName + "' comes with '" + comes[c] + "', which found no slot on it");
                 return OZT_Const.NO_INTERNAL;
             }
-            extra = extra + OZT_Book.BuyPrice(m_Trader, OZT_Book.EntryOf(comes[c]), line.Count);
+            extra = extra + OZT_Book.BuyFor(m_Player, m_Trader, OZT_Book.EntryOf(comes[c]), line.Count);
         }
 
         // What the request fits: goods of this trader, an entry hanging on the
@@ -619,7 +625,9 @@ class OZT_Deal
         {
             OZT_WireFit fit = line.Fit[f];
             OZT_BookEntry sold = OZT_Book.EntryOf(fit.ClassName);
-            int cost = OZT_Book.BuyPrice(m_Trader, sold, 1);
+            if (OZT_Book.Locked(m_Player, m_Trader, sold))
+                return OZT_Const.NO_LOCKED;
+            int cost = OZT_Book.BuyFor(m_Player, m_Trader, sold, 1);
             if (cost <= 0)
                 return OZT_Const.NO_CHANGED;
             if (fit.On >= f)

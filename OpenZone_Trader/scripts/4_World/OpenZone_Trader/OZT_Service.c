@@ -36,6 +36,11 @@ class OZT_Open
             error = OZT_Const.NO_TOO_FAR;
             return "";
         }
+        if (!OZT_Gates.Admits(player, trader))
+        {
+            error = OZT_Const.NO_ACCESS;
+            return "";
+        }
 
         OZT_MoneyProvider money = OZT_Money.Of(trader);
         if (!money)
@@ -81,9 +86,11 @@ class OZT_Open
                 wg.ClassName = e.ClassName;
                 wg.Category = e.Category;
                 // What one costs here with what comes with it, and what that is.
-                wg.Buy = OZT_Book.BuyWith(trader, e, 1);
+                // Locked goods are not shown to this player (design §8.2):
+                // nothing to buy, and the shelf shows nothing it cannot sell.
+                wg.Buy = OZT_Book.BuyWith(player, trader, e, 1);
                 array<string> comes;
-                OZT_Book.Comes(trader, e, comes);
+                OZT_Book.Comes(player, trader, e, comes);
                 for (int w = 0; w < comes.Count(); w++)
                     wg.With.Insert(comes[w]);
                 if (e.Sell > 0)

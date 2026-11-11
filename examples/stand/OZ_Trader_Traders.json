@@ -11,6 +11,7 @@
               { "ClassName": "CargoPants_Green", "SlotName": "Legs" },
               { "ClassName": "MilitaryBoots_Brown", "SlotName": "Feet" },
               { "ClassName": "BaseballCap_Olive", "SlotName": "Headgear" } ] },
-          "Categories": ["gear", "ammo"], "BuyFactor": 1, "SellFactor": 1, "Provider": "", "NoExchange": 1 }
+          "Categories": ["gear", "ammo"], "BuyFactor": 1, "SellFactor": 1, "Provider": "", "NoExchange": 1,
+          "Access": [ { "Kind": "stand", "Arg": "friend" } ] }
     ]
 }

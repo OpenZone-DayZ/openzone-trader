@@ -25,6 +25,10 @@ class OZT_Goods
     string Quantity = "";
     ref array<string> With;
 
+    // The gates of this line (design §8.2): who may buy it, and its discounts.
+    ref array<ref OZT_Condition> Requires;
+    ref array<ref OZT_Discount> Discounts;
+
     // A line read from a file ran no initialiser: one without With has none.
     OZT_Goods Copy()
     {
@@ -33,6 +37,10 @@ class OZT_Goods
         c.Buy = Buy;
         c.Sell = Sell;
         c.Quantity = Quantity;
+        c.Requires = new array<ref OZT_Condition>();
+        OZT_Condition.CopyAll(Requires, c.Requires);
+        c.Discounts = new array<ref OZT_Discount>();
+        OZT_Discount.CopyAll(Discounts, c.Discounts);
         c.With = new array<string>();
         if (With)
         {
@@ -53,11 +61,19 @@ class OZT_Category
     string Name = "";
     ref array<ref OZT_Goods> Goods;
 
+    // The gates of every line of the category, besides each line's own.
+    ref array<ref OZT_Condition> Requires;
+    ref array<ref OZT_Discount> Discounts;
+
     OZT_Category Copy()
     {
         OZT_Category c = new OZT_Category();
         c.Id = Id;
         c.Name = Name;
+        c.Requires = new array<ref OZT_Condition>();
+        OZT_Condition.CopyAll(Requires, c.Requires);
+        c.Discounts = new array<ref OZT_Discount>();
+        OZT_Discount.CopyAll(Discounts, c.Discounts);
         c.Goods = new array<ref OZT_Goods>();
         if (Goods)
         {

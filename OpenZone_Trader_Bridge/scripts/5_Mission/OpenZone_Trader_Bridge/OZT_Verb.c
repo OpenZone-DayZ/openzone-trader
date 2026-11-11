@@ -57,6 +57,8 @@ class OZT_VerbOps
             return OZT_VerbNpc.OpHurt(player, args, detail);
         if (op == "admin")
             return OZT_VerbNpc.OpAdmin(player, args, detail);
+        if (op == "flag")
+            return OZT_StandGate.OpFlag(player, args, detail);
         // -- ops of the later tasks go above this line --
         detail = "unknown op '" + op + "'; known: " + KnownOps();
         return false;
@@ -64,7 +66,7 @@ class OZT_VerbOps
 
     static string KnownOps()
     {
-        return "status, reload, fps, balance, price, pay, damage, open, fit, quote, deal, show, tree, load, fits, hurt, admin";
+        return "status, reload, fps, balance, price, pay, damage, open, fit, quote, deal, show, tree, load, fits, hurt, admin, flag";
     }
 
     // ---- what the ops share ---------------------------------------------------

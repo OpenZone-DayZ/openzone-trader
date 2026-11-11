@@ -101,7 +101,15 @@ class OZT_VerbNpc
     {
         string aop = OZT_VerbOps.Arg(args, "aop", "list");
         string body = OZT_VerbOps.Arg(args, "body", "{}");
-        OZT_Admin section = new OZT_Admin();
+        // Another mod's section by its id (section=research, say), as the
+        // core's dispatcher would hand it the request.
+        string id = OZT_VerbOps.Arg(args, "section", OZT_Const.SECTION_ADMIN);
+        OZ_AdminSection section = OZ_AdminRegistry.Get(id);
+        if (!section)
+        {
+            detail = "admin: no section '" + id + "'";
+            return false;
+        }
         bool ok;
         string error;
         string answer = section.Handle(aop, body, player.GetIdentity(), ok, error);

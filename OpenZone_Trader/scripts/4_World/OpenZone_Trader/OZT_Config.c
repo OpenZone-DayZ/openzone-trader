@@ -98,7 +98,7 @@ class OZT_Config
     string Counters()
     {
         string s = "traders=" + m_Traders.Traders.Count().ToString() + " goods=" + m_GoodsCount.ToString();
-        s = s + " money=" + m_Settings.Provider + " gates=none";
+        s = s + " money=" + m_Settings.Provider + " gates=" + OZT_Gates.Families();
         s = s + " problems=" + m_Problems.ToString();
         return s;
     }
@@ -167,6 +167,7 @@ class OZT_Config
         CheckNotes();
         CheckGoods();
         CheckTraders();
+        CheckDiscounts();
         CheckLoops();
         m_Problems = OZT_Log.Warned();
         m_Revision++;
@@ -445,7 +446,11 @@ class OZT_Config
                 OZT_Goods e = cat.Goods[g];
                 if (e.Buy <= 0 || e.Sell <= 0)
                     continue;
-                int costs = RoundUpTo(e.Buy * cheapest, unit);
+                // The largest discount the goods can get anywhere: a
+                // discount that holds at the cheapest trader makes the cheapest
+                // price (design §8.2, the money loop with discounts).
+                float most = MostDiscount(cat, e);
+                int costs = RoundUpTo(e.Buy * cheapest * (100 - most) / 100, unit);
                 float pays = e.Sell * dearest * best;
                 if (e.Quantity != OZT_Const.RULE_UNIT)
                     pays = RoundDownTo(pays, unit);
@@ -454,10 +459,69 @@ class OZT_Config
                     continue;
                 string msg = "Goods: '" + e.ClassName + "' sells for " + pays.ToString() + " at '" + dearAt + "'";
                 msg = msg + " and costs " + costs.ToString() + " at '" + cheapAt + "': a money loop";
-                msg = msg + " (Sell " + e.Sell.ToString() + ", Buy " + e.Buy.ToString() + " in the file; the factors are counted)";
+                msg = msg + " (Sell " + e.Sell.ToString() + ", Buy " + e.Buy.ToString() + " in the file; the factors are counted";
+                msg = msg + ", and a discount of " + most.ToString() + " %)";
                 Problem(msg);
             }
         }
+    }
+
+    // A discount gives 0 to 100 percent; one the provider computes needs a
+    // cap. What is out of range is brought in and said; a computed discount
+    // without a cap gives nothing (a missing Max reads zero) and is said too.
+    private void CheckDiscounts()
+    {
+        for (int c = 0; c < m_Goods.Categories.Count(); c++)
+        {
+            OZT_Category cat = m_Goods.Categories[c];
+            CheckDiscountList("category '" + cat.Id + "'", cat.Discounts);
+            for (int g = 0; g < cat.Goods.Count(); g++)
+                CheckDiscountList("'" + cat.Goods[g].ClassName + "'", cat.Goods[g].Discounts);
+        }
+    }
+
+    private void CheckDiscountList(string where, array<ref OZT_Discount> list)
+    {
+        if (!list)
+            return;
+        for (int i = 0; i < list.Count(); i++)
+        {
+            OZT_Discount d = list[i];
+            if (d.By)
+            {
+                if (d.Max <= 0)
+                    Problem("Goods: a discount of " + where + " by '" + d.By.Kind + "' has no Max above zero and gives nothing");
+                if (d.Max > 100)
+                {
+                    Problem("Goods: a discount of " + where + " has a Max above 100; 100 is used");
+                    d.Max = 100;
+                }
+                continue;
+            }
+            if (d.Percent < 0 || d.Percent > 100)
+            {
+                Problem("Goods: a discount of " + where + " is " + d.Percent.ToString() + " %; it is brought into 0 to 100");
+                d.Percent = Math.Clamp(d.Percent, 0, 100);
+            }
+        }
+    }
+
+    // The most a discount of the goods' category or line can give.
+    private float MostDiscount(OZT_Category cat, OZT_Goods e)
+    {
+        float most = 0;
+        array<ref OZT_Discount> all = new array<ref OZT_Discount>();
+        OZT_Discount.CopyAll(cat.Discounts, all);
+        OZT_Discount.CopyAll(e.Discounts, all);
+        for (int i = 0; i < all.Count(); i++)
+        {
+            float d = all[i].Most();
+            if (d > most)
+                most = d;
+        }
+        if (most > 100)
+            most = 100;
+        return most;
     }
 
     // The largest of the condition factors: what the best-kept thing sells for.

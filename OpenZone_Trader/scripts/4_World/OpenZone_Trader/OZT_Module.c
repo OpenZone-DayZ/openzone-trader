@@ -36,6 +36,8 @@ class OZT_Module : CF_ModuleWorld
 
         OZT_Book.Rebuild();
         OZT_Money.Provide(new OZT_ItemMoney());
+        // The identity kinds are this mod's own: they need the core alone.
+        OZT_Gates.Provide(new OZT_FactionGate());
 
         // The points ride in the core's sync packet: the handler first, then
         // the points, whose respawn sends the packet again.
@@ -71,6 +73,7 @@ class OZT_Module : CF_ModuleWorld
         // Every glue has had its start by now: say which named providers
         // nobody brought, then the line the stand waits for.
         OZT_Money.CheckNamed();
+        OZT_Gates.CheckNamed();
         OZT_Log.Info(ReadyLine());
     }
 
@@ -82,6 +85,7 @@ class OZT_Module : CF_ModuleWorld
             m_ReadyTimer.Stop();
 
         OZT_Money.Reset();
+        OZT_Gates.Reset();
         OZT_Book.Reset();
 
         // The core empties its own registries at mission end; the objects at

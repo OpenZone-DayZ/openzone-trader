@@ -183,6 +183,8 @@ class OZT_Points
             return OZT_Const.NO_CLOSED;
         if (away > point.Radius)
             return OZT_Const.NO_TOO_FAR;
+        if (!OZT_Gates.Admits(player, point))
+            return OZT_Const.NO_ACCESS;
         return "";
     }
 

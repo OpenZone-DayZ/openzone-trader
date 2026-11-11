@@ -58,6 +58,11 @@ class OZT_Settings : OZ_ConfigBase
     string Provider = "items";
     ref array<ref OZT_Note> Notes;
     ref array<string> Holders;
+
+    // The gate families switched off for the whole server (design §8.2): a
+    // condition of such a family passes and its discounts are not given. A
+    // trader turns one on again with its own GatesOn.
+    ref array<string> GatesOff;
     ref OZT_ConditionFactors Condition;
 
     // The least time between two deals of one player, in milliseconds.
@@ -78,6 +83,7 @@ class OZT_Settings : OZ_ConfigBase
         Provider = OZT_Const.PROVIDER_ITEMS;
         Notes = new array<ref OZT_Note>();
         Holders = new array<string>();
+        GatesOff = new array<string>();
         Condition = new OZT_ConditionFactors();
         CooldownMs = 1000;
         WearBought = 1;
@@ -89,6 +95,18 @@ class OZT_Settings : OZ_ConfigBase
 
         if (Provider == "")
             Provider = OZT_Const.PROVIDER_ITEMS;
+
+        // A list the file does not carry: no family is off.
+        array<string> off = new array<string>();
+        if (GatesOff)
+        {
+            for (int g = 0; g < GatesOff.Count(); g++)
+            {
+                if (GatesOff[g] != "" && off.Find(GatesOff[g]) < 0)
+                    off.Insert(GatesOff[g]);
+            }
+        }
+        GatesOff = off;
 
         // Everything nested goes into objects a script made (OZ_ConfigBase.c):
         // what the loader allocated ran no field initialiser.

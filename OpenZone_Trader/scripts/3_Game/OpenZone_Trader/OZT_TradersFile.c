@@ -87,6 +87,12 @@ class OZT_Point
     // object.
     ref OZT_Outfit Outfit;
 
+    // Who may trade here at all (§8.2), and the gate families switched on or
+    // off for this trader against the server's GatesOff.
+    ref array<ref OZT_Condition> Access;
+    ref array<string> GatesOn;
+    ref array<string> GatesOff;
+
     OZT_Point Copy()
     {
         OZT_Point c = new OZT_Point();
@@ -116,6 +122,20 @@ class OZT_Point
             c.Outfit = Outfit.Copy();
         else
             c.Outfit = new OZT_Outfit();
+        c.Access = new array<ref OZT_Condition>();
+        OZT_Condition.CopyAll(Access, c.Access);
+        c.GatesOn = new array<string>();
+        c.GatesOff = new array<string>();
+        if (GatesOn)
+        {
+            for (int g = 0; g < GatesOn.Count(); g++)
+                c.GatesOn.Insert(GatesOn[g]);
+        }
+        if (GatesOff)
+        {
+            for (int h = 0; h < GatesOff.Count(); h++)
+                c.GatesOff.Insert(GatesOff[h]);
+        }
         return c;
     }
 

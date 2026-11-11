@@ -70,6 +70,7 @@ class OZT_Const
     static const string NO_NOT_TAKEN = "STR_OZT_NO_NOT_TAKEN";
     static const string NO_NOT_EMPTY = "STR_OZT_NO_NOT_EMPTY";
     static const string NO_LOCKED    = "STR_OZT_NO_LOCKED";
+    static const string NO_ACCESS    = "STR_OZT_NO_ACCESS";
     static const string NO_STOCK     = "STR_OZT_NO_STOCK";
     static const string NO_INTERNAL  = "STR_OZT_NO_INTERNAL";
 

@@ -105,6 +105,10 @@ class OZT_BookEntry
 
     // What comes attached to it, as the checked file names it.
     ref array<string> With;
+
+    // Its category's gates and its own, together (design §8.2).
+    ref array<ref OZT_Condition> Requires;
+    ref array<ref OZT_Discount> Discounts;
 }
 
 class OZT_Book
@@ -134,6 +138,12 @@ class OZT_Book
                     for (int w = 0; w < line.With.Count(); w++)
                         e.With.Insert(line.With[w]);
                 }
+                e.Requires = new array<ref OZT_Condition>();
+                OZT_Condition.CopyAll(cat.Requires, e.Requires);
+                OZT_Condition.CopyAll(line.Requires, e.Requires);
+                e.Discounts = new array<ref OZT_Discount>();
+                OZT_Discount.CopyAll(cat.Discounts, e.Discounts);
+                OZT_Discount.CopyAll(line.Discounts, e.Discounts);
                 s_ByClass.Set(e.ClassName, e);
             }
         }
@@ -151,6 +161,9 @@ class OZT_Book
             money.Sell = notes[n].Value;
             money.Rule = OZT_Const.RULE_UNIT;
             money.With = new array<string>();
+            // Money has no gates: a note is worth its face value to everyone.
+            money.Requires = new array<ref OZT_Condition>();
+            money.Discounts = new array<ref OZT_Discount>();
             s_ByClass.Set(money.ClassName, money);
         }
     }
@@ -205,11 +218,41 @@ class OZT_Book
         return piece * count;
     }
 
+    // Are the goods locked for this player here (their Requires)? A lock nobody
+    // answers is off. Without a player there is no lock.
+    static bool Locked(PlayerBase player, OZT_Point trader, OZT_BookEntry e)
+    {
+        if (!player || !e || !e.Requires)
+            return false;
+        return !OZT_Gates.All(player, trader, e.Requires, true);
+    }
+
+    // What this player pays for `count` of it here: 0 when it is not sold to
+    // them (not dealt in, no price, locked); otherwise one piece's price, less
+    // the player's best discount and rounded UP to a note, times the count.
+    // Without a player: the plain price.
+    static int BuyFor(PlayerBase player, OZT_Point trader, OZT_BookEntry e, int count)
+    {
+        int plain = BuyPrice(trader, e, 1);
+        if (plain <= 0 || count <= 0)
+            return 0;
+        if (!player || e.Category == OZT_Const.CATEGORY_CHANGE)
+            return plain * count;
+        if (Locked(player, trader, e))
+            return 0;
+        float pct = OZT_Gates.Best(player, trader, e.Discounts);
+        if (pct <= 0)
+            return plain * count;
+        int unit = OZT_Config.Get().Unit();
+        int piece = OZT_Config.RoundUpTo(plain * (100 - pct) / 100, unit);
+        return piece * count;
+    }
+
     // What comes attached to the goods at this trader: the classes of its
-    // `With` that this trader sells himself. At a trader who does not sell a
-    // part the goods are bare: all he hands out stays inside what he deals in,
-    // which is what the loop check counts.
-    static void Comes(OZT_Point trader, OZT_BookEntry e, out array<string> parts)
+    // `With` that this trader sells this player. At a trader who does not sell
+    // a part the goods are bare: all he hands out stays inside what he deals
+    // in, which is what the loop check counts.
+    static void Comes(PlayerBase player, OZT_Point trader, OZT_BookEntry e, out array<string> parts)
     {
         parts = new array<string>();
         if (!e || !e.With)
@@ -217,7 +260,7 @@ class OZT_Book
         for (int i = 0; i < e.With.Count(); i++)
         {
             string part = e.With[i];
-            if (BuyPrice(trader, EntryOf(part), 1) > 0)
+            if (BuyFor(player, trader, EntryOf(part), 1) > 0)
                 parts.Insert(part);
         }
     }
@@ -225,16 +268,16 @@ class OZT_Book
     // What the player pays for `count` of the goods as this trader sells
     // them: each with what comes with it, every part at its own price. Nothing
     // comes free, so a sum of classes makes no loop while no class alone does.
-    static int BuyWith(OZT_Point trader, OZT_BookEntry e, int count)
+    static int BuyWith(PlayerBase player, OZT_Point trader, OZT_BookEntry e, int count)
     {
-        int own = BuyPrice(trader, e, count);
+        int own = BuyFor(player, trader, e, count);
         if (own <= 0)
             return 0;
         array<string> parts;
-        Comes(trader, e, parts);
+        Comes(player, trader, e, parts);
         int sum = own;
         for (int i = 0; i < parts.Count(); i++)
-            sum = sum + BuyPrice(trader, EntryOf(parts[i]), count);
+            sum = sum + BuyFor(player, trader, EntryOf(parts[i]), count);
         return sum;
     }
 

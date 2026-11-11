@@ -2,7 +2,9 @@
 
 DayZ 1.30.164289, the diag build on the stand; `OpenZone_Core`, `OpenZone_Trader` and its
 stand tools; the stand's own files (`examples/stand`). The client is the MCP's own, a window
-of 1600x900, English. Everything below was done with real mouse input (`tools/click.py`,
+of 1600x900, English; the last run a window of 1920x1080 with the Ukrainian strings (the
+stand's `language="Russian"`: the game has no Ukrainian, so the mod's original stands in
+every column but the English one). Everything below was done with real mouse input (`tools/click.py`,
 `tools/drag.py`) and real keys, and read from screenshots, the client's script log (the
 screen's `dbg:` lines) and the server's `deal:` lines. The player's id in those lines is
 left out.
@@ -29,14 +31,15 @@ and a pile of twelve 7.62x39 rounds in the pants. The screen is opened by the se
 | S.12 | double click on the shelf's nails (5 a unit) | the quantity dialog: HOW MANY TO BUY, 99 (a full stack), "5 each", total 495 | nothing asked: a bought total is the price of one times the count |
 | S.13 | key F in the dialog, then the pile sold whole through its dialog (ALL, SELL), key F | BUY nails 99 for 495, SELL rounds 12 for 60; YOU PAY -435, money after 1 565; then the deal is done | `net 435 (items): -Ammo_762x39x12=60 +Nailx99=495` |
 | S.14 | a tab of the shelf, a drag on the live view, key Esc | the tab's goods only; the character turns with the mouse; the screen closes, the cursor goes, the HUD is back | nothing asked |
+| S.15 | the Ukrainian strings at 1920x1080: S.4's deal put together again, then S.8's | every title, label and line of the screen in Ukrainian and inside its box; the tiles 44 pixels a cell; "Бракує грошей" and "Бракує 500" in red | `quote` answered, then refused |
 
 No `SCRIPT (E)` line and no `ERROR` line in the client's or the server's log of any of
 these runs; the boots' verdicts were a pass.
 
 Not covered by these runs: walking after the screen has closed (the calls that give the
 controls back are the probe menu's, measured in phase 2a; the gamepad was left alone, the
-owner was at the machine); the screen in Ukrainian; the screen at 3840x1600 and at
-1920x1080; a deal refused for want of room, seen from the screen; a second client.
+owner was at the machine); the screen at 3840x1600; a deal refused for want of room, seen
+from the screen; a second client.
 
 ## What was learned on the way
 
@@ -63,8 +66,12 @@ owner was at the machine); the screen in Ukrainian; the screen at 3840x1600 and 
 - **The engine tells a double click twice**: the second press comes as a press, and
   `OnDoubleClick` comes with it. The screen takes one gesture once.
 - **A wrapped text takes the colour it has when its text is set**: `SetColor` after
-  `SetText` showed on the next text. The colour is set first now (not seen on the stand
-  yet: the fix is younger than the last run).
+  `SetText` showed on the next text. With the colour set first the refusal is red at once
+  (S.15).
+- **What the game names stays in the client's language.** Slot names, item names and
+  descriptions are the game's own strings: on the stand's Ukrainian check they are Russian,
+  as they are for a Ukrainian player on a Russian client. Two slot names of that language
+  are wider than a slot tile and are cut ("Верхняя одежда", "Нарукавная повязка").
 - **A trap of this machine, not of the screen.** The owner's taskbar stands at the left
   edge of the desktop, 80 pixels wide, and the client's window opens in the top left
   corner, under it. Real clicks at client x below 77 went to the taskbar: for an hour the

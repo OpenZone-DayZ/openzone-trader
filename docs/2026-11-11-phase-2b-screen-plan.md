@@ -100,4 +100,5 @@ What the builds found, in the order they found it:
 - TRY ON (design §3.7).
 - A bought line's count cannot be lowered by one: its tile leaves the cart whole.
 - More than seven tabs on a side narrow the tabs; beyond four columns of slots the slots narrow and their labels are cut.
-- The gallery at 3840x1600 and 1920x1080 in both languages (`openzone-core/CONTRIBUTING.md`): the screen was seen at 1600x900 in English only.
+- The gallery at 3840x1600 and 1920x1080 in both languages (`openzone-core/CONTRIBUTING.md`): the screen was seen at 1600x900 in English and at 1920x1080 in Ukrainian; 3840x1600 is owed, and so is a preview index for `ui_gallery`.
+- A slot's name longer than its tile is cut.

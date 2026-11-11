@@ -16,7 +16,7 @@ name = "openzone-trader"
 # OpenZone_TraderProbe        -- client + server stand tool of phase 0: scenes, the two
 #                                inventory dumps, the stand's wallet and notes.
 # OpenZone_TraderProbe_Bridge -- server only: the `ozt_probe` verb.
-mods = ["OpenZone_Trader", "OpenZone_TraderProbe", "OpenZone_TraderProbe_Bridge"]
+mods = ["OpenZone_Trader", "OpenZone_Trader_Bridge", "OpenZone_TraderProbe", "OpenZone_TraderProbe_Bridge"]
 
 [expect]
 # Printed by OZT_Module one tick after the mission starts.

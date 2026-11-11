@@ -34,6 +34,9 @@ class OZT_Module : CF_ModuleWorld
 
         OZT_Config.ServerLoad();
 
+        OZT_Book.Rebuild();
+        OZT_Money.Provide(new OZT_ItemMoney());
+
         // -- later tasks start their parts above this line --
 
         // The ready line one tick later: a line printed here may speak before
@@ -45,6 +48,9 @@ class OZT_Module : CF_ModuleWorld
     // Called by the timer by name: it must not be private.
     void Ready()
     {
+        // Every glue has had its start by now: say which named providers
+        // nobody brought, then the line the stand waits for.
+        OZT_Money.CheckNamed();
         OZT_Log.Info(ReadyLine());
     }
 
@@ -54,6 +60,9 @@ class OZT_Module : CF_ModuleWorld
 
         if (m_ReadyTimer)
             m_ReadyTimer.Stop();
+
+        OZT_Money.Reset();
+        OZT_Book.Reset();
 
         // -- later tasks stop their parts above this line --
     }

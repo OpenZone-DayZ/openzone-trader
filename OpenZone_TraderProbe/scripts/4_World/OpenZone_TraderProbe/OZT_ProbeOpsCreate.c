@@ -134,6 +134,69 @@ class OZT_ProbeOpsCreate
         return GameInventory.LocationCreateEntity(loc, type, ECE_IN_INVENTORY, RF_DEFAULT);
     }
 
+    // fill into=all|<handle> [class=Paper]: one item of the class on every cell
+    // the occupancy map calls free, so that a fit rule can be driven to its
+    // edge. A holder whose gate refuses the class keeps its room, which is the
+    // point for a note wallet.
+    static bool FillCargo(OZT_Probe p, PlayerBase player, map<string, string> args, out string detail)
+    {
+        string type = p.ArgOf(args, "class", "Paper");
+        string intoName = p.ArgOf(args, "into", "all");
+        array<EntityAI> holders = new array<EntityAI>();
+        if (intoName == "all")
+        {
+            array<EntityAI> all = new array<EntityAI>();
+            player.GetInventory().EnumerateInventory(InventoryTraversalType.PREORDER, all);
+            for (int a = 0; a < all.Count(); a++)
+            {
+                EntityAI h = all[a];
+                if (h && h != player && h.GetInventory().GetCargo())
+                    holders.Insert(h);
+            }
+        }
+        else
+        {
+            EntityAI one = p.ItemOf(player, intoName);
+            if (!one)
+            {
+                detail = "fill needs into=all or a known handle";
+                return false;
+            }
+            holders.Insert(one);
+        }
+
+        int made = 0;
+        int refused = 0;
+        for (int i = 0; i < holders.Count(); i++)
+        {
+            EntityAI holder = holders[i];
+            array<bool> taken;
+            int gw;
+            int gh;
+            if (!OZT_ProbeInv.Map(holder, null, taken, gw, gh))
+                continue;
+            int here = 0;
+            for (int r = 0; r < gh; r++)
+            {
+                for (int c = 0; c < gw; c++)
+                {
+                    if (taken[r * gw + c])
+                        continue;
+                    InventoryLocation loc = new InventoryLocation();
+                    loc.SetCargo(holder, null, 0, r, c, false);
+                    if (GameInventory.LocationCreateEntity(loc, type, ECE_IN_INVENTORY, RF_DEFAULT))
+                        here++;
+                    else
+                        refused++;
+                }
+            }
+            made = made + here;
+            p.AddLine("filled " + here.ToString() + " cell(s) of " + OZT_ProbeInv.Name(holder));
+        }
+        detail = "fill: " + made.ToString() + " " + type + " made in " + holders.Count().ToString() + " holder(s), " + refused.ToString() + " cell(s) refused";
+        return true;
+    }
+
     // A stack grown or shrunk by script, or a magazine's rounds set.
     static bool ChangeAmount(OZT_Probe p, PlayerBase player, map<string, string> args, out string detail)
     {

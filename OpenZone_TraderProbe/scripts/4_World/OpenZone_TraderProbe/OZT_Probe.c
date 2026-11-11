@@ -138,6 +138,8 @@ class OZT_Probe
             return OZT_ProbeOpsMove.RecreateOne(this, player, args, detail);
         if (op == "gate")
             return OZT_ProbeOpsGate.AskGates(this, player, args, detail);
+        if (op == "fill")
+            return OZT_ProbeOpsCreate.FillCargo(this, player, args, detail);
         // -- routes of the later tasks go above this line --
         detail = "unknown op '" + op + "'; known: " + KnownOps();
         return false;
@@ -145,7 +147,7 @@ class OZT_Probe
 
     protected string KnownOps()
     {
-        return "status, strip, dress, dump, find, where, weapon, create, qty, hands, del, move, recreate, gate";
+        return "status, strip, dress, dump, find, where, weapon, create, qty, hands, del, move, recreate, gate, fill";
     }
 
     protected bool OpStatus(out string detail)

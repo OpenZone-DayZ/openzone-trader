@@ -102,3 +102,81 @@ Scene: the money scene of Task 3 (635 in four stacks, a canteen in the trousers)
 | 6.4 | the notes after it | `{"op": "balance"}` | `provider=items unit=5 balance=595 stacks: 5x4 5x5 50x1 500x1` | yes |
 | 6.5 | the client against the server | `dump 1` | `SAME`, 29 items; a second `BandageDressing` in the jacket at `r0 c3` | yes |
 | 6.6 | the log | `deal:` | one line: `deal: <uid> at 'stand' net 40 (items): +BandageDressingx1=40` | yes |
+
+## Task 7: the scripted deals of the phase
+
+One boot, one sequence, the rows in the plan's order with the plan's numbers. Scene: the kit;
+three fives and two fifties in the jacket's wallet, four loose fives in the trousers, a 500
+and nine 500s in the backpack's wallet (5135 in all); a canteen, a pile of twelve rounds and
+a can of tuna in the trousers.
+
+`{"op": "balance"}` before row 1: `provider=items unit=5 balance=5135 stacks: 5x3 5x4 50x2 500x1 500x9` (as expected).
+
+| # | what is asked | command | answer | stacks afterwards | as expected? |
+|---|---|---|---|---|---|
+| 1 | a bandage: change in notes | `{"op": "deal", "buy": "BandageDressing:1"}` | `deal ok=yes net=40 paid=40 received=0 balance=5095 hands= left=0` | `5x4 5x5 50x1 500x1 500x9` | yes |
+| 2 | four papers: paid exactly | `{"op": "deal", "buy": "Paper:4"}` | `deal ok=yes net=20 paid=20 received=0 balance=5075 hands= left=0` | `5x5 50x1 500x1 500x9` | yes |
+| 3 | three rifles: short of money | `{"op": "deal", "buy": "AKM:3"}` | `deal ok=no why=STR_OZT_NO_MONEY net=7500 paid=0 received=0 balance=0 hands= left=0` | unchanged | yes |
+| 4 | the canteen sold | `{"op": "deal", "sell": "Canteen"}` | `deal ok=yes net=-60 paid=0 received=60 balance=5135 hands= left=0` | `5x7 50x2 500x1 500x9` | yes |
+| 5 | eight rounds of the pile sold | `{"op": "deal", "sell": "Ammo_762x39:8"}` | `deal ok=yes net=-40 paid=0 received=40 balance=5175 hands= left=0`; the pile `ammo 4/20` | `5x15 50x2 500x1 500x9` | yes |
+| 6 | thirty rounds bought | `{"op": "deal", "buy": "Ammo_762x39:30"}` | `deal ok=yes net=300 paid=300 received=0 balance=4875 hands= left=0`; the old pile `ammo 20/20`, a new one `CARGO M65Jacket_Black r2 c0`, `ammo 14/20` (number 0 in the engine's order) | `5x15 50x6 500x9` | yes |
+| 7 | a helmet bought | `{"op": "deal", "buy": "Mich2001Helmet:1"}` | `deal ok=yes net=900 paid=900 received=0 balance=3975 hands= left=0`; the helmet `ATT ... slot=Headgear` | `5x15 50x8 500x7` | yes |
+| - | the client against the server | `dump 2` | `SAME`, 35 items (`server-dump-after-seven-deals.txt`, `client-dump-after-seven-deals.txt`) | | yes |
+| - | a quote for the scope | `{"op": "quote", "buy": "PSO1Optic:1"}` | `quote ok=yes net=600 paid=600 received=0 balance=3375 hands= left=0` | | yes |
+| - | the scope at 650 in the file | `{"op": "reload"}` | `reloaded: traders=1 goods=11 money=items gates=none problems=0 revision=2` | | yes |
+| - | the deal the client showed at 600 | `{"op": "deal", "buy": "PSO1Optic:1", "net": "600"}` | `deal ok=no why=STR_OZT_NO_CHANGED net=650 paid=0 received=0 balance=0 hands= left=0` | unchanged | yes |
+| - | the file put back | `{"op": "reload"}` | `reloaded: ... problems=0 revision=3` | | yes |
+| 8 | goods this trader does not deal in | `{"op": "deal", "buy": "TunaCan:1"}` | `deal ok=no why=STR_OZT_NO_CHANGED net=0 ...` | unchanged | yes |
+| 9 | the same sold | `{"op": "deal", "sell": "TunaCan"}` | `deal ok=no why=STR_OZT_NO_NOT_TAKEN net=0 ...` | unchanged | yes |
+| 10 | a thing sold here and not bought back | `{"op": "deal", "sell": "Paper"}` | `deal ok=no why=STR_OZT_NO_NOT_TAKEN net=0 ...` | unchanged | yes |
+| 11 | a backpack with things in it | `{"op": "deal", "sell": "TaloonBag_Blue"}` | `deal ok=no why=STR_OZT_NO_NOT_EMPTY ... left=4` | unchanged | yes |
+| 12 | a rifle with five parts | `{"op": "deal", "sell": "AKM"}` | `deal ok=no why=STR_OZT_NO_NOT_EMPTY ... left=5` | unchanged | yes |
+| 13 | a loaded magazine | `{"op": "deal", "sell": "Mag_AKM_30Rnd"}` | `deal ok=no why=STR_OZT_NO_NOT_EMPTY ... left=30` | unchanged | yes |
+| 14 | a canteen lying on the ground | `{"op": "deal", "sellnear": "Canteen"}` | `deal ok=no why=STR_OZT_NO_NOT_YOURS ...` | unchanged | yes |
+| 15 | a trader that is not in the file | `{"op": "deal", "trader": "nobody", "buy": "Paper:1"}` | `deal ok=no why=STR_OZT_NO_CLOSED ...` | unchanged | yes |
+| 16 | from 32 m | teleport to `4690 339 10230`, `{"op": "deal", "buy": "Paper:1"}` | `deal ok=no why=STR_OZT_NO_TOO_FAR ...` | unchanged | yes |
+| - | after nine refusals | `{"op": "balance"}`, `dump 3` | `balance=3975 stacks: 5x15 50x8 500x7`; `SAME`, 35 items | | yes |
+| 17 | the scope sold off the rifle on the shoulder | `{"op": "deal", "sell": "PSO1Optic"}` | `deal ok=yes net=-300 paid=0 received=300 balance=4275 hands= left=0`; the rifle `attachments=4`, its state machine idle | `5x15 50x14 500x7` | yes |
+| 18 | a canteen worn | `{"op": "damage", "class": "Canteen", "health": "0.6"}` | `Canteen health level 1` | | yes |
+| 19 | the worn canteen sold | `{"op": "deal", "sell": "Canteen"}` | `deal ok=yes net=-50 paid=0 received=50 balance=4325 hands= left=0` | `5x15 50x15 500x7` | yes |
+| 20 | the helmet ruined | `{"op": "damage", "class": "Mich2001Helmet", "health": "0"}` | `Mich2001Helmet health level 4` | | yes |
+| 21 | the ruined helmet sold | `{"op": "deal", "sell": "Mich2001Helmet"}` | `deal ok=no why=STR_OZT_NO_NOT_TAKEN ...` | unchanged | yes |
+| 22 | `"CooldownMs": 600000` | `{"op": "reload"}` | `reloaded: ... problems=0 revision=4` | | yes |
+| 23 | a deal inside the cooldown | `{"op": "deal", "buy": "Paper:1"}` | `deal ok=no why=STR_OZT_NO_BUSY net=0 paid=0 received=0 balance=0 hands= left=0` | unchanged | yes |
+| 24 | the cooldown off, `"WearBought": 0` | `{"op": "reload"}` | `reloaded: ... problems=0 revision=5` | | yes |
+| 25 | the same deal | `{"op": "deal", "buy": "Paper:1"}` | `deal ok=yes net=5 paid=5 received=0 balance=4320 hands= left=0` | `5x14 50x15 500x7` | yes |
+| 26 | a rifle with nothing worn | `{"op": "quote", "buy": "AKM:1"}` | `quote ok=yes net=2500 paid=2500 received=0 balance=1820 hands=AKM left=0` | | yes |
+| 27 | the settings put back | `{"op": "reload"}` | `reloaded: ... problems=0 revision=6` | | yes |
+| 28 | the same quote | `{"op": "quote", "buy": "AKM:1"}` | `quote ok=yes net=2500 paid=2500 received=0 balance=1820 hands= left=0` | | yes |
+| - | a canteen into the trousers, every free cell filled | `ozt_probe` `create`, `{"op": "fill", "into": "all"}` | the canteen at `CARGO CargoPants_Black r0 c2`; `fill: 45 Paper made in 7 holder(s), 54 cell(s) refused` | | yes |
+| 29 | two things into full bags | `{"op": "deal", "buy": "Paper:2"}` | `deal ok=no why=STR_OZT_NO_SPACE net=10 paid=0 received=0 balance=0 hands= left=2` | unchanged | yes |
+| 30 | a canteen and two piles sold, two papers and a canteen bought | `{"op": "deal", "sell": "Canteen,Ammo_762x39#0,Ammo_762x39#1", "buy": "Paper:2,Canteen:1"}` | `deal ok=yes net=-100 paid=0 received=100 balance=4420 hands= left=0`; `hands hold null` | `5x14 50x17 500x7` | yes |
+| 31 | a canteen sold, four papers and a canteen bought | `{"op": "deal", "sell": "Canteen", "buy": "Paper:4,Canteen:1"}` | `deal ok=yes net=80 paid=80 received=0 balance=4340 hands=Canteen left=0`; `hands hold <id> Canteen` | `5x8 50x16 500x7` | yes |
+| 32 | the canteen sold out of the hands | `{"op": "deal", "sell": "Canteen"}` | `deal ok=yes net=-60 paid=0 received=60 balance=4400 hands= left=0` | `5x10 50x17 500x7` | yes |
+| 33 | one thing into full bags | `{"op": "deal", "buy": "Paper:1"}` | `deal ok=yes net=5 paid=5 received=0 balance=4395 hands=Paper left=0`; `hands hold <id> Paper` | `5x9 50x17 500x7` | yes |
+| 34 | one more, the hands busy | `{"op": "deal", "buy": "Paper:1"}` | `deal ok=no why=STR_OZT_NO_SPACE net=5 paid=0 received=0 balance=0 hands= left=1` | unchanged | yes |
+| 35 | a canteen into full bags | `{"op": "quote", "buy": "Canteen:1"}` | `quote ok=no why=STR_OZT_NO_SPACE net=120 paid=0 received=0 balance=0 hands= left=1` | | yes |
+| 36 | two bandages sold, a canteen bought | `{"op": "deal", "sell": "BandageDressing,BandageDressing#1", "buy": "Canteen:1"}` | `deal ok=yes net=80 paid=80 received=0 balance=4315 hands= left=0`; the canteen `CARGO M65Jacket_Black r0 c2` | `5x3 50x16 500x7` | yes |
+| - | the client against the server | `dump 4` | `SAME`, 84 items (`server-dump-full-bags.txt`, `client-dump-full-bags.txt`) | | yes |
+
+After the run: the verdict is pass with no warning and no error, so no `deal defect`; the log
+holds fourteen `deal:` lines, one for each deal that stood (rows 1, 2, 4, 5, 6, 7, 17, 19, 25,
+30, 31, 32, 33, 36); no paper lies loose within ten metres, and the one canteen that does is
+the one put on the ground for row 14 (deleted afterwards; the character stripped; the stand's
+three files equal `examples/stand/`).
+
+One thing was done differently from the plan: the comparison the plan asks for after row 3
+was not taken on its own; the one after row 7 covers it.
+
+## What the run shows
+
+- **Paid:** rows 1 and 2 (row 2 exactly: the loose fives are spent whole and their cells are free).
+- **Short of money:** row 3, refused with the server's net, nothing moved.
+- **Change in notes:** row 1 (a fifty spent, two fives back onto the fives in the wallet); rows 6 and 7 the same with 500s.
+- **One overflow to the hands:** row 33.
+- **Two overflows refused:** row 29, with the count.
+- **Price changed:** the scope at 650 in the file against 600 shown: refused as `changed`, with the server's net.
+- **The order of things** (decision 11 of the plan): row 30, the canteen is laid first though the papers are named first, and nothing goes to the hands; row 31, laid once more with the canteen set aside for the hands, so that four papers take its cells.
+- **Sold and bought in one deal:** row 36, a canteen takes the cells of two bandages; row 30, the cells of the canteen and the piles sold.
+- **Refusals that touch nothing:** rows 8-16, 21, 23, 34, and the comparison after them.
+- **Differed from the plan:** nothing in the answers. What the plan had wrong before this run is in the plan's execution record: the stall's placement (Task 4) and the profile's mod list (Task 1).

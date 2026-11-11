@@ -1,0 +1,25 @@
+022499 M65Jacket_Black | ATT SurvivorM_Boris#022448 slot=Body | 4x3 | -
+022500 CargoPants_Black | ATT SurvivorM_Boris#022448 slot=Legs | 4x3 | -
+022501 MilitaryBoots_Black | ATT SurvivorM_Boris#022448 slot=Feet | 3x3 | -
+022503 TaloonBag_Blue | ATT SurvivorM_Boris#022448 slot=Back | 4x5 | -
+022505 PlateCarrierPouches | CARGO CargoPants_Black#022500 r0 c0 flip=no | 5x3 | -
+022506 PlateCarrierHolster | HANDS SurvivorM_Boris#022448 | 2x3 | -
+022507 MakarovIJ70 | ATT PlateCarrierHolster#022506 slot=Pistol | 2x2 | -
+022508 Mag_IJ70_8Rnd | ATT MakarovIJ70#022507 slot=magazine | 1x2 | ammo 12/12
+022510 PSO1Optic | CARGO M65Jacket_Black#022499 r1 c3 flip=no | 3x2 | -
+022511 AK_Suppressor | CARGO M65Jacket_Black#022499 r2 c0 flip=no | 3x1 | -
+022512 AK_WoodBttstck | CARGO M65Jacket_Black#022499 r3 c0 flip=no | 3x1 | -
+022513 AK_WoodHndgrd | CARGO M65Jacket_Black#022499 r0 c4 flip=no | 2x1 | -
+022514 FNX45 | CARGO TaloonBag_Blue#022503 r0 c0 flip=no | 3x2 | -
+022515 Mag_FNX45_15Rnd | ATT FNX45#022514 slot=magazine | 1x2 | ammo 15/15
+022516 PistolSuppressor | ATT FNX45#022514 slot=pistolMuzzle | 3x1 | -
+022517 SmallProtectorCase | CARGO TaloonBag_Blue#022503 r0 c3 flip=no | 3x4 | -
+022518 OZT_ProbeWallet | CARGO TaloonBag_Blue#022503 r2 c0 flip=no | 2x2 | -
+022519 Nail | CARGO TaloonBag_Blue#022503 r2 c2 flip=no | 1x1 | qty 70/99
+022520 OZT_ProbeWallet | CARGO M65Jacket_Black#022499 r0 c0 flip=no | 2x2 | -
+022521 BandageDressing | CARGO M65Jacket_Black#022499 r0 c2 flip=no | 1x2 | qty 4/4
+022527 Ammo_357 | CARGO M65Jacket_Black#022499 r0 c3 flip=no | 1x1 | ammo 6/20
+022528 OZT_ProbeNote50 | CARGO OZT_ProbeWallet#022520 r0 c0 flip=no | 2x1 | qty 22/500
+022598 OZT_ProbeNote | CARGO OZT_ProbeWallet#022520 r0 c2 flip=no | 2x1 | qty 6/500
+022599 OZT_ProbeNote500 | CARGO OZT_ProbeWallet#022520 r0 c4 flip=no | 2x1 | qty 3/500
+022608 Paper | CARGO PlateCarrierPouches#022505 r0 c0 flip=no | 1x1 | -

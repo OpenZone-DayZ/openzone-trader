@@ -317,3 +317,93 @@ wallet, a canteen and a pile of twelve rounds in the trousers.
 The seven of row C.1: the canteen, the pile, the bandage and the scope on the rifle sell; the
 rifle, its magazine and the backpack are not empty. The verdict of the boot is a pass; the log
 holds no error line.
+
+## Phase 3a: trees
+
+The same day: a thing that is not a stack is sold as a tree
+(`docs/2026-11-11-phase-3a-plan.md`). Four boots. The kit is the probe's, made again with
+`strip` and `dress` before every row that changes it; the stand's trader takes the rifle
+(1 250), its magazine (90), the scope (300), the backpack (200) and 7.62x39 rounds (5 a round),
+and does not take the suppressor, the buttstock, the handguard, the plate carrier or a pistol.
+A comparison is the client's inventory against the server's, line for line (`dump <k>`).
+
+### The tree, read and priced (the first boot)
+
+| # | what is asked | command | answer | as expected? |
+|---|---|---|---|---|
+| D.1 | the rifle as a deal would read it | `{"op": "tree", "item": "AKM"}` | `tree: AKM=1250 Mag_AKM_30Rnd=90 PSO1Optic=300 AK_Suppressor:no AK_WoodBttstck:no AK_WoodHndgrd:no Ammo_762x39x30L0=150 \| total=1790 moves=3 inside=0` | yes |
+| D.2 | the scope kept by choice | `{"op": "tree", "item": "AKM", "keep": "PSO1Optic"}` | `... PSO1Optic:kept ... \| total=1490 moves=4 inside=0` | yes |
+| D.3 | the magazine kept: its rounds ride in it | `{"op": "tree", "item": "AKM", "keep": "Mag_AKM_30Rnd"}` | `AKM=1250 Mag_AKM_30Rnd:kept PSO1Optic=300 ... \| total=1550 moves=4 inside=0`, no lot of rounds | yes |
+| D.4 | the magazine sold, its rounds kept | `{"op": "tree", "item": "AKM", "keeprounds": "Mag_AKM_30Rnd"}` | `... Mag_AKM_30Rnd=90 ... Ammo_762x39x30L0:kept \| total=1640 moves=3 inside=0` | yes |
+| D.5 | the magazine alone | `{"op": "tree", "item": "Mag_AKM_30Rnd"}` | `tree: Mag_AKM_30Rnd=90 Ammo_762x39x30L0=150 \| total=240 moves=0 inside=0` | yes |
+| D.6 | the backpack with four things in it | `{"op": "tree", "item": "TaloonBag_Blue"}` | `tree: TaloonBag_Blue=200 \| total=200 moves=0 inside=4` | yes |
+| D.7 | a thing the trader does not take | `{"op": "tree", "item": "PlateCarrierVest"}` | `tree: the trader does not take it: PlateCarrierVest:no \| total=0 moves=0 inside=0` | yes |
+| D.8 | every round of the magazine worn | `{"op": "damage", "class": "Mag_AKM_30Rnd", "rounds": "0.4"}` | `Mag_AKM_30Rnd: 30 of 30 rounds set to damage 0.4` | yes |
+| D.9 | worn rounds are paid as worn | `{"op": "tree", "item": "Mag_AKM_30Rnd"}` | `tree: Mag_AKM_30Rnd=90 Ammo_762x39x30L1=125 \| total=215 moves=0 inside=0` (30 x 5 x 0.85 = 127.5, down to 125) | yes |
+| D.10 | what `open` says of carried things | `{"op": "open"}` | `yours=5 (sells 4, not empty 1)`; in `trader_last.json`: the rifle `Price` 1250 `Tree` 1765 `Why` 0, the magazine `Tree` 215 `Loaded` 30 `LoadedPrice` 125, the scope 300, the bandage 20, the backpack `Why` 2 | yes |
+
+### The deal (the second boot)
+
+| # | what is asked | command | answer | as expected? |
+|---|---|---|---|---|
+| D.11 | a quote for the rifle | `{"op": "quote", "sell": "AKM"}` | `quote ok=yes net=-1790 paid=0 received=1790 balance=1790 hands= left=0 sold=1790 lines=1790 kept=3 rounds=0` | yes |
+| D.12 | the deal | `{"op": "deal", "sell": "AKM"}` | `deal ok=yes net=-1790 ... kept=3 rounds=0`. The rifle, its magazine and the scope are gone; the suppressor, the buttstock and the handguard lie in the jacket, the same entities (their network ids are those of the dump before); 3 x 500, 5 x 50 and 8 x 5 in the wallet. `dump 1`: SAME | yes |
+| D.13 | the scope and the magazine kept | `{"op": "deal", "sell": "AKM", "keep": "PSO1Optic,Mag_AKM_30Rnd"}` | `deal ok=yes net=-1250 ... kept=5 rounds=0`. Five parts in the jacket, the magazine with its thirty rounds (turned, to fit). `dump 2`: SAME | yes |
+| D.14 | worn rounds kept | row D.8, then `{"op": "deal", "sell": "AKM", "keeprounds": "Mag_AKM_30Rnd"}` | `deal ok=yes net=-1640 ... kept=3 rounds=30`. The rounds are two piles of their own, 20 and 10, in the jacket. `dump 3`: SAME | yes |
+| D.15 | the piles are as worn as the rounds were | `{"op": "price", "class": "Ammo_762x39"}` | `Ammo_762x39 rule='unit' buy(1)=10 sell(20 of 20, level 1)=85`: with the pile of ten (40) they bring 125, what the lot would have brought | yes |
+| D.16 | the magazine sold off the rifle | `{"op": "deal", "sell": "Mag_AKM_30Rnd"}` | `deal ok=yes net=-240 ... kept=0`; `ozt_probe` `weapon`: `GetMagazine=null \| IsIdle=yes \| attachments=4 \| stable state=1 internal=0`. `dump 4`: SAME | yes |
+| D.17 | the backpack alone | `{"op": "quote", "sell": "TaloonBag_Blue"}` | `quote ok=no why=STR_OZT_NO_NOT_EMPTY ... left=4` | yes |
+| D.18 | the rifle and its own scope as two lines | `{"op": "quote", "sell": "AKM,PSO1Optic"}` | `quote ok=no why=STR_OZT_NO_INTERNAL` | yes |
+| D.19 | the backpack with the four things, a pistol among them | `{"op": "quote", "sell": "TaloonBag_Blue,FNX45,SmallProtectorCase,OZT_ProbeWallet#1,Nail"}` | `quote ok=no why=STR_OZT_NO_NOT_TAKEN ... sold=200 lines=200`: the backpack's line stands, the pistol's does not | yes |
+| D.20 | every cargo full of paper | `ozt_probe` `fill`, then `{"op": "quote", "sell": "AKM"}` | `quote ok=no why=STR_OZT_NO_SPACE net=-1790 ... left=3 sold=1790 lines=1790 kept=3` | yes |
+| D.21 | six cells freed in the jacket: two parts fit, the third has only the hands | six `find` and `del`, then `{"op": "quote", "sell": "AKM"}` | `quote ok=yes net=-1790 ... hands=AK_WoodHndgrd left=0 ... kept=3` | yes |
+| D.22 | that deal | `{"op": "deal", "sell": "AKM"}` | `deal ok=yes ... hands=AK_WoodHndgrd`; `ozt_probe` `hands`: `hands hold ... AK_WoodHndgrd \| ... hand state=2 idle=yes`; the client's ack `hands=AK_WoodHndgrd state=2`. `dump 5`: SAME | yes |
+| D.23 | the backpack holding a canteen, a magazine of twelve rounds and a pile of seven: the pile sold in part | `{"op": "quote", "sell": "TaloonBag_Blue,Canteen,Mag_AKM_30Rnd,Ammo_762x39:3"}` | `quote ok=no why=STR_OZT_NO_NOT_EMPTY ... left=1` | yes |
+| D.24 | the same, the pile whole | `{"op": "deal", "sell": "TaloonBag_Blue,Canteen,Mag_AKM_30Rnd,Ammo_762x39"}` | `deal ok=yes net=-445 ... sold=445 lines=200+60+150+35`. `dump 9`: SAME | yes |
+| D.25 | the rifle sold and a new one bought | 40 fifties added, then `{"op": "deal", "sell": "AKM", "buy": "AKM:1"}` | `deal ok=yes net=710 paid=710 received=0 balance=1735 ... sold=1790 lines=1790 kept=3`. The new rifle on the shoulder, the three parts in the jacket. `dump 10`: SAME | yes |
+
+`Mag_AKM_30Rnd` without a number is the first the engine lists: one lying in the backpack
+comes before the rifle's.
+
+### A plan that is wrong (the second boot)
+
+The stand's switch `refuse=` makes one commit treat the planned place of every kept part as
+refused, then the engine's own choice, then the ground. Each row is `{"op": "deal", "sell":
+"AKM", "refuse": "<n>"}` on a fresh kit.
+
+| # | refuse | answer | what happened |
+|---|---|---|---|
+| D.26 | 3 | `deal ok=no why=STR_OZT_NO_INTERNAL ...` | Nothing sold and nothing moved: the kit as it was, `dump 6`: SAME. `ERROR: deal defect: the kept part AK_Suppressor could be moved nowhere; the deal is refused, nothing was sold` |
+| D.27 | 1 | `deal ok=yes net=-1790 ... kept=3` | `GameInventory.FindFreeLocationFor(part, FindInventoryLocationType.CARGO, loc)` named a cell, the engine took the part there and the client followed; three `deal defect ... it went to the engine's own choice` lines. `dump 7`: SAME |
+| D.28 | 2 | `deal ok=yes net=-1790 ... kept=3` | The three parts lie on the ground at the player's feet (`world_entities` within 6 m names them at the player's position), and the client's own inventory screen lists them nearby. `dump 8`: SAME (20 lines) |
+
+Row D.26 answered `received=1790` in the first build although nothing was paid; a commit that
+stops now answers `paid=0 received=0`.
+
+### Built-in parts, rounds in a weapon, holders that are kept (the third boot)
+
+The goods file for this boot only: a revolver (250), a bolt-action rifle (400), the plate
+carrier (500), its pouches (150), .357 and 7.62x54 rounds (5 a round); put back afterwards.
+
+| # | what is asked | command | answer | as expected? |
+|---|---|---|---|---|
+| D.29 | a revolver | `{"op": "tree", "item": "Magnum"}` | `tree: Magnum=250 Magnum_Ejector:built-in Magnum_Cylinder:built-in \| total=250 moves=0 inside=0` | yes |
+| D.30 | six rounds in its chambers | `{"op": "load", "class": "Magnum", "chamber": "Ammo_357"}`, then the tree | `Magnum: muzzle 0 chamber loaded inner 0 ...` six times; `... Ammo_357x6L0=30 \| total=280` | yes |
+| D.31 | sold, the rounds kept | `{"op": "deal", "sell": "Magnum", "keeprounds": "Magnum"}` | `deal ok=yes net=-250 ... kept=0 rounds=6`; a pile of six in the jacket, no cylinder and no ejector anywhere. `dump 11`: SAME | yes |
+| D.32 | a rifle with an internal magazine, in the hands | `create ... kind=hands`, `{"op": "load", "class": "Mosin9130", "inner": "Ammo_762x54", "chamber": "Ammo_762x54"}`, the tree | `Mosin9130: muzzle 0 chamber loaded inner 4`; `tree: Mosin9130=400 Ammo_762x54x5L0=25 \| total=425` | yes |
+| D.33 | sold out of the hands | `{"op": "deal", "sell": "Mosin9130"}` | `deal ok=yes net=-425`; `hands hold null \| ... hand state=1 idle=yes` | yes |
+| D.34 | the rifle in the hands: a round chambered, the magazine worn, the scope ruined | `move ... kind=hands via=sync`; `load ... chamber`; `damage` of the scope to 0 and of the magazine to 0.6; the tree | `tree: AKM=1250 Mag_AKM_30Rnd=75 PSO1Optic:no AK_Suppressor:no AK_WoodBttstck:no AK_WoodHndgrd:no Ammo_762x39x1L0=5 Ammo_762x39x30L1=125 \| total=1455 moves=4 inside=0`: wearing the magazine wore its rounds | yes |
+| D.35 | that deal | `{"op": "deal", "sell": "AKM"}` | `deal ok=yes net=-1455 ... kept=4`; the hands empty, state 1; four parts in the jacket. `dump 12`: SAME | yes |
+| D.36 | the plate carrier: its pouches sold, its holster not taken | `{"op": "tree", "item": "PlateCarrierVest"}` | `tree: PlateCarrierVest=500 PlateCarrierPouches=150 PlateCarrierHolster:no MakarovIJ70:rides Mag_IJ70_8Rnd:rides \| total=650 moves=1 inside=0` | yes |
+| D.37 | a sheet of paper in the pouches | `{"op": "quote", "sell": "PlateCarrierVest"}` | `quote ok=no why=STR_OZT_NO_NOT_EMPTY ... left=1`: a sold part with something in it | yes |
+| D.38 | the pouches kept, paper and all | `{"op": "deal", "sell": "PlateCarrierVest", "keep": "PlateCarrierPouches"}` | `deal ok=yes net=-500 ... hands=PlateCarrierHolster ... kept=2`. The pouches lie in the trousers with the paper still in them; the holster is in the hands with the pistol and its magazine on it; the client's ack `hands=PlateCarrierHolster state=2`. `dump 13`: SAME | yes |
+
+The verdicts: the first, second and fourth boots pass with no warning. The second boot's log
+holds the seven `deal defect` lines of rows D.26 to D.28, which are the stand's own doing;
+the third boot's holds four warnings of the goods file as it stood for a minute (round prices
+of 4 and 3, not multiples of the smallest note). The fourth boot is the final build, and its
+verdict is a pass with no warning and no error line.
+
+Not covered: a second client watching a kept part come off; a part whose holder's gate refuses
+it (every kept part of these runs was taken by the first cargo that had room); a deal of
+trees with a provider that is not items.

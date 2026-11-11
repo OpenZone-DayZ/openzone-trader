@@ -6,18 +6,21 @@ a deal is one cart that buys and sells at once. Money is items of any class or a
 behind a small glue pbo; goods and whole traders can be opened by faction, post and research.
 Class prefix `OZT_`; runs with `OpenZone_Core` alone.
 
-## Status: the trade screen works for plain items; no trader in the world yet
+## Status: the trade screen buys plain items and sells things with their parts; no trader in the world yet
 
-The server half works for plain items: the three JSON files, the price book, item money,
-the inventory model and the deal, driven on the test stand by scripted deals
-([docs/measurements](docs/measurements)). The trade screen works for plain items too: the
-shelf, your own things and your character's slots, a deal put together by double click or
-by dragging, how many of a stack, the server's verdict before you confirm, a card for the
-thing under the cursor, the trader's price list, and goods tried on your character before
-you buy them
-([screen.md](docs/measurements/2026-11-11/screen.md)). It is opened by a stand command:
-the trader's action in the world and items with parts come with their own phases, so
-there is still nothing to play. The plans are in [docs](docs); the
+The server half works: the three JSON files, the price book, item money, the inventory
+model and the deal, driven on the test stand by scripted deals
+([docs/measurements](docs/measurements)). The trade screen works too: the shelf, your own
+things and your character's slots, a deal put together by double click or by dragging, how
+many of a stack, the server's verdict before you confirm, a card for the thing under the
+cursor, the trader's price list, and goods tried on your character before you buy them
+([screen.md](docs/measurements/2026-11-11/screen.md)). A thing is sold with what is on it:
+every part by its own price, loaded rounds as rounds; what the trader does not take comes
+off and stays with you, and a container is sold together with everything in it
+([deals.md](docs/measurements/2026-11-11/deals.md), "Phase 3a"). The screen is opened by a
+stand command: the trader's action in the world, buying parts and choosing on the screen
+which parts to keep come with their own phases, so there is still nothing to play. The
+plans are in [docs](docs); the
 design note lives beside the repositories of the series, in
 `docs/specs/2026-11-10-openzone-trader-design.md`.
 
@@ -37,9 +40,11 @@ tools. They are never published and no server should load them.
 обміну теж працює для простих речей: полиця торговця, ваші речі, слоти персонажа, угода
 подвійним клацанням або перетягуванням, кількість зі стосу, вердикт сервера до
 підтвердження, картка речі під курсором, прайс торговця і примірка товару на персонажі
-до купівлі. Відкривається він поки що
-командою стенда: дія торговця у світі та речі з частинами — попереду, тож грати ще нема
-в що.
+до купівлі. Річ продається разом із тим, що на ній: кожна частина за своєю ціною, заряджені
+набої як набої; те, чого торговець не бере, знімається й залишається у вас, а контейнер
+продається лише разом з усім вмістом. Відкривається екран поки що командою стенда: дія
+торговця у світі, купівля частин і вибір на екрані, які частини залишити, — попереду, тож
+грати ще нема в що.
 
 ## Licence
 

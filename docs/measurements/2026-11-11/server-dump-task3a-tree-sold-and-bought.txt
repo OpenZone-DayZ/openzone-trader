@@ -1,0 +1,16 @@
+022950 M65Jacket_Black | ATT SurvivorM_Boris#022441 slot=Body | 4x3 | -
+022951 CargoPants_Black | ATT SurvivorM_Boris#022441 slot=Legs | 4x3 | -
+022952 MilitaryBoots_Black | ATT SurvivorM_Boris#022441 slot=Feet | 3x3 | -
+022953 PlateCarrierVest | ATT SurvivorM_Boris#022441 slot=Vest | 5x5 | -
+022956 PlateCarrierPouches | ATT PlateCarrierVest#022953 slot=VestPouch | 5x3 | -
+022957 PlateCarrierHolster | ATT PlateCarrierVest#022953 slot=VestHolster | 2x3 | -
+022958 MakarovIJ70 | ATT PlateCarrierHolster#022957 slot=Pistol | 2x2 | -
+022959 Mag_IJ70_8Rnd | ATT MakarovIJ70#022958 slot=magazine | 1x2 | ammo 12/12
+022962 AK_Suppressor | CARGO M65Jacket_Black#022950 r0 c3 flip=no | 3x1 | -
+022963 AK_WoodBttstck | CARGO M65Jacket_Black#022950 r1 c3 flip=no | 3x1 | -
+022964 AK_WoodHndgrd | CARGO M65Jacket_Black#022950 r2 c0 flip=no | 2x1 | -
+022971 OZT_ProbeWallet | CARGO M65Jacket_Black#022950 r0 c0 flip=no | 2x2 | -
+022972 BandageDressing | CARGO M65Jacket_Black#022950 r0 c2 flip=no | 1x2 | qty 4/4
+022978 OZT_ProbeNote | CARGO OZT_ProbeWallet#022971 r0 c2 flip=no | 2x1 | qty 7/500
+022979 OZT_ProbeNote50 | CARGO OZT_ProbeWallet#022971 r0 c4 flip=no | 2x1 | qty 34/500
+022980 AKM | ATT SurvivorM_Boris#022441 slot=Shoulder | 8x3 | -

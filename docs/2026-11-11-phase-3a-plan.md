@@ -18,7 +18,7 @@ The owner's rule for everything that touches a price (2026-11-11): no money out 
 
 - **Rounds are paid as loose rounds are.** A round in a magazine or a weapon brings what the same round brings in a pile of its class: the pile's line of the book, its rule, and the condition factor of the round's own damage. Loading worn rounds into a magazine must not sell them as new.
 - **Rounds that come back come back as they were.** Kept rounds are made as piles of their class with the mean health the rounds had. Selling a magazine and keeping its rounds must not repair them.
-- **A part is never lost and never doubled.** A kept part is moved, never copied; if the engine refuses its planned place at the commit, it goes to the engine's own choice, then to the ground at the player's feet, and the log says so. A part is in exactly one of four states, and only a sold node is paid.
+- **A part is never lost and never doubled.** A kept part is moved, never copied; if the engine refuses its planned place at the commit, it goes to the engine's own choice, then to the ground at the player's feet, and the log says so; a part that can go nowhere stops the deal before anything is paid or deleted. A part is in exactly one state, and only a sold node is paid.
 
 ---
 
@@ -37,6 +37,14 @@ Numbered on from the phase 1 plan's sixteen.
 25. **The commit's order** (one script call): kept parts move (`LocationCanAddEntity`, then `LocationSyncMoveEntity` and `InventoryInputUserData.SendServerMove`); sold nodes and spent notes are deleted; stacks shrink; bought things, kept rounds and the change are created; stacks grow.
 26. **What `open` says of a carried thing.** `Price` stays the thing's own. `Tree` is new: what the thing brings sold with everything on it that the trader takes, nothing kept. `Loaded` and `LoadedPrice` are new: the rounds in it and what they bring. `Why` 2 now means one thing: something lies inside it. A screen that sells a thing whole shows `Tree` before the quote answers.
 
+Added while building:
+
+27. **A built-in part is no part.** What sits in a slot the game does not show the player (`EntityAI.CanDisplayAttachmentSlot`, the test the game's own inventory screen draws slots by: a revolver's cylinder and ejector, whatever a mod builds into a weapon) is the thing itself: neither priced nor kept, it goes with what it sits on. Without this the first revolver sold would have left its cylinder in the player's bag.
+28. **A kept part is asked about itself.** It exists, so its place is asked of the engine with the part itself at the very cell (`GameInventory.LocationCanAddEntity`), not with a stand-in of its class: what is in it and on it counts, as it does when a player moves it by hand.
+29. **Moves before money.** The commit moves every kept part first and stops, refusing the deal as `STR_OZT_NO_INTERNAL`, if one of them could be moved nowhere; only then is money taken and anything deleted. A commit that stops answers `Paid` 0 and `Received` 0.
+30. **What the answer says of what stays.** `OZT_DealRes.Kept` is the number of parts that come off, `KeptRounds` the rounds that come back; a quote carries them, so the screen can say it before Confirm.
+31. **A container on the screen.** A thing with something inside may be put into the SELL cart; the quote refuses it as not empty, with the count, until everything that lies in it is in the cart too. The screen no longer stops it at the tile.
+
 ---
 
 ## File structure
@@ -48,9 +56,9 @@ Numbered on from the phase 1 plan's sixteen.
 | `scripts/4_World/OpenZone_Trader/OZT_InvModel.c` | holders that take nothing; a place kept for a moved part; hands taken |
 | `scripts/4_World/OpenZone_Trader/OZT_Deal.c` | the sells read as trees; kept parts and kept rounds in the plan and in the commit |
 | `scripts/4_World/OpenZone_Trader/OZT_Service.c` | `open` fills the new fields |
-| `OpenZone_Trader_Bridge/.../OZT_Verb.c` | `tree`; `keep=` and `keeprounds=` on `quote` and `deal`; the line sums in the answer |
-| `scripts/5_Mission/OpenZone_Trader/OZT_TradeMenu.c` | a carried thing's tile and its cart line show `Tree` |
-| `OpenZone_Trader/strings.csv` | "not empty" says "inside", not "on it" |
+| `OpenZone_Trader_Bridge/.../OZT_Verb.c` | `tree`; `load`; `damage ... rounds=`; `keep=`, `keeprounds=` and `refuse=` on `quote` and `deal`; the line sums and what stays in the answer |
+| `scripts/5_Mission/OpenZone_Trader/OZT_TradeMenu.c`, `OZT_TradeCart.c` | a carried thing's tile and its cart line show `Tree`; the verdict says what stays; a container may go into the cart |
+| `OpenZone_Trader/strings.csv` | "not empty" speaks of what lies inside; two lines for what stays |
 
 ---
 
@@ -104,12 +112,12 @@ One thing was added while writing the reader: a loaded round whose cartridge typ
 
 ### Task 2: The plan and the commit
 
-- [ ] **Step 1:** `OZT_InvModel.c`: a second list beside `gone`, `shut`: holders whose cargo takes nothing (they leave or move). `Reserve(OZT_Place place, string type)` marks the cells of a place another model gave. `TakeHands()` marks the hands. `PlaceInHandsNow(string type, out OZT_Place place)` asks the hands as they are (`CanAddEntityInHands`).
-- [ ] **Step 2:** `OZT_Deal.c`, the sells: a first pass resolves every line and collects the things sold whole; a second reads each as a stack (as now) or as a tree (decisions 18 to 21). The deal keeps `m_Gone` (every sold node), `m_Moves` (kept parts), `m_KeptLots`.
-- [ ] **Step 3:** `OZT_Deal.c`, the plan: before `LayThings`, a model of the inventory as it is, with the moved and the sold holders shut, gives every kept part a cell (decision 22). `LayThings` shuts the same holders, reserves those cells, lays the bought lines, then the kept lots as stacks of their own (decision 24), then the change. The leftover rule is decision 23.
-- [ ] **Step 4:** `OZT_Deal.c`, the commit (decision 25). A kept part whose planned place the engine refuses goes to `FindFreeLocationFor` of the player, then to the ground; each is a `deal defect` line. A kept lot's stacks get their units and their health.
-- [ ] **Step 5:** `OZT_Verb.c`: `keep=` and `keeprounds=` on `quote` and `deal`; the answer's line gains `sold=` and `lines=`.
-- [ ] **Step 6:** Boot; the kit and money; the rows below, each followed by the two dumps (`ozt_probe dump`): the client's inventory is the server's.
+- [x] **Step 1:** `OZT_InvModel.c`: a second list beside `gone`, `shut`: things that stay where they are in the picture and still take nothing, with all that hangs on them or lies in them. `PlaceMoved(EntityAI e, out OZT_Place place)` gives a part that exists a cell, asking the engine about the part itself (decision 28). `Reserve(OZT_Place place, int w, int h)` marks the cells, or the hands, of a place another picture gave.
+- [x] **Step 2:** `OZT_Deal.c`, the sells: a first pass resolves every line and collects the things sold whole; a second reads each as a stack (as before) or as a tree (decisions 18 to 21). The deal keeps `m_Gone` (every sold node), `m_Moves` (kept parts), `m_KeptLots`.
+- [x] **Step 3:** `OZT_Deal.c`, the plan: `PlanMoves` gives every kept part a cell in the inventory as it is, the largest first, with the moved and the sold things shut (decision 22). `LayThings` shuts the moved parts, reserves their cells, lays the bought lines, then the kept lots as stacks of their own (decision 24), then the change. The leftover rule is decision 23; the one kept part without a cell goes to the hands as they are now (`MoveToHands`).
+- [x] **Step 4:** `OZT_Deal.c`, the commit (decisions 25 and 29). A kept part whose planned place the engine refuses goes to `FindFreeLocationFor` of the player (never into something that leaves), then to the ground by `GameInventory.SetGroundPosByOwner` and the same synchronous move; each is a `deal defect` line. A kept lot's stacks get their units, their health and, round by round, their damage.
+- [x] **Step 5:** `OZT_Verb.c`: `keep=`, `keeprounds=` and `refuse=` on `quote` and `deal`; the answer's line gains `sold=`, `lines=`, `kept=` and `rounds=`; the op `load` fills a weapon's internal magazine and chambers.
+- [x] **Step 6:** Boot; the kit and money; the rows below, each followed by a comparison of the client with the server. As the stand answered them: `docs/measurements/2026-11-11/deals.md`, rows D.11 to D.38.
 
 | args (`oz_trader`) | expected |
 |---|---|
@@ -124,20 +132,28 @@ One thing was added while writing the reader: a loaded round whose cartridge typ
 | `{"op":"quote","sell":"AKM,PSO1Optic"}` | `ok=no why=STR_OZT_NO_INTERNAL`: the scope is the rifle's part already |
 | `{"op":"deal","sell":"AKM","buy":"AKM:1"}` | the slot the rifle leaves takes the new rifle (decision of §5); the kept parts in the bags |
 
-- [ ] **Step 7:** Commit: `trader: a deal sells trees: kept parts move first, kept rounds come back as they were, a container goes with what is in it`.
+- [x] **Step 7:** Commit: `trader: a deal sells trees: kept parts move first, kept rounds come back as they were, a container goes with what is in it`.
+
+What the table above did not foresee, and the stand showed:
+
+- `Mag_AKM_30Rnd#1` is the rifle's own magazine when another lies in the backpack: the engine lists what lies in a worn thing before the next worn thing. The container rows were sent again with the right one.
+- The backpack "with its four things" named the jacket's wallet first (`OZT_ProbeWallet` without a number); with `#1` the row answers as written.
+- The row with full bags answers `left=3`: with every cargo full of paper the three parts are counted together and the hands are not tried. One part alone without a cell goes to the hands (row D.21).
 
 ### Task 3: The screen shows the tree's sum
 
-- [ ] **Step 1:** `OZT_TradeMenu.c`: a carried thing's tile shows `Tree`; its cart line's `Whole` is `Tree`; the card's line "the trader pays" says the same.
-- [ ] **Step 2:** `strings.csv`: `STR_OZT_UI_WHY_NOT_EMPTY` and `STR_OZT_NO_NOT_EMPTY` speak of what lies inside.
-- [ ] **Step 3:** On a live client: the rifle's slot tile shows 1 790; dragged to SELL, the quote says 1 790 and Confirm sells it; the three parts the trader does not take appear among the player's things.
-- [ ] **Step 4:** Commit: `trader: the screen sells a thing with what is on it`.
+- [x] **Step 1:** `OZT_TradeMenu.c`, `OZT_TradeCart.c`: a carried thing's tile shows `Tree` (the card and the selection read the tile); its cart line's `Whole` is `Tree`. A thing with something inside may go into the cart (decision 31). The verdict of a quote that stands says what stays, parts and rounds, and the line under the buttons says it too.
+- [x] **Step 2:** `strings.csv`: `STR_OZT_UI_WHY_NOT_EMPTY` and `STR_OZT_NO_NOT_EMPTY` speak of what lies inside; `STR_OZT_UI_STAYS_PARTS`, `STR_OZT_UI_STAYS_ROUNDS`.
+- [x] **Step 3:** On a live client, 1920x1080, Ukrainian and English: the rifle's slot tile shows 1 790; a double click puts it into SELL, the quote says +1 790 and "Parts that stay with you: 3", F sells it; the suppressor, the buttstock and the handguard appear among the player's things, marked as not taken. The backpack with four things goes into SELL and the verdict reads "4 thing(s) lie inside and are not in the deal", red, Confirm unlit.
+- [x] **Step 4:** Commit: `trader: the screen sells a thing with what is on it`.
+
+Two things of the screen were put right on the way: a refused quote no longer calls a net of zero an even trade, and the line that says what stays is taken away by the next quote that keeps nothing.
 
 ### Task 4: Record
 
-- [ ] `docs/measurements/2026-11-11/deals.md`: a section "Phase 3a: trees" with the rows above as the stand answered them.
-- [ ] The design's §4.2, §4.3, §5 and §6 say what is built.
-- [ ] The skills: what the stand taught that phase 0 had not.
+- [x] `docs/measurements/2026-11-11/deals.md`: a section "Phase 3a: trees", rows D.1 to D.38, and the comparisons worth keeping beside it (`*-dump-task3a-*.txt`).
+- [x] The design's §4.2, §4.3, §5 and §6 say what is built.
+- [x] The skills: what the stand taught that phase 0 had not.
 
 ---
 
@@ -147,3 +163,5 @@ One thing was added while writing the reader: a loaded round whose cartridge typ
 - Nothing is bought onto anything (3b).
 - A kept part is planned by its class, not by what hangs on it: a kept part's own size is its class's, as everywhere in the game.
 - A second client watching a kept part move was not put there (phase 0's open point stands).
+- No kept part of these runs met a holder that refused it: each was taken by the first cargo with room. The refusal is the engine's own answer to the plan's question, and the three ways out of a wrong plan were seen working with the stand's switch.
+- A part that a script keeps from being taken off while something depends on it (not one the game hides) is moved like any other: the thing it hung on is gone in the same call.

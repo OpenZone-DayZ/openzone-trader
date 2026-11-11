@@ -222,10 +222,13 @@ class OZT_Config
 
     // Goods: the class exists, is not one of the server's banknotes, stands in
     // the book once, and both prices are whole multiples of the smallest note.
+    // What comes with goods is goods of the book too, with a price to buy,
+    // and fits them.
     private void CheckGoods()
     {
         int unit = Unit();
         array<string> seen = new array<string>();
+        array<OZT_Goods> lines = new array<OZT_Goods>();
         m_GoodsCount = 0;
         for (int c = 0; c < m_Goods.Categories.Count(); c++)
         {
@@ -252,6 +255,7 @@ class OZT_Config
                     continue;
                 }
                 seen.Insert(e.ClassName);
+                lines.Insert(e);
                 e.Buy = Fitted(e.ClassName, "Buy", e.Buy, unit);
                 e.Sell = Fitted(e.ClassName, "Sell", e.Sell, unit);
                 kept.Insert(e);
@@ -259,6 +263,45 @@ class OZT_Config
             cat.Goods = kept;
             m_GoodsCount = m_GoodsCount + kept.Count();
         }
+
+        for (int w = 0; w < lines.Count(); w++)
+            CheckWith(lines[w], seen, lines);
+    }
+
+    // What comes attached to goods: each a class of the book with a price to
+    // buy (it is charged at that price: nothing comes free), in a slot of its
+    // own. What fails is left out, here in memory: the file is the admin's.
+    private void CheckWith(OZT_Goods host, array<string> seen, array<OZT_Goods> lines)
+    {
+        if (!host.With || host.With.Count() == 0)
+            return;
+        array<string> comes = new array<string>();
+        array<string> taken = new array<string>();
+        for (int p = 0; p < host.With.Count(); p++)
+        {
+            string part = host.With[p];
+            string why = "";
+            int at = seen.Find(part);
+            if (!ClassKnown(part))
+                why = "no such class";
+            else if (at < 0 || lines[at].Buy <= 0)
+                why = "it has no price to buy in the price book";
+            else
+            {
+                string slot = OZT_Fit.SlotFor(host.ClassName, part, taken);
+                if (slot == "")
+                    why = "it does not fit, or its slot is taken by a part named before it";
+                else
+                    taken.Insert(slot);
+            }
+            if (why != "")
+            {
+                Problem("Goods: '" + host.ClassName + "' comes with '" + part + "', which is left out: " + why);
+                continue;
+            }
+            comes.Insert(part);
+        }
+        host.With = comes;
     }
 
     private int Fitted(string type, string side, int price, int unit)

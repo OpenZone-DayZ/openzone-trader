@@ -80,7 +80,12 @@ class OZT_Open
                 OZT_WireGoods wg = new OZT_WireGoods();
                 wg.ClassName = e.ClassName;
                 wg.Category = e.Category;
-                wg.Buy = OZT_Book.BuyPrice(trader, e, 1);
+                // What one costs here with what comes with it, and what that is.
+                wg.Buy = OZT_Book.BuyWith(trader, e, 1);
+                array<string> comes;
+                OZT_Book.Comes(trader, e, comes);
+                for (int w = 0; w < comes.Count(); w++)
+                    wg.With.Insert(comes[w]);
                 if (e.Sell > 0)
                     wg.Sell = OZT_Config.RoundDownTo(e.Sell * trader.SellFactor, unit);
                 wg.Rule = e.Rule;

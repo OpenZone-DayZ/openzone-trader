@@ -102,6 +102,9 @@ class OZT_BookEntry
     int Buy;
     int Sell;
     string Rule;
+
+    // What comes attached to it, as the checked file names it.
+    ref array<string> With;
 }
 
 class OZT_Book
@@ -125,6 +128,12 @@ class OZT_Book
                 e.Buy = line.Buy;
                 e.Sell = line.Sell;
                 e.Rule = line.Quantity;
+                e.With = new array<string>();
+                if (line.With)
+                {
+                    for (int w = 0; w < line.With.Count(); w++)
+                        e.With.Insert(line.With[w]);
+                }
                 s_ByClass.Set(e.ClassName, e);
             }
         }
@@ -161,6 +170,39 @@ class OZT_Book
         int unit = OZT_Config.Get().Unit();
         int piece = OZT_Config.RoundUpTo(e.Buy * trader.BuyFactor, unit);
         return piece * count;
+    }
+
+    // What comes attached to the goods at this trader: the classes of its
+    // `With` that this trader sells himself. At a trader who does not sell a
+    // part the goods are bare: all he hands out stays inside what he deals in,
+    // which is what the loop check counts.
+    static void Comes(OZT_Point trader, OZT_BookEntry e, out array<string> parts)
+    {
+        parts = new array<string>();
+        if (!e || !e.With)
+            return;
+        for (int i = 0; i < e.With.Count(); i++)
+        {
+            string part = e.With[i];
+            if (BuyPrice(trader, EntryOf(part), 1) > 0)
+                parts.Insert(part);
+        }
+    }
+
+    // What the player pays for `count` of the goods as this trader sells
+    // them: each with what comes with it, every part at its own price. Nothing
+    // comes free, so a sum of classes makes no loop while no class alone does.
+    static int BuyWith(OZT_Point trader, OZT_BookEntry e, int count)
+    {
+        int own = BuyPrice(trader, e, count);
+        if (own <= 0)
+            return 0;
+        array<string> parts;
+        Comes(trader, e, parts);
+        int sum = own;
+        for (int i = 0; i < parts.Count(); i++)
+            sum = sum + BuyPrice(trader, EntryOf(parts[i]), count);
+        return sum;
     }
 
     // What this trader pays for `count` units of `item` (the count matters

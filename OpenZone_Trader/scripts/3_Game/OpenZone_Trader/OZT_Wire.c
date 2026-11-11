@@ -31,6 +31,14 @@ class OZT_WireGoods
     string Rule = "";
     // -1 while stock is unlimited: the headroom for finite stock (design §11).
     int Stock = -1;
+    // What comes attached to one at this trader, each charged at its own
+    // price: Buy is the sum.
+    ref array<string> With;
+
+    void OZT_WireGoods()
+    {
+        With = new array<string>();
+    }
 }
 
 // One thing the player carries that this trader pays for: the entity by the
@@ -142,17 +150,63 @@ class OZT_WireSell
     }
 }
 
+// A part fitted to a thing the same line buys: goods of this trader, bought at
+// its own price, that arrive attached. `SlotName` names the slot, "" leaves it to
+// the server. `On` is what it hangs on: -1 the bought thing, otherwise an
+// earlier entry of the same list.
+class OZT_WireFit
+{
+    string ClassName = "";
+    string SlotName = "";
+    int On = -1;
+
+    OZT_WireFit Copy()
+    {
+        OZT_WireFit c = new OZT_WireFit();
+        c.ClassName = ClassName;
+        c.SlotName = SlotName;
+        c.On = On;
+        return c;
+    }
+}
+
 // Goods the player buys, by class: pieces, or units under the unit rule.
+//
+// With Fit the line buys one piece and the parts named, attached to it. With
+// OnLow and OnHigh the class is a part and goes onto that thing of the
+// player's, in the slot SlotName names ("" leaves it to the server).
 class OZT_WireBuy
 {
     string ClassName = "";
     int Count = 0;
+    ref array<ref OZT_WireFit> Fit;
+    int OnLow = 0;
+    int OnHigh = 0;
+    string SlotName = "";
 
+    void OZT_WireBuy()
+    {
+        Fit = new array<ref OZT_WireFit>();
+    }
+
+    // An arrived line ran no constructor: a line without Fit has none.
     OZT_WireBuy Copy()
     {
         OZT_WireBuy c = new OZT_WireBuy();
         c.ClassName = ClassName;
         c.Count = Count;
+        c.OnLow = OnLow;
+        c.OnHigh = OnHigh;
+        c.SlotName = SlotName;
+        if (Fit)
+        {
+            for (int i = 0; i < Fit.Count(); i++)
+            {
+                OZT_WireFit f = Fit[i];
+                if (f)
+                    c.Fit.Insert(f.Copy());
+            }
+        }
         return c;
     }
 }

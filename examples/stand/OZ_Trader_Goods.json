@@ -5,13 +5,17 @@
             { "ClassName": "Canteen", "Buy": 120, "Sell": 60, "Quantity": "fraction" },
             { "ClassName": "BandageDressing", "Buy": 40, "Sell": 20, "Quantity": "fraction" },
             { "ClassName": "Mich2001Helmet", "Buy": 900, "Sell": 450 },
+            { "ClassName": "NVGoggles", "Buy": 1500, "Sell": 750 },
+            { "ClassName": "Battery9V", "Buy": 20, "Sell": 10 },
             { "ClassName": "TaloonBag_Blue", "Buy": 400, "Sell": 200 },
             { "ClassName": "Paper", "Buy": 5 }
         ] },
         { "Id": "weapons", "Name": "Зброя", "Goods": [
             { "ClassName": "AKM", "Buy": 2500, "Sell": 1250 },
             { "ClassName": "Mag_AKM_30Rnd", "Buy": 180, "Sell": 90 },
-            { "ClassName": "PSO1Optic", "Buy": 600, "Sell": 300 }
+            { "ClassName": "PSO1Optic", "Buy": 600, "Sell": 300 },
+            { "ClassName": "MakarovIJ70", "Buy": 650, "Sell": 325, "With": ["Mag_IJ70_8Rnd"] },
+            { "ClassName": "Mag_IJ70_8Rnd", "Buy": 60, "Sell": 30 }
         ] },
         { "Id": "ammo", "Name": "Набої", "Goods": [
             { "ClassName": "Ammo_762x39", "Buy": 10, "Sell": 5, "Quantity": "unit" },

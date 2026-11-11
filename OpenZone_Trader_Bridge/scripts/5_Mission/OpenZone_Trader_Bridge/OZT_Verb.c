@@ -49,6 +49,8 @@ class OZT_VerbOps
             return OpTree(player, args, detail);
         if (op == "load")
             return OpLoad(player, args, detail);
+        if (op == "fits")
+            return OpFits(player, args, detail);
         // -- ops of the later tasks go above this line --
         detail = "unknown op '" + op + "'; known: " + KnownOps();
         return false;
@@ -56,7 +58,7 @@ class OZT_VerbOps
 
     static string KnownOps()
     {
-        return "status, reload, balance, price, pay, damage, open, fit, quote, deal, show, tree, load";
+        return "status, reload, balance, price, pay, damage, open, fit, quote, deal, show, tree, load, fits";
     }
 
     // ---- what the ops share ---------------------------------------------------
@@ -325,8 +327,15 @@ class OZT_VerbOps
     }
 
     // quote / deal: [trader=<id>] [sell=Class[:units][#nth],...] [sellnear=Class]
-    // [keep=Class[#nth],...] [keeprounds=Class[#nth],...] [buy=Class:n,...]
+    // [keep=Class[#nth],...] [keeprounds=Class[#nth],...]
+    // [buy=Class[:n][+Part[>Sub...]]...,...] [on=Class[#nth]] [slot=<name>]
     // [net=<n>] [refuse=<1..3>]
+    //
+    // A bought line may name parts fitted to the thing it buys: `+Part` hangs
+    // on the thing, `>Sub` on the part before it (AKM:1+PSO1Optic+Mag_AKM_30Rnd,
+    // Mich2001Helmet:1+NVGoggles>Battery9V). With on= every bought line is a
+    // part that goes onto that thing the player carries, in the slot slot=
+    // names or in the first that fits.
     //
     // `sell` names things the player carries; `sellnear` a thing lying within
     // five metres (to ask for something that is not the player's). `keep` names
@@ -377,14 +386,32 @@ class OZT_VerbOps
             req.Sells.Insert(SellOf(lying, 0));
         }
 
-        Items(Arg(args, "buy", ""), names, counts, nths);
-        for (int b = 0; b < names.Count(); b++)
+        EntityAI onto = null;
+        if (args.Contains("on"))
         {
-            OZT_WireBuy buy = new OZT_WireBuy();
-            buy.ClassName = names[b];
-            buy.Count = counts[b];
-            if (buy.Count < 1)
-                buy.Count = 1;
+            Items(Arg(args, "on", ""), names, counts, nths);
+            if (names.Count() == 1)
+                onto = Carried(player, names[0], nths[0]);
+            if (!onto)
+            {
+                detail = "on= names nothing the player carries: " + Arg(args, "on", "");
+                return false;
+            }
+        }
+        array<ref OZT_WireBuy> bought = new array<ref OZT_WireBuy>();
+        BuysOf(Arg(args, "buy", ""), bought);
+        for (int b = 0; b < bought.Count(); b++)
+        {
+            OZT_WireBuy buy = bought[b];
+            if (onto)
+            {
+                int ol;
+                int oh;
+                onto.GetNetworkID(ol, oh);
+                buy.OnLow = ol;
+                buy.OnHigh = oh;
+                buy.SlotName = Arg(args, "slot", "");
+            }
             req.Buys.Insert(buy);
         }
 
@@ -422,6 +449,102 @@ class OZT_VerbOps
         string body = Ask(player, OZT_Const.OP_DEAL, json, ok, why);
         OZT_Deal.StandRefuse(0);
         detail = "deal " + Told(body, ok, why);
+        return true;
+    }
+
+    // The buy argument: lines separated by commas, each Class[:n] and then
+    // its fitted parts, `+Part` on the thing and `>Sub` on the part before.
+    static void BuysOf(string list, array<ref OZT_WireBuy> lines)
+    {
+        if (list == "")
+            return;
+        array<string> tokens = new array<string>();
+        list.Split(",", tokens);
+        for (int i = 0; i < tokens.Count(); i++)
+        {
+            string token = tokens[i].Trim();
+            if (token == "")
+                continue;
+            array<string> pieces = new array<string>();
+            token.Split("+", pieces);
+            string head = pieces[0].Trim();
+            int count = 1;
+            int colon = head.IndexOf(":");
+            if (colon > -1)
+            {
+                int after = head.Length() - colon - 1;
+                count = head.Substring(colon + 1, after).ToInt();
+                head = head.Substring(0, colon);
+            }
+            if (count < 1)
+                count = 1;
+            OZT_WireBuy buy = new OZT_WireBuy();
+            buy.ClassName = head;
+            buy.Count = count;
+            for (int p = 1; p < pieces.Count(); p++)
+            {
+                array<string> chain = new array<string>();
+                pieces[p].Split(">", chain);
+                int on = -1;
+                for (int c = 0; c < chain.Count(); c++)
+                {
+                    OZT_WireFit fit = new OZT_WireFit();
+                    fit.ClassName = chain[c].Trim();
+                    fit.On = on;
+                    buy.Fit.Insert(fit);
+                    on = buy.Fit.Count() - 1;
+                }
+            }
+            lines.Insert(buy);
+        }
+    }
+
+    // fits host=<Class> part=<Class> [slot=<name>] [carried=1] [nth=<k>]: the
+    // slot a part takes on a thing by config, and what the engine says of it:
+    // its gates alone (the item check and the script check, what a deal asks),
+    // and everything (occupancy too). The host is a local stand-in of the
+    // class, or with carried=1 the thing the player carries.
+    static bool OpFits(PlayerBase player, map<string, string> args, out string detail)
+    {
+        string hostType = Arg(args, "host", "");
+        string partType = Arg(args, "part", "");
+        string slot = Arg(args, "slot", "");
+        if (slot == "")
+            slot = OZT_Fit.SlotFor(hostType, partType, null);
+        else if (!OZT_Fit.SlotOf(hostType, partType, slot))
+            slot = "";
+        detail = "fits: " + partType + " on " + hostType + ": slot by config '" + slot + "'";
+        if (slot == "")
+            return true;
+
+        bool carried = Arg(args, "carried", "0") == "1";
+        vector feet = player.GetPosition();
+        EntityAI host;
+        if (carried)
+            host = Carried(player, hostType, Arg(args, "nth", "0").ToInt());
+        else
+            host = EntityAI.Cast(GetGame().CreateObjectEx(hostType, feet, ECE_LOCAL | ECE_NOPERSISTENCY_WORLD));
+        EntityAI part = EntityAI.Cast(GetGame().CreateObjectEx(partType, feet, ECE_LOCAL | ECE_NOPERSISTENCY_WORLD));
+        if (!host || !part)
+        {
+            detail = detail + "; no host or no stand-in could be made";
+        }
+        else
+        {
+            InventoryLocation loc = new InventoryLocation();
+            loc.SetAttachment(host, part, InventorySlots.GetSlotIdFromString(slot));
+            string gates = "no";
+            if (GameInventory.LocationTestAddEntity(loc, false, true, false, false, true, false))
+                gates = "yes";
+            string all = "no";
+            if (GameInventory.LocationCanAddEntity(loc))
+                all = "yes";
+            detail = detail + "; the engine's gates " + gates + ", with occupancy " + all;
+        }
+        if (part)
+            GetGame().ObjectDelete(part);
+        if (host && !carried)
+            GetGame().ObjectDelete(host);
         return true;
     }
 

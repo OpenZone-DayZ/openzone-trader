@@ -333,23 +333,7 @@ class OZT_InvModel
     // The slot names a class may sit on, from its own config.
     protected void SlotNamesOf(string type, array<string> names)
     {
-        array<string> roots = {"CfgVehicles", "CfgWeapons", "CfgMagazines"};
-        for (int i = 0; i < roots.Count(); i++)
-        {
-            string path = roots[i] + " " + type + " inventorySlot";
-            if (!GetGame().ConfigIsExisting(path))
-                continue;
-            if (GetGame().ConfigGetType(path) == CT_ARRAY)
-            {
-                GetGame().ConfigGetTextArray(path, names);
-                return;
-            }
-            string one;
-            GetGame().ConfigGetText(path, one);
-            if (one != "")
-                names.Insert(one);
-            return;
-        }
+        OZT_Fit.PartSlots(type, names);
     }
 
     // ---- placing -----------------------------------------------------------------

@@ -68,6 +68,7 @@ STR_OZT_UI_HOLDS,Місткість,Cargo
 STR_OZT_UI_IN_STACK,У стосі,In the stack
 STR_OZT_UI_FULL_STACK,Повний стос,A full stack
 STR_OZT_UI_COUNT,Кількість,Count
+STR_OZT_UI_COMES_WITH,У комплекті,Comes with
 STR_OZT_UI_PAYS_NEW,Торговець дає за нову,The trader pays for a pristine one
 STR_OZT_UI_SELLS_FOR,Ціна в торговця,The trader sells it for
 STR_OZT_UI_CLOSE,ЗАКРИТИ,CLOSE

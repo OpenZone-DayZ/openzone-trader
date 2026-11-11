@@ -1708,7 +1708,19 @@ class OZT_TradeMenu : UIScriptedMenu
             return;
         m_HoverFor = m_HoverFor + dt;
         if (m_HoverFor >= CARD_AFTER && !m_Card.IsShown())
-            m_Card.Open(t, GoodsOf(t.Type));
+            // What the goods come with at this trader, by the game's names.
+            OZT_WireGoods entry = GoodsOf(t.Type);
+            string comes = "";
+            if (entry && entry.With)
+            {
+                for (int w = 0; w < entry.With.Count(); w++)
+                {
+                    if (comes != "")
+                        comes = comes + ", ";
+                    comes = comes + OZT_Ui.NameOf(m_Shelf.Of(entry.With[w]));
+                }
+            }
+            m_Card.Open(t, entry, comes);
         m_Card.Frame();
     }
 

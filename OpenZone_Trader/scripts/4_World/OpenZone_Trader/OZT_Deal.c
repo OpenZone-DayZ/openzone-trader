@@ -20,6 +20,12 @@
 // on it and what is loaded in it, each part by its own line of the book. What
 // lies inside a thing is no part of it: a container is sold when everything in
 // it is sold by the same deal.
+//
+// A bought thing may arrive with parts on it: what the goods come with at this
+// trader, and what the request fits to it. A part may also be bought straight
+// onto a thing the player carries. Every part is goods of the trader, paid at
+// its own price; it needs a slot, not cells (OZT_Fit), and is attached in the
+// commit, a parent before what hangs on it.
 
 // A stack the player keeps, grown (a merge) or shrunk (a part sold or paid).
 class OZT_Grow
@@ -40,6 +46,38 @@ class OZT_Make
 
     // Below zero: new. Otherwise the health of rounds that come back, 0..1.
     float Health;
+
+    // What arrives attached to it; null when nothing does.
+    OZT_PartList Parts;
+}
+
+// The parts of one bought thing, in the order they are attached.
+class OZT_PartList
+{
+    ref array<ref OZT_PartMake> Items;
+
+    void OZT_PartList()
+    {
+        Items = new array<ref OZT_PartMake>();
+    }
+}
+
+// A part the commit attaches: to the thing its list belongs to (On below
+// zero), or to an earlier part of the same list.
+class OZT_PartMake
+{
+    string ClassName;
+    string SlotName;
+    int SlotId;
+    int On;
+}
+
+// A part bought onto a thing the player carries: the first entry of Parts is
+// that part, the rest hang on it.
+class OZT_Onto
+{
+    EntityAI Host;
+    ref OZT_PartList Parts;
 }
 
 // A part the player keeps: it comes off the sold thing and goes to a place the
@@ -54,9 +92,11 @@ class OZT_Move
 
 class OZT_Deal
 {
-    // The most one line may ask for: pieces, and units under the unit rule.
+    // The most one line may ask for: pieces, and units under the unit rule;
+    // and parts on one bought thing.
     static const int MAX_PIECES = 50;
     static const int MAX_UNITS = 5000;
+    static const int MAX_PARTS = 16;
 
     // A quote changes nothing, but it lays a whole plan: one client may ask
     // for one only so often.
@@ -86,9 +126,15 @@ class OZT_Deal
     protected ref array<string> m_BuyClasses;
     protected ref array<int> m_BuyCounts;
     protected ref array<string> m_BuyRules;
+
+    // The parts of each bought line (an empty list for a plain one), and the
+    // parts bought onto things the player carries.
+    protected ref array<ref OZT_PartList> m_BuyParts;
+    protected ref array<ref OZT_Onto> m_Ontos;
     protected ref array<string> m_Homeless;
     protected ref array<int> m_HomelessUnits;
     protected ref array<float> m_HomelessHealth;
+    protected ref array<OZT_PartList> m_HomelessParts;
 
     // The sold trees; the parts that come off them; the same parts as a list
     // for the pictures; the lots of rounds that come back.
@@ -140,9 +186,12 @@ class OZT_Deal
         m_BuyClasses = new array<string>();
         m_BuyCounts = new array<int>();
         m_BuyRules = new array<string>();
+        m_BuyParts = new array<ref OZT_PartList>();
+        m_Ontos = new array<ref OZT_Onto>();
         m_Homeless = new array<string>();
         m_HomelessUnits = new array<int>();
         m_HomelessHealth = new array<float>();
+        m_HomelessParts = new array<OZT_PartList>();
         m_Trees = new array<ref OZT_Tree>();
         m_Moves = new array<ref OZT_Move>();
         m_Shut = new array<EntityAI>();
@@ -463,16 +512,178 @@ class OZT_Deal
             if (line.Count > most)
                 return OZT_Const.NO_INTERNAL;
 
+            // A thing of the player's the line's goods go onto, as a part.
+            EntityAI host = null;
+            bool onto = line.OnLow != 0 || line.OnHigh != 0;
+            if (onto)
+            {
+                host = EntityAI.Cast(GetGame().GetObjectByNetworkId(line.OnLow, line.OnHigh));
+                if (!host || host.GetHierarchyRootPlayer() != m_Player)
+                    return OZT_Const.NO_NOT_YOURS;
+                if (m_Gone.Find(host) > -1 || UnderGone(host))
+                    return OZT_Const.NO_CHANGED;
+            }
+            bool fitted = line.Fit.Count() > 0;
+            if ((onto || fitted) && line.Count != 1)
+                return OZT_Const.NO_INTERNAL;
+
+            // The line's parts: what the goods come with here, then what the
+            // request fits; each priced, each given a slot.
+            OZT_PartList list = new OZT_PartList();
+            array<ref OZT_PartMake> parts = list.Items;
+            int extra = 0;
+            string why = ReadParts(line, entry, host, parts, extra);
+            if (why != "")
+                return why;
+            price = price + extra;
+
             total = total + price;
             m_Res.BuyPrices.Insert(price);
             m_Res.Bought = total;
-            m_BuyClasses.Insert(entry.ClassName);
-            m_BuyCounts.Insert(line.Count);
-            m_BuyRules.Insert(entry.Rule);
-            m_Lines = m_Lines + " +" + entry.ClassName + "x" + line.Count.ToString() + "=" + price.ToString();
+            string word = " +" + entry.ClassName + "x" + line.Count.ToString() + "=" + price.ToString();
+            if (parts.Count() > 0)
+                word = word + "(" + parts.Count().ToString() + " parts)";
+            if (onto)
+            {
+                OZT_Onto o = new OZT_Onto();
+                o.Host = host;
+                o.Parts = list;
+                m_Ontos.Insert(o);
+                word = word + " onto " + host.GetType();
+            }
+            else
+            {
+                m_BuyClasses.Insert(entry.ClassName);
+                m_BuyCounts.Insert(line.Count);
+                m_BuyRules.Insert(entry.Rule);
+                m_BuyParts.Insert(list);
+            }
+            m_Lines = m_Lines + word;
         }
         m_Net = m_Net + total;
         return "";
+    }
+
+    // One bought line's parts into `parts`, and what they add to the line's
+    // price into `extra`. For a line that goes onto a carried thing the first
+    // entry is the line's own goods on that thing.
+    protected string ReadParts(OZT_WireBuy line, OZT_BookEntry entry, EntityAI host, array<ref OZT_PartMake> parts, out int extra)
+    {
+        extra = 0;
+        string why;
+        int root = -1;
+        if (host)
+        {
+            // The slot may hold a thing this deal sells: then it is free.
+            why = AddPart(parts, entry.ClassName, line.SlotName, -1, host.GetType());
+            if (why != "")
+                return why;
+            EntityAI there = host.GetInventory().FindAttachment(parts[0].SlotId);
+            if (there && m_Gone.Find(there) < 0)
+                return OZT_Const.NO_CHANGED;
+            if (TakenOnto(host, parts[0].SlotId))
+                return OZT_Const.NO_CHANGED;
+            root = 0;
+        }
+
+        // What the goods come with at this trader, each for every piece.
+        array<string> comes;
+        OZT_Book.Comes(m_Trader, entry, comes);
+        for (int c = 0; c < comes.Count(); c++)
+        {
+            why = AddPart(parts, comes[c], "", root, entry.ClassName);
+            if (why != "")
+            {
+                OZT_Log.Error("deal: '" + entry.ClassName + "' comes with '" + comes[c] + "', which found no slot on it");
+                return OZT_Const.NO_INTERNAL;
+            }
+            extra = extra + OZT_Book.BuyPrice(m_Trader, OZT_Book.EntryOf(comes[c]), line.Count);
+        }
+
+        // What the request fits: goods of this trader, an entry hanging on the
+        // bought thing or on an earlier entry of its own list.
+        int first = parts.Count();
+        if (first + line.Fit.Count() > MAX_PARTS)
+            return OZT_Const.NO_INTERNAL;
+        for (int f = 0; f < line.Fit.Count(); f++)
+        {
+            OZT_WireFit fit = line.Fit[f];
+            OZT_BookEntry sold = OZT_Book.EntryOf(fit.ClassName);
+            int cost = OZT_Book.BuyPrice(m_Trader, sold, 1);
+            if (cost <= 0)
+                return OZT_Const.NO_CHANGED;
+            if (fit.On >= f)
+                return OZT_Const.NO_INTERNAL;
+            int on = root;
+            string onClass = entry.ClassName;
+            if (fit.On >= 0)
+            {
+                on = first + fit.On;
+                onClass = parts[on].ClassName;
+            }
+            why = AddPart(parts, sold.ClassName, fit.SlotName, on, onClass);
+            if (why != "")
+                return why;
+            extra = extra + cost;
+        }
+        return "";
+    }
+
+    // One more part of a list: its slot on what it hangs on, by the request's
+    // word or by config, and not one an earlier part of the list has taken.
+    protected string AddPart(array<ref OZT_PartMake> parts, string type, string slot, int on, string onClass)
+    {
+        array<string> taken = new array<string>();
+        for (int i = 0; i < parts.Count(); i++)
+        {
+            if (parts[i].On == on)
+                taken.Insert(parts[i].SlotName);
+        }
+        string name = slot;
+        if (name == "")
+            name = OZT_Fit.SlotFor(onClass, type, taken);
+        else if (!OZT_Fit.SlotOf(onClass, type, name) || InNames(taken, name))
+            name = "";
+        if (name == "")
+            return OZT_Const.NO_CHANGED;
+        int id = InventorySlots.GetSlotIdFromString(name);
+        if (id == InventorySlots.INVALID)
+            return OZT_Const.NO_CHANGED;
+
+        OZT_PartMake p = new OZT_PartMake();
+        p.ClassName = type;
+        p.SlotName = name;
+        p.SlotId = id;
+        p.On = on;
+        parts.Insert(p);
+        return "";
+    }
+
+    protected bool InNames(array<string> names, string name)
+    {
+        string want = name;
+        want.ToLower();
+        for (int i = 0; i < names.Count(); i++)
+        {
+            string have = names[i];
+            have.ToLower();
+            if (have == want)
+                return true;
+        }
+        return false;
+    }
+
+    // Has an earlier line of this deal bought a part into that slot of that
+    // thing already?
+    protected bool TakenOnto(EntityAI host, int slotId)
+    {
+        for (int i = 0; i < m_Ontos.Count(); i++)
+        {
+            OZT_Onto o = m_Ontos[i];
+            if (o.Host == host && o.Parts.Items[0].SlotId == slotId)
+                return true;
+        }
+        return false;
     }
 
     // ---- 4. the money --------------------------------------------------------------
@@ -550,6 +761,9 @@ class OZT_Deal
             if (m_Model.PlaceInHands(m_Homeless[0], hands))
             {
                 AddMake(m_Homeless[0], hands, m_HomelessUnits[0], m_HomelessHealth[0]);
+                OZT_PartList rode = m_HomelessParts[0];
+                if (rode && rode.Items.Count() > 0)
+                    m_Makes[m_Makes.Count() - 1].Parts = rode;
                 m_Res.InHands = m_Homeless[0];
                 ForgetHomeless();
                 return "";
@@ -658,6 +872,7 @@ class OZT_Deal
         m_Homeless.Clear();
         m_HomelessUnits.Clear();
         m_HomelessHealth.Clear();
+        m_HomelessParts.Clear();
     }
 
     // Lays everything the deal brings into a fresh picture of the inventory as
@@ -675,6 +890,15 @@ class OZT_Deal
         {
             OZT_Move move = m_Moves[k];
             m_Model.Reserve(move.Place, move.W, move.H);
+        }
+
+        // Do the bought parts fit, as the engine's own gates see it? Asked
+        // once: the answer does not depend on the laying.
+        if (!aside)
+        {
+            string fits = CheckFits();
+            if (fits != "")
+                return fits;
         }
 
         // Parts sold and parts paid shrink their stacks before anything is
@@ -702,7 +926,7 @@ class OZT_Deal
             if (m_BuyRules[b] == OZT_Const.RULE_UNIT && OZT_Stack.Countable(probe))
                 PlaceUnits(type, m_BuyCounts[b], false);
             else
-                PlacePieces(type, m_BuyCounts[b], wear);
+                PlacePieces(type, m_BuyCounts[b], wear, m_BuyParts[b]);
         }
 
         // The rounds that come back: stacks of their own, as they were.
@@ -859,8 +1083,9 @@ class OZT_Deal
 
     // `count` pieces of a class: a free slot of the character first when bought
     // gear is worn (decision 4), then a cargo. A thing that goes onto a slot
-    // needs no cells and is never the one set aside.
-    protected void PlacePieces(string type, int count, bool wear)
+    // needs no cells and is never the one set aside. `parts` arrive on every
+    // piece; they need no place of their own.
+    protected void PlacePieces(string type, int count, bool wear, OZT_PartList parts)
     {
         for (int i = 0; i < count; i++)
         {
@@ -875,17 +1100,70 @@ class OZT_Deal
             if (placed)
             {
                 AddMake(type, place, 0, -1);
+                if (parts.Items.Count() > 0)
+                    m_Makes[m_Makes.Count() - 1].Parts = parts;
                 continue;
             }
             AddHomeless(type, 0, -1);
+            m_HomelessParts.Set(m_HomelessParts.Count() - 1, parts);
         }
     }
 
+    // The engine's gates for every bought part, with stand-ins: a local entity
+    // of the class for a thing that does not exist yet, the carried thing
+    // itself for a part that goes onto it. The item check and the script check,
+    // no occupancy: which slot is free is the plan's own to know.
+    protected string CheckFits()
+    {
+        for (int b = 0; b < m_BuyParts.Count(); b++)
+        {
+            array<ref OZT_PartMake> parts = m_BuyParts[b].Items;
+            if (parts.Count() == 0)
+                continue;
+            if (!GatesTake(m_Model.ProbeOf(m_BuyClasses[b]), parts))
+                return OZT_Const.NO_CHANGED;
+        }
+        for (int o = 0; o < m_Ontos.Count(); o++)
+        {
+            OZT_Onto onto = m_Ontos[o];
+            if (!GatesTake(onto.Host, onto.Parts.Items))
+                return OZT_Const.NO_CHANGED;
+        }
+        return "";
+    }
+
+    protected bool GatesTake(EntityAI host, array<ref OZT_PartMake> parts)
+    {
+        if (!host)
+            return false;
+        for (int i = 0; i < parts.Count(); i++)
+        {
+            OZT_PartMake p = parts[i];
+            EntityAI on = host;
+            if (p.On >= 0)
+                on = m_Model.ProbeOf(parts[p.On].ClassName);
+            EntityAI part = m_Model.ProbeOf(p.ClassName);
+            if (!on || !part)
+                return false;
+            InventoryLocation loc = new InventoryLocation();
+            loc.SetAttachment(on, part, p.SlotId);
+            if (!GameInventory.LocationTestAddEntity(loc, false, true, false, false, true, false))
+            {
+                OZT_Log.Dbg("deal: the gates refuse " + p.ClassName + " in the slot " + p.SlotName + " of " + on.GetType());
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // What found no place. PlacePieces sets the parts of its own thing right
+    // after; everything else has none.
     protected void AddHomeless(string type, int units, float health)
     {
         m_Homeless.Insert(type);
         m_HomelessUnits.Insert(units);
         m_HomelessHealth.Insert(health);
+        m_HomelessParts.Insert(null);
     }
 
     protected void AddGrow(EntityAI stack, int units)
@@ -941,6 +1219,14 @@ class OZT_Deal
         }
         for (int m = 0; m < m_Makes.Count(); m++)
             CreateOne(m_Makes[m]);
+
+        // Parts bought onto things the player carries: after the deletions,
+        // so that a slot this deal frees is free.
+        for (int o = 0; o < m_Ontos.Count(); o++)
+        {
+            OZT_Onto onto = m_Ontos[o];
+            AttachParts(onto.Host, onto.Parts.Items);
+        }
         for (int g = 0; g < m_Grows.Count(); g++)
         {
             if (m_Grows[g].Units > 0)
@@ -1091,6 +1377,59 @@ class OZT_Deal
             Unload(made);
         if (made && make.Health >= 0)
             Wear(made, make.Health);
+        if (made && make.Parts)
+            AttachParts(made, make.Parts.Items);
+    }
+
+    // The parts of one thing, a parent before what hangs on it. A part the
+    // engine refuses is still made, loose: a paid thing is never lost, and
+    // what hangs on it is attached to it where it lies.
+    protected void AttachParts(EntityAI host, array<ref OZT_PartMake> parts)
+    {
+        array<EntityAI> made = new array<EntityAI>();
+        for (int i = 0; i < parts.Count(); i++)
+        {
+            OZT_PartMake p = parts[i];
+            EntityAI on = host;
+            if (p.On >= 0)
+                on = made[p.On];
+            EntityAI part = null;
+            if (on)
+                part = AttachOne(on, p);
+            if (!part)
+            {
+                part = m_Player.GetHumanInventory().CreateInInventory(p.ClassName);
+                string how = "by the engine's own search";
+                if (!part)
+                {
+                    vector feet = m_Player.GetPosition();
+                    part = EntityAI.Cast(GetGame().CreateObjectEx(p.ClassName, feet, ECE_PLACE_ON_SURFACE));
+                    how = "at the player's feet";
+                }
+                string msg = "deal defect: the engine refused the part " + p.ClassName + " in the slot " + p.SlotName;
+                msg = msg + "; it was made " + how;
+                OZT_Log.Error(msg);
+                if (part)
+                    Unload(part);
+            }
+            made.Insert(part);
+        }
+    }
+
+    // A magazine goes onto a weapon through the weapon, so that its state
+    // machine knows (phase 0: a bare attachment call leaves it without one);
+    // anything else straight into its slot. A bought magazine holds no rounds.
+    protected EntityAI AttachOne(EntityAI on, OZT_PartMake p)
+    {
+        EntityAI part = null;
+        Weapon_Base wpn = Weapon_Base.Cast(on);
+        if (wpn && OZT_Fit.IsMagazine(p.ClassName))
+            part = wpn.SpawnAttachedMagazine(p.ClassName, WeaponWithAmmoFlags.NONE);
+        else
+            part = on.GetInventory().CreateAttachmentEx(p.ClassName, p.SlotId);
+        if (part)
+            Unload(part);
+        return part;
     }
 
     // Rounds that come back are as they were: the pile takes their health,

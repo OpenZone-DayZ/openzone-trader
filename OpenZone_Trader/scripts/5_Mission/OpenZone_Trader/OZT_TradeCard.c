@@ -90,8 +90,9 @@ class OZT_Card
     }
 
     // `g` is the trader's entry for the thing's class (null when he neither
-    // sells nor takes it).
-    void Open(OZT_Tile t, OZT_WireGoods g)
+    // sells nor takes it); `comes` names what the goods come with, "" when
+    // nothing does.
+    void Open(OZT_Tile t, OZT_WireGoods g, string comes)
     {
         if (!m_Root || !m_Body || !t || !t.Item || !t.Root)
             return;
@@ -166,6 +167,9 @@ class OZT_Card
             Line(OZT_Ui.Words("STR_OZT_UI_IN_STACK"), t.Count.ToString());
         if ((t.Kind == OZT_Tile.BUY || t.Kind == OZT_Tile.SELL) && t.Count > 0)
             Line(OZT_Ui.Words("STR_OZT_UI_COUNT"), t.Count.ToString());
+        // What the price of the goods holds besides the goods.
+        if (goods && comes != "")
+            Line(OZT_Ui.Words("STR_OZT_UI_COMES_WITH"), comes);
         // The other side of the same trader's book.
         if (goods && g && g.Sell > 0)
             Line(OZT_Ui.Words("STR_OZT_UI_PAYS_NEW"), OZT_Ui.Sum(g.Sell));

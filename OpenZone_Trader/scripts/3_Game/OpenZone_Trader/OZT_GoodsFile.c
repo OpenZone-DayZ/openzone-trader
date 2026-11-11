@@ -8,6 +8,10 @@
 // can be split is paid by its share of a full stack under every rule but
 // "unit": one unit never brings the price of a stack.
 //
+// `With` names classes that come attached to the goods: a pistol with its
+// magazine. Each is goods of the book itself and is charged at its own price:
+// the goods cost the sum, nothing comes free.
+//
 // What is checked HERE is what the file alone can answer, and those fixes are
 // written back by the core's loader. Whether a class exists in the game, and
 // whether a price fits the banknotes, is checked by OZT_Config in memory only:
@@ -19,7 +23,9 @@ class OZT_Goods
     int Buy = 0;
     int Sell = 0;
     string Quantity = "";
+    ref array<string> With;
 
+    // A line read from a file ran no initialiser: one without With has none.
     OZT_Goods Copy()
     {
         OZT_Goods c = new OZT_Goods();
@@ -27,6 +33,16 @@ class OZT_Goods
         c.Buy = Buy;
         c.Sell = Sell;
         c.Quantity = Quantity;
+        c.With = new array<string>();
+        if (With)
+        {
+            for (int i = 0; i < With.Count(); i++)
+            {
+                string part = With[i];
+                if (part != "" && part != ClassName && c.With.Find(part) < 0)
+                    c.With.Insert(part);
+            }
+        }
         return c;
     }
 }

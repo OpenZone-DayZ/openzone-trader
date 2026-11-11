@@ -76,7 +76,7 @@ class OZT_Open
                 wg.Category = e.Category;
                 wg.Buy = OZT_Book.BuyPrice(trader, e, 1);
                 if (e.Sell > 0)
-                    wg.Sell = OZT_Config.RoundTo(e.Sell * trader.SellFactor, unit);
+                    wg.Sell = OZT_Config.RoundDownTo(e.Sell * trader.SellFactor, unit);
                 wg.Rule = e.Rule;
                 if (wg.Buy <= 0 && wg.Sell <= 0)
                     continue;

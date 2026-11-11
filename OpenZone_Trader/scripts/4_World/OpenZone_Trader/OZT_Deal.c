@@ -718,18 +718,15 @@ class OZT_Deal
         return made;
     }
 
-    // More units onto a stack the player keeps. A quantity stack takes the
-    // weighted condition of what it held and the pristine units it gets, as the
-    // game's own combine does; a pile of rounds counts rounds.
+    // More units onto a stack the player keeps. The plan gives new units only
+    // to a stack in the condition of new goods (OZT_InvModel.StacksWithRoom),
+    // so the condition never changes here; inside that condition the stack
+    // takes the weighted health of what it held and the new units it gets, as
+    // the game's own combine does for a stack and for a pile of rounds.
     protected void Merge(EntityAI stack, int units)
     {
-        if (!stack)
+        if (!stack || units <= 0)
             return;
-        if (Magazine.Cast(stack))
-        {
-            OZT_Stack.Add(stack, units);
-            return;
-        }
         float held = OZT_Stack.Units(stack);
         float health = stack.GetHealth01("", "");
         float mixed = (health * held + units) / (held + units);

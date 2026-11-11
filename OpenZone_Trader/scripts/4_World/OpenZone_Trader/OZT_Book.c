@@ -85,6 +85,14 @@ class OZT_Stack
         float part = ib.GetQuantity() / most;
         return Math.Clamp(part, 0, 1);
     }
+
+    // Is the stack in the condition of new goods? What a deal brings is new,
+    // and it joins such a stack only (the owner, 2026-11-11): what differs in
+    // condition is neither stacked nor averaged.
+    static bool LikeNew(EntityAI e)
+    {
+        return e.GetHealthLevel() == GameConstants.STATE_PRISTINE;
+    }
 }
 
 class OZT_BookEntry
@@ -141,7 +149,9 @@ class OZT_Book
     }
 
     // What the player pays this trader for `count` of it: units of a stack
-    // under the unit rule, pieces otherwise. 0: not sold here.
+    // under the unit rule, pieces otherwise. 0: not sold here. One piece's price
+    // goes UP to a multiple of the smallest note and is then multiplied: the
+    // price a catalogue shows for one, times the count.
     static int BuyPrice(OZT_Point trader, OZT_BookEntry e, int count)
     {
         if (count <= 0 || !Deals(trader, e))
@@ -149,12 +159,13 @@ class OZT_Book
         if (e.Buy <= 0)
             return 0;
         int unit = OZT_Config.Get().Unit();
-        int piece = OZT_Config.RoundTo(e.Buy * trader.BuyFactor, unit);
+        int piece = OZT_Config.RoundUpTo(e.Buy * trader.BuyFactor, unit);
         return piece * count;
     }
 
     // What this trader pays for `count` units of `item` (the count matters
-    // under the unit rule only). 0: not taken.
+    // under the unit rule only). 0: not taken. The line's total goes DOWN to a
+    // multiple of the smallest note.
     static int SellPrice(OZT_Point trader, OZT_BookEntry e, EntityAI item, int count)
     {
         if (!item || !Deals(trader, e))
@@ -170,6 +181,6 @@ class OZT_Book
         else if (e.Rule == OZT_Const.RULE_FRACTION)
             price = price * OZT_Stack.Fraction(item);
         int unit = OZT_Config.Get().Unit();
-        return OZT_Config.RoundTo(price, unit);
+        return OZT_Config.RoundDownTo(price, unit);
     }
 }

@@ -180,3 +180,31 @@ was not taken on its own; the one after row 7 covers it.
 - **Sold and bought in one deal:** row 36, a canteen takes the cells of two bandages; row 30, the cells of the canteen and the piles sold.
 - **Refusals that touch nothing:** rows 8-16, 21, 23, 34, and the comparison after them.
 - **Differed from the plan:** nothing in the answers. What the plan had wrong before this run is in the plan's execution record: the stall's placement (Task 4) and the profile's mod list (Task 1).
+
+## After the owner's two decisions
+
+The same day the owner changed two of the plan's own decisions, and the code with them:
+prices are rounded always in the trader's favour ("we want no money dupes"), and what a deal
+brings joins only a stack in the same condition ("what differs in condition must not be
+stacked or averaged"). One more boot on the changed code. Rows 3.14 and 3.15 above were
+measured before the change; their answers now are rows A.4 and A.5.
+
+| # | what is asked | command | answer | as expected? |
+|---|---|---|---|---|
+| A.1 | prices that are exact multiples, as before | `price` for `Canteen`, for 30 rounds; `pay 40` | `buy(1)=120 sell(1 of 1, level 0)=60`; `buy(30)=300`; `pay 40: spend 50x1/2; change 10 = 5x2` | yes |
+| A.2 | a worn canteen | `damage` to 0.6, `{"op": "price", "class": "Canteen"}` | `sell(1 of 1, level 1)=50` (51 goes down) | yes |
+| A.3 | the same canteen at 950 of 1000 | `ozt_probe` `{"op": "qty", "item": "canteen", "set": "950"}`, `price` | `sell(1 of 1, level 1)=45`: 48.45 goes down to 45, where the nearest multiple is 50 | yes |
+| A.4 | the goods file with `Paper` at `Buy` 7, `Sell` 7 and a `NoSuchThing` | `{"op": "reload"}` | `reloaded: ... problems=3 revision=2`; `Buy of 'Paper' is 7, not a multiple of the smallest note (5); using 10`, `Sell of 'Paper' is 7, not a multiple of the smallest note (5); using 5`, `'NoSuchThing' in category 'gear' is skipped: no such class` | yes |
+| A.5 | the file put back; then `CooldownMs` 700000 and back | three reloads | `problems=0 revision=3`; `problems=1 revision=4`; `problems=0 revision=5` | yes |
+| A.6 | the trader's `BuyFactor` at 1.01 | `{"op": "reload"}`, `price` for `Canteen`, for 30 rounds | `revision=6`; `buy(1)=125` (121.2 goes up, where the nearest multiple is 120); `buy(30)=450` (one round at 10.1 goes up to 15, then thirty of them) | yes |
+| A.7 | the file put back | `{"op": "reload"}` | `problems=0 revision=7` | yes |
+| A.8 | Task 6's first deal again | `quote` and `deal` of a bandage, `balance` | `net=40 ... balance=595`, `stacks: 5x4 5x5 50x1 500x1` | yes |
+| A.9 | a pile of four rounds, worn | `ozt_probe` `create` with `ammo` 4, `{"op": "damage", "class": "Ammo_762x39", "health": "0.6"}` | `Ammo_762x39 health level 1` | yes |
+| A.10 | eight rounds bought | `{"op": "deal", "buy": "Ammo_762x39:8"}` | `deal ok=yes net=80 paid=80 received=0 balance=515 hands= left=0`; the worn pile still `ammo 4/20`; a new pile `CARGO M65Jacket_Black r0 c4`, `ammo 8/20` | yes |
+| A.11 | four more | `{"op": "deal", "buy": "Ammo_762x39:4"}` | `deal ok=yes net=40 paid=40 received=0 balance=475 hands= left=0`; the new pile `ammo 12/20`, the worn one still `ammo 4/20`; `stacks: 5x5 50x9` | yes |
+| A.12 | the client against the server | `dump 2` | `SAME`, 29 items | yes |
+| A.13 | the 36 rows of Task 7 again, on a fresh scene | the same commands in the same order | every answer, balance and stack list as in the table of Task 7 above; the comparison after row 36 `SAME`, 84 items | yes |
+
+The log of this boot holds seventeen `deal:` lines (three of rows A.8-A.11, fourteen of
+Task 7), no error of the mod and no `deal defect`. Its verdict fails on the warning budget
+alone: the four WARNING lines of rows A.4 and A.5, which those rows provoke on purpose.

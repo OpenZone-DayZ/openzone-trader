@@ -103,13 +103,37 @@ class OZT_Config
         return GetGame().ConfigIsExisting("CfgMagazines " + type);
     }
 
-    // To a multiple of `unit`, half up.
-    static int RoundTo(float amount, int unit)
+    // A price becomes a multiple of `unit` always in the trader's favour (the
+    // owner, 2026-11-11: no money dupes): what the player pays goes up to the
+    // next multiple, what the trader pays goes down to the last one. Never to
+    // the nearest, which would now and then hand out money.
+    //
+    // A product of floats carries noise in its last digits, so an amount that
+    // is a multiple to within a thousandth of a unit (more for a large amount)
+    // counts as that multiple: 120 x 1.0 must not become 125.
+    static int RoundUpTo(float amount, int unit)
     {
         if (unit < 1)
             unit = 1;
-        float parts = Math.Floor(amount / unit + 0.5);
-        int n = parts;
+        float parts = amount / unit;
+        float slack = 0.001 + parts * 0.000001;
+        float whole = Math.Floor(parts);
+        int n = whole;
+        if (parts - whole > slack)
+            n = n + 1;
+        return n * unit;
+    }
+
+    static int RoundDownTo(float amount, int unit)
+    {
+        if (unit < 1)
+            unit = 1;
+        float parts = amount / unit;
+        float slack = 0.001 + parts * 0.000001;
+        float whole = Math.Floor(parts);
+        int n = whole;
+        if (whole + 1 - parts < slack)
+            n = n + 1;
         return n * unit;
     }
 
@@ -235,7 +259,9 @@ class OZT_Config
             return price;
         if (price % unit == 0)
             return price;
-        int rounded = RoundTo(price, unit);
+        int rounded = RoundDownTo(price, unit);
+        if (side == "Buy")
+            rounded = RoundUpTo(price, unit);
         string msg = "Goods: " + side + " of '" + type + "' is " + price.ToString();
         msg = msg + ", not a multiple of the smallest note (" + unit.ToString() + "); using " + rounded.ToString();
         Problem(msg);

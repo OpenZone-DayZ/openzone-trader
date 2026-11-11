@@ -468,9 +468,11 @@ class OZT_InvModel
             m_StackUnits.Set(at, units);
     }
 
-    // The stacks of a class that lie in a cargo and have room, with the room of
-    // each as planned so far; with `notesFirst` the ones inside note holders
-    // come first.
+    // The stacks of a class that lie in a cargo, are in the condition of new
+    // goods and have room, with the room of each as planned so far; with
+    // `notesFirst` the ones inside note holders come first. A stack in another
+    // condition gets nothing: what differs in condition is neither stacked nor
+    // averaged (the owner, 2026-11-11).
     void StacksWithRoom(string type, bool notesFirst, out array<EntityAI> stacks, out array<int> room)
     {
         stacks = new array<EntityAI>();
@@ -481,6 +483,8 @@ class OZT_InvModel
             {
                 EntityAI s = m_Stacks[i];
                 if (!s || s.GetType() != type)
+                    continue;
+                if (!OZT_Stack.LikeNew(s))
                     continue;
                 InventoryLocation il = new InventoryLocation();
                 if (!s.GetInventory().GetCurrentInventoryLocation(il))

@@ -1,0 +1,401 @@
+// Tiles and the grids they lie in.
+//
+// A tile is a thing's picture with its marks. Four grids hold them: the
+// trader's shelf, the player's own things and the two carts. A grid is twelve
+// cells across; a tile takes half the item's inventory size, rounded up (the
+// true size is for the card), and tiles are packed first fit, row by row.
+
+class OZT_Tile
+{
+    // What a tile stands for.
+    static const int SHELF = 1;   // goods of the trader
+    static const int OWN   = 2;   // a thing the player carries
+    static const int BUY   = 3;   // a line of the BUY cart
+    static const int SELL  = 4;   // a line of the SELL cart
+
+    static const string LAYOUT = "OpenZone_Trader/gui/layouts/ozt_trade_tile.layout";
+    static const string ROOT   = "OZT_TradeTile";
+
+    int Kind;
+    string Type;
+
+    // The entity the picture is drawn from: the player's own thing, or the
+    // shelf's stand-in for a class.
+    EntityAI Item;
+
+    // The player's own thing, as the server names it.
+    int Low;
+    int High;
+
+    // What the tile shows. Price below zero: asked, not answered yet.
+    int Price;
+    int Count;
+
+    // 0: can be sold. 1: the trader does not take it. 2: not empty.
+    int Why;
+
+    // A line of a cart, or the place in the list the tile was made from.
+    int Index;
+
+    // Cells.
+    int W;
+    int H;
+    int Col;
+    int Row;
+
+    Widget Root;
+    protected Widget m_Edge;
+    protected Widget m_Bg;
+    protected ItemPreviewWidget m_Pic;
+    protected Widget m_No;
+    protected Widget m_Pip;
+    protected TextWidget m_PriceText;
+    protected TextWidget m_QtyText;
+    protected TextWidget m_QtyTop;
+    protected bool m_Picked;
+
+    void OZT_Tile(int kind, string type, EntityAI item)
+    {
+        Kind = kind;
+        Type = type;
+        Item = item;
+        W = 1;
+        H = 1;
+        ReadFootprint();
+    }
+
+    // Half the inventory size, rounded up, and never wider than the grid.
+    protected void ReadFootprint()
+    {
+        InventoryItem ii = InventoryItem.Cast(Item);
+        if (!ii)
+            return;
+        int w;
+        int h;
+        GetGame().GetInventoryItemSize(ii, w, h);
+        W = (w + 1) / 2;
+        H = (h + 1) / 2;
+        if (W < 1)
+            W = 1;
+        if (H < 1)
+            H = 1;
+        if (W > OZT_TileGrid.COLS)
+            W = OZT_TileGrid.COLS;
+        if (H > 6)
+            H = 6;
+    }
+
+    bool Build(Widget parent)
+    {
+        Root = OZT_Ui.Make(LAYOUT, parent, ROOT);
+        if (!Root)
+            return false;
+        m_Edge = Root.FindAnyWidget("TileEdge");
+        m_Bg = Root.FindAnyWidget("TileBg");
+        m_Pic = ItemPreviewWidget.Cast(Root.FindAnyWidget("TilePic"));
+        m_No = Root.FindAnyWidget("TileNo");
+        m_Pip = Root.FindAnyWidget("TilePip");
+        m_PriceText = TextWidget.Cast(Root.FindAnyWidget("TilePrice"));
+        m_QtyText = TextWidget.Cast(Root.FindAnyWidget("TileQty"));
+        m_QtyTop = TextWidget.Cast(Root.FindAnyWidget("TileQtyTop"));
+        if (m_Pic && Item)
+        {
+            m_Pic.SetItem(Item);
+            m_Pic.SetView(Item.GetViewIndex());
+            m_Pic.SetModelOrientation("0 0 0");
+        }
+        PaintMarks();
+        return true;
+    }
+
+    // Where the grid put it, in whole pixels: `cell` is one cell's side.
+    void Place(float cell)
+    {
+        if (!Root)
+            return;
+        float w = W * cell;
+        float h = H * cell;
+        Root.SetPos(Col * cell, Row * cell);
+        Root.SetSize(w, h);
+        if (m_Bg)
+        {
+            m_Bg.SetPos(1, 1);
+            m_Bg.SetSize(w - 2, h - 2);
+        }
+    }
+
+    // The whole of a holder of the given size, in pixels: a slot's tile.
+    void Fill(float w, float h)
+    {
+        if (!Root)
+            return;
+        W = 2;
+        H = 1;
+        Root.SetPos(0, 0);
+        Root.SetSize(w, h);
+        if (m_Bg)
+        {
+            m_Bg.SetPos(1, 1);
+            m_Bg.SetSize(w - 2, h - 2);
+        }
+        PaintMarks();
+    }
+
+    void PaintMarks()
+    {
+        if (!Root)
+            return;
+        if (m_PriceText)
+        {
+            // A tile one cell wide has room for four digits.
+            if (Price > 0 && W == 1)
+                m_PriceText.SetText(OZT_Ui.Short(Price));
+            else if (Price > 0)
+                m_PriceText.SetText(OZT_Ui.Sum(Price));
+            else if (Price < 0)
+                m_PriceText.SetText("...");
+            else
+                m_PriceText.SetText("");
+        }
+        // The count: beside the price where the tile is wide enough for both,
+        // above it where it is not.
+        bool wide = W > 1;
+        if (m_QtyText)
+        {
+            m_QtyText.Show(Count > 0 && wide);
+            if (Count > 0)
+                m_QtyText.SetText(Count.ToString());
+        }
+        if (m_QtyTop)
+        {
+            m_QtyTop.Show(Count > 0 && !wide);
+            if (Count > 0)
+                m_QtyTop.SetText(Count.ToString());
+        }
+        if (m_No)
+        {
+            m_No.Show(Why != 0);
+            if (Why == 2)
+                m_No.SetColor(OZT_Look.Alert());
+            else
+                m_No.SetColor(OZT_Look.Bad());
+        }
+        if (m_Pip)
+        {
+            int level = 0;
+            if (Item && Kind != SHELF && Kind != BUY)
+                level = Item.GetHealthLevel();
+            m_Pip.Show(level > 0);
+            if (level > 0)
+                m_Pip.SetColor(OZT_Look.Condition(level));
+        }
+        SetPicked(m_Picked);
+    }
+
+    // The selected tile wears the accent on its border.
+    void SetPicked(bool on)
+    {
+        m_Picked = on;
+        if (m_Edge)
+        {
+            if (on)
+                m_Edge.SetColor(OZT_Look.Accent());
+            else
+                m_Edge.SetColor(OZT_Look.EdgeDim());
+        }
+        if (m_Bg)
+        {
+            if (on)
+                m_Bg.SetColor(OZT_Look.TileLit());
+            else
+                m_Bg.SetColor(OZT_Look.Tile());
+        }
+    }
+
+    bool IsPicked()
+    {
+        return m_Picked;
+    }
+
+    void Unbuild()
+    {
+        if (m_Pic)
+            m_Pic.SetItem(null);
+        if (Root)
+            Root.Unlink();
+        Root = null;
+    }
+}
+
+class OZT_TileGrid
+{
+    static const int COLS = 12;
+    static const float CELL_UNITS = 44;
+
+    protected ScrollWidget m_Scroll;
+    protected Widget m_Content;
+    protected CanvasWidget m_Lines;
+    protected ref array<ref OZT_Tile> m_Tiles;
+    protected int m_MinRows;
+    protected int m_Rows;
+    protected float m_Cell;
+
+    // `prefix` names the scroll, its content and its canvas in the layout:
+    // <prefix>Scroll, <prefix>Content, <prefix>Lines.
+    void OZT_TileGrid(Widget root, string prefix, int minRows)
+    {
+        m_Scroll = ScrollWidget.Cast(root.FindAnyWidget(prefix + "Scroll"));
+        m_Content = root.FindAnyWidget(prefix + "Content");
+        m_Lines = CanvasWidget.Cast(root.FindAnyWidget(prefix + "Lines"));
+        m_Tiles = new array<ref OZT_Tile>();
+        m_MinRows = minRows;
+        m_Rows = minRows;
+        m_Cell = Math.Floor(CELL_UNITS * OZT_Ui.Px());
+        if (m_Cell < 8)
+            m_Cell = 8;
+    }
+
+    bool IsReady()
+    {
+        return m_Scroll && m_Content;
+    }
+
+    float Cell()
+    {
+        return m_Cell;
+    }
+
+    int Count()
+    {
+        return m_Tiles.Count();
+    }
+
+    OZT_Tile Get(int i)
+    {
+        return m_Tiles[i];
+    }
+
+    void Clear()
+    {
+        for (int i = 0; i < m_Tiles.Count(); i++)
+            m_Tiles[i].Unbuild();
+        m_Tiles.Clear();
+    }
+
+    // Adds a tile and makes its widgets; false when the layout did not load.
+    bool Add(OZT_Tile t)
+    {
+        if (!m_Content || !t.Build(m_Content))
+            return false;
+        m_Tiles.Insert(t);
+        return true;
+    }
+
+    // The tile a widget belongs to: the widget itself or anything inside it.
+    OZT_Tile Of(Widget w)
+    {
+        while (w)
+        {
+            for (int i = 0; i < m_Tiles.Count(); i++)
+            {
+                if (m_Tiles[i].Root == w)
+                    return m_Tiles[i];
+            }
+            if (w == m_Content)
+                return null;
+            w = w.GetParent();
+        }
+        return null;
+    }
+
+    // Is the widget this grid's, or anything in it?
+    bool Holds(Widget w)
+    {
+        while (w)
+        {
+            if (w == m_Scroll)
+                return true;
+            w = w.GetParent();
+        }
+        return false;
+    }
+
+    // Packs the tiles first fit in the order they were added, places them,
+    // sizes the content to its rows and draws the cells.
+    void Arrange()
+    {
+        if (!IsReady())
+            return;
+
+        // One int per row, a bit per column.
+        array<int> rows = new array<int>();
+        int used = 0;
+        for (int i = 0; i < m_Tiles.Count(); i++)
+        {
+            OZT_Tile t = m_Tiles[i];
+            bool placed = false;
+            int mask = ((1 << t.W) - 1);
+            for (int y = 0; y < 400 && !placed; y++)
+            {
+                for (int x = 0; x + t.W <= COLS; x++)
+                {
+                    int shifted = mask << x;
+                    bool fits = true;
+                    for (int j = 0; j < t.H; j++)
+                    {
+                        int at = y + j;
+                        if (at < rows.Count() && (rows[at] & shifted) != 0)
+                        {
+                            fits = false;
+                            break;
+                        }
+                    }
+                    if (!fits)
+                        continue;
+                    for (int k = 0; k < t.H; k++)
+                    {
+                        int row = y + k;
+                        while (rows.Count() <= row)
+                            rows.Insert(0);
+                        rows[row] = rows[row] | shifted;
+                    }
+                    t.Col = x;
+                    t.Row = y;
+                    placed = true;
+                    if (y + t.H > used)
+                        used = y + t.H;
+                    break;
+                }
+            }
+            t.Place(m_Cell);
+        }
+
+        m_Rows = used;
+        if (m_Rows < m_MinRows)
+            m_Rows = m_MinRows;
+        m_Content.SetSize(COLS * m_Cell, m_Rows * m_Cell);
+        m_Content.Update();
+        m_Scroll.Update();
+        DrawCells();
+    }
+
+    protected void DrawCells()
+    {
+        if (!m_Lines)
+            return;
+        m_Lines.Clear();
+        float w = COLS * m_Cell;
+        float h = m_Rows * m_Cell;
+        int color = OZT_Look.GridLine();
+        for (int x = 0; x <= COLS; x++)
+        {
+            float px = x * m_Cell;
+            m_Lines.DrawLine(px, 0, px, h, 1, color);
+        }
+        for (int y = 0; y <= m_Rows; y++)
+        {
+            float py = y * m_Cell;
+            m_Lines.DrawLine(0, py, w, py, 1, color);
+        }
+    }
+}

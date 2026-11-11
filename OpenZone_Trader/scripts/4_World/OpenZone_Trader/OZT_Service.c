@@ -53,6 +53,12 @@ class OZT_Open
         res.Label = money.Label();
         res.Balance = money.Balance(player);
         res.WearBought = OZT_Config.Get().Settings().WearBought;
+        if (money.Physical())
+        {
+            array<ref OZT_Note> notes = OZT_Config.Get().Settings().Notes;
+            for (int n = 0; n < notes.Count(); n++)
+                res.Notes.Insert(notes[n].ClassName);
+        }
         res.Condition = OZT_Config.Get().Settings().Condition.Copy();
 
         int unit = OZT_Config.Get().Unit();

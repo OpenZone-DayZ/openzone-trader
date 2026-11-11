@@ -42,13 +42,14 @@ class CfgMods
         version    = "0.1.0";
         type       = "mod";
 
-        // No mission module yet: the trade screen brings it in phase 2.
-        dependencies[] = {"Game", "World"};
+        dependencies[] = {"Game", "World", "Mission"};
 
         class defs
         {
             class gameScriptModule  { value = ""; files[] = {"OpenZone_Trader/scripts/3_Game"}; };
             class worldScriptModule { value = ""; files[] = {"OpenZone_Trader/scripts/4_World"}; };
+            // The trade screen and the client's side of the service.
+            class missionScriptModule { value = ""; files[] = {"OpenZone_Trader/scripts/5_Mission"}; };
         };
     };
 };

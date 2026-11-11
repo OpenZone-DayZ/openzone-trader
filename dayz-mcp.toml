@@ -17,6 +17,11 @@ name = "openzone-trader"
 #                                inventory dumps, the stand's wallet and notes.
 # OpenZone_TraderProbe_Bridge -- server only: the `ozt_probe` verb.
 mods = ["OpenZone_Trader", "OpenZone_Trader_Bridge", "OpenZone_TraderProbe", "OpenZone_TraderProbe_Bridge"]
+# The layout generator reads the series' design tokens from the core, so the
+# trade screen wears the same palette and type as the PDA and the research tree.
+# The trader's own file is laid over it: the few colours and sizes a trade
+# screen has and the PDA does not.
+tokens = ["../openzone-core/ui/tokens.json", "ui/tokens.json"]
 
 [expect]
 # Printed by OZT_Module one tick after the mission starts.

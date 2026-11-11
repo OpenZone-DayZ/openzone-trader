@@ -1,0 +1,141 @@
+{
+  "layout": "ozt_trade_tile",
+  "note": "One tile of the trade screen: a thing's picture on its square, the price in gold at the bottom left, a count (bottom right on a wide tile, top right on a narrow one), a pip for its condition at the top right, and a coloured corner when it cannot be sold as it is. The root takes the pointer: a click and a drag land on it, and everything inside ignores the pointer, the picture too (a press on a picture that took the pointer never became a drag). The menu sizes the root to the tile's cells, then TileBg one pixel inside it, so that TileEdge shows as a border; the marks hang on the corners and follow (OZT_TradeTile.c). The marks stand at priority 610: the game draws an item's picture over its low siblings whatever their order (the vanilla icon keeps its picture at 151 and its count at 606).",
+  "root": {
+    "frame": {
+      "name": "OZT_TradeTile",
+      "size": [
+        44,
+        44
+      ],
+      "priority": 5,
+      "children": [
+        {
+          "panel": {
+            "name": "TileEdge",
+            "size": "fill",
+            "color": "$edge",
+            "children": [
+              {
+                "panel": {
+                  "name": "TileBg",
+                  "at": [
+                    1,
+                    1
+                  ],
+                  "size": [
+                    42,
+                    42
+                  ],
+                  "color": "$tile"
+                }
+              },
+              {
+                "preview": {
+                  "name": "TilePic",
+                  "size": "fill",
+                  "props": {
+                    "ignorepointer": 1
+                  },
+                  "note": "Ignores the pointer: the press has to land on the root, which is the widget the engine drags."
+                }
+              },
+              {
+                "panel": {
+                  "name": "TileNo",
+                  "at": [
+                    3,
+                    3
+                  ],
+                  "size": [
+                    9,
+                    9
+                  ],
+                  "color": "$bad",
+                  "hidden": true,
+                  "note": "It cannot be sold as it is: red when the trader does not take it, amber when it has to be emptied first.",
+                  "priority": 610
+                }
+              },
+              {
+                "panel": {
+                  "name": "TilePip",
+                  "anchor": "right",
+                  "at": [
+                    4,
+                    4
+                  ],
+                  "size": [
+                    7,
+                    7
+                  ],
+                  "color": "$ok",
+                  "hidden": true,
+                  "note": "Condition: shown from worn downwards, in the colour of the level.",
+                  "priority": 610
+                }
+              },
+              {
+                "label": {
+                  "name": "TilePrice",
+                  "anchor": "bottom",
+                  "at": [
+                    4,
+                    1
+                  ],
+                  "size": [
+                    84,
+                    16
+                  ],
+                  "font": "small",
+                  "color": "$gold",
+                  "note": "Wider than a one-cell tile on purpose: a tile clips it, and a price is never cut short on a wide one.",
+                  "priority": 610
+                }
+              },
+              {
+                "label": {
+                  "name": "TileQty",
+                  "anchor": "bottom-right",
+                  "at": [
+                    3,
+                    1
+                  ],
+                  "size": [
+                    40,
+                    16
+                  ],
+                  "font": "small",
+                  "color": "$text",
+                  "align": "right",
+                  "hidden": true,
+                  "priority": 610
+                }
+              },
+              {
+                "label": {
+                  "name": "TileQtyTop",
+                  "anchor": "right",
+                  "at": [
+                    13,
+                    1
+                  ],
+                  "size": [
+                    30,
+                    16
+                  ],
+                  "font": "small",
+                  "color": "$text",
+                  "align": "right",
+                  "hidden": true,
+                  "priority": 610,
+                  "note": "The count on a tile one cell wide, where the bottom is the price's."
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

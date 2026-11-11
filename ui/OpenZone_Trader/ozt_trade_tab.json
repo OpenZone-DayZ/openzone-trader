@@ -1,0 +1,38 @@
+{
+  "layout": "ozt_trade_tab",
+  "note": "One category tab of the trade screen. The root takes the pointer and carries the tab's index as its user id; the menu sizes it, paints TabBg and TabLine for the tab in view and sets the text (OZT_TradeMenu.c).",
+  "root": {
+    "frame": {
+      "name": "OZT_TradeTab",
+      "size": [72, 44],
+      "children": [
+        {
+          "panel": {
+            "name": "TabBg",
+            "size": "fill",
+            "color": "$raised"
+          }
+        },
+        {
+          "panel": {
+            "name": "TabLine",
+            "anchor": "bottom",
+            "size": [528, 2],
+            "color": "$accent",
+            "hidden": true,
+            "note": "The mark of the tab in view. As wide as the whole strip: the tab clips it."
+          }
+        },
+        {
+          "label": {
+            "name": "TabText",
+            "size": "fill",
+            "font": "small",
+            "color": "$muted",
+            "align": "center"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -22,6 +22,10 @@ class OZT_Const
     // the trader's id.
     static const string SHOW_PREFIX = "trader:";
 
+    // The trade screen's menu id, beside the series' own (131-135 are the PDA's
+    // and the research tree's). A large id makes EnterScriptedMenu answer nothing.
+    static const int MENU_TRADE = 136;
+
     // Kinds of a trader point.
     static const string KIND_OBJECT = "object";
     static const string KIND_NPC    = "npc";

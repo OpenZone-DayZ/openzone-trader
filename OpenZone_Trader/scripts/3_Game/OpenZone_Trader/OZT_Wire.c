@@ -65,6 +65,9 @@ class OZT_OpenRes
     ref array<ref OZT_WireCategory> Categories;
     ref array<ref OZT_WireGoods> Goods;
     ref array<ref OZT_WireOwn> Yours;
+    // The classes that are this trader's money when money is items: the screen
+    // counts them as money and does not show them among the player's things.
+    ref array<string> Notes;
 
     void OZT_OpenRes()
     {
@@ -72,6 +75,7 @@ class OZT_OpenRes
         Categories = new array<ref OZT_WireCategory>();
         Goods = new array<ref OZT_WireGoods>();
         Yours = new array<ref OZT_WireOwn>();
+        Notes = new array<string>();
     }
 }
 
@@ -139,4 +143,19 @@ class OZT_DealRes
     // The number a refusal carries: things that do not fit (no space), things
     // in the way (not empty).
     int Left = 0;
+
+    // What the lines come to, on a refusal too as far as they were read: what
+    // the trader pays for everything sold, what everything bought costs, and
+    // each line's own sum in the order of the request. The screen shows these
+    // and computes none of its own.
+    int Sold = 0;
+    int Bought = 0;
+    ref array<int> SellPrices;
+    ref array<int> BuyPrices;
+
+    void OZT_DealRes()
+    {
+        SellPrices = new array<int>();
+        BuyPrices = new array<int>();
+    }
 }

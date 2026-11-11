@@ -11,3 +11,51 @@ STR_OZT_NO_NOT_EMPTY,Спершу спорожніть річ (усередин�
 STR_OZT_NO_LOCKED,Цей товар вам недоступний,These goods are not available to you
 STR_OZT_NO_STOCK,Товар закінчився,Out of stock
 STR_OZT_NO_INTERNAL,Торговець не зміг виконати угоду,The trader could not complete the deal
+# The trade screen. Titles are capitals in both languages; the capital of the
+# Ukrainian i is typed as the Latin I, which the game's fonts have.
+STR_OZT_UI_BUY,КУПIВЛЯ,BUY
+STR_OZT_UI_SELL,ПРОДАЖ,SELL
+STR_OZT_UI_TRADER,ТОРГОВЕЦЬ,TRADER
+STR_OZT_UI_YOURS,ВАШI РЕЧI,YOUR ITEMS
+STR_OZT_UI_YOURS_META,"усе, що у ваших сумках",everything in your bags
+STR_OZT_UI_CHARACTER,ПЕРСОНАЖ,CHARACTER
+STR_OZT_UI_ALL,УСЕ,ALL
+STR_OZT_UI_BUY_EMPTY,"Перетягніть сюди товар або двічі клацніть його на полиці","Drag goods here, or double-click them on the shelf"
+STR_OZT_UI_SELL_EMPTY,"Перетягніть сюди свої речі або двічі клацніть їх","Drag your items here, or double-click them"
+STR_OZT_UI_TO_PAY,До сплати,To pay
+STR_OZT_UI_TO_RECEIVE,До отримання,To receive
+STR_OZT_UI_TRADER_MONEY,Гроші торговця,Trader's money
+STR_OZT_UI_UNLIMITED,без ліміту,unlimited
+STR_OZT_UI_PRICE_LIST,ПРАЙС,PRICE LIST
+STR_OZT_UI_YOUR_MONEY,Ваші гроші,Your money
+STR_OZT_UI_DEAL,УГОДА,DEAL
+STR_OZT_UI_YOU_GET,ВИ ОТРИМАЄТЕ,YOU GET
+STR_OZT_UI_YOU_PAY,ВИ ПЛАТИТЕ,YOU PAY
+STR_OZT_UI_EVEN,РIВНИЙ ОБМIН,EVEN TRADE
+STR_OZT_UI_YOU_SELL,Продаєте,You sell
+STR_OZT_UI_YOU_BUY,Купуєте,You buy
+STR_OZT_UI_AFTER,Грошей після угоди,Money after
+STR_OZT_UI_SHORT,Бракує,Short by
+STR_OZT_UI_CONFIRM,ПIДТВЕРДИТИ,CONFIRM
+STR_OZT_UI_CLEAR,ОЧИСТИТИ,CLEAR
+STR_OZT_UI_FITS,Усе вміщується у ваші речі,Everything fits in your bags
+STR_OZT_UI_TO_HANDS,Місця немає: %1 піде в руки,No room in your bags: %1 goes to your hands
+STR_OZT_UI_ASKING,Торговець рахує...,The trader is counting...
+STR_OZT_UI_EMPTY_DEAL,Куплене й решта лягають у перше вільне місце,Bought items and change go to the first free space in your bags
+STR_OZT_UI_LOADING,Чекаємо на торговця...,Waiting for the trader...
+STR_OZT_UI_HELLO,"Клацніть річ, щоб вибрати її. Двічі клацніть або перетягніть, щоб додати до угоди.","Click an item to select it. Double-click or drag it to move it into the deal."
+STR_OZT_UI_DONE,Угоду укладено,The deal is done
+STR_OZT_UI_KEYS,ЛКМ - вибрати     2xЛКМ або перетягнути - в угоду     F - підтвердити     R - очистити     Esc - закрити,LMB - select     2xLMB or drag - into the deal     F - confirm     R - clear     Esc - close
+STR_OZT_UI_WHY_NOT_TAKEN,Торговець це не бере,The trader does not take this
+STR_OZT_UI_WHY_NOT_EMPTY,"Спершу спорожніть: щось лежить у ній або закріплене на ній","Empty it first: something is in it or on it"
+STR_OZT_UI_PRICE,Ціна,Price
+STR_OZT_UI_PAYS,Торговець дає,The trader pays
+STR_OZT_UI_HANDS,Руки,Hands
+STR_OZT_UI_HOW_MANY_BUY,СКIЛЬКИ КУПИТИ,HOW MANY TO BUY
+STR_OZT_UI_HOW_MANY_SELL,СКIЛЬКИ ПРОДАТИ,HOW MANY TO SELL
+STR_OZT_UI_TOTAL,Разом,Total
+STR_OZT_UI_CANCEL,СКАСУВАТИ,CANCEL
+STR_OZT_UI_OK_BUY,КУПИТИ,BUY
+STR_OZT_UI_OK_SELL,ПРОДАТИ,SELL
+STR_OZT_UI_EACH,%1 за одиницю,%1 each
+STR_OZT_UI_WHOLE,%1 за все,%1 for all of it

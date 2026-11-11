@@ -1,0 +1,296 @@
+{
+  "layout": "ozt_trade_qty",
+  "note": "The quantity dialog of the trade screen (OZT_TradeQty.c): how many units of a stack are sold, or bought of goods priced by the unit. A window of its own on the workspace, not a part of the screen's layout: the game draws an item's picture over its low siblings, so what must cover the pictures of the tiles has to stand high, and a picture inside something high is drawn only in the vanilla tooltip's shape: a root at 952, a frame at 0, the picture at 201. QtyVeil takes the pointer, so nothing under the dialog answers while it is open.",
+  "root": {
+    "frame": {
+      "name": "OZT_TradeQty",
+      "size": "screen",
+      "priority": 952,
+      "children": [
+        {
+          "panel": {
+            "name": "QtyVeil",
+            "size": "fill",
+            "color": "$veil",
+            "click": true,
+            "priority": 0,
+            "note": "Takes the pointer: nothing under the dialog answers while it is open."
+          }
+        },
+        {
+          "panel": {
+            "name": "QtyBox",
+            "anchor": "center",
+            "size": [
+              480,
+              306
+            ],
+            "color": "$panel",
+            "edge": true,
+            "priority": 1,
+            "children": [
+              {
+                "panel": {
+                  "name": "QtyHead",
+                  "at": [
+                    0,
+                    0
+                  ],
+                  "size": [
+                    480,
+                    40
+                  ],
+                  "color": "$head",
+                  "children": [
+                    {
+                      "panel": {
+                        "name": "QtyDot",
+                        "at": [
+                          16,
+                          16
+                        ],
+                        "size": [
+                          8,
+                          8
+                        ],
+                        "color": "$accent"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "QtyTitle",
+                        "at": [
+                          34,
+                          0
+                        ],
+                        "size": [
+                          430,
+                          40
+                        ],
+                        "font": "header",
+                        "color": "$text"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "panel": {
+                  "name": "QtyPicBed",
+                  "at": [
+                    20,
+                    58
+                  ],
+                  "size": [
+                    72,
+                    72
+                  ],
+                  "color": "$tile"
+                }
+              },
+              {
+                "preview": {
+                  "name": "QtyPic",
+                  "at": [
+                    20,
+                    58
+                  ],
+                  "size": [
+                    72,
+                    72
+                  ],
+                  "priority": 201,
+                  "props": {
+                    "ignorepointer": 1
+                  }
+                }
+              },
+              {
+                "label": {
+                  "name": "QtyName",
+                  "at": [
+                    106,
+                    60
+                  ],
+                  "size": [
+                    230,
+                    30
+                  ],
+                  "font": "header",
+                  "color": "$text"
+                }
+              },
+              {
+                "label": {
+                  "name": "QtyUnit",
+                  "at": [
+                    106,
+                    94
+                  ],
+                  "size": [
+                    230,
+                    24
+                  ],
+                  "font": "small",
+                  "color": "$muted"
+                }
+              },
+              {
+                "label": {
+                  "name": "QtyCount",
+                  "at": [
+                    336,
+                    58
+                  ],
+                  "size": [
+                    124,
+                    72
+                  ],
+                  "font": "big",
+                  "color": "$text",
+                  "align": "right"
+                }
+              },
+              {
+                "button": {
+                  "name": "QtyMinus",
+                  "at": [
+                    20,
+                    152
+                  ],
+                  "size": [
+                    44,
+                    44
+                  ],
+                  "text": "-",
+                  "glyph": true,
+                  "color": "$text"
+                }
+              },
+              {
+                "raw": {
+                  "name": "QtySlider",
+                  "class": "SliderWidgetClass",
+                  "at": [
+                    74,
+                    158
+                  ],
+                  "size": [
+                    262,
+                    32
+                  ],
+                  "color": "$accent",
+                  "props": {
+                    "style": "Default",
+                    "no focus": 0,
+                    "maximum": 1,
+                    "step": 1,
+                    "current": 1,
+                    "fill in": 1,
+                    "listen to input": 1
+                  }
+                }
+              },
+              {
+                "button": {
+                  "name": "QtyPlus",
+                  "at": [
+                    346,
+                    152
+                  ],
+                  "size": [
+                    44,
+                    44
+                  ],
+                  "text": "+",
+                  "glyph": true,
+                  "color": "$text"
+                }
+              },
+              {
+                "button": {
+                  "name": "QtyAll",
+                  "at": [
+                    400,
+                    152
+                  ],
+                  "size": [
+                    60,
+                    44
+                  ],
+                  "text": "#STR_OZT_UI_ALL",
+                  "font": "hint",
+                  "color": "$text"
+                }
+              },
+              {
+                "label": {
+                  "name": "QtyTotalLabel",
+                  "at": [
+                    20,
+                    208
+                  ],
+                  "size": [
+                    200,
+                    32
+                  ],
+                  "text": "#STR_OZT_UI_TOTAL",
+                  "font": "body",
+                  "color": "$muted"
+                }
+              },
+              {
+                "label": {
+                  "name": "QtyTotal",
+                  "at": [
+                    220,
+                    208
+                  ],
+                  "size": [
+                    240,
+                    32
+                  ],
+                  "font": "sum",
+                  "color": "$gold",
+                  "align": "right"
+                }
+              },
+              {
+                "button": {
+                  "name": "QtyOk",
+                  "at": [
+                    20,
+                    250
+                  ],
+                  "size": [
+                    214,
+                    44
+                  ],
+                  "font": "header",
+                  "bg": "$accent",
+                  "color": "$screen"
+                }
+              },
+              {
+                "button": {
+                  "name": "QtyCancel",
+                  "at": [
+                    246,
+                    250
+                  ],
+                  "size": [
+                    214,
+                    44
+                  ],
+                  "text": "#STR_OZT_UI_CANCEL",
+                  "font": "header",
+                  "color": "$text"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

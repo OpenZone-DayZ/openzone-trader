@@ -6,13 +6,17 @@ a deal is one cart that buys and sells at once. Money is items of any class or a
 behind a small glue pbo; goods and whole traders can be opened by faction, post and research.
 Class prefix `OZT_`; runs with `OpenZone_Core` alone.
 
-## Status: phase 1 done, nothing to play yet
+## Status: the trade screen works for plain items; no trader in the world yet
 
 The server half works for plain items: the three JSON files, the price book, item money,
 the inventory model and the deal, driven on the test stand by scripted deals
-([docs/measurements](docs/measurements)). There is no trade screen yet, so there is still
-nothing to play; the screen is phase 2. The plans are in [docs](docs); the design note
-lives beside the repositories of the series, in
+([docs/measurements](docs/measurements)). The trade screen works for plain items too: the
+shelf, your own things and your character's slots, a deal put together by double click or
+by dragging, how many of a stack, the server's verdict before you confirm
+([screen.md](docs/measurements/2026-11-11/screen.md)). It is opened by a stand command:
+the trader's action in the world, items with parts, the card and the price list come with
+their own phases, so there is still nothing to play. The plans are in [docs](docs); the
+design note lives beside the repositories of the series, in
 `docs/specs/2026-11-10-openzone-trader-design.md`.
 
 `OpenZone_Trader_Bridge`, `OpenZone_TraderProbe` and `OpenZone_TraderProbe_Bridge` are stand
@@ -26,9 +30,12 @@ tools. They are never published and no server should load them.
 невелику склейку; товари й самих торговців можна відкривати за фракцією, посадою та
 дослідженнями.
 
-Стан: фазу 1 завершено. Серверна половина працює для простих речей: файли налаштувань,
-прайс, гроші предметами, модель інвентаря та угода; на стенді її перевірено сценарними
-угодами. Екрана обміну ще немає, тож грати ще нема в що.
+Стан: серверна половина працює для простих речей (файли налаштувань, прайс, гроші
+предметами, модель інвентаря та угода), її перевірено на стенді сценарними угодами. Екран
+обміну теж працює для простих речей: полиця торговця, ваші речі, слоти персонажа, угода
+подвійним клацанням або перетягуванням, кількість зі стосу, вердикт сервера до
+підтвердження. Відкривається він поки що командою стенда: дія торговця у світі, речі з
+частинами, картка товару та прайс — попереду, тож грати ще нема в що.
 
 ## Licence
 

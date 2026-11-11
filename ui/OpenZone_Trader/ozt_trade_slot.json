@@ -1,0 +1,92 @@
+{
+  "layout": "ozt_trade_slot",
+  "note": "One slot of the character on the trade screen: the slot's ghost icon and its name, as the vanilla inventory shows them, and room for the tile of what is worn there. The menu makes one per entry of the game's playerSlots list plus one for the hands, lays them seven to a column and loads the icon from the slot's config; a worn thing gets an ozt_trade_tile inside SlotHold (OZT_TradeMenu.c).",
+  "root": {
+    "panel": {
+      "name": "OZT_TradeSlot",
+      "size": [
+        64,
+        58
+      ],
+      "color": "$seam",
+      "children": [
+        {
+          "panel": {
+            "name": "SlotIn",
+            "size": "fill",
+            "color": "$none",
+            "children": [
+              {
+                "panel": {
+                  "name": "SlotBg",
+                  "at": [
+                    1,
+                    1
+                  ],
+                  "size": [
+                    62,
+                    56
+                  ],
+                  "color": "$cell"
+                }
+              },
+              {
+                "raw": {
+                  "name": "SlotIcon",
+                  "class": "ImageWidgetClass",
+                  "at": [
+                    14,
+                    4
+                  ],
+                  "size": [
+                    36,
+                    36
+                  ],
+                  "color": "$faint",
+                  "props": {
+                    "ignorepointer": 1,
+                    "mode": "blend",
+                    "src alpha": 1,
+                    "stretch": 1
+                  },
+                  "note": "The ghost icon the slot's config names; loaded by the menu."
+                }
+              },
+              {
+                "panel": {
+                  "name": "SlotHold",
+                  "at": [
+                    0,
+                    0
+                  ],
+                  "size": [
+                    64,
+                    45
+                  ],
+                  "color": "$none"
+                }
+              },
+              {
+                "label": {
+                  "name": "SlotName",
+                  "at": [
+                    0,
+                    45
+                  ],
+                  "size": [
+                    64,
+                    13
+                  ],
+                  "font": "tiny",
+                  "color": "$muted",
+                  "align": "center",
+                  "priority": 600
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

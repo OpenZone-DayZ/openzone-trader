@@ -288,6 +288,8 @@ class OZT_Deal
             }
 
             total = total + price;
+            m_Res.SellPrices.Insert(price);
+            m_Res.Sold = total;
             if (whole)
                 m_Gone.Insert(e);
             else
@@ -356,6 +358,8 @@ class OZT_Deal
                 return OZT_Const.NO_INTERNAL;
 
             total = total + price;
+            m_Res.BuyPrices.Insert(price);
+            m_Res.Bought = total;
             m_BuyClasses.Insert(entry.ClassName);
             m_BuyCounts.Insert(line.Count);
             m_BuyRules.Insert(entry.Rule);

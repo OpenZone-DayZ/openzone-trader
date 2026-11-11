@@ -1,0 +1,1280 @@
+{
+  "layout": "ozt_trade",
+  "note": "The trade screen (menu 136, OZT_TradeMenu), arranged as the mockup: the body is a block of 1840x1032 units in the middle of the screen, so the columns keep their widths on a wide one. Left: the BUY cart over the trader's shelf. Middle: the character, the selected thing, the deal panel fed by the server's quote, Confirm and Clear. Right: the SELL cart over the player's own things. The whole screen is covered: the world is not seen behind a deal. Names are read by the scripts in scripts/5_Mission/OpenZone_Trader.",
+  "root": {
+    "frame": {
+      "name": "OZT_Trade",
+      "size": "screen",
+      "priority": 2,
+      "children": [
+        {
+          "panel": {
+            "name": "TradeBack",
+            "size": "fill",
+            "color": "$screen",
+            "note": "Opaque on purpose: a client-local copy of the character may stand at the player's feet while something is tried on, and it must not be seen."
+          }
+        },
+        {
+          "frame": {
+            "name": "TradeBody",
+            "anchor": "center",
+            "size": [
+              1840,
+              1032
+            ],
+            "children": [
+              {
+                "panel": {
+                  "name": "BuyPanel",
+                  "at": [
+                    0,
+                    0
+                  ],
+                  "size": [
+                    560,
+                    372
+                  ],
+                  "color": "$panel",
+                  "edge": true,
+                  "children": [
+                    {
+                      "panel": {
+                        "name": "BuyHead",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          560,
+                          40
+                        ],
+                        "color": "$head",
+                        "children": [
+                          {
+                            "panel": {
+                              "name": "BuyDot",
+                              "at": [
+                                16,
+                                16
+                              ],
+                              "size": [
+                                8,
+                                8
+                              ],
+                              "color": "$accent"
+                            }
+                          },
+                          {
+                            "label": {
+                              "name": "BuyTitle",
+                              "at": [
+                                34,
+                                0
+                              ],
+                              "size": [
+                                216,
+                                40
+                              ],
+                              "text": "#STR_OZT_UI_BUY",
+                              "font": "header",
+                              "color": "$text"
+                            }
+                          },
+                          {
+                            "label": {
+                              "name": "BuyMeta",
+                              "at": [
+                                250,
+                                0
+                              ],
+                              "size": [
+                                294,
+                                40
+                              ],
+                              "font": "hint",
+                              "color": "$muted",
+                              "align": "right"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "raw": {
+                        "name": "BuyScroll",
+                        "class": "ScrollWidgetClass",
+                        "at": [
+                          16,
+                          54
+                        ],
+                        "size": [
+                          538,
+                          264
+                        ],
+                        "color": "$edge",
+                        "props": {
+                          "clipchildren": 1,
+                          "Scrollbar V": 1,
+                          "style": "blank"
+                        },
+                        "note": "The cart: the menu sizes BuyContent to its rows and lays one ozt_trade_tile per line into it.",
+                        "children": [
+                          {
+                            "frame": {
+                              "name": "BuyContent",
+                              "at": [
+                                0,
+                                0
+                              ],
+                              "size": [
+                                528,
+                                264
+                              ],
+                              "children": [
+                                {
+                                  "panel": {
+                                    "name": "BuyCells",
+                                    "size": "fill",
+                                    "color": "$cell"
+                                  }
+                                },
+                                {
+                                  "raw": {
+                                    "name": "BuyLines",
+                                    "class": "CanvasWidgetClass",
+                                    "size": "fill",
+                                    "props": {
+                                      "ignorepointer": 1
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "BuyEmpty",
+                        "at": [
+                          16,
+                          160
+                        ],
+                        "size": [
+                          528,
+                          44
+                        ],
+                        "text": "#STR_OZT_UI_BUY_EMPTY",
+                        "font": "body",
+                        "color": "$muted",
+                        "align": "center"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "BuyTotalLabel",
+                        "at": [
+                          16,
+                          322
+                        ],
+                        "size": [
+                          240,
+                          44
+                        ],
+                        "text": "#STR_OZT_UI_TO_PAY",
+                        "font": "body",
+                        "color": "$muted"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "BuyTotal",
+                        "at": [
+                          256,
+                          322
+                        ],
+                        "size": [
+                          288,
+                          44
+                        ],
+                        "font": "sum",
+                        "color": "$text",
+                        "align": "right"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "panel": {
+                  "name": "ShelfPanel",
+                  "at": [
+                    0,
+                    386
+                  ],
+                  "size": [
+                    560,
+                    554
+                  ],
+                  "color": "$panel",
+                  "edge": true,
+                  "children": [
+                    {
+                      "panel": {
+                        "name": "ShelfHead",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          560,
+                          40
+                        ],
+                        "color": "$head",
+                        "children": [
+                          {
+                            "panel": {
+                              "name": "ShelfDot",
+                              "at": [
+                                16,
+                                16
+                              ],
+                              "size": [
+                                8,
+                                8
+                              ],
+                              "color": "$accent"
+                            }
+                          },
+                          {
+                            "label": {
+                              "name": "ShelfTitle",
+                              "at": [
+                                34,
+                                0
+                              ],
+                              "size": [
+                                216,
+                                40
+                              ],
+                              "text": "#STR_OZT_UI_TRADER",
+                              "font": "header",
+                              "color": "$text"
+                            }
+                          },
+                          {
+                            "label": {
+                              "name": "ShelfMeta",
+                              "at": [
+                                250,
+                                0
+                              ],
+                              "size": [
+                                294,
+                                40
+                              ],
+                              "font": "hint",
+                              "color": "$muted",
+                              "align": "right"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "panel": {
+                        "name": "ShelfTabs",
+                        "at": [
+                          16,
+                          48
+                        ],
+                        "size": [
+                          528,
+                          44
+                        ],
+                        "color": "$none",
+                        "note": "The menu lays one ozt_trade_tab per category here, the first being ALL."
+                      }
+                    },
+                    {
+                      "raw": {
+                        "name": "ShelfScroll",
+                        "class": "ScrollWidgetClass",
+                        "at": [
+                          16,
+                          96
+                        ],
+                        "size": [
+                          538,
+                          396
+                        ],
+                        "color": "$edge",
+                        "props": {
+                          "clipchildren": 1,
+                          "Scrollbar V": 1,
+                          "style": "blank"
+                        },
+                        "note": "The flat grid: twelve cells across, a tile takes half the item's inventory size, rounded up.",
+                        "children": [
+                          {
+                            "frame": {
+                              "name": "ShelfContent",
+                              "at": [
+                                0,
+                                0
+                              ],
+                              "size": [
+                                528,
+                                396
+                              ],
+                              "children": [
+                                {
+                                  "panel": {
+                                    "name": "ShelfCells",
+                                    "size": "fill",
+                                    "color": "$cell"
+                                  }
+                                },
+                                {
+                                  "raw": {
+                                    "name": "ShelfLines",
+                                    "class": "CanvasWidgetClass",
+                                    "size": "fill",
+                                    "props": {
+                                      "ignorepointer": 1
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "panel": {
+                        "name": "ShelfRule",
+                        "at": [
+                          16,
+                          502
+                        ],
+                        "size": [
+                          528,
+                          1
+                        ],
+                        "color": "$rule"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "ShelfMoneyLabel",
+                        "at": [
+                          16,
+                          503
+                        ],
+                        "size": [
+                          200,
+                          50
+                        ],
+                        "text": "#STR_OZT_UI_TRADER_MONEY",
+                        "font": "body",
+                        "color": "$muted"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "ShelfMoney",
+                        "at": [
+                          216,
+                          503
+                        ],
+                        "size": [
+                          170,
+                          50
+                        ],
+                        "text": "#STR_OZT_UI_UNLIMITED",
+                        "font": "title",
+                        "color": "$text"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "ListBtn",
+                        "at": [
+                          404,
+                          506
+                        ],
+                        "size": [
+                          140,
+                          42
+                        ],
+                        "text": "#STR_OZT_UI_PRICE_LIST",
+                        "font": "hint",
+                        "color": "$text",
+                        "hidden": true,
+                        "note": "Shown when the price list is built."
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "panel": {
+                  "name": "CharPanel",
+                  "at": [
+                    682,
+                    0
+                  ],
+                  "size": [
+                    476,
+                    710
+                  ],
+                  "color": "$panel",
+                  "edge": true,
+                  "children": [
+                    {
+                      "panel": {
+                        "name": "CharHead",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          476,
+                          40
+                        ],
+                        "color": "$head",
+                        "children": [
+                          {
+                            "panel": {
+                              "name": "CharDot",
+                              "at": [
+                                16,
+                                16
+                              ],
+                              "size": [
+                                8,
+                                8
+                              ],
+                              "color": "$accent"
+                            }
+                          },
+                          {
+                            "label": {
+                              "name": "CharTitle",
+                              "at": [
+                                34,
+                                0
+                              ],
+                              "size": [
+                                216,
+                                40
+                              ],
+                              "text": "#STR_OZT_UI_CHARACTER",
+                              "font": "header",
+                              "color": "$text"
+                            }
+                          },
+                          {
+                            "label": {
+                              "name": "CharMeta",
+                              "at": [
+                                250,
+                                0
+                              ],
+                              "size": [
+                                210,
+                                40
+                              ],
+                              "font": "hint",
+                              "color": "$muted",
+                              "align": "right"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "panel": {
+                        "name": "CharBed",
+                        "at": [
+                          18,
+                          52
+                        ],
+                        "size": [
+                          440,
+                          442
+                        ],
+                        "color": "$cell"
+                      }
+                    },
+                    {
+                      "raw": {
+                        "name": "CharView",
+                        "class": "PlayerPreviewWidgetClass",
+                        "at": [
+                          18,
+                          52
+                        ],
+                        "size": [
+                          440,
+                          442
+                        ],
+                        "note": "The player as they stand, with everything worn. The menu narrows it when slot tiles take the right of the block."
+                      }
+                    },
+                    {
+                      "panel": {
+                        "name": "CharSlots",
+                        "at": [
+                          18,
+                          52
+                        ],
+                        "size": [
+                          440,
+                          442
+                        ],
+                        "color": "$none",
+                        "note": "Slot tiles, seven to a column, laid by the menu from the right edge."
+                      }
+                    },
+                    {
+                      "panel": {
+                        "name": "SelRule",
+                        "at": [
+                          18,
+                          506
+                        ],
+                        "size": [
+                          440,
+                          1
+                        ],
+                        "color": "$rule"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "SelName",
+                        "at": [
+                          18,
+                          514
+                        ],
+                        "size": [
+                          300,
+                          26
+                        ],
+                        "font": "header",
+                        "color": "$text",
+                        "note": "The selected thing: its name, the price that applies here, what it is."
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "SelPrice",
+                        "at": [
+                          318,
+                          514
+                        ],
+                        "size": [
+                          140,
+                          26
+                        ],
+                        "font": "header",
+                        "color": "$gold",
+                        "align": "right"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "SelSub",
+                        "at": [
+                          18,
+                          542
+                        ],
+                        "size": [
+                          440,
+                          20
+                        ],
+                        "font": "small",
+                        "color": "$muted"
+                      }
+                    },
+                    {
+                      "text": {
+                        "name": "SelText",
+                        "at": [
+                          18,
+                          568
+                        ],
+                        "size": [
+                          440,
+                          128
+                        ],
+                        "font": "small",
+                        "color": "$muted",
+                        "grow": false
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "panel": {
+                  "name": "DealPanel",
+                  "at": [
+                    682,
+                    724
+                  ],
+                  "size": [
+                    476,
+                    150
+                  ],
+                  "color": "$panel",
+                  "edge": true,
+                  "children": [
+                    {
+                      "label": {
+                        "name": "DealTitle",
+                        "at": [
+                          18,
+                          26
+                        ],
+                        "size": [
+                          180,
+                          22
+                        ],
+                        "text": "#STR_OZT_UI_DEAL",
+                        "font": "hint",
+                        "color": "$muted"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "DealNet",
+                        "at": [
+                          18,
+                          54
+                        ],
+                        "size": [
+                          186,
+                          64
+                        ],
+                        "text": "0",
+                        "font": "big",
+                        "color": "$muted"
+                      }
+                    },
+                    {
+                      "panel": {
+                        "name": "DealBar",
+                        "at": [
+                          208,
+                          16
+                        ],
+                        "size": [
+                          1,
+                          118
+                        ],
+                        "color": "$edge"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "DealSellLabel",
+                        "at": [
+                          226,
+                          16
+                        ],
+                        "size": [
+                          130,
+                          24
+                        ],
+                        "text": "#STR_OZT_UI_YOU_SELL",
+                        "font": "body",
+                        "color": "$muted"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "DealSell",
+                        "at": [
+                          356,
+                          16
+                        ],
+                        "size": [
+                          102,
+                          24
+                        ],
+                        "text": "0",
+                        "font": "body",
+                        "color": "$text",
+                        "align": "right"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "DealBuyLabel",
+                        "at": [
+                          226,
+                          44
+                        ],
+                        "size": [
+                          130,
+                          24
+                        ],
+                        "text": "#STR_OZT_UI_YOU_BUY",
+                        "font": "body",
+                        "color": "$muted"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "DealBuy",
+                        "at": [
+                          356,
+                          44
+                        ],
+                        "size": [
+                          102,
+                          24
+                        ],
+                        "text": "0",
+                        "font": "body",
+                        "color": "$text",
+                        "align": "right"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "DealAfterLabel",
+                        "at": [
+                          226,
+                          72
+                        ],
+                        "size": [
+                          150,
+                          24
+                        ],
+                        "text": "#STR_OZT_UI_AFTER",
+                        "font": "body",
+                        "color": "$muted"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "DealAfter",
+                        "at": [
+                          376,
+                          72
+                        ],
+                        "size": [
+                          82,
+                          24
+                        ],
+                        "font": "body",
+                        "color": "$text",
+                        "align": "right"
+                      }
+                    },
+                    {
+                      "text": {
+                        "name": "DealSpace",
+                        "at": [
+                          226,
+                          100
+                        ],
+                        "size": [
+                          232,
+                          40
+                        ],
+                        "text": "#STR_OZT_UI_EMPTY_DEAL",
+                        "font": "small",
+                        "color": "$muted",
+                        "grow": false,
+                        "note": "The space verdict, or why the deal would be refused: the server's own answer to a quote."
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "button": {
+                  "name": "ConfirmBtn",
+                  "at": [
+                    682,
+                    888
+                  ],
+                  "size": [
+                    232,
+                    52
+                  ],
+                  "text": "#STR_OZT_UI_CONFIRM",
+                  "font": "header",
+                  "bg": "$raised",
+                  "color": "$muted",
+                  "note": "Grey while there is nothing to confirm; the menu paints it in the accent when the server's quote stands."
+                }
+              },
+              {
+                "button": {
+                  "name": "ClearBtn",
+                  "at": [
+                    926,
+                    888
+                  ],
+                  "size": [
+                    232,
+                    52
+                  ],
+                  "text": "#STR_OZT_UI_CLEAR",
+                  "font": "header",
+                  "color": "$text"
+                }
+              },
+              {
+                "panel": {
+                  "name": "SellPanel",
+                  "at": [
+                    1280,
+                    0
+                  ],
+                  "size": [
+                    560,
+                    372
+                  ],
+                  "color": "$panel",
+                  "edge": true,
+                  "children": [
+                    {
+                      "panel": {
+                        "name": "SellHead",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          560,
+                          40
+                        ],
+                        "color": "$head",
+                        "children": [
+                          {
+                            "panel": {
+                              "name": "SellDot",
+                              "at": [
+                                16,
+                                16
+                              ],
+                              "size": [
+                                8,
+                                8
+                              ],
+                              "color": "$accent"
+                            }
+                          },
+                          {
+                            "label": {
+                              "name": "SellTitle",
+                              "at": [
+                                34,
+                                0
+                              ],
+                              "size": [
+                                216,
+                                40
+                              ],
+                              "text": "#STR_OZT_UI_SELL",
+                              "font": "header",
+                              "color": "$text"
+                            }
+                          },
+                          {
+                            "label": {
+                              "name": "SellMeta",
+                              "at": [
+                                250,
+                                0
+                              ],
+                              "size": [
+                                294,
+                                40
+                              ],
+                              "font": "hint",
+                              "color": "$muted",
+                              "align": "right"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "raw": {
+                        "name": "SellScroll",
+                        "class": "ScrollWidgetClass",
+                        "at": [
+                          16,
+                          54
+                        ],
+                        "size": [
+                          538,
+                          264
+                        ],
+                        "color": "$edge",
+                        "props": {
+                          "clipchildren": 1,
+                          "Scrollbar V": 1,
+                          "style": "blank"
+                        },
+                        "note": "The cart: the menu sizes SellContent to its rows and lays one ozt_trade_tile per line into it.",
+                        "children": [
+                          {
+                            "frame": {
+                              "name": "SellContent",
+                              "at": [
+                                0,
+                                0
+                              ],
+                              "size": [
+                                528,
+                                264
+                              ],
+                              "children": [
+                                {
+                                  "panel": {
+                                    "name": "SellCells",
+                                    "size": "fill",
+                                    "color": "$cell"
+                                  }
+                                },
+                                {
+                                  "raw": {
+                                    "name": "SellLines",
+                                    "class": "CanvasWidgetClass",
+                                    "size": "fill",
+                                    "props": {
+                                      "ignorepointer": 1
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "SellEmpty",
+                        "at": [
+                          16,
+                          160
+                        ],
+                        "size": [
+                          528,
+                          44
+                        ],
+                        "text": "#STR_OZT_UI_SELL_EMPTY",
+                        "font": "body",
+                        "color": "$muted",
+                        "align": "center"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "SellTotalLabel",
+                        "at": [
+                          16,
+                          322
+                        ],
+                        "size": [
+                          240,
+                          44
+                        ],
+                        "text": "#STR_OZT_UI_TO_RECEIVE",
+                        "font": "body",
+                        "color": "$muted"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "SellTotal",
+                        "at": [
+                          256,
+                          322
+                        ],
+                        "size": [
+                          288,
+                          44
+                        ],
+                        "font": "sum",
+                        "color": "$text",
+                        "align": "right"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "panel": {
+                  "name": "OwnPanel",
+                  "at": [
+                    1280,
+                    386
+                  ],
+                  "size": [
+                    560,
+                    554
+                  ],
+                  "color": "$panel",
+                  "edge": true,
+                  "children": [
+                    {
+                      "panel": {
+                        "name": "OwnHead",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          560,
+                          40
+                        ],
+                        "color": "$head",
+                        "children": [
+                          {
+                            "panel": {
+                              "name": "OwnDot",
+                              "at": [
+                                16,
+                                16
+                              ],
+                              "size": [
+                                8,
+                                8
+                              ],
+                              "color": "$accent"
+                            }
+                          },
+                          {
+                            "label": {
+                              "name": "OwnTitle",
+                              "at": [
+                                34,
+                                0
+                              ],
+                              "size": [
+                                216,
+                                40
+                              ],
+                              "text": "#STR_OZT_UI_YOURS",
+                              "font": "header",
+                              "color": "$text"
+                            }
+                          },
+                          {
+                            "label": {
+                              "name": "OwnMeta",
+                              "at": [
+                                250,
+                                0
+                              ],
+                              "size": [
+                                294,
+                                40
+                              ],
+                              "font": "hint",
+                              "color": "$muted",
+                              "align": "right",
+                              "text": "#STR_OZT_UI_YOURS_META"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "panel": {
+                        "name": "OwnTabs",
+                        "at": [
+                          16,
+                          48
+                        ],
+                        "size": [
+                          528,
+                          44
+                        ],
+                        "color": "$none",
+                        "note": "The menu lays one ozt_trade_tab per category here, the first being ALL."
+                      }
+                    },
+                    {
+                      "raw": {
+                        "name": "OwnScroll",
+                        "class": "ScrollWidgetClass",
+                        "at": [
+                          16,
+                          96
+                        ],
+                        "size": [
+                          538,
+                          396
+                        ],
+                        "color": "$edge",
+                        "props": {
+                          "clipchildren": 1,
+                          "Scrollbar V": 1,
+                          "style": "blank"
+                        },
+                        "note": "The flat grid: twelve cells across, a tile takes half the item's inventory size, rounded up.",
+                        "children": [
+                          {
+                            "frame": {
+                              "name": "OwnContent",
+                              "at": [
+                                0,
+                                0
+                              ],
+                              "size": [
+                                528,
+                                396
+                              ],
+                              "children": [
+                                {
+                                  "panel": {
+                                    "name": "OwnCells",
+                                    "size": "fill",
+                                    "color": "$cell"
+                                  }
+                                },
+                                {
+                                  "raw": {
+                                    "name": "OwnLines",
+                                    "class": "CanvasWidgetClass",
+                                    "size": "fill",
+                                    "props": {
+                                      "ignorepointer": 1
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "panel": {
+                        "name": "OwnRule",
+                        "at": [
+                          16,
+                          502
+                        ],
+                        "size": [
+                          528,
+                          1
+                        ],
+                        "color": "$rule"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "OwnMoneyLabel",
+                        "at": [
+                          16,
+                          503
+                        ],
+                        "size": [
+                          260,
+                          50
+                        ],
+                        "text": "#STR_OZT_UI_YOUR_MONEY",
+                        "font": "body",
+                        "color": "$muted"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "OwnMoney",
+                        "at": [
+                          276,
+                          503
+                        ],
+                        "size": [
+                          268,
+                          50
+                        ],
+                        "font": "sum",
+                        "color": "$gold",
+                        "align": "right"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "label": {
+                  "name": "TradeInfo",
+                  "at": [
+                    0,
+                    954
+                  ],
+                  "size": [
+                    1840,
+                    30
+                  ],
+                  "text": "#STR_OZT_UI_LOADING",
+                  "font": "title",
+                  "color": "$text",
+                  "align": "center",
+                  "note": "What the screen waits for, what just happened, or why something was refused."
+                }
+              },
+              {
+                "label": {
+                  "name": "TradeKeys",
+                  "at": [
+                    0,
+                    994
+                  ],
+                  "size": [
+                    1840,
+                    24
+                  ],
+                  "text": "#STR_OZT_UI_KEYS",
+                  "font": "hint",
+                  "color": "$muted",
+                  "align": "center"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "panel": {
+            "name": "TradeGhost",
+            "size": [
+              88,
+              88
+            ],
+            "color": "$pick",
+            "hidden": true,
+            "priority": 60,
+            "note": "What is seen under the cursor while a tile is dragged, moved by the menu. It and its picture ignore the pointer: what the engine names as the receiver of a drop is the widget under the cursor, and that must be the place, not the ghost.",
+            "children": [
+              {
+                "preview": {
+                  "name": "GhostPic",
+                  "size": "fill",
+                  "props": {
+                    "ignorepointer": 1
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

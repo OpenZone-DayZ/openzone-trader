@@ -61,3 +61,31 @@ stand's file names the origin the engine itself had chosen for a stall on this r
 
 The body of `open` begins `{"Revision":2,"Trader":"stand","Name":"Стендовий торговець","Radius":5.0,"Provider":"items","Physical":1,"Unit":5,...`
 (read after row 4.2) and is 1317 bytes: two parts of the core's 900-byte transport.
+
+## Task 5: the inventory model
+
+After the restart there is exactly one stall, at the place the file names: the one of the
+last boot was never saved. Scene: the kit and a canteen in the trousers. `fit` asks the model
+alone and lays things in the order they are listed.
+
+| # | what is asked | command | answer | as expected? |
+|---|---|---|---|---|
+| 5.1 | three small things | `{"op": "fit", "buy": "Paper:3"}` | `fit: placed=3 unplaced=0`, `Paper: CARGO M65Jacket_Black r0 c3`, `r0 c4`, `r0 c5` | yes |
+| 5.2 | the same, made | `{"op": "fit", "buy": "Paper:3", "make": "1"}` | the same places, `made=3 where planned=3` | yes |
+| 5.3 | two helmets | `{"op": "fit", "buy": "Mich2001Helmet:2"}` | `Mich2001Helmet: SLOT Headgear` and `Mich2001Helmet: CARGO CargoPants_Black r0 c2 turned` | yes |
+| 5.4 | three rifles | `{"op": "fit", "buy": "AKM:3"}` | `placed=1 unplaced=2`: `AKM: SLOT Melee`, twice `AKM: NO PLACE` | yes |
+| 5.5 | two rifles | `{"op": "fit", "buy": "AKM:2"}` | `placed=2 unplaced=0`: `AKM: SLOT Melee`, `AKM: HANDS` | yes |
+| 5.6 | two new stacks of notes | `{"op": "fit", "notes": "OZT_ProbeNote50:2"}` | `OZT_ProbeNote50: CARGO OZT_ProbeWallet r0 c0` and `r0 c2` | yes |
+| 5.7 | a helmet, made | `{"op": "fit", "buy": "Mich2001Helmet:1", "make": "1"}` | `Mich2001Helmet: SLOT Headgear`, `made=1 where planned=1` | yes |
+| 5.8 | the client against the server | `dump 1` | `SAME`, 28 items | yes |
+| 5.9 | every free cell filled | `ozt_probe` `{"op": "fill", "into": "all"}` | `fill: 53 Paper made in 7 holder(s), 60 cell(s) refused` | yes |
+| 5.10 | one thing into full bags | `{"op": "fit", "buy": "Paper:1"}` | `placed=1 unplaced=0`, `Paper: HANDS` | yes |
+| 5.11 | two things into full bags | `{"op": "fit", "buy": "Paper:2"}` | `placed=0 unplaced=2`, twice `Paper: NO PLACE` | yes |
+| 5.12 | a note into full bags | `{"op": "fit", "notes": "OZT_ProbeNote:1"}` | `OZT_ProbeNote: CARGO OZT_ProbeWallet r0 c0` | yes |
+| 5.13 | a canteen into full bags | `{"op": "fit", "buy": "Canteen:1"}` | `Canteen: HANDS` | yes |
+| 5.14 | the same with the carried canteen leaving | `{"op": "fit", "buy": "Canteen:1", "gone": "Canteen"}` | `Canteen: CARGO CargoPants_Black r0 c0` | yes |
+| 5.15 | the same, made | `{"op": "fit", "buy": "Canteen:1", "gone": "Canteen", "make": "1"}` | the same place, `made=1 where planned=1` | yes |
+| 5.16 | the client against the server | `dump 2` | `SAME`, 81 items; the canteen in the trousers is a new one (`022604`, the one of `dump 1` was `022505`) | yes |
+| 5.17 | nothing left by the plans | `world_entities` for `Canteen` and `Paper`, 10 m | none of either lying loose | yes |
+
+The verdict after these rows: pass, no warning, no error.

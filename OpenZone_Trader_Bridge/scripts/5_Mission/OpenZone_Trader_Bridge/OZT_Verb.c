@@ -37,6 +37,8 @@ class OZT_VerbOps
             return OpDamage(player, args, detail);
         if (op == "open")
             return OpOpen(player, args, detail);
+        if (op == "fit")
+            return OpFit(player, args, detail);
         // -- ops of the later tasks go above this line --
         detail = "unknown op '" + op + "'; known: " + KnownOps();
         return false;
@@ -44,7 +46,7 @@ class OZT_VerbOps
 
     static string KnownOps()
     {
-        return "status, reload, balance, price, pay, damage, open";
+        return "status, reload, balance, price, pay, damage, open, fit";
     }
 
     // ---- what the ops share ---------------------------------------------------
@@ -145,6 +147,162 @@ class OZT_VerbOps
         detail = detail + " categories=" + res.Categories.Count().ToString() + " provider=" + res.Provider;
         detail = detail + " unit=" + res.Unit.ToString() + " balance=" + res.Balance.ToString();
         detail = detail + " bytes=" + body.Length().ToString() + " revision=" + res.Revision.ToString();
+        return true;
+    }
+
+    // A list of things in an argument: Class[:count][#nth], separated by commas.
+    // count 0 means "not given"; nth picks among several the player carries.
+    static void Items(string list, out array<string> names, out array<int> counts, out array<int> nths)
+    {
+        names = new array<string>();
+        counts = new array<int>();
+        nths = new array<int>();
+        if (list == "")
+            return;
+        array<string> tokens = new array<string>();
+        list.Split(",", tokens);
+        for (int i = 0; i < tokens.Count(); i++)
+        {
+            string token = tokens[i].Trim();
+            if (token == "")
+                continue;
+            int nth = 0;
+            int hash = token.IndexOf("#");
+            if (hash > -1)
+            {
+                int afterHash = token.Length() - hash - 1;
+                nth = token.Substring(hash + 1, afterHash).ToInt();
+                token = token.Substring(0, hash);
+            }
+            int count = 0;
+            int colon = token.IndexOf(":");
+            if (colon > -1)
+            {
+                int afterColon = token.Length() - colon - 1;
+                count = token.Substring(colon + 1, afterColon).ToInt();
+                token = token.Substring(0, colon);
+            }
+            names.Insert(token);
+            counts.Insert(count);
+            nths.Insert(nth);
+        }
+    }
+
+    // fit [buy=Class:n,...] [notes=Class:n,...] [gone=Class#nth,...] [make=1]:
+    // where a plan puts new things, with the `gone` things taken out of the
+    // picture. buy: n pieces, a free slot first when the settings wear bought
+    // gear, then cargo. notes: n new stacks, note holders first. One thing with
+    // no place goes to free hands. With make=1 the gone things are deleted and
+    // every planned thing is created at its place in the same call, as a commit
+    // does, and what the engine did is compared with the plan.
+    static bool OpFit(PlayerBase player, map<string, string> args, out string detail)
+    {
+        array<string> names;
+        array<int> counts;
+        array<int> nths;
+
+        array<EntityAI> gone = new array<EntityAI>();
+        Items(Arg(args, "gone", ""), names, counts, nths);
+        for (int g = 0; g < names.Count(); g++)
+        {
+            EntityAI leaving = Carried(player, names[g], nths[g]);
+            if (!leaving)
+            {
+                detail = "fit: the player carries no " + names[g] + " number " + nths[g].ToString();
+                return false;
+            }
+            gone.Insert(leaving);
+        }
+
+        OZT_InvModel model = new OZT_InvModel(player, gone);
+        bool wear = OZT_Config.Get().Settings().WearBought == 1;
+        array<string> classes = new array<string>();
+        array<ref OZT_Place> places = new array<ref OZT_Place>();
+        array<string> homeless = new array<string>();
+        string report = "";
+
+        Items(Arg(args, "buy", ""), names, counts, nths);
+        for (int b = 0; b < names.Count(); b++)
+        {
+            int pieces = counts[b];
+            if (pieces < 1)
+                pieces = 1;
+            for (int n = 0; n < pieces; n++)
+            {
+                OZT_Place place;
+                bool placed = false;
+                if (wear)
+                    placed = model.PlaceOnSlot(names[b], place);
+                if (!placed)
+                    placed = model.PlaceInCargo(names[b], false, place);
+                if (!placed)
+                {
+                    homeless.Insert(names[b]);
+                    continue;
+                }
+                classes.Insert(names[b]);
+                places.Insert(place);
+                report = report + " | " + names[b] + ": " + place.Text();
+            }
+        }
+
+        Items(Arg(args, "notes", ""), names, counts, nths);
+        for (int s = 0; s < names.Count(); s++)
+        {
+            int piles = counts[s];
+            if (piles < 1)
+                piles = 1;
+            for (int k = 0; k < piles; k++)
+            {
+                OZT_Place spot;
+                if (!model.PlaceInCargo(names[s], true, spot))
+                {
+                    homeless.Insert(names[s]);
+                    continue;
+                }
+                classes.Insert(names[s]);
+                places.Insert(spot);
+                report = report + " | " + names[s] + ": " + spot.Text();
+            }
+        }
+
+        int unplaced = homeless.Count();
+        if (unplaced == 1)
+        {
+            OZT_Place hands;
+            if (model.PlaceInHands(homeless[0], hands))
+            {
+                classes.Insert(homeless[0]);
+                places.Insert(hands);
+                report = report + " | " + homeless[0] + ": HANDS";
+                unplaced = 0;
+            }
+        }
+        for (int u = 0; u < homeless.Count() && unplaced > 0; u++)
+            report = report + " | " + homeless[u] + ": NO PLACE";
+
+        string head = "fit: placed=" + classes.Count().ToString() + " unplaced=" + unplaced.ToString();
+        if (Arg(args, "make", "0") == "1")
+        {
+            for (int d = 0; d < gone.Count(); d++)
+                GetGame().ObjectDelete(gone[d]);
+            int made = 0;
+            int asPlanned = 0;
+            for (int m = 0; m < classes.Count(); m++)
+            {
+                EntityAI fresh = OZT_InvModel.Make(player, places[m], classes[m]);
+                if (!fresh)
+                    continue;
+                made++;
+                if (OZT_InvModel.Stands(fresh, places[m]))
+                    asPlanned++;
+            }
+            head = head + " made=" + made.ToString() + " where planned=" + asPlanned.ToString();
+        }
+        model.Dispose();
+
+        SaveAnswer(head + report);
+        detail = head + report;
         return true;
     }
 

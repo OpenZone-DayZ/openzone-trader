@@ -89,3 +89,16 @@ alone and lays things in the order they are listed.
 | 5.17 | nothing left by the plans | `world_entities` for `Canteen` and `Paper`, 10 m | none of either lying loose | yes |
 
 The verdict after these rows: pass, no warning, no error.
+
+## Task 6: the first deals
+
+Scene: the money scene of Task 3 (635 in four stacks, a canteen in the trousers).
+
+| # | what is asked | command | answer | as expected? |
+|---|---|---|---|---|
+| 6.1 | a quote | `{"op": "quote", "buy": "BandageDressing:1"}` | `quote ok=yes net=40 paid=40 received=0 balance=595 hands= left=0` | yes |
+| 6.2 | a quote changes nothing | `{"op": "balance"}` | `provider=items unit=5 balance=635 stacks: 5x3 5x4 50x2 500x1` | yes |
+| 6.3 | the deal | `{"op": "deal", "buy": "BandageDressing:1"}` | `deal ok=yes net=40 paid=40 received=0 balance=595 hands= left=0` | yes |
+| 6.4 | the notes after it | `{"op": "balance"}` | `provider=items unit=5 balance=595 stacks: 5x4 5x5 50x1 500x1` | yes |
+| 6.5 | the client against the server | `dump 1` | `SAME`, 29 items; a second `BandageDressing` in the jacket at `r0 c3` | yes |
+| 6.6 | the log | `deal:` | one line: `deal: <uid> at 'stand' net 40 (items): +BandageDressingx1=40` | yes |

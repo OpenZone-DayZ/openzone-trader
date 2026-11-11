@@ -71,6 +71,8 @@ class OZT_Module : CF_ModuleWorld
         // the points are ours to take away.
         OZT_Points.Remove();
 
+        OZT_Deal.Reset();
+
         // -- later tasks stop their parts above this line --
     }
 

@@ -115,6 +115,8 @@ class OZT_Service : OZ_ServiceHandler
 
         if (op == OZT_Const.OP_OPEN)
             return OZT_Open.Answer(player, json, ok, error);
+        if (op == OZT_Const.OP_DEAL)
+            return OZT_Deal.Run(player, json, true, ok, error);
         // -- operations of the later tasks go above this line --
         return "";
     }

@@ -39,6 +39,10 @@ class OZT_VerbOps
             return OpOpen(player, args, detail);
         if (op == "fit")
             return OpFit(player, args, detail);
+        if (op == "quote")
+            return OpDeal(player, args, false, detail);
+        if (op == "deal")
+            return OpDeal(player, args, true, detail);
         // -- ops of the later tasks go above this line --
         detail = "unknown op '" + op + "'; known: " + KnownOps();
         return false;
@@ -46,7 +50,7 @@ class OZT_VerbOps
 
     static string KnownOps()
     {
-        return "status, reload, balance, price, pay, damage, open, fit";
+        return "status, reload, balance, price, pay, damage, open, fit, quote, deal";
     }
 
     // ---- what the ops share ---------------------------------------------------
@@ -304,6 +308,128 @@ class OZT_VerbOps
         SaveAnswer(head + report);
         detail = head + report;
         return true;
+    }
+
+    // quote / deal: [trader=<id>] [sell=Class[:units][#nth],...] [sellnear=Class]
+    // [buy=Class:n,...] [net=<n>]
+    //
+    // `sell` names things the player carries; `sellnear` a thing lying within
+    // five metres (to ask for something that is not the player's). A quote runs
+    // every check and the whole plan and changes nothing. A deal is sent through
+    // the service handler, as a client's is; without net= it carries the net the
+    // server itself quotes, as an honest client would.
+    static bool OpDeal(PlayerBase player, map<string, string> args, bool commit, out string detail)
+    {
+        OZT_DealReq req = new OZT_DealReq();
+        req.Trader = Arg(args, "trader", "stand");
+
+        array<string> names;
+        array<int> counts;
+        array<int> nths;
+        Items(Arg(args, "sell", ""), names, counts, nths);
+        for (int s = 0; s < names.Count(); s++)
+        {
+            EntityAI sold = Carried(player, names[s], nths[s]);
+            if (!sold)
+            {
+                detail = "the player carries no " + names[s] + " number " + nths[s].ToString();
+                return false;
+            }
+            req.Sells.Insert(SellOf(sold, counts[s]));
+        }
+
+        string near = Arg(args, "sellnear", "");
+        if (near != "")
+        {
+            EntityAI lying = Nearby(player, near);
+            if (!lying)
+            {
+                detail = "no " + near + " lies within five metres";
+                return false;
+            }
+            req.Sells.Insert(SellOf(lying, 0));
+        }
+
+        Items(Arg(args, "buy", ""), names, counts, nths);
+        for (int b = 0; b < names.Count(); b++)
+        {
+            OZT_WireBuy buy = new OZT_WireBuy();
+            buy.ClassName = names[b];
+            buy.Count = counts[b];
+            if (buy.Count < 1)
+                buy.Count = 1;
+            req.Buys.Insert(buy);
+        }
+
+        bool ok;
+        string why;
+        string err;
+        string json;
+        JsonFileLoader<OZT_DealReq>.MakeData(req, json, err, false);
+        string quoted = OZT_Deal.Run(player, json, false, ok, why);
+        if (!commit)
+        {
+            SaveAnswer(quoted);
+            detail = "quote " + Told(quoted, ok, why);
+            return true;
+        }
+
+        if (args.Contains("net"))
+            req.Net = Arg(args, "net", "0").ToInt();
+        else
+        {
+            OZT_DealRes q = new OZT_DealRes();
+            JsonFileLoader<OZT_DealRes>.LoadData(quoted, q, err);
+            req.Net = q.Net;
+        }
+        JsonFileLoader<OZT_DealReq>.MakeData(req, json, err, false);
+        string body = Ask(player, OZT_Const.OP_DEAL, json, ok, why);
+        detail = "deal " + Told(body, ok, why);
+        return true;
+    }
+
+    static OZT_WireSell SellOf(EntityAI e, int count)
+    {
+        OZT_WireSell line = new OZT_WireSell();
+        int low;
+        int high;
+        e.GetNetworkID(low, high);
+        line.Low = low;
+        line.High = high;
+        line.Count = count;
+        return line;
+    }
+
+    // The nearest thing of a class that lies loose within five metres.
+    static EntityAI Nearby(PlayerBase player, string type)
+    {
+        array<Object> found = new array<Object>();
+        vector here = player.GetPosition();
+        GetGame().GetObjectsAtPosition(here, 5, found, null);
+        for (int i = 0; i < found.Count(); i++)
+        {
+            EntityAI e = EntityAI.Cast(found[i]);
+            if (e && e.GetType() == type && !e.GetHierarchyParent())
+                return e;
+        }
+        return null;
+    }
+
+    // An answer of the deal in one line.
+    static string Told(string body, bool ok, string why)
+    {
+        OZT_DealRes res = new OZT_DealRes();
+        string err;
+        if (body != "")
+            JsonFileLoader<OZT_DealRes>.LoadData(body, res, err);
+        string s;
+        if (ok)
+            s = "ok=yes";
+        else
+            s = "ok=no why=" + why;
+        s = s + " net=" + res.Net.ToString() + " paid=" + res.Paid.ToString() + " received=" + res.Received.ToString();
+        s = s + " balance=" + res.Balance.ToString() + " hands=" + res.InHands + " left=" + res.Left.ToString();
+        return s;
     }
 
     // ---- the ops of this task -------------------------------------------------

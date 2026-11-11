@@ -156,6 +156,7 @@ class OZT_Config
         CheckNotes();
         CheckGoods();
         CheckTraders();
+        CheckLoops();
         m_Problems = OZT_Log.Warned();
         m_Revision++;
     }
@@ -299,5 +300,76 @@ class OZT_Config
             kept.Insert(p);
         }
         m_Traders.Traders = kept;
+    }
+
+    // A thing that sells for more than it costs is a money press: bought at one
+    // trader and sold at another, or at the same one, it makes money out of
+    // nothing (the owner, 2026-11-11: no money dupes). The prices compared are
+    // the ones a deal would use: the least any trader asks for one piece, rounded
+    // up, against the most any trader pays for it in the best condition, rounded
+    // down. Under the unit rule a sale is rounded once for the whole stack, so
+    // there the pay for one unit is compared before rounding. A finding changes
+    // nothing, the prices are the admin's: it is said and counted.
+    private void CheckLoops()
+    {
+        int unit = Unit();
+        float best = BestCondition();
+        for (int c = 0; c < m_Goods.Categories.Count(); c++)
+        {
+            OZT_Category cat = m_Goods.Categories[c];
+            string cheapAt = "";
+            string dearAt = "";
+            float cheapest = 0;
+            float dearest = 0;
+            for (int t = 0; t < m_Traders.Traders.Count(); t++)
+            {
+                OZT_Point p = m_Traders.Traders[t];
+                if (p.Categories.Find(cat.Id) < 0)
+                    continue;
+                if (cheapAt == "" || p.BuyFactor < cheapest)
+                {
+                    cheapest = p.BuyFactor;
+                    cheapAt = p.Id;
+                }
+                if (dearAt == "" || p.SellFactor > dearest)
+                {
+                    dearest = p.SellFactor;
+                    dearAt = p.Id;
+                }
+            }
+            if (cheapAt == "")
+                continue;
+
+            for (int g = 0; g < cat.Goods.Count(); g++)
+            {
+                OZT_Goods e = cat.Goods[g];
+                if (e.Buy <= 0 || e.Sell <= 0)
+                    continue;
+                int costs = RoundUpTo(e.Buy * cheapest, unit);
+                float pays = e.Sell * dearest * best;
+                if (e.Quantity != OZT_Const.RULE_UNIT)
+                    pays = RoundDownTo(pays, unit);
+                float over = pays - costs;
+                if (over <= 0.001 + pays * 0.000001)
+                    continue;
+                string msg = "Goods: '" + e.ClassName + "' sells for " + pays.ToString() + " at '" + dearAt + "'";
+                msg = msg + " and costs " + costs.ToString() + " at '" + cheapAt + "': a money loop";
+                msg = msg + " (Sell " + e.Sell.ToString() + ", Buy " + e.Buy.ToString() + " in the file; the factors are counted)";
+                Problem(msg);
+            }
+        }
+    }
+
+    // The largest of the condition factors: what the best-kept thing sells for.
+    private float BestCondition()
+    {
+        float best = 0;
+        for (int level = 0; level < OZT_Const.LEVEL_RUINED; level++)
+        {
+            float f = m_Settings.Condition.Of(level);
+            if (f > best)
+                best = f;
+        }
+        return best;
     }
 }

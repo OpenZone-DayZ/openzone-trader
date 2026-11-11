@@ -4,7 +4,9 @@
 // pristine one. Zero or less turns that side off, and so does leaving the key
 // out. `Quantity` is the quantity rule: "" one price for the piece, "unit" a
 // price per unit of a stack (rounds, nails), "fraction" a price for a full one,
-// scaled by what is left when it is sold (a canteen, a bandage).
+// scaled by what is left when it is sold (a canteen, a bandage). A stack that
+// can be split is paid by its share of a full stack under every rule but
+// "unit": one unit never brings the price of a stack.
 //
 // What is checked HERE is what the file alone can answer, and those fixes are
 // written back by the core's loader. Whether a class exists in the game, and

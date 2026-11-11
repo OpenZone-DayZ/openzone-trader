@@ -31,7 +31,8 @@ class OZT_Make
     string ClassName;
     ref OZT_Place Place;
 
-    // Above zero: a stack of this many units. Zero: as the game makes it.
+    // Above zero: a stack of this many units. Zero: as the game makes it, a
+    // magazine with no rounds in it.
     int Units;
 }
 
@@ -697,6 +698,18 @@ class OZT_Deal
 
         if (made && make.Units > 0)
             OZT_Stack.Set(made, make.Units);
+        else if (made)
+            Unload(made);
+    }
+
+    // The game makes a magazine full, and its rounds are goods of their own:
+    // a bought magazine holds none (decision 16 of the plan). Phase 3 sells a
+    // magazine with rounds, each paid for.
+    protected void Unload(EntityAI made)
+    {
+        Magazine mag = Magazine.Cast(made);
+        if (mag && !mag.IsAmmoPile())
+            mag.ServerSetAmmoCount(0);
     }
 
     // The engine refused a planned place. A paid thing is never lost: the

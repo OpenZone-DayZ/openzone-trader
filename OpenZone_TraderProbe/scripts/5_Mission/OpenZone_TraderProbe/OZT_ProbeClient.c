@@ -46,7 +46,18 @@ class OZT_ProbeClient
             OZT_ProbeInv.Tree(player, lines);
         OZT_ProbeLog.WriteAll("client_dump.txt", lines);
         array<string> ack = new array<string>();
-        ack.Insert(command + " items=" + lines.Count().ToString());
+        // The hands as the client's own state machine has them (1 is empty, 2
+        // is holding): the server's side of this is `ozt_probe hands`.
+        string held = "none";
+        string state = "";
+        if (player)
+        {
+            EntityAI inHands = player.GetHumanInventory().GetEntityInHands();
+            if (inHands)
+                held = inHands.GetType();
+            state = player.GetDayZPlayerInventory().GetCurrentStateID().ToString();
+        }
+        ack.Insert(command + " items=" + lines.Count().ToString() + " hands=" + held + " state=" + state);
         OZT_ProbeLog.WriteAll("client_dump.ack", ack);
     }
 }

@@ -208,3 +208,80 @@ measured before the change; their answers now are rows A.4 and A.5.
 The log of this boot holds seventeen `deal:` lines (three of rows A.8-A.11, fourteen of
 Task 7), no error of the mod and no `deal defect`. Its verdict fails on the warning budget
 alone: the four WARNING lines of rows A.4 and A.5, which those rows provoke on purpose.
+
+## A money loop, stacks, magazines, and places sold and bought
+
+The same day the owner asked for a warning when goods sell for more than they cost, and for a
+check of a deal that sells a worn thing and buys another for its slot. Writing the warning
+found two money presses of the same family; both were closed first. Two boots on the changed
+code: the first for every row below up to B.23, the second for the final wording of the
+warning. Rows of the plan that were run again say so.
+
+### The warning, and a stack priced as a piece (Task 3 Steps 10-11, whole)
+
+| # | what is asked | command | answer | as expected? |
+|---|---|---|---|---|
+| B.1 | the rows of Steps 10-11 as they were | the same commands in the same order | every answer as in rows 3.8-3.13 and A.2-A.7: `sell(1 of 1, level 1)=50`, then `=45`; `problems=3 revision=2`, `problems=0 revision=3`, `problems=1 revision=4`, `problems=0 revision=5`; with the buy factor at 1.01 `buy(1)=125` and `buy(30)=450`; `problems=0 revision=7` | yes |
+| B.2 | the canteen at `Sell` 130, `Buy` 120 | `{"op": "reload"}` | `reloaded: ... problems=1 revision=8`, one WARNING naming the canteen as a money loop | yes |
+| B.3 | the file back; the trader's `SellFactor` at 2.1 | `{"op": "reload"}` | `problems=7 revision=9`: the canteen, the helmet, the backpack, the rifle, the magazine, the scope and the round; not the bandage (42 goes down to 40, its cost) | yes |
+| B.4 | the file back | `{"op": "reload"}` | `problems=0 revision=10` | yes |
+| B.5 | thirty nails, the goods line `Nail` with `Buy` 100, `Sell` 50 and no rule | `ozt_probe` `create` with `qty` 30; `{"op": "reload"}`; `{"op": "price", "class": "Nail"}` | the pile `qty 30/99`; `problems=0 revision=11`; `Nail rule='' buy(1)=100 sell(30 of 30, level 0)=15` (50 x 30 / 99 is 15.15) | yes |
+| B.6 | twenty of them, and one | `price` with `count` 20, then 1 | `sell(20 of 30, level 0)=10`; `sell(1 of 30, level 0)=0` | yes |
+| B.7 | twelve rounds, `Ammo_762x39` with `Buy` 200, `Sell` 100 and no rule | `price`, then with `count` 1 | `Ammo_762x39 rule='' buy(1)=200 sell(12 of 12, level 0)=60`; `sell(1 of 12, level 0)=5` | yes |
+| B.8 | the file back | `{"op": "reload"}` | `problems=0 revision=12` | yes |
+
+Before the change the two lines with `count` 1 would have answered 50 and 100, the price of the
+whole stack for one unit of it. That is read from the code (the old `SellPrice` multiplied by
+the count under the unit rule only, and `Fraction` answered 1 for every magazine class), not
+measured: no build with the hole was booted.
+
+### A magazine, and places sold and bought (Task 6 Step 5, whole)
+
+| # | what is asked | command | answer | as expected? |
+|---|---|---|---|---|
+| B.9 | the first rows of the step as they were | the same commands | `balance=595`, `stacks: 5x4 5x5 50x1 500x1`; the worn pile still `ammo 4/20`, the new one `ammo 8/20` and then `12/20` in the jacket; `balance=475`, `stacks: 5x5 50x9` | yes |
+| B.10 | how the game makes a magazine | `ozt_probe` `{"op": "create", "class": "Mag_AKM_30Rnd", "into": "pants", "cell": "free", "as": "rawmag"}` | `ammo 30/30` | a fact |
+| B.11 | a magazine bought | `{"op": "deal", "buy": "Mag_AKM_30Rnd:1"}` | `deal ok=yes net=180 paid=180 received=0 balance=2295 hands= left=0`; `find`: `CARGO M65Jacket_Black r0 c5`, `ammo 0/30` | yes |
+| B.12 | and sold back | `{"op": "deal", "sell": "Mag_AKM_30Rnd"}` | `deal ok=yes net=-90 paid=0 received=90 balance=2385 hands= left=0`; `stacks: 5x17 50x6 500x4` | yes |
+| B.13 | the worn backpack sold, a backpack bought | `{"op": "deal", "sell": "TaloonBag_Blue", "buy": "TaloonBag_Blue:1"}` | `deal ok=yes net=200 paid=200 received=0 balance=2185 hands= left=0`; `find`: `ATT ... slot=Back`, entity 022728 where 022682 stood | yes |
+| B.14 | a worn helmet sold, a helmet bought | `fit` with `make`, then `{"op": "deal", "sell": "Mich2001Helmet", "buy": "Mich2001Helmet:1"}` | the first on `SLOT Headgear` (022729); `deal ok=yes net=450 paid=450 received=0 balance=1735 hands= left=0`; `find`: `slot=Headgear`, 022730 | yes |
+| B.15 | a bare rifle on the shoulder sold, a rifle bought | `fit` with `make`, then `{"op": "deal", "sell": "AKM", "buy": "AKM:1"}` | the first on `SLOT Shoulder` (022731); `deal ok=yes net=1250 paid=1250 received=0 balance=485 hands= left=0`; `find`: `slot=Shoulder`, 022732; `stacks: 5x7 50x9` | yes |
+| B.16 | the client against the server | `dump 3` | `dump 3 items=19 hands=none state=1`, `SAME` | yes |
+| B.17 | the canteen in the hands sold, a canteen bought, with every bag full | `move` to the hands, `fill` (77 papers, 22 cells refused), `hands` (022709, `hand state=2`), then `{"op": "deal", "sell": "Canteen", "buy": "Canteen:1"}` | `deal ok=yes net=60 paid=60 received=0 balance=425 hands=Canteen left=0`; `hands hold 022814 Canteen`, `inventory processing=no`, `CanDeleteItems=yes`, `hand state=2 idle=yes`; `stacks: 5x5 50x8` | yes |
+| B.18 | the client against the server | `dump 4` | `dump 4 items=96 hands=Canteen state=2`, `SAME` | yes |
+| B.19 | the new canteen sold out of the hands | `{"op": "deal", "sell": "Canteen"}` | `deal ok=yes net=-60 paid=0 received=60 balance=485 hands= left=0`; `hands hold null`, `hand state=1` | yes |
+| B.20 | one more bought into them | `{"op": "deal", "buy": "Canteen:1"}` | `deal ok=yes net=120 paid=120 received=0 balance=365 hands=Canteen left=0`; `hands hold 022815 Canteen`, `hand state=2`; `stacks: 5x3 50x7` | yes |
+| B.21 | the client against the server | `dump 5` | `dump 5 items=96 hands=Canteen state=2`, `SAME`; kept as `server-dump-places-sold-and-bought.txt` and `client-dump-places-sold-and-bought.txt` | yes |
+| B.22 | a fresh scene: every cargo full but the empty backpack; the backpack sold and a paper bought | `fit`, `quote`, `deal` | `fit`: `Paper: CARGO TaloonBag_Blue r0 c0` (the only room); `quote ok=yes net=-195 paid=0 received=195 balance=195 hands=Paper left=0`; the deal the same; `hands hold 022951 Paper`; the backpack `GONE`; `stacks: 5x9 50x3`; `dump 6 items=72 hands=Paper state=2`, `SAME` | yes |
+| B.23 | rows B.13-B.17 once more on a fresh scene, for the screenshot | the same four deals, with 2000 in the wallet | `balance=1800`, `1350`, `100`, `40`; `hands hold 023070 Canteen`, `hand state=2` | yes |
+
+Each time the plan asked the engine for its gates about a place that was still taken, by the
+thing the same deal sells, and the commit deleted that thing and created the new one there in
+one call: on the character's `Back`, `Headgear` and `Shoulder` slots and in the hands, twice
+each (rows B.13-B.17 and B.23). The hand state machine followed on both sides. Row B.22 is the
+other side of the same rule: the cells of a container that is sold are nobody's.
+
+The first screenshot of this run was a black frame: the machine's monitor was switched off,
+the game went on rendering and the capture did not. Row B.23 is the same scene built again
+once it was on.
+
+The log of the first boot holds sixteen `deal:` lines, no error of the mod and no
+`deal defect`; its verdict, taken before row B.1, is a pass.
+
+### The wording of the warning (the second boot)
+
+The first boot's WARNING lines gave the prices of the file alone, which read oddly when the
+loop comes from a trader's factor (`Sell 60, Buy 120`). They now name both sums.
+
+| # | what is asked | command | answer | as expected? |
+|---|---|---|---|---|
+| B.24 | the canteen at `Sell` 130 | `{"op": "reload"}` | `problems=1 revision=2`; `WARNING: Goods: 'Canteen' sells for 130 at 'stand' and costs 120 at 'stand': a money loop (Sell 130, Buy 120 in the file; the factors are counted)` | yes |
+| B.25 | the file back; `SellFactor` 2.1 | `{"op": "reload"}` | `problems=7 revision=3`: the canteen 125 against 120, the helmet 945 against 900, the backpack 420 against 400, the rifle 2625 against 2500, the magazine 185 against 180, the scope 630 against 600, the round 10.5 against 10 | yes |
+| B.26 | the file back | `{"op": "reload"}` | `problems=0 revision=4` | yes |
+
+The verdict of the second boot, taken before row B.24, is a pass with no warning. A reload
+needs no client: these three rows ran with nobody connected.
+
+Not covered here either: a second client watching such a deal; a thing bought into a
+container bought in the same deal (it is not planned: a backpack and things for it, with full
+bags, are two deals).

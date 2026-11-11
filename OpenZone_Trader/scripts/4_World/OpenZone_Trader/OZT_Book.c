@@ -164,8 +164,8 @@ class OZT_Book
     }
 
     // What this trader pays for `count` units of `item` (the count matters
-    // under the unit rule only). 0: not taken. The line's total goes DOWN to a
-    // multiple of the smallest note.
+    // for a stack that can be split). 0: not taken. The line's total goes DOWN
+    // to a multiple of the smallest note.
     static int SellPrice(OZT_Point trader, OZT_BookEntry e, EntityAI item, int count)
     {
         if (!item || !Deals(trader, e))
@@ -177,9 +177,26 @@ class OZT_Book
             return 0;
         float price = e.Sell * trader.SellFactor * OZT_Config.Get().Settings().Condition.Of(level);
         if (e.Rule == OZT_Const.RULE_UNIT)
+        {
             price = price * count;
+        }
+        else if (OZT_Stack.Countable(item))
+        {
+            // A stack that can be split is paid by what is in it, under any
+            // rule: the price is for a full stack, and what is sold, the whole
+            // of it or a part, brings its share. One unit never brings the
+            // price of a stack (the owner, 2026-11-11: no money dupes).
+            float most = OZT_Stack.Max(item);
+            if (most < count)
+                most = count;
+            if (most < 1)
+                most = 1;
+            price = price * count / most;
+        }
         else if (e.Rule == OZT_Const.RULE_FRACTION)
+        {
             price = price * OZT_Stack.Fraction(item);
+        }
         int unit = OZT_Config.Get().Unit();
         return OZT_Config.RoundDownTo(price, unit);
     }

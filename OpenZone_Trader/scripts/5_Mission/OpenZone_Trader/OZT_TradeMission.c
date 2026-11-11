@@ -13,6 +13,36 @@ modded class MissionGameplay
         super.OnInit();
         OZ_Show.OnShow.Insert(OZT_Show);
         OZ_ClientState.ServiceWatch().Insert(OZT_SvcRes);
+
+        // The trader points ride in the core's sync packet, the first one and
+        // every later one; and at once when the packet came before the mission.
+        OZ_ClientState.SyncWatch().Insert(OZT_Sync);
+        OZ_Notice.OnAnswer.Insert(OZT_Notice);
+        if (OZ_ClientState.Ready())
+            OZT_ApplyPoints();
+    }
+
+    void OZT_Sync(OZ_SyncPayload p)
+    {
+        OZT_ApplyPoints();
+    }
+
+    void OZT_ApplyPoints()
+    {
+        OZT_ClientPoints.Clear();
+        int chunks = OZ_ClientState.Extra(OZT_ClientPoints.SYNC_POINTS_N, "0").ToInt();
+        for (int c = 0; c < chunks; c++)
+            OZT_ClientPoints.AddChunk(OZ_ClientState.Extra(OZT_ClientPoints.SYNC_POINTS + c.ToString(), ""));
+        OZT_Log.Dbg("points: " + OZT_ClientPoints.Count().ToString() + " from the sync packet");
+    }
+
+    // A refusal of the trade action: the player stands in the world, not in
+    // a menu, so it is a notification (the research mod's way).
+    void OZT_Notice(string op, bool ok, string why)
+    {
+        if (op.IndexOf("trader.") != 0)
+            return;
+        NotificationSystem.AddNotificationExtended(4, "#STR_OZT_MODNAME", OZ_Notice.Text(), "");
     }
 
     void OZT_Show(string what)
@@ -78,6 +108,8 @@ modded class MissionGameplay
         // the mission.
         OZ_Show.OnShow.Remove(OZT_Show);
         OZ_ClientState.ServiceWatch().Remove(OZT_SvcRes);
+        OZ_ClientState.SyncWatch().Remove(OZT_Sync);
+        OZ_Notice.OnAnswer.Remove(OZT_Notice);
         GetGame().GetCallQueue(CALL_CATEGORY_GUI).Remove(OZT_OpenTrade);
         super.OnMissionFinish();
     }

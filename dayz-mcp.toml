@@ -38,6 +38,7 @@ noise        = ["Bridge.Url is not https", "bridge: "]
 
 # Read from the ready line. The stand's own files (examples/stand) set them.
 [expect.counters]
-traders  = 1
+# The stall and Ostap, a trader's character (phase 4).
+traders  = 2
 goods    = 15
 problems = 0

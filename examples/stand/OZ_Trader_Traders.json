@@ -3,6 +3,14 @@
     "Traders": [
         { "Id": "stand", "Name": "Стендовий торговець", "Kind": "object", "ClassName": "Land_City_Stand_Grocery",
           "Pos": [4690.0, 340.77, 10198.0], "Yaw": 0, "Radius": 8,
-          "Categories": ["gear", "weapons", "ammo"], "BuyFactor": 1, "SellFactor": 1, "Provider": "", "Exchange": 1 }
+          "Categories": ["gear", "weapons", "ammo"], "BuyFactor": 1, "SellFactor": 1, "Provider": "" },
+        { "Id": "npc", "Name": "Остап", "Kind": "npc", "ClassName": "SurvivorM_Boris",
+          "Pos": [4687.0, 339.0, 10195.5], "Yaw": 180, "Radius": 3,
+          "Outfit": { "Items": [
+              { "ClassName": "M65Jacket_Olive", "SlotName": "Body" },
+              { "ClassName": "CargoPants_Green", "SlotName": "Legs" },
+              { "ClassName": "MilitaryBoots_Brown", "SlotName": "Feet" },
+              { "ClassName": "BaseballCap_Olive", "SlotName": "Headgear" } ] },
+          "Categories": ["gear", "ammo"], "BuyFactor": 1, "SellFactor": 1, "Provider": "", "NoExchange": 1 }
     ]
 }

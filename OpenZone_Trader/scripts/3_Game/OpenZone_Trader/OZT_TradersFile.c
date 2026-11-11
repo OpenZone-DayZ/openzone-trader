@@ -6,6 +6,63 @@
 // categories of the price book it deals in, a factor on each side of its
 // prices, and its own money provider ("" means the server's).
 
+// One thing a trader's character wears or carries, in the shape of the core's
+// loadout item (OZ_LoadoutItem: the same keys, so an outfit reads like a
+// preset of the factions mod). It lives in 3_Game with the point; the 4_World
+// half turns it into the core's preset when the character is dressed.
+//
+// A key the file does not carry reads ZERO in a nested object (the loader
+// leaves its default unset), so zero means "as the class has it" for both
+// numbers: Quantity 0 is the class's own, Health01 0 or less is left alone (an
+// outfit of ruined things is never meant).
+class OZT_OutfitItem
+{
+    string ClassName = "";
+    string SlotName = "";
+    int Quantity = 0;
+    float Health01 = -1;
+    ref array<ref OZT_OutfitItem> Inside;
+
+    OZT_OutfitItem Copy()
+    {
+        OZT_OutfitItem c = new OZT_OutfitItem();
+        c.ClassName = ClassName;
+        c.SlotName = SlotName;
+        c.Quantity = Quantity;
+        c.Health01 = Health01;
+        c.Inside = new array<ref OZT_OutfitItem>();
+        if (Inside)
+        {
+            for (int i = 0; i < Inside.Count(); i++)
+            {
+                if (Inside[i])
+                    c.Inside.Insert(Inside[i].Copy());
+            }
+        }
+        return c;
+    }
+}
+
+class OZT_Outfit
+{
+    ref array<ref OZT_OutfitItem> Items;
+
+    OZT_Outfit Copy()
+    {
+        OZT_Outfit c = new OZT_Outfit();
+        c.Items = new array<ref OZT_OutfitItem>();
+        if (Items)
+        {
+            for (int i = 0; i < Items.Count(); i++)
+            {
+                if (Items[i])
+                    c.Items.Insert(Items[i].Copy());
+            }
+        }
+        return c;
+    }
+}
+
 class OZT_Point
 {
     string Id = "";
@@ -20,9 +77,15 @@ class OZT_Point
     float SellFactor = 1;
     string Provider = "";
 
-    // 1: the trader changes the server's banknotes at face value (the screen's
-    // change tab); 0: it does not. Only item money has notes to change.
-    int Exchange = 1;
+    // 1: this trader does not change the server's banknotes; 0, and a file that
+    // does not say: it does (the screen's change tab, at face value). Said this
+    // way round because a key a nested object lacks reads zero. Only item money
+    // has notes to change.
+    int NoExchange = 0;
+
+    // What a trader of kind npc wears (§9.3 of the design); nothing for an
+    // object.
+    ref OZT_Outfit Outfit;
 
     OZT_Point Copy()
     {
@@ -48,7 +111,11 @@ class OZT_Point
         c.BuyFactor = BuyFactor;
         c.SellFactor = SellFactor;
         c.Provider = Provider;
-        c.Exchange = Exchange;
+        c.NoExchange = NoExchange;
+        if (Outfit)
+            c.Outfit = Outfit.Copy();
+        else
+            c.Outfit = new OZT_Outfit();
         return c;
     }
 

@@ -447,7 +447,8 @@ already used as type name`): the request's fields are `SlotName`.
 2026-11-12, the owner's word of the night before: a tab where the player changes notes for
 the notes they need, a 100 into five 20s. The server's notes stand in the price book under
 the category `@change` at face value both ways, with no factor of the trader's and no
-rounding; a trader changes them unless its `Exchange` is 0, and only item money with two
+rounding; a trader changes them unless its `NoExchange` is 1 (named so after F.4: a key a
+trader's entry lacks reads zero, so a default of 1 would not hold), and only item money with two
 notes or more has a change tab. Notes given are sold stack units, notes taken are bought
 units, and what the given notes leave over comes back as change in the largest notes. The
 stand's money gained notes of 10, 20 and 100 (5, 10, 20, 50, 100, 500). The kit: three

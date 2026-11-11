@@ -11,8 +11,13 @@ placed object and as an editor exports it: for a building that is the middle of 
 model, so the stall's `Pos` is 1.77 m above the runway it stands on. `Radius` is measured
 from `Pos`; this stall's body lies south of its origin, hence the 8 metres.
 
-`Exchange` of a trader is the change tab: 1 (the default) changes the server's notes
-at face value, a 100 into five 20s; 0 leaves the tab out. Only item money has notes,
-and it takes two kinds of them.
+A trader changes the server's notes at face value (the change tab: a 100 into five 20s)
+unless its `NoExchange` is 1. It is said that way round because a key a trader's entry
+does not carry reads zero. Only item money has notes, and it takes two kinds of them.
+
+The second point is a trader's character (`Kind` "npc"): an ordinary survivor class,
+dressed by `Outfit` in the shape of the core's loadout preset (`ClassName`, `SlotName`,
+`Quantity`, `Health01`, `Inside`), standing on the runway at `Pos` and facing `Yaw`.
+It does not change notes, to show the tab missing.
 
 They are not a starting point for a real server: the note classes exist on the stand only.

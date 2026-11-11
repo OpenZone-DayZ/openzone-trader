@@ -37,6 +37,9 @@ class OZT_Module : CF_ModuleWorld
         OZT_Book.Rebuild();
         OZT_Money.Provide(new OZT_ItemMoney());
 
+        // The points ride in the core's sync packet: the handler first, then
+        // the points, whose respawn sends the packet again.
+        OZ_SyncExtras.OnFill().Insert(OZT_PointsFill);
         OZT_Points.Respawn();
         OZ_ServiceRegistry.Register(OZT_Const.SERVICE, new OZT_Service());
 
@@ -46,6 +49,13 @@ class OZT_Module : CF_ModuleWorld
         // a neighbour module has registered what it describes.
         m_ReadyTimer = new Timer(CALL_CATEGORY_SYSTEM);
         m_ReadyTimer.Run(READY_DELAY, this, "Ready", NULL, false);
+    }
+
+    // The core's sync packet asks for our part: the trader points. Not
+    // private: the invoker calls it.
+    void OZT_PointsFill(OZ_SyncPayload p)
+    {
+        OZT_Points.Fill(p);
     }
 
     // Called by the timer by name: it must not be private.
@@ -68,7 +78,8 @@ class OZT_Module : CF_ModuleWorld
         OZT_Book.Reset();
 
         // The core empties its own registries at mission end; the objects at
-        // the points are ours to take away.
+        // the points are ours to take away, and so is our handler of its packet.
+        OZ_SyncExtras.OnFill().Remove(OZT_PointsFill);
         OZT_Points.Remove();
 
         OZT_Deal.Reset();

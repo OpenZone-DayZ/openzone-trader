@@ -327,16 +327,19 @@ class OZT_Config
         for (int i = 0; i < m_Traders.Traders.Count(); i++)
         {
             OZT_Point p = m_Traders.Traders[i];
-            if (p.Kind == OZT_Const.KIND_NPC)
-            {
-                Problem("Traders: '" + p.Id + "' is an npc; the NPC is not built yet, the point is skipped");
-                continue;
-            }
             if (!ClassKnown(p.ClassName))
             {
                 Problem("Traders: '" + p.Id + "' is skipped: no such class '" + p.ClassName + "'");
                 continue;
             }
+            // A trader's character is an ordinary survivor (design §9.2).
+            if (p.Kind == OZT_Const.KIND_NPC && !GetGame().IsKindOf(p.ClassName, "SurvivorBase"))
+            {
+                Problem("Traders: '" + p.Id + "' is skipped: an npc's class must be a survivor, '" + p.ClassName + "' is not");
+                continue;
+            }
+            if (p.Kind == OZT_Const.KIND_NPC)
+                CheckOutfit(p.Id, p.Outfit.Items);
             array<string> cats = new array<string>();
             for (int c = 0; c < p.Categories.Count(); c++)
             {
@@ -350,6 +353,42 @@ class OZT_Config
             kept.Insert(p);
         }
         m_Traders.Traders = kept;
+    }
+
+    // What a trader's character wears: a class that does not exist is left
+    // out and said, the rest is worn (the core's own rule for presets).
+    //
+    // A list of lists, not recursion: a recursive call that passed an item's
+    // own list (`it.Inside`) from inside a loop over the method's array
+    // parameter came back with that parameter pointing at the item's list
+    // (measured 2026-11-12, static and not: the rest of the outfit read as
+    // missing; dayz-modding, enforce-script.md).
+    private void CheckOutfit(string id, array<ref OZT_OutfitItem> top)
+    {
+        array<ref array<ref OZT_OutfitItem>> lists = new array<ref array<ref OZT_OutfitItem>>();
+        if (top)
+            lists.Insert(top);
+        int at = 0;
+        while (at < lists.Count())
+        {
+            array<ref OZT_OutfitItem> items = lists[at];
+            at++;
+            for (int i = items.Count() - 1; i >= 0; i--)
+            {
+                OZT_OutfitItem it = items[i];
+                if (!it || !ClassKnown(it.ClassName))
+                {
+                    string name = "";
+                    if (it)
+                        name = it.ClassName;
+                    Problem("Traders: '" + id + "' wears '" + name + "', which is no class; it is left out");
+                    items.RemoveOrdered(i);
+                    continue;
+                }
+                if (it.Inside)
+                    lists.Insert(it.Inside);
+            }
+        }
     }
 
     // A thing that sells for more than it costs is a money press: bought at one

@@ -19,6 +19,8 @@ class OZT_VerbOps
         }
         if (op == "reload")
             return OpReload(detail);
+        if (op == "fps")
+            return OZT_VerbNpc.OpFps(args, detail);
 
         PlayerBase player = Player();
         if (!player)
@@ -51,6 +53,8 @@ class OZT_VerbOps
             return OpLoad(player, args, detail);
         if (op == "fits")
             return OpFits(player, args, detail);
+        if (op == "hurt")
+            return OZT_VerbNpc.OpHurt(player, args, detail);
         // -- ops of the later tasks go above this line --
         detail = "unknown op '" + op + "'; known: " + KnownOps();
         return false;
@@ -58,7 +62,7 @@ class OZT_VerbOps
 
     static string KnownOps()
     {
-        return "status, reload, balance, price, pay, damage, open, fit, quote, deal, show, tree, load, fits";
+        return "status, reload, fps, balance, price, pay, damage, open, fit, quote, deal, show, tree, load, fits, hurt";
     }
 
     // ---- what the ops share ---------------------------------------------------

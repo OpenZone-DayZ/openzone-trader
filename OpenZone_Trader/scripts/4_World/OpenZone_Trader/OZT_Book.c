@@ -179,7 +179,7 @@ class OZT_Book
     // takes two kinds of them to change one into the other.
     static bool Changes(OZT_Point trader)
     {
-        if (!trader || trader.Exchange != 1)
+        if (!trader || trader.NoExchange == 1)
             return false;
         OZT_MoneyProvider money = OZT_Money.Of(trader);
         if (!money || !money.Physical())

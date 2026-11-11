@@ -40,13 +40,20 @@ class OZT_WireOwn
 {
     int Low = 0;
     int High = 0;
-    // For the whole of it: the thing, or the stack as it stands.
+    // For the thing itself, or the stack as it stands: its own line of the
+    // book, nothing that hangs on it or is loaded in it.
     int Price = 0;
-    // 0: sells. 2: not empty, something hangs on it, lies in it or is loaded
-    // into it (phase 3 sells such a thing as a tree).
+    // 0: sells. 2: something lies inside it, and it goes only together with
+    // all of that.
     int Why = 0;
     // Above zero: a stack of this many units, of which a part may be sold.
     int Units = 0;
+    // What it brings sold as it is, with everything on it and in its magazines
+    // that the trader takes and nothing kept. A stack: the same as Price.
+    int Tree = 0;
+    // The rounds loaded in the thing itself, and what they bring.
+    int Loaded = 0;
+    int LoadedPrice = 0;
 }
 
 class OZT_OpenRes
@@ -79,20 +86,58 @@ class OZT_OpenRes
     }
 }
 
+// What the player keeps of a thing they sell: a part of it (by the two halves of
+// its network id), which then comes off and stays with everything on it; or,
+// with Rounds 1, the rounds loaded in the thing named, which may be the sold
+// thing itself or a part of it.
+class OZT_WireKeep
+{
+    int Low = 0;
+    int High = 0;
+    int Rounds = 0;
+
+    OZT_WireKeep Copy()
+    {
+        OZT_WireKeep c = new OZT_WireKeep();
+        c.Low = Low;
+        c.High = High;
+        c.Rounds = Rounds;
+        return c;
+    }
+}
+
 // One thing the player sells: the entity by the two halves of its network id,
-// and how many units of it when it is a stack (0: all of it).
+// and how many units of it when it is a stack (0: all of it). A thing that is
+// not a stack is sold with what hangs on it and what is loaded in it, less what
+// Keep names.
 class OZT_WireSell
 {
     int Low = 0;
     int High = 0;
     int Count = 0;
+    ref array<ref OZT_WireKeep> Keep;
 
+    void OZT_WireSell()
+    {
+        Keep = new array<ref OZT_WireKeep>();
+    }
+
+    // An arrived line ran no constructor: a line without Keep has none.
     OZT_WireSell Copy()
     {
         OZT_WireSell c = new OZT_WireSell();
         c.Low = Low;
         c.High = High;
         c.Count = Count;
+        if (Keep)
+        {
+            for (int i = 0; i < Keep.Count(); i++)
+            {
+                OZT_WireKeep k = Keep[i];
+                if (k)
+                    c.Keep.Insert(k.Copy());
+            }
+        }
         return c;
     }
 }

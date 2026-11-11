@@ -111,10 +111,26 @@ class OZT_Open
             wo.Low = low;
             wo.High = high;
             wo.Price = price;
-            if (OZT_Deal.InTheWay(own) > 0)
-                wo.Why = 2;
             if (OZT_Stack.Countable(own))
+            {
                 wo.Units = units;
+                wo.Tree = price;
+            }
+            else
+            {
+                // Sold whole, with nothing else in the deal: what hangs on it
+                // and is loaded in it is paid by its own lines, and what lies
+                // inside it stands in the way.
+                OZT_Tree tree = OZT_Tree.Read(trader, own, null, null);
+                wo.Tree = tree.Total;
+                int loaded;
+                int loadedPrice;
+                tree.LoadedIn(own, loaded, loadedPrice);
+                wo.Loaded = loaded;
+                wo.LoadedPrice = loadedPrice;
+                if (tree.Inside > 0)
+                    wo.Why = 2;
+            }
             res.Yours.Insert(wo);
         }
 

@@ -45,6 +45,8 @@ class OZT_VerbOps
             return OpDeal(player, args, true, detail);
         if (op == "show")
             return OpShow(player, args, detail);
+        if (op == "tree")
+            return OpTree(player, args, detail);
         // -- ops of the later tasks go above this line --
         detail = "unknown op '" + op + "'; known: " + KnownOps();
         return false;
@@ -52,7 +54,7 @@ class OZT_VerbOps
 
     static string KnownOps()
     {
-        return "status, reload, balance, price, pay, damage, open, fit, quote, deal, show";
+        return "status, reload, balance, price, pay, damage, open, fit, quote, deal, show, tree";
     }
 
     // ---- what the ops share ---------------------------------------------------
@@ -449,6 +451,81 @@ class OZT_VerbOps
         return s;
     }
 
+    // What a request keeps, from two arguments: keep=Class[#nth],... names
+    // parts that stay with the player, keeprounds=Class[#nth],... things whose
+    // loaded rounds stay.
+    static bool Keeps(PlayerBase player, map<string, string> args, out array<ref OZT_WireKeep> keep, out string detail)
+    {
+        keep = new array<ref OZT_WireKeep>();
+        array<string> names;
+        array<int> counts;
+        array<int> nths;
+        for (int which = 0; which < 2; which++)
+        {
+            string list = Arg(args, "keep", "");
+            if (which == 1)
+                list = Arg(args, "keeprounds", "");
+            Items(list, names, counts, nths);
+            for (int i = 0; i < names.Count(); i++)
+            {
+                EntityAI part = Carried(player, names[i], nths[i]);
+                if (!part)
+                {
+                    detail = "the player carries no " + names[i] + " number " + nths[i].ToString();
+                    return false;
+                }
+                OZT_WireKeep line = new OZT_WireKeep();
+                int low;
+                int high;
+                part.GetNetworkID(low, high);
+                line.Low = low;
+                line.High = high;
+                line.Rounds = which;
+                keep.Insert(line);
+            }
+        }
+        return true;
+    }
+
+    // tree item=Class[#nth] [keep=Class[#nth],...] [keeprounds=Class[#nth],...]:
+    // the thing as a deal reads it when it is sold alone: every node with its
+    // state, every lot of rounds, the sums. Nothing is changed.
+    static bool OpTree(PlayerBase player, map<string, string> args, out string detail)
+    {
+        OZT_Point trader = TraderOf(args);
+        if (!trader)
+        {
+            detail = "tree: no trader '" + Arg(args, "trader", "stand") + "'";
+            return false;
+        }
+        array<string> names;
+        array<int> counts;
+        array<int> nths;
+        Items(Arg(args, "item", ""), names, counts, nths);
+        if (names.Count() != 1)
+        {
+            detail = "tree needs item=Class[#nth]";
+            return false;
+        }
+        EntityAI root = Carried(player, names[0], nths[0]);
+        if (!root)
+        {
+            detail = "the player carries no " + names[0] + " number " + nths[0].ToString();
+            return false;
+        }
+        array<ref OZT_WireKeep> keep;
+        if (!Keeps(player, args, keep, detail))
+            return false;
+
+        OZT_Tree tree = OZT_Tree.Read(trader, root, keep, null);
+        if (tree.Taken())
+            detail = "tree: " + tree.Text();
+        else
+            detail = "tree: the trader does not take it: " + tree.Text();
+        SaveAnswer(detail);
+        return true;
+    }
+
     // show [trader=<id>]: tell the client to put the trade screen up for a
     // trader, the way the trade action will.
     static bool OpShow(PlayerBase player, map<string, string> args, out string detail)
@@ -561,8 +638,10 @@ class OZT_VerbOps
         return true;
     }
 
-    // damage class=<Class> [nth=<k>] health=<0..1>: a stand helper, so that a
-    // sold item can be worn or damaged.
+    // damage class=<Class> [nth=<k>] health=<0..1> | rounds=<0..1>: a stand
+    // helper, so that a sold item can be worn or damaged. With rounds= the
+    // thing is left as it is and every round loaded in the magazine gets that
+    // damage (0: new).
     static bool OpDamage(PlayerBase player, map<string, string> args, out string detail)
     {
         string type = Arg(args, "class", "");
@@ -571,6 +650,25 @@ class OZT_VerbOps
         {
             detail = "damage: the player carries no " + type;
             return false;
+        }
+        if (args.Contains("rounds"))
+        {
+            Magazine mag = Magazine.Cast(item);
+            if (!mag)
+            {
+                detail = "damage: rounds= needs a magazine or a pile, " + type + " is neither";
+                return false;
+            }
+            float dmg = Arg(args, "rounds", "0").ToFloat();
+            int held = mag.GetAmmoCount();
+            int done = 0;
+            for (int i = 0; i < held; i++)
+            {
+                if (mag.SetCartridgeDamageAtIndex(i, dmg))
+                    done++;
+            }
+            detail = type + ": " + done.ToString() + " of " + held.ToString() + " rounds set to damage " + dmg.ToString();
+            return true;
         }
         item.SetHealth01("", "", Arg(args, "health", "1").ToFloat());
         detail = type + " health level " + item.GetHealthLevel().ToString();

@@ -42,8 +42,13 @@ class OZT_Deal
     static const int MAX_PIECES = 50;
     static const int MAX_UNITS = 5000;
 
+    // A quote changes nothing, but it lays a whole plan: one client may ask
+    // for one only so often.
+    static const int QUOTE_GAP_MS = 100;
+
     // When each player last made a deal: uid -> the game's milliseconds.
     protected static ref map<string, int> s_Last = new map<string, int>();
+    protected static ref map<string, int> s_LastQuote = new map<string, int>();
 
     protected PlayerBase m_Player;
     protected OZT_Point m_Trader;
@@ -84,6 +89,7 @@ class OZT_Deal
     static void Reset()
     {
         s_Last.Clear();
+        s_LastQuote.Clear();
     }
 
     void OZT_Deal(PlayerBase player)
@@ -230,6 +236,14 @@ class OZT_Deal
                     return OZT_Const.NO_BUSY;
             }
         }
+        else
+        {
+            int asked;
+            int now = GetGame().GetTime();
+            if (s_LastQuote.Find(Uid(), asked) && now - asked < QUOTE_GAP_MS)
+                return OZT_Const.NO_BUSY;
+            s_LastQuote.Set(Uid(), now);
+        }
         return "";
     }
 
@@ -295,7 +309,7 @@ class OZT_Deal
     }
 
     // What hangs on a thing, lies in it or is loaded into it.
-    protected int InTheWay(EntityAI e)
+    static int InTheWay(EntityAI e)
     {
         int n = e.GetInventory().AttachmentCount();
         CargoBase cargo = e.GetInventory().GetCargo();

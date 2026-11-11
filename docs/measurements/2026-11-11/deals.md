@@ -298,3 +298,22 @@ The verdict of the third boot, taken before row B.27, is a pass with no warning.
 Not covered here either: a second client watching such a deal; a thing bought into a
 container bought in the same deal (it is not planned: a backpack and things for it, with full
 bags, are two deals).
+
+## Phase 2b: the wire for the screen
+
+The same day, after phase 2a: `open` lists the player's own things with what each brings, the
+service has a `quote`, and the stand verb can tell a client to open
+(`docs/2026-11-11-phase-2b-wire-plan.md`). One boot; the kit, four fifties in the jacket's
+wallet, a canteen and a pile of twelve rounds in the trousers.
+
+| # | what is asked | command | answer | as expected? |
+|---|---|---|---|---|
+| C.1 | what the player carries that the trader pays for | `{"op": "open"}` | `open ok=yes trader=stand goods=10 categories=3 provider=items unit=5 balance=200 bytes=1696 revision=1 yours=7 (sells 4, not empty 3)` | yes |
+| C.2 | a quote through the service handler | `{"op": "quote", "buy": "BandageDressing:1"}` | `quote ok=yes net=40 paid=40 received=0 balance=160 hands= left=0` | yes |
+| C.3 | two quotes in one call | `{"op": "quote", "sell": "Canteen", "buy": "Canteen:1", "twice": "1"}` | `quote ok=yes net=60 paid=60 received=0 balance=140 hands= left=0`, and the second `ok=no why=STR_OZT_NO_BUSY` | yes |
+| C.4 | a deal after it | `{"op": "deal", "sell": "Ammo_762x39:5", "buy": "BandageDressing:1"}` | `deal ok=yes net=15 paid=15 received=0 balance=185 hands= left=0` | yes |
+| C.5 | telling the client to open | `{"op": "show"}` | `show: sent 'trader:stand'` | yes |
+
+The seven of row C.1: the canteen, the pile, the bandage and the scope on the rifle sell; the
+rifle, its magazine and the backpack are not empty. The verdict of the boot is a pass; the log
+holds no error line.

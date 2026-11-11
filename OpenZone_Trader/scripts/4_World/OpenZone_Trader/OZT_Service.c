@@ -84,6 +84,34 @@ class OZT_Open
             }
         }
 
+        // What the player carries that this trader pays for, each with what it
+        // brings as it is now. The screen marks everything else as not taken.
+        array<EntityAI> all = new array<EntityAI>();
+        player.GetInventory().EnumerateInventory(InventoryTraversalType.PREORDER, all);
+        for (int i = 0; i < all.Count(); i++)
+        {
+            EntityAI own = all[i];
+            if (!own || own == player)
+                continue;
+            OZT_BookEntry entry = OZT_Book.EntryOf(own.GetType());
+            int units = OZT_Stack.Units(own);
+            int price = OZT_Book.SellPrice(trader, entry, own, units);
+            if (price <= 0)
+                continue;
+            OZT_WireOwn wo = new OZT_WireOwn();
+            int low;
+            int high;
+            own.GetNetworkID(low, high);
+            wo.Low = low;
+            wo.High = high;
+            wo.Price = price;
+            if (OZT_Deal.InTheWay(own) > 0)
+                wo.Why = 2;
+            if (OZT_Stack.Countable(own))
+                wo.Units = units;
+            res.Yours.Insert(wo);
+        }
+
         string body;
         if (!JsonFileLoader<OZT_OpenRes>.MakeData(res, body, err, false))
         {
@@ -117,6 +145,10 @@ class OZT_Service : OZ_ServiceHandler
             return OZT_Open.Answer(player, json, ok, error);
         if (op == OZT_Const.OP_DEAL)
             return OZT_Deal.Run(player, json, true, ok, error);
+        // The same request, with nothing changed and the net not compared:
+        // what the screen shows before Confirm is the server's own answer.
+        if (op == OZT_Const.OP_QUOTE)
+            return OZT_Deal.Run(player, json, false, ok, error);
         // -- operations of the later tasks go above this line --
         return "";
     }

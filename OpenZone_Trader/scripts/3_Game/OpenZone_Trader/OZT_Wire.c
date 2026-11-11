@@ -33,6 +33,22 @@ class OZT_WireGoods
     int Stock = -1;
 }
 
+// One thing the player carries that this trader pays for: the entity by the
+// two halves of its network id, and what it brings as it is now. What is not in
+// the list is not taken here.
+class OZT_WireOwn
+{
+    int Low = 0;
+    int High = 0;
+    // For the whole of it: the thing, or the stack as it stands.
+    int Price = 0;
+    // 0: sells. 2: not empty, something hangs on it, lies in it or is loaded
+    // into it (phase 3 sells such a thing as a tree).
+    int Why = 0;
+    // Above zero: a stack of this many units, of which a part may be sold.
+    int Units = 0;
+}
+
 class OZT_OpenRes
 {
     int Revision = 0;
@@ -48,12 +64,14 @@ class OZT_OpenRes
     ref OZT_ConditionFactors Condition;
     ref array<ref OZT_WireCategory> Categories;
     ref array<ref OZT_WireGoods> Goods;
+    ref array<ref OZT_WireOwn> Yours;
 
     void OZT_OpenRes()
     {
         Condition = new OZT_ConditionFactors();
         Categories = new array<ref OZT_WireCategory>();
         Goods = new array<ref OZT_WireGoods>();
+        Yours = new array<ref OZT_WireOwn>();
     }
 }
 

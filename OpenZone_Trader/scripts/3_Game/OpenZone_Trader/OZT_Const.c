@@ -16,6 +16,11 @@ class OZT_Const
     static const string SERVICE = "trader";
     static const string OP_OPEN = "open";
     static const string OP_DEAL = "deal";
+    static const string OP_QUOTE = "quote";
+
+    // What the server tells a client to show (OZ_Rpc.Show): this prefix, then
+    // the trader's id.
+    static const string SHOW_PREFIX = "trader:";
 
     // Kinds of a trader point.
     static const string KIND_OBJECT = "object";

@@ -43,6 +43,8 @@ class OZT_VerbOps
             return OpDeal(player, args, false, detail);
         if (op == "deal")
             return OpDeal(player, args, true, detail);
+        if (op == "show")
+            return OpShow(player, args, detail);
         // -- ops of the later tasks go above this line --
         detail = "unknown op '" + op + "'; known: " + KnownOps();
         return false;
@@ -50,7 +52,7 @@ class OZT_VerbOps
 
     static string KnownOps()
     {
-        return "status, reload, balance, price, pay, damage, open, fit, quote, deal";
+        return "status, reload, balance, price, pay, damage, open, fit, quote, deal, show";
     }
 
     // ---- what the ops share ---------------------------------------------------
@@ -151,6 +153,14 @@ class OZT_VerbOps
         detail = detail + " categories=" + res.Categories.Count().ToString() + " provider=" + res.Provider;
         detail = detail + " unit=" + res.Unit.ToString() + " balance=" + res.Balance.ToString();
         detail = detail + " bytes=" + body.Length().ToString() + " revision=" + res.Revision.ToString();
+        int sells = 0;
+        for (int y = 0; y < res.Yours.Count(); y++)
+        {
+            if (res.Yours[y].Why == 0)
+                sells++;
+        }
+        int full = res.Yours.Count() - sells;
+        detail = detail + " yours=" + res.Yours.Count().ToString() + " (sells " + sells.ToString() + ", not empty " + full.ToString() + ")";
         return true;
     }
 
@@ -366,11 +376,18 @@ class OZT_VerbOps
         string err;
         string json;
         JsonFileLoader<OZT_DealReq>.MakeData(req, json, err, false);
-        string quoted = OZT_Deal.Run(player, json, false, ok, why);
+        // Through the service handler, as a client's is.
+        string quoted = Ask(player, OZT_Const.OP_QUOTE, json, ok, why);
         if (!commit)
         {
-            SaveAnswer(quoted);
             detail = "quote " + Told(quoted, ok, why);
+            if (Arg(args, "twice", "0") == "1")
+            {
+                bool ok2;
+                string why2;
+                string again = Ask(player, OZT_Const.OP_QUOTE, json, ok2, why2);
+                detail = detail + " | asked again at once: " + Told(again, ok2, why2);
+            }
             return true;
         }
 
@@ -430,6 +447,22 @@ class OZT_VerbOps
         s = s + " net=" + res.Net.ToString() + " paid=" + res.Paid.ToString() + " received=" + res.Received.ToString();
         s = s + " balance=" + res.Balance.ToString() + " hands=" + res.InHands + " left=" + res.Left.ToString();
         return s;
+    }
+
+    // show [trader=<id>]: tell the client to put the trade screen up for a
+    // trader, the way the trade action will.
+    static bool OpShow(PlayerBase player, map<string, string> args, out string detail)
+    {
+        string id = Arg(args, "trader", "stand");
+        PlayerIdentity to = player.GetIdentity();
+        if (!to)
+        {
+            detail = "show: the player has no identity";
+            return false;
+        }
+        OZ_Rpc.Show(to, OZT_Const.SHOW_PREFIX + id);
+        detail = "show: sent '" + OZT_Const.SHOW_PREFIX + id + "'";
+        return true;
     }
 
     // ---- the ops of this task -------------------------------------------------

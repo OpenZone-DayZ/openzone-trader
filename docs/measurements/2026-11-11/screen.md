@@ -42,6 +42,11 @@ and a pile of twelve 7.62x39 rounds in the pants. The screen is opened by the se
 | S.23 | the helmet tried on again, a double click on its tile in the slot Head | the helmet is a line of BUY, 900; YOU PAY -900; the trying goes on; the card comes up for the tried tile as for any | `quote` answered |
 | S.24 | key Esc while the helmet is tried on and in the cart | the screen closes; the world is as it was, no second character in it; no error line in either log | nothing asked |
 | S.25 | the helmet tried on; the SERVER asked what stands at the player's place (`world_entities`, class `Man`, 10 m; it leaves out only a person with an identity) | the live view shows the character in the helmet | `listed 0 of 0 object(s) within 10m`, `players=1`: the server has no second character there |
+| S.26 | phase 3a's build, Ukrainian, 1920x1080; the kit with no money; the screen opened | the rifle's slot tile reads 1 790: the rifle, its scope, its magazine and thirty rounds; the backpack's reads 200 and wears the amber corner | `open` answered: `Tree` 1790 for the rifle |
+| S.27 | a double click on the rifle's slot tile | SELL holds the rifle, 1 790; ВИ ОТРИМАЄТЕ +1 790; the verdict reads "Залишаться у вас частини: 3", and the line under the buttons says the same in amber; Confirm lit | `quote` answered: it stands, three parts stay |
+| S.28 | key F | "Угоду укладено"; the rifle is gone from its slot and from the character; the suppressor, the buttstock and the handguard are among the player's things, each with the red corner; money 1 790 | `deal: <uid> at 'stand' net -1790 (items): -AKM=1790(3 sold, 3 kept)` |
+| S.29 | a double click on the backpack's slot tile (four things lie in it) | SELL holds the backpack, 200; the verdict, red: "Усередині лежать речі, яких немає в угоді: 4"; the panel's title stays УГОДА over a 0; Confirm unlit | `quote` refused: `STR_OZT_NO_NOT_EMPTY`, 4 |
+| S.30 | the same in English, a fresh kit with the magazine's rounds worn | the rifle's tile and its line read 1 765; with the backpack beside it: "4 thing(s) lie inside and are not in the deal"; after R and the rifle alone: YOU GET +1 765, "Parts that stay with you: 3" in the verdict and under the buttons | `quote` answered both times |
 
 No `SCRIPT (E)` line and no `ERROR` line in the client's or the server's log of any of
 these runs; the boots' verdicts were a pass.
@@ -50,7 +55,8 @@ Not covered by these runs: walking after the screen has closed (the calls that g
 controls back are the probe menu's, measured in phase 2a; the gamepad was left alone, the
 owner was at the machine); real input at 3840x1600 (S.20 is a look, the window stood off the
 desktop); the price list with more lines than it shows at once; a deal refused for want of
-room, seen from the screen; a second client.
+room, seen from the screen; a second client; choosing on the screen which parts to keep
+(the screen sells a thing whole: phase 3c).
 
 ## What was learned on the way
 

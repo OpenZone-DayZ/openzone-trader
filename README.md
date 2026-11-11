@@ -6,11 +6,13 @@ a deal is one cart that buys and sells at once. Money is items of any class or a
 behind a small glue pbo; goods and whole traders can be opened by faction, post and research.
 Class prefix `OZT_`; runs with `OpenZone_Core` alone.
 
-## Status: phase 0, nothing to play yet
+## Status: phase 0 done, nothing to play yet
 
-The repository holds a measurement probe for the test stand and no mod. The probe asks the
-engine the questions the deal depends on: creating an item at a chosen cell, reusing the cell
-of a sold item, moving a kept part off a sold weapon, banknotes in a wallet. The plan is
+The repository holds a measurement probe for the test stand and no mod. The probe's questions
+(creating an item at a chosen cell, reusing the cell of a sold item, moving a kept part off a
+sold weapon, banknotes in a wallet) are answered in
+[docs/measurements/2026-11-11/answers.md](docs/measurements/2026-11-11/answers.md); the mod
+itself starts in phase 1. The plan of phase 0 is
 [docs/2026-11-11-phase-0-plan.md](docs/2026-11-11-phase-0-plan.md); the design note lives
 beside the repositories of the series, in `docs/specs/2026-11-10-openzone-trader-design.md`.
 
@@ -25,7 +27,9 @@ published and no server should load them.
 невелику склейку; товари й самих торговців можна відкривати за фракцією, посадою та
 дослідженнями.
 
-Стан: фаза 0. У репозиторії лише вимірювальний зонд для стенда, грати ще нема в що.
+Стан: фазу 0 завершено. У репозиторії лише вимірювальний зонд для стенда; на його запитання
+відповідає `docs/measurements/2026-11-11/answers.md`. Сам мод починається з фази 1, грати ще
+нема в що.
 
 ## Licence
 

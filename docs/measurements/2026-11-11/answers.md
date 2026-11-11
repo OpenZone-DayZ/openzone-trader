@@ -66,3 +66,78 @@ Seen in passing while the kit was built (task3 #2):
   `Weapon_Base.SpawnAttachedMagazine` both worked on a pistol that already lay in the backpack's
   cargo, so an item lying in a cargo takes parts from the server.
 - `SpawnAttachedMagazine(type, WeaponWithAmmoFlags.NONE)` attaches a full magazine.
+
+## What the deal does
+
+1. **Placing a bought item.** A cargo cell: `GameInventory.LocationCreateEntity(loc, type, ECE_IN_INVENTORY, RF_DEFAULT)`
+   with `loc.SetCargo(holder, null, 0, row, col, flip)`. The cell and the turn are honoured exactly, in the same
+   call. A character slot or a slot of an item: the same call with `loc.SetAttachment(holder, null, slot)`, or
+   `CreateAttachmentEx(type, slot)`; a weapon's magazine only through
+   `Weapon_Base.SpawnAttachedMagazine(type, WeaponWithAmmoFlags.NONE)`. The hands: `HumanInventory.CreateInHands(type)`.
+   The place does not have to be read back: in every creation of these runs the place asked was the place got,
+   and a place that was not free, or that a gate refused, gave null and created nothing anywhere. The size of a
+   class is its config `itemSize` under `CfgVehicles`, `CfgWeapons` or `CfgMagazines`.
+   (task4 #4-#16, #18-#24, #29; task5 #4-#8, #36)
+
+2. **The commit is one script call.** Its order: kept parts move; what is sold is deleted; spent money is
+   deleted or shrunk; what is bought and the change are created. `GetGame().ObjectDelete` takes an item out of
+   its place at once, so its cells, its slot or the hands can be used by the very next line; the entity itself
+   is gone a frame later. `Object.Delete()` and `EntityAI.DeleteSafe()` leave the item in its place for the rest
+   of the call (the second for 23-128 ms, a round trip through the client) and are not used.
+   (task5 #10, #12, #17, #19, #24, #26, #39, #43, #54; task6b #17)
+
+3. **Kept parts move synchronously.** `GameInventory.LocationSyncMoveEntity(src, dst)` and then
+   `InventoryInputUserData.SendServerMove(null, InventoryCommandType.SYNC_MOVE, src, dst)`, after
+   `GameInventory.LocationCanAddEntity(dst)` said yes. It worked for every source tried: a part of a weapon worn
+   on the shoulder, the magazine of a weapon that is not in the hands, the magazine of a pistol in a holster
+   (three levels below the character), the parts of a pistol lying in a backpack; into a cargo cell and into the
+   hands. A weapon that loses its magazine this way settles its own state. A living player's own
+   `ServerTakeToDst`, `ServerTakeEntityToTargetCargoEx` and `ServerTakeEntityToHands` are not used: they land a
+   tenth to half of a second later, they lose the part when its host is deleted in the meantime, and where a
+   script gate refuses they leave the client and the server holding different inventories. Deleting the part and
+   making it again works too and is needed nowhere; it would lose what another mod stored on the part.
+   (task6b #4, #9-#12, #14-#18, #21, #22; task6a #5, #8, #12, #21, #22, #28, #30-#32)
+
+4. **The fit rule asks the engine little.** Occupancy is the plan's own map, built from each item's location;
+   it agreed with the engine on every cell of every cargo in every dump. Script gates are asked with one
+   `ECE_LOCAL` entity per class and
+   `TestAddEntityInCargoEx(probe, 0, row, col, flip, false, true, false, false, true, false)`: 0.9 microseconds a
+   call, and making or deleting the entity takes under a millisecond by a timer that counts whole milliseconds.
+   A slot is asked with `CanAddAttachmentEx(probe, slot)`, the hands with `CanAddEntityInHands(probe)`.
+   `LocationCanAddEntity` is occupancy and gates together. A deal of thirty items costs thirty local entities
+   and a few dozen calls: milliseconds at most. The probe entity is local, the client never sees it.
+   (task7 #6-#29, `dump 82`)
+
+5. **Notes.** A stack is created at its planned cell and given its number with `SetQuantity`; a stack that is
+   there grows and shrinks with `AddQuantity`. The maximum is `GetQuantityMax()`; a number above it is clamped
+   without a word, so the plan splits money into stacks itself. The bool both calls return means "the item was
+   destroyed", not "it worked". A stack set to zero deletes itself with `Delete()`: its cell is still taken for
+   the rest of the call, so a stack the deal spends whole is deleted with `ObjectDelete` instead. A pile of
+   ammunition set to zero rounds stays as an empty pile and is deleted the same way. Any holder whose own gate
+   takes the note takes it at any depth: a wallet in worn clothing, in a backpack, worn in a slot, and a
+   holder's own note slot. `AreChildrenAccessible` is false for a holder lying in a cargo and is not a reason to
+   skip it. (task4 #34-#59; task7 #12-#17)
+
+6. **The hands and the check before a deal.** The hands count as free when `CanAddEntityInHands(probe)` says
+   yes; a heavy item is no exception. Before the deal touches the inventory: the character is alive, conscious
+   and not restrained, `PlayerBase.CanDeleteItems()` is true, `GetDayZPlayerInventory().IsProcessing()` is false,
+   no action runs, and the character is not in a vehicle (there the hands count as busy by rule, not by
+   measurement). (task4 #28, #30; task5 #48-#51; task7 #26-#29; task6b #20-#25)
+
+7. **Client against server.** After every creation, deletion and synchronous move the client's inventory was
+   the server's, line for line. Three things broke that, and the rules above avoid all three:
+   `ServerTakeToDst` on a magazine its weapon will not release (the client moved it, the server did not);
+   `LocationSyncMoveEntity` without `SendServerMove` (the client kept the part on the rifle and lost it when the
+   rifle went); and, on the server alone, a magazine attached with a bare `CreateAttachment`, which the weapon's
+   state machine never learns of. (task6a `dump 62`-`dump 64`; task6b `dump 73`, `dump 75`; task5 #4-#8)
+
+## What these runs did not cover
+
+- A second client watching, and a real network delay: every comparison is between the server and the
+  owner of the inventory, on one machine. That matters most for the synchronous move, which is the
+  engine's path for a holder that is not a living character.
+- The real wallet, notes and slot mods of the reference server; the stand-ins copy their shape (phase 6).
+- A character in a vehicle, unconscious, restrained or in the middle of an action: the deal refuses there by
+  rule, nothing was created or moved in those states.
+- A deal's worth of changes in one call (thirty creations, moves and deletions together): each kind was
+  measured on its own and in pairs.

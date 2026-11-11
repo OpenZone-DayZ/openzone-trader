@@ -1,0 +1,332 @@
+=== #1 strip ok=yes frame=123211 t=83.5 args: op=strip
+    deleted 10 top-level item(s); send dress as the next command
+=== #2 dress ok=yes frame=137785 t=90.5 args: op=dress
+    dressed: 23 of 23 handles; a missing one has a 'dress: NOT' line in results.log
+=== #3 dump ok=yes frame=150976 t=97.4 args: op=dump
+    dump: 23 items -> server_dump.txt; cargos=7 cells asked=149 model-vs-engine mismatches=0
+    probe entity Paper 1x1 made=yes
+    cargo 022607 M65Jacket_Black 6x4 items=2 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022526 slot=Body
+    cargo 022628 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO M65Jacket_Black#022607 r0 c0 flip=no
+    cargo 022608 CargoPants_Black 5x4 items=0 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022526 slot=Legs
+    cargo 022613 PlateCarrierPouches 5x3 items=0 children accessible=yes mismatches=0 at ATT PlateCarrierVest#022610 slot=VestPouch
+    cargo 022611 TaloonBag_Blue 6x5 items=4 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022526 slot=Back
+    cargo 022625 SmallProtectorCase 3x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022611 r0 c3 flip=no
+    cargo 022626 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022611 r2 c0 flip=no
+=== #4 weapon ok=yes frame=170415 t=107.4 args: op=weapon item=rifle
+    AKM at ATT SurvivorM_Boris#022526 slot=Shoulder | GetMagazine=022617 Mag_AKM_30Rnd | IsIdle=yes | attachments=5 | stable state=4 internal=6
+      022617 Mag_AKM_30Rnd | ATT AKM#022612 slot=magazine | 1x3 | ammo 30/30
+      022618 PSO1Optic | ATT AKM#022612 slot=weaponOpticsAK | 3x2 | -
+      022619 AK_Suppressor | ATT AKM#022612 slot=weaponMuzzleAK | 3x1 | -
+      022620 AK_WoodBttstck | ATT AKM#022612 slot=weaponButtstockAK | 3x1 | -
+      022621 AK_WoodHndgrd | ATT AKM#022612 slot=weaponHandguardAK | 2x1 | -
+=== #5 create ok=yes frame=184462 t=114.4 args: slot=Melee via=loc into=player as=rifle2 class=AKM op=create kind=slot
+    create AKM asked ATT SurvivorM_Boris slot=Melee via=loc -> got ATT SurvivorM_Boris#022526 slot=Melee | - | entity 8x3 | 1 ms
+    config size of AKM: 8x3 found=yes
+    watching created AKM from ATT SurvivorM_Boris#022526 slot=Melee
+    watch #5 created AKM ends +3000 ms, 6189 frames: ATT SurvivorM_Boris#022526 slot=Melee
+=== #6 weapon ok=yes frame=196107 t=120.4 args: op=weapon item=rifle2
+    AKM at ATT SurvivorM_Boris#022526 slot=Melee | GetMagazine=null | IsIdle=yes | attachments=0 | stable state=1 internal=0
+=== #7 create ok=yes frame=209660 t=127.4 args: via=att into=rifle2 as=rifle2_mag class=Mag_AKM_30Rnd op=create kind=slot
+    create Mag_AKM_30Rnd asked ATT AKM slot=(the engine's choice) via=CreateAttachment -> got ATT AKM#022665 slot=magazine | ammo 30/30 | entity 1x3 | 1 ms
+    config size of Mag_AKM_30Rnd: 1x3 found=yes
+    watching created Mag_AKM_30Rnd from ATT AKM#022665 slot=magazine
+    watch #7 created Mag_AKM_30Rnd ends +3000 ms, 6440 frames: ATT AKM#022665 slot=magazine
+=== #8 weapon ok=yes frame=217983 t=131.4 args: op=weapon item=rifle2
+    AKM at ATT SurvivorM_Boris#022526 slot=Melee | GetMagazine=022666 Mag_AKM_30Rnd | IsIdle=yes | attachments=1 | stable state=1 internal=0
+      022666 Mag_AKM_30Rnd | ATT AKM#022665 slot=magazine | 1x3 | ammo 30/30
+=== #9 create ok=yes frame=237621 t=141.5 args: into=bag as=d1 class=Paper op=create cell=free
+    create Paper asked CARGO TaloonBag_Blue r3 c2 flip=no via=loc -> got CARGO TaloonBag_Blue#022611 r3 c2 flip=no | - | entity 1x1 | 0 ms
+    config size of Paper: 1x1 found=yes
+    watching created Paper from CARGO TaloonBag_Blue#022611 r3 c2 flip=no
+    watch #9 created Paper ends +3000 ms, 6035 frames: CARGO TaloonBag_Blue#022611 r3 c2 flip=no
+=== #10 del ok=yes frame=252039 t=148.5 args: how=object op=del follow=can item=d1
+    del object CARGO TaloonBag_Blue#022611 r3 c2 flip=no | same call: still there: pending=yes toDelete=yes setForDeletion=yes at NOLOC | the freed cell in the same call: LocationCanAddEntity=yes occupancy test alone=yes
+    watching doomed Paper from CARGO TaloonBag_Blue#022611 r3 c2 flip=no
+    deleted by object from CARGO TaloonBag_Blue#022611 r3 c2 flip=no; same call: still there: pending=yes toDelete=yes setForDeletion=yes at NOLOC
+    items in the holder's cargo: 5 before, 4 in the same call
+    the freed cell in the same call: LocationCanAddEntity=yes occupancy test alone=yes
+    watch #10 doomed Paper changed +3 ms, 1 frames: GONE
+=== #11 create ok=yes frame=268559 t=156.5 args: into=bag as=d2 class=Paper op=create cell=free
+    create Paper asked CARGO TaloonBag_Blue r3 c2 flip=no via=loc -> got CARGO TaloonBag_Blue#022611 r3 c2 flip=no | - | entity 1x1 | 0 ms
+    config size of Paper: 1x1 found=yes
+    watching created Paper from CARGO TaloonBag_Blue#022611 r3 c2 flip=no
+    watch #11 created Paper ends +3000 ms, 6542 frames: CARGO TaloonBag_Blue#022611 r3 c2 flip=no
+=== #12 del ok=yes frame=278650 t=161.5 args: follow=create as=d2new how=object op=del item=d2
+    del object CARGO TaloonBag_Blue#022611 r3 c2 flip=no | same call: still there: pending=yes toDelete=yes setForDeletion=yes at NOLOC | same-call create -> CARGO TaloonBag_Blue#022611 r3 c2 flip=no
+    watching doomed Paper from CARGO TaloonBag_Blue#022611 r3 c2 flip=no
+    deleted by object from CARGO TaloonBag_Blue#022611 r3 c2 flip=no; same call: still there: pending=yes toDelete=yes setForDeletion=yes at NOLOC
+    items in the holder's cargo: 5 before, 4 in the same call
+    watching made in the freed place Paper from CARGO TaloonBag_Blue#022611 r3 c2 flip=no
+    same call: Paper created at the freed place -> CARGO TaloonBag_Blue#022611 r3 c2 flip=no
+    watch #12 doomed Paper changed +3 ms, 1 frames: GONE
+    watch #12 made in the freed place Paper ends +3000 ms, 6105 frames: CARGO TaloonBag_Blue#022611 r3 c2 flip=no
+=== #13 create ok=yes frame=288635 t=166.5 args: into=bag as=d3 class=Paper op=create cell=free
+    create Paper asked CARGO TaloonBag_Blue r4 c0 flip=no via=loc -> got CARGO TaloonBag_Blue#022611 r4 c0 flip=no | - | entity 1x1 | 0 ms
+    config size of Paper: 1x1 found=yes
+    watching created Paper from CARGO TaloonBag_Blue#022611 r4 c0 flip=no
+    watch #13 created Paper ends +3000 ms, 6156 frames: CARGO TaloonBag_Blue#022611 r4 c0 flip=no
+=== #14 del ok=yes frame=296976 t=170.5 args: follow=next as=d3new how=object op=del frames=1 item=d3
+    del object CARGO TaloonBag_Blue#022611 r4 c0 flip=no | same call: still there: pending=yes toDelete=yes setForDeletion=yes at NOLOC | Paper queued for frame 296977 (now 296976)
+    watching doomed Paper from CARGO TaloonBag_Blue#022611 r4 c0 flip=no
+    deleted by object from CARGO TaloonBag_Blue#022611 r4 c0 flip=no; same call: still there: pending=yes toDelete=yes setForDeletion=yes at NOLOC
+    items in the holder's cargo: 6 before, 5 in the same call
+    later #14 frame=296977 create: Paper -> CARGO TaloonBag_Blue#022611 r4 c0 flip=no
+    watch #14 doomed Paper changed +1 ms, 1 frames: GONE
+    watch #14 made later Paper ends +3000 ms, 6310 frames: CARGO TaloonBag_Blue#022611 r4 c0 flip=no
+=== #15 where ok=yes frame=305299 t=174.5 args: op=where item=d3new
+    d3new: 022684 Paper | CARGO TaloonBag_Blue#022611 r4 c0 flip=no | 1x1 | -
+=== #16 create ok=yes frame=313356 t=178.5 args: into=bag as=d1 class=Paper op=create cell=free
+    create Paper asked CARGO TaloonBag_Blue r4 c1 flip=no via=loc -> got CARGO TaloonBag_Blue#022611 r4 c1 flip=no | - | entity 1x1 | 0 ms
+    config size of Paper: 1x1 found=yes
+    watching created Paper from CARGO TaloonBag_Blue#022611 r4 c1 flip=no
+    watch #16 created Paper ends +3000 ms, 6263 frames: CARGO TaloonBag_Blue#022611 r4 c1 flip=no
+=== #17 del ok=yes frame=323889 t=183.5 args: how=delete op=del follow=can item=d1
+    del delete CARGO TaloonBag_Blue#022611 r4 c1 flip=no | same call: still there: pending=no toDelete=no setForDeletion=yes at CARGO TaloonBag_Blue#022611 r4 c1 flip=no | the freed cell in the same call: LocationCanAddEntity=no occupancy test alone=no
+    watching doomed Paper from CARGO TaloonBag_Blue#022611 r4 c1 flip=no
+    deleted by delete from CARGO TaloonBag_Blue#022611 r4 c1 flip=no; same call: still there: pending=no toDelete=no setForDeletion=yes at CARGO TaloonBag_Blue#022611 r4 c1 flip=no
+    items in the holder's cargo: 7 before, 7 in the same call
+    the freed cell in the same call: LocationCanAddEntity=no occupancy test alone=no
+    watch #17 doomed Paper changed +2 ms, 1 frames: GONE
+=== #18 create ok=yes frame=337618 t=190.5 args: into=bag as=d2 class=Paper op=create cell=free
+    create Paper asked CARGO TaloonBag_Blue r4 c1 flip=no via=loc -> got CARGO TaloonBag_Blue#022611 r4 c1 flip=no | - | entity 1x1 | 0 ms
+    config size of Paper: 1x1 found=yes
+    watching created Paper from CARGO TaloonBag_Blue#022611 r4 c1 flip=no
+    watch #18 created Paper ends +3000 ms, 6459 frames: CARGO TaloonBag_Blue#022611 r4 c1 flip=no
+=== #19 del ok=yes frame=345893 t=194.5 args: follow=create as=d2new how=delete op=del item=d2
+    del delete CARGO TaloonBag_Blue#022611 r4 c1 flip=no | same call: still there: pending=no toDelete=no setForDeletion=yes at CARGO TaloonBag_Blue#022611 r4 c1 flip=no | same-call create -> the engine returned nothing
+    watching doomed Paper from CARGO TaloonBag_Blue#022611 r4 c1 flip=no
+    deleted by delete from CARGO TaloonBag_Blue#022611 r4 c1 flip=no; same call: still there: pending=no toDelete=no setForDeletion=yes at CARGO TaloonBag_Blue#022611 r4 c1 flip=no
+    items in the holder's cargo: 7 before, 7 in the same call
+    same call: Paper created at the freed place -> the engine returned nothing
+    watch #19 doomed Paper changed +3 ms, 1 frames: GONE
+=== #20 create ok=yes frame=353844 t=198.5 args: into=bag as=d3 class=Paper op=create cell=free
+    create Paper asked CARGO TaloonBag_Blue r4 c1 flip=no via=loc -> got CARGO TaloonBag_Blue#022611 r4 c1 flip=no | - | entity 1x1 | 0 ms
+    config size of Paper: 1x1 found=yes
+    watching created Paper from CARGO TaloonBag_Blue#022611 r4 c1 flip=no
+    watch #20 created Paper ends +3000 ms, 6186 frames: CARGO TaloonBag_Blue#022611 r4 c1 flip=no
+=== #21 del ok=yes frame=362181 t=202.5 args: follow=next as=d3new how=delete op=del frames=1 item=d3
+    del delete CARGO TaloonBag_Blue#022611 r4 c1 flip=no | same call: still there: pending=no toDelete=no setForDeletion=yes at CARGO TaloonBag_Blue#022611 r4 c1 flip=no | Paper queued for frame 362182 (now 362181)
+    watching doomed Paper from CARGO TaloonBag_Blue#022611 r4 c1 flip=no
+    deleted by delete from CARGO TaloonBag_Blue#022611 r4 c1 flip=no; same call: still there: pending=no toDelete=no setForDeletion=yes at CARGO TaloonBag_Blue#022611 r4 c1 flip=no
+    items in the holder's cargo: 7 before, 7 in the same call
+    later #21 frame=362182 create: Paper -> CARGO TaloonBag_Blue#022611 r4 c1 flip=no
+    watch #21 doomed Paper changed +2 ms, 1 frames: GONE
+    watch #21 made later Paper ends +3000 ms, 5495 frames: CARGO TaloonBag_Blue#022611 r4 c1 flip=no
+=== #22 where ok=yes frame=369583 t=206.5 args: op=where item=d3new
+    d3new: 022688 Paper | CARGO TaloonBag_Blue#022611 r4 c1 flip=no | 1x1 | -
+=== #23 create ok=yes frame=391534 t=217.5 args: into=bag as=d1 class=Paper op=create cell=free
+    create Paper asked CARGO TaloonBag_Blue r4 c2 flip=no via=loc -> got CARGO TaloonBag_Blue#022611 r4 c2 flip=no | - | entity 1x1 | 0 ms
+    config size of Paper: 1x1 found=yes
+    watching created Paper from CARGO TaloonBag_Blue#022611 r4 c2 flip=no
+    watch #23 created Paper ends +3000 ms, 5599 frames: CARGO TaloonBag_Blue#022611 r4 c2 flip=no
+=== #24 del ok=yes frame=405228 t=224.5 args: how=safe op=del follow=can item=d1
+    del safe CARGO TaloonBag_Blue#022611 r4 c2 flip=no | same call: still there: pending=no toDelete=no setForDeletion=no at CARGO TaloonBag_Blue#022611 r4 c2 flip=no | the freed cell in the same call: LocationCanAddEntity=no occupancy test alone=no
+    watching doomed Paper from CARGO TaloonBag_Blue#022611 r4 c2 flip=no
+    deleted by safe from CARGO TaloonBag_Blue#022611 r4 c2 flip=no; same call: still there: pending=no toDelete=no setForDeletion=no at CARGO TaloonBag_Blue#022611 r4 c2 flip=no
+    items in the holder's cargo: 8 before, 8 in the same call
+    the freed cell in the same call: LocationCanAddEntity=no occupancy test alone=no
+    watch #24 doomed Paper changed +126 ms, 202 frames: GONE
+=== #25 create ok=yes frame=417717 t=230.5 args: into=bag as=d2 class=Paper op=create cell=free
+    create Paper asked CARGO TaloonBag_Blue r4 c2 flip=no via=loc -> got CARGO TaloonBag_Blue#022611 r4 c2 flip=no | - | entity 1x1 | 0 ms
+    config size of Paper: 1x1 found=yes
+    watching created Paper from CARGO TaloonBag_Blue#022611 r4 c2 flip=no
+=== #26 del ok=yes frame=424424 t=233.5 args: follow=create as=d2new how=safe op=del item=d2
+    del safe CARGO TaloonBag_Blue#022611 r4 c2 flip=no | same call: still there: pending=no toDelete=no setForDeletion=no at CARGO TaloonBag_Blue#022611 r4 c2 flip=no | same-call create -> the engine returned nothing
+    watching doomed Paper from CARGO TaloonBag_Blue#022611 r4 c2 flip=no
+    deleted by safe from CARGO TaloonBag_Blue#022611 r4 c2 flip=no; same call: still there: pending=no toDelete=no setForDeletion=no at CARGO TaloonBag_Blue#022611 r4 c2 flip=no
+    items in the holder's cargo: 8 before, 8 in the same call
+    same call: Paper created at the freed place -> the engine returned nothing
+    watch #25 created Paper ends +3002 ms, 6708 frames: CARGO TaloonBag_Blue#022611 r4 c2 flip=no
+    watch #26 doomed Paper changed +128 ms, 233 frames: GONE
+=== #27 create ok=yes frame=432839 t=237.5 args: into=bag as=d3 class=Paper op=create cell=free
+    create Paper asked CARGO TaloonBag_Blue r4 c2 flip=no via=loc -> got CARGO TaloonBag_Blue#022611 r4 c2 flip=no | - | entity 1x1 | 0 ms
+    config size of Paper: 1x1 found=yes
+    watching created Paper from CARGO TaloonBag_Blue#022611 r4 c2 flip=no
+    watch #27 created Paper ends +3000 ms, 6062 frames: CARGO TaloonBag_Blue#022611 r4 c2 flip=no
+=== #28 del ok=yes frame=440881 t=241.5 args: follow=next as=d3new how=safe op=del frames=1 item=d3
+    del safe CARGO TaloonBag_Blue#022611 r4 c2 flip=no | same call: still there: pending=no toDelete=no setForDeletion=no at CARGO TaloonBag_Blue#022611 r4 c2 flip=no | Paper queued for frame 440882 (now 440881)
+    watching doomed Paper from CARGO TaloonBag_Blue#022611 r4 c2 flip=no
+    deleted by safe from CARGO TaloonBag_Blue#022611 r4 c2 flip=no; same call: still there: pending=no toDelete=no setForDeletion=no at CARGO TaloonBag_Blue#022611 r4 c2 flip=no
+    items in the holder's cargo: 8 before, 8 in the same call
+    later #28 frame=440882 create: Paper -> GONE
+    watch #28 doomed Paper changed +28 ms, 37 frames: GONE
+=== #29 where ok=yes frame=449471 t=245.5 args: op=where item=d3new
+    d3new: 022688 Paper | CARGO TaloonBag_Blue#022611 r4 c1 flip=no | 1x1 | -
+=== #30 create ok=yes frame=476305 t=259.5 args: into=bag as=d3 class=Paper op=create cell=free
+    create Paper asked CARGO TaloonBag_Blue r4 c2 flip=no via=loc -> got CARGO TaloonBag_Blue#022611 r4 c2 flip=no | - | entity 1x1 | 0 ms
+    config size of Paper: 1x1 found=yes
+    watching created Paper from CARGO TaloonBag_Blue#022611 r4 c2 flip=no
+    watch #30 created Paper ends +3000 ms, 6459 frames: CARGO TaloonBag_Blue#022611 r4 c2 flip=no
+=== #31 del ok=yes frame=484818 t=263.5 args: follow=next as=d3new60 how=safe op=del frames=60 item=d3
+    del safe CARGO TaloonBag_Blue#022611 r4 c2 flip=no | same call: still there: pending=no toDelete=no setForDeletion=no at CARGO TaloonBag_Blue#022611 r4 c2 flip=no | Paper queued for frame 484878 (now 484818)
+    watching doomed Paper from CARGO TaloonBag_Blue#022611 r4 c2 flip=no
+    deleted by safe from CARGO TaloonBag_Blue#022611 r4 c2 flip=no; same call: still there: pending=no toDelete=no setForDeletion=no at CARGO TaloonBag_Blue#022611 r4 c2 flip=no
+    items in the holder's cargo: 8 before, 8 in the same call
+    later #31 frame=484878 create: Paper -> GONE
+    watch #31 doomed Paper changed +121 ms, 263 frames: GONE
+=== #32 create ok=yes frame=493582 t=267.5 args: into=bag as=d3 class=Paper op=create cell=free
+    create Paper asked CARGO TaloonBag_Blue r4 c2 flip=no via=loc -> got CARGO TaloonBag_Blue#022611 r4 c2 flip=no | - | entity 1x1 | 0 ms
+    config size of Paper: 1x1 found=yes
+    watching created Paper from CARGO TaloonBag_Blue#022611 r4 c2 flip=no
+    watch #32 created Paper ends +3000 ms, 6370 frames: CARGO TaloonBag_Blue#022611 r4 c2 flip=no
+=== #33 del ok=yes frame=508284 t=274.5 args: follow=next as=d3new600 how=safe op=del frames=600 item=d3
+    del safe CARGO TaloonBag_Blue#022611 r4 c2 flip=no | same call: still there: pending=no toDelete=no setForDeletion=no at CARGO TaloonBag_Blue#022611 r4 c2 flip=no | Paper queued for frame 508884 (now 508284)
+    watching doomed Paper from CARGO TaloonBag_Blue#022611 r4 c2 flip=no
+    deleted by safe from CARGO TaloonBag_Blue#022611 r4 c2 flip=no; same call: still there: pending=no toDelete=no setForDeletion=no at CARGO TaloonBag_Blue#022611 r4 c2 flip=no
+    items in the holder's cargo: 8 before, 8 in the same call
+    watch #33 doomed Paper changed +25 ms, 45 frames: GONE
+    later #33 frame=508884 create: Paper -> CARGO TaloonBag_Blue#022611 r4 c2 flip=no
+    watch #33 made later Paper ends +3000 ms, 5615 frames: CARGO TaloonBag_Blue#022611 r4 c2 flip=no
+=== #34 where ok=yes frame=517274 t=279.5 args: op=where item=d3new600
+    d3new600: 022701 Paper | CARGO TaloonBag_Blue#022611 r4 c2 flip=no | 1x1 | -
+=== #35 dump ok=yes frame=526458 t=284.5 args: op=dump
+    dump: 29 items -> server_dump.txt; cargos=7 cells asked=149 model-vs-engine mismatches=0
+    probe entity Paper 1x1 made=yes
+    cargo 022607 M65Jacket_Black 6x4 items=2 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022526 slot=Body
+    cargo 022628 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO M65Jacket_Black#022607 r0 c0 flip=no
+    cargo 022608 CargoPants_Black 5x4 items=0 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022526 slot=Legs
+    cargo 022613 PlateCarrierPouches 5x3 items=0 children accessible=yes mismatches=0 at ATT PlateCarrierVest#022610 slot=VestPouch
+    cargo 022611 TaloonBag_Blue 6x5 items=8 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022526 slot=Back
+    cargo 022625 SmallProtectorCase 3x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022611 r0 c3 flip=no
+    cargo 022626 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022611 r2 c0 flip=no
+=== #36 create ok=yes frame=560990 t=300.5 args: via=loc as=hl class=Paper op=create kind=hands
+    create Paper asked HANDS via=loc (the hands hold null) -> got HANDS SurvivorM_Boris#022526 | - | entity 1x1 | 0 ms
+    config size of Paper: 1x1 found=yes
+    watching created Paper from HANDS SurvivorM_Boris#022526
+    watch #36 created Paper ends +3000 ms, 5843 frames: HANDS SurvivorM_Boris#022526
+=== #37 del ok=yes frame=568952 t=304.5 args: how=object op=del item=hl
+    del object HANDS SurvivorM_Boris#022526 | same call: still there: pending=yes toDelete=yes setForDeletion=yes at NOLOC
+    watching doomed Paper from HANDS SurvivorM_Boris#022526
+    deleted by object from HANDS SurvivorM_Boris#022526; same call: still there: pending=yes toDelete=yes setForDeletion=yes at NOLOC
+    items in the holder's cargo: -1 before, -1 in the same call
+    watch #37 doomed Paper changed +2 ms, 1 frames: GONE
+=== #38 create ok=yes frame=578005 t=308.5 args: slot=Headgear via=loc into=player as=helmet class=Mich2001Helmet op=create kind=slot
+    create Mich2001Helmet asked ATT SurvivorM_Boris slot=Headgear via=loc -> got ATT SurvivorM_Boris#022526 slot=Headgear | - | entity 4x3 | 0 ms
+    config size of Mich2001Helmet: 4x3 found=yes
+    watching created Mich2001Helmet from ATT SurvivorM_Boris#022526 slot=Headgear
+    watch #38 created Mich2001Helmet ends +3000 ms, 6554 frames: ATT SurvivorM_Boris#022526 slot=Headgear
+=== #39 del ok=yes frame=586855 t=312.5 args: follow=create as=helmet2 how=object op=del item=helmet
+    del object ATT SurvivorM_Boris#022526 slot=Headgear | same call: still there: pending=yes toDelete=yes setForDeletion=yes at NOLOC | same-call create -> ATT SurvivorM_Boris#022526 slot=Headgear
+    watching doomed Mich2001Helmet from ATT SurvivorM_Boris#022526 slot=Headgear
+    deleted by object from ATT SurvivorM_Boris#022526 slot=Headgear; same call: still there: pending=yes toDelete=yes setForDeletion=yes at NOLOC
+    items in the holder's cargo: -1 before, -1 in the same call
+    watching made in the freed place Mich2001Helmet from ATT SurvivorM_Boris#022526 slot=Headgear
+    same call: Mich2001Helmet created at the freed place -> ATT SurvivorM_Boris#022526 slot=Headgear
+    watch #39 doomed Mich2001Helmet changed +2 ms, 1 frames: GONE
+    watch #39 made in the freed place Mich2001Helmet ends +3000 ms, 5287 frames: ATT SurvivorM_Boris#022526 slot=Headgear
+=== #40 del ok=yes frame=597737 t=318.5 args: follow=next as=helmet3 how=safe op=del frames=1 item=helmet2
+    del safe ATT SurvivorM_Boris#022526 slot=Headgear | same call: still there: pending=no toDelete=no setForDeletion=no at ATT SurvivorM_Boris#022526 slot=Headgear | Mich2001Helmet queued for frame 597738 (now 597737)
+    watching doomed Mich2001Helmet from ATT SurvivorM_Boris#022526 slot=Headgear
+    deleted by safe from ATT SurvivorM_Boris#022526 slot=Headgear; same call: still there: pending=no toDelete=no setForDeletion=no at ATT SurvivorM_Boris#022526 slot=Headgear
+    items in the holder's cargo: -1 before, -1 in the same call
+    later #40 frame=597738 create: Mich2001Helmet -> GONE
+    watch #40 doomed Mich2001Helmet changed +23 ms, 50 frames: GONE
+=== #41 create ok=yes frame=607314 t=323.5 args: via=hands as=h1 class=Canteen op=create kind=hands
+    create Canteen asked HANDS via=hands (the hands hold null) -> got HANDS SurvivorM_Boris#022526 | qty 1000/1000 | entity 2x2 | 0 ms
+    config size of Canteen: 2x2 found=yes
+    watching created Canteen from HANDS SurvivorM_Boris#022526
+    watch #41 created Canteen ends +3000 ms, 5435 frames: HANDS SurvivorM_Boris#022526
+=== #42 hands ok=yes frame=614735 t=327.5 args: op=hands
+    hands hold 022709 Canteen | inventory processing=no | CanDeleteItems=yes | action running=no | in vehicle=no
+    alive=yes unconscious=no restrained=no
+    juncture on the held item=no
+=== #43 del ok=yes frame=626039 t=333.5 args: class=Paper follow=create as=h2 how=object op=del item=h1
+    del object HANDS SurvivorM_Boris#022526 | same call: still there: pending=yes toDelete=yes setForDeletion=yes at NOLOC | same-call create -> HANDS SurvivorM_Boris#022526
+    watching doomed Canteen from HANDS SurvivorM_Boris#022526
+    deleted by object from HANDS SurvivorM_Boris#022526; same call: still there: pending=yes toDelete=yes setForDeletion=yes at NOLOC
+    items in the holder's cargo: -1 before, -1 in the same call
+    watching made in the freed place Paper from HANDS SurvivorM_Boris#022526
+    same call: Paper created at the freed place -> HANDS SurvivorM_Boris#022526
+    watch #43 doomed Canteen changed +2 ms, 1 frames: GONE
+    watch #43 made in the freed place Paper ends +3000 ms, 5944 frames: HANDS SurvivorM_Boris#022526
+=== #44 hands ok=yes frame=634095 t=337.5 args: op=hands
+    hands hold 022710 Paper | inventory processing=no | CanDeleteItems=yes | action running=no | in vehicle=no
+    alive=yes unconscious=no restrained=no
+    juncture on the held item=no
+=== #45 dump ok=yes frame=652366 t=346.5 args: op=dump
+    dump: 30 items -> server_dump.txt; cargos=7 cells asked=149 model-vs-engine mismatches=0
+    probe entity Paper 1x1 made=yes
+    cargo 022607 M65Jacket_Black 6x4 items=2 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022526 slot=Body
+    cargo 022628 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO M65Jacket_Black#022607 r0 c0 flip=no
+    cargo 022608 CargoPants_Black 5x4 items=0 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022526 slot=Legs
+    cargo 022613 PlateCarrierPouches 5x3 items=0 children accessible=yes mismatches=0 at ATT PlateCarrierVest#022610 slot=VestPouch
+    cargo 022611 TaloonBag_Blue 6x5 items=8 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022526 slot=Back
+    cargo 022625 SmallProtectorCase 3x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022611 r0 c3 flip=no
+    cargo 022626 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022611 r2 c0 flip=no
+=== #46 del ok=yes frame=684379 t=363.5 args: how=safe op=del item=h2
+    del safe HANDS SurvivorM_Boris#022526 | same call: still there: pending=no toDelete=no setForDeletion=no at HANDS SurvivorM_Boris#022526
+    watching doomed Paper from HANDS SurvivorM_Boris#022526
+    deleted by safe from HANDS SurvivorM_Boris#022526; same call: still there: pending=no toDelete=no setForDeletion=no at HANDS SurvivorM_Boris#022526
+    items in the holder's cargo: -1 before, -1 in the same call
+    watch #46 doomed Paper changed +31 ms, 49 frames: GONE
+=== #47 hands ok=yes frame=692554 t=367.5 args: op=hands
+    hands hold null | inventory processing=no | CanDeleteItems=yes | action running=no | in vehicle=no
+    alive=yes unconscious=no restrained=no
+=== #48 create ok=yes frame=701123 t=371.5 args: via=hands as=barrel class=Barrel_Blue op=create kind=hands
+    create Barrel_Blue asked HANDS via=hands (the hands hold null) -> got HANDS SurvivorM_Boris#022526 | qty 0/200000 | entity 10x15 | 0 ms
+    config size of Barrel_Blue: 10x15 found=yes
+    watching created Barrel_Blue from HANDS SurvivorM_Boris#022526
+    watch #48 created Barrel_Blue ends +3000 ms, 6328 frames: HANDS SurvivorM_Boris#022526
+=== #49 hands ok=yes frame=711356 t=376.5 args: op=hands
+    hands hold 022714 Barrel_Blue | inventory processing=no | CanDeleteItems=yes | action running=no | in vehicle=no
+    alive=yes unconscious=no restrained=no
+    juncture on the held item=no
+=== #50 del ok=yes frame=732388 t=386.5 args: how=object op=del item=barrel
+    del object HANDS SurvivorM_Boris#022526 | same call: still there: pending=yes toDelete=yes setForDeletion=yes at NOLOC
+    watching doomed Barrel_Blue from HANDS SurvivorM_Boris#022526
+    deleted by object from HANDS SurvivorM_Boris#022526; same call: still there: pending=yes toDelete=yes setForDeletion=yes at NOLOC
+    items in the holder's cargo: -1 before, -1 in the same call
+    watch #50 doomed Barrel_Blue changed +1 ms, 1 frames: GONE
+=== #51 hands ok=yes frame=746686 t=393.5 args: op=hands
+    hands hold null | inventory processing=no | CanDeleteItems=yes | action running=no | in vehicle=no
+    alive=yes unconscious=no restrained=no
+=== #52 create ok=yes frame=768328 t=404.5 args: qty=50 via=loc into=wallet_bag as=n_wb class=OZT_ProbeNote op=create cell=free
+    create OZT_ProbeNote asked CARGO OZT_ProbeWallet r0 c0 flip=no via=loc -> got CARGO OZT_ProbeWallet#022626 r0 c0 flip=no | qty 50/500 | entity 2x1 | 0 ms
+    config size of OZT_ProbeNote: 2x1 found=yes
+    watching created OZT_ProbeNote from CARGO OZT_ProbeWallet#022626 r0 c0 flip=no
+    watch #52 created OZT_ProbeNote ends +3000 ms, 5123 frames: CARGO OZT_ProbeWallet#022626 r0 c0 flip=no
+=== #53 del ok=yes frame=775151 t=408.5 args: how=object op=del item=n_wb
+    del object CARGO OZT_ProbeWallet#022626 r0 c0 flip=no | same call: still there: pending=yes toDelete=yes setForDeletion=yes at NOLOC
+    watching doomed OZT_ProbeNote from CARGO OZT_ProbeWallet#022626 r0 c0 flip=no
+    deleted by object from CARGO OZT_ProbeWallet#022626 r0 c0 flip=no; same call: still there: pending=yes toDelete=yes setForDeletion=yes at NOLOC
+    items in the holder's cargo: 1 before, 0 in the same call
+    watch #53 doomed OZT_ProbeNote changed +1 ms, 1 frames: GONE
+=== #54 del ok=yes frame=783144 t=412.5 args: class=Paper follow=create as=afterpistol how=object op=del item=bagpistol
+    del object CARGO TaloonBag_Blue#022611 r0 c0 flip=no | same call: still there: pending=yes toDelete=yes setForDeletion=yes at NOLOC | same-call create -> CARGO TaloonBag_Blue#022611 r0 c0 flip=no
+    watching part of the doomed FNX45 from ATT FNX45#022622 slot=magazine
+    watching part of the doomed FNX45 from ATT FNX45#022622 slot=pistolMuzzle
+    watching doomed FNX45 from CARGO TaloonBag_Blue#022611 r0 c0 flip=no
+    deleted by object from CARGO TaloonBag_Blue#022611 r0 c0 flip=no; same call: still there: pending=yes toDelete=yes setForDeletion=yes at NOLOC
+    items in the holder's cargo: 8 before, 7 in the same call
+    watching made in the freed place Paper from CARGO TaloonBag_Blue#022611 r0 c0 flip=no
+    same call: Paper created at the freed place -> CARGO TaloonBag_Blue#022611 r0 c0 flip=no
+    watch #54 doomed FNX45 changed +3 ms, 1 frames: GONE
+    watch #54 part of the doomed FNX45 changed +3 ms, 1 frames: GONE
+    watch #54 part of the doomed FNX45 changed +3 ms, 1 frames: GONE
+    watch #54 made in the freed place Paper ends +3000 ms, 6259 frames: CARGO TaloonBag_Blue#022611 r0 c0 flip=no
+=== #55 del ok=yes frame=799064 t=420.5 args: how=object op=del item=rifle
+    del object ATT SurvivorM_Boris#022526 slot=Shoulder | same call: still there: pending=yes toDelete=yes setForDeletion=yes at NOLOC
+    watching part of the doomed AKM from ATT AKM#022612 slot=magazine
+    watching part of the doomed AKM from ATT AKM#022612 slot=weaponOpticsAK
+    watching part of the doomed AKM from ATT AKM#022612 slot=weaponMuzzleAK
+    watching part of the doomed AKM from ATT AKM#022612 slot=weaponButtstockAK
+    watching part of the doomed AKM from ATT AKM#022612 slot=weaponHandguardAK
+    watching doomed AKM from ATT SurvivorM_Boris#022526 slot=Shoulder
+    deleted by object from ATT SurvivorM_Boris#022526 slot=Shoulder; same call: still there: pending=yes toDelete=yes setForDeletion=yes at NOLOC
+    items in the holder's cargo: -1 before, -1 in the same call
+    watch #55 doomed AKM changed +2 ms, 1 frames: GONE
+    watch #55 part of the doomed AKM changed +2 ms, 1 frames: GONE
+    watch #55 part of the doomed AKM changed +2 ms, 1 frames: GONE
+    watch #55 part of the doomed AKM changed +2 ms, 1 frames: GONE
+    watch #55 part of the doomed AKM changed +2 ms, 1 frames: GONE
+    watch #55 part of the doomed AKM changed +2 ms, 1 frames: GONE
+=== #56 dump ok=yes frame=808257 t=425.5 args: op=dump
+    dump: 21 items -> server_dump.txt; cargos=7 cells asked=149 model-vs-engine mismatches=0
+    probe entity Paper 1x1 made=yes
+    cargo 022607 M65Jacket_Black 6x4 items=2 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022526 slot=Body
+    cargo 022628 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO M65Jacket_Black#022607 r0 c0 flip=no
+    cargo 022608 CargoPants_Black 5x4 items=0 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022526 slot=Legs
+    cargo 022613 PlateCarrierPouches 5x3 items=0 children accessible=yes mismatches=0 at ATT PlateCarrierVest#022610 slot=VestPouch
+    cargo 022611 TaloonBag_Blue 6x5 items=8 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022526 slot=Back
+    cargo 022625 SmallProtectorCase 3x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022611 r0 c3 flip=no
+    cargo 022626 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022611 r2 c0 flip=no

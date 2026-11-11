@@ -130,6 +130,8 @@ class OZT_Probe
             return OZT_ProbeOpsCreate.ChangeAmount(this, player, args, detail);
         if (op == "hands")
             return OZT_ProbeOpsGate.HandsState(this, player, detail);
+        if (op == "del")
+            return OZT_ProbeOpsDelete.DeleteOne(this, player, args, detail);
         // -- routes of the later tasks go above this line --
         detail = "unknown op '" + op + "'; known: " + KnownOps();
         return false;
@@ -137,7 +139,7 @@ class OZT_Probe
 
     protected string KnownOps()
     {
-        return "status, strip, dress, dump, find, where, weapon, create, qty, hands";
+        return "status, strip, dress, dump, find, where, weapon, create, qty, hands, del";
     }
 
     protected bool OpStatus(out string detail)
@@ -374,6 +376,10 @@ class OZT_Probe
         int n = wpn.GetInventory().AttachmentCount();
         detail = wpn.GetType() + " at " + OZT_ProbeInv.Where(wpn) + " | GetMagazine=" + OZT_ProbeInv.Name(mag);
         detail = detail + " | IsIdle=" + OZT_ProbeLog.B(wpn.IsIdle()) + " | attachments=" + n.ToString();
+        // The state machine's own picture: a magazine attached behind its back
+        // leaves these where they were.
+        detail = detail + " | stable state=" + wpn.GetCurrentStableStateID().ToString();
+        detail = detail + " internal=" + wpn.GetInternalStateID().ToString();
         for (int i = 0; i < n; i++)
             AddLine("  " + OZT_ProbeInv.Line(wpn.GetInventory().GetAttachmentFromIndex(i)));
         return true;

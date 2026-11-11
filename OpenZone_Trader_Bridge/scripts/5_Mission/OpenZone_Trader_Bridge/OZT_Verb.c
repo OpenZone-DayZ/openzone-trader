@@ -35,6 +35,8 @@ class OZT_VerbOps
             return OpPay(player, args, detail);
         if (op == "damage")
             return OpDamage(player, args, detail);
+        if (op == "open")
+            return OpOpen(player, args, detail);
         // -- ops of the later tasks go above this line --
         detail = "unknown op '" + op + "'; known: " + KnownOps();
         return false;
@@ -42,7 +44,7 @@ class OZT_VerbOps
 
     static string KnownOps()
     {
-        return "status, reload, balance, price, pay, damage";
+        return "status, reload, balance, price, pay, damage, open";
     }
 
     // ---- what the ops share ---------------------------------------------------
@@ -90,6 +92,62 @@ class OZT_VerbOps
         return null;
     }
 
+    // One request through the handler the core's dispatcher calls for a client,
+    // as this player. The full answer goes to OZT_Const.LAST_ANSWER.
+    static string Ask(PlayerBase player, string op, string json, out bool ok, out string why)
+    {
+        ok = false;
+        why = "the service 'trader' is not registered";
+        OZ_ServiceHandler svc = OZ_ServiceRegistry.Get(OZT_Const.SERVICE);
+        if (!svc)
+            return "";
+        string body = svc.Handle(op, json, player.GetIdentity(), ok, why);
+        SaveAnswer(body);
+        return body;
+    }
+
+    static void SaveAnswer(string body)
+    {
+        FileHandle fh = OpenFile(OZT_Const.LAST_ANSWER, FileMode.WRITE);
+        if (!fh)
+            return;
+        FPrint(fh, body);
+        CloseFile(fh);
+    }
+
+    // open [trader=<id>]: what a client's `open` gets.
+    static bool OpOpen(PlayerBase player, map<string, string> args, out string detail)
+    {
+        OZT_OpenReq req = new OZT_OpenReq();
+        req.Trader = Arg(args, "trader", "stand");
+        string json;
+        string err;
+        JsonFileLoader<OZT_OpenReq>.MakeData(req, json, err, false);
+
+        bool ok;
+        string why;
+        string body = Ask(player, OZT_Const.OP_OPEN, json, ok, why);
+        if (!ok)
+        {
+            detail = "open ok=no why=" + why;
+            return true;
+        }
+
+        // Read it back the way a client will: a body that does not parse here
+        // would not parse there.
+        OZT_OpenRes res = new OZT_OpenRes();
+        if (!JsonFileLoader<OZT_OpenRes>.LoadData(body, res, err))
+        {
+            detail = "open ok=yes, but the body does not parse back: " + err;
+            return false;
+        }
+        detail = "open ok=yes trader=" + res.Trader + " goods=" + res.Goods.Count().ToString();
+        detail = detail + " categories=" + res.Categories.Count().ToString() + " provider=" + res.Provider;
+        detail = detail + " unit=" + res.Unit.ToString() + " balance=" + res.Balance.ToString();
+        detail = detail + " bytes=" + body.Length().ToString() + " revision=" + res.Revision.ToString();
+        return true;
+    }
+
     // ---- the ops of this task -------------------------------------------------
 
     // The files again, as an admin's edit would be picked up.
@@ -97,6 +155,7 @@ class OZT_VerbOps
     {
         OZT_Config.ServerLoad();
         OZT_Book.Rebuild();
+        OZT_Points.Respawn();
         // -- later tasks refresh their parts above this line --
         detail = "reloaded: " + OZT_Config.Get().Counters() + " revision=" + OZT_Config.Get().Revision().ToString();
         return true;

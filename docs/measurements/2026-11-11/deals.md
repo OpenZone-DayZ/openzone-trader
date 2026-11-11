@@ -34,3 +34,30 @@ backpack's wallet, four loose fives and a canteen in the trousers.
 
 The verdict of this boot was taken before row 3.14: pass, no warning, the counters
 `traders=1 goods=11 problems=0` met.
+
+## Task 4: an object trader from the file, and `open`
+
+The first build of this task placed the stall with the engine's `ECE_PLACE_ON_SURFACE`, and
+the run showed that it does not give one place for one request: at mission start the stall
+stood on the ground 2.5 m aside of the asked point (origin at `<4690.19, 340.77, 10192.47>`
+for an asked `<4690, 339, 10190>`), and after a reload at the asked point with its origin at
+ground level, half buried (the same in the logs of four boots and some twenty reloads). A
+second build lifted the object by the depth of `ClippingInfo` below its origin: 3.57 m for
+this stall, which showed its foundation above the runway. The build that stands is the third:
+the object is created at `Pos` exactly, with the flags of the game's object spawner, and the
+stand's file names the origin the engine itself had chosen for a stall on this runway
+(1.77 m above it).
+
+| # | what is asked | command | answer | as expected? |
+|---|---|---|---|---|
+| 4.1 | where the stall stands after the start | log, `point '` | `point 'stand' (Land_City_Stand_Grocery) stands at <4690.000000, 340.769989, 10195.000000>` (the file then said `10195`) | yes |
+| 4.2 | the same after a reload | `{"op": "reload"}`, log | `reloaded: ... problems=0 revision=2`; the same place in the log; one stall in the world, at that position; from outside it stands on the runway, door at ground level | yes |
+| 4.3 | the file changed to `Pos` `[4690.0, 340.77, 10198.0]`, `Radius` 8 (the character at `10192` was inside the stall: its body lies south of its origin) | `{"op": "reload"}`, log | `reloaded: ... revision=3`; `stands at <4690.000000, 340.769989, 10198.000000>`; one stall | yes |
+| 4.4 | the catalogue | `{"op": "open"}` | `open ok=yes trader=stand goods=10 categories=3 provider=items unit=5 balance=635 bytes=1317 revision=3` | yes |
+| 4.5 | a trader that is not in the file | `{"op": "open", "trader": "nobody"}` | `open ok=no why=STR_OZT_NO_CLOSED` | yes |
+| 4.6 | from 32 m | teleport to `4690 339 10230`, `{"op": "open"}` | `open ok=no why=STR_OZT_NO_TOO_FAR` | yes |
+| 4.7 | back at the stall | teleport to `4690 339 10192`, `{"op": "open"}` | `open ok=yes ... balance=635 bytes=1317 revision=3` | yes |
+| 4.8 | one more reload | `{"op": "reload"}` | `reloaded: ... revision=4`; still one stall, `4690.000000 340.769989 10198.000000` | yes |
+
+The body of `open` begins `{"Revision":2,"Trader":"stand","Name":"Стендовий торговець","Radius":5.0,"Provider":"items","Physical":1,"Unit":5,...`
+(read after row 4.2) and is 1317 bytes: two parts of the core's 900-byte transport.

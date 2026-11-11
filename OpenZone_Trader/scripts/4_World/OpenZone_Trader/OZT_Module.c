@@ -37,6 +37,9 @@ class OZT_Module : CF_ModuleWorld
         OZT_Book.Rebuild();
         OZT_Money.Provide(new OZT_ItemMoney());
 
+        OZT_Points.Respawn();
+        OZ_ServiceRegistry.Register(OZT_Const.SERVICE, new OZT_Service());
+
         // -- later tasks start their parts above this line --
 
         // The ready line one tick later: a line printed here may speak before
@@ -63,6 +66,10 @@ class OZT_Module : CF_ModuleWorld
 
         OZT_Money.Reset();
         OZT_Book.Reset();
+
+        // The core empties its own registries at mission end; the objects at
+        // the points are ours to take away.
+        OZT_Points.Remove();
 
         // -- later tasks stop their parts above this line --
     }

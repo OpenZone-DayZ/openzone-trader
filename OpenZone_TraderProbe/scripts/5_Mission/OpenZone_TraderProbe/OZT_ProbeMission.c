@@ -15,3 +15,21 @@ modded class MissionServer
         OZT_Probe.Get().OnFrame();
     }
 }
+
+modded class MissionGameplay
+{
+    protected ref OZT_ProbeClient m_OZT_ProbeClient;
+
+    override void OnInit()
+    {
+        super.OnInit();
+        m_OZT_ProbeClient = new OZT_ProbeClient();
+    }
+
+    override void OnUpdate(float timeslice)
+    {
+        super.OnUpdate(timeslice);
+        if (m_OZT_ProbeClient)
+            m_OZT_ProbeClient.OnFrame(timeslice);
+    }
+}

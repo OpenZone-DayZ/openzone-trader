@@ -1,0 +1,24 @@
+=== #1 strip ok=yes frame=142409 t=93.4 args: op=strip
+    deleted 3 top-level item(s); send dress as the next command
+=== #2 dress ok=yes frame=154995 t=99.4 args: op=dress
+    dressed: 23 of 23 handles; a missing one has a 'dress: NOT' line in results.log
+=== #3 dump ok=yes frame=179668 t=112.4 args: op=dump
+    dump: 23 items -> server_dump.txt; cargos=7 cells asked=149 model-vs-engine mismatches=0
+    probe entity Paper 1x1 made=yes
+    cargo 022553 M65Jacket_Black 6x4 items=2 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022511 slot=Body
+    cargo 022574 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO M65Jacket_Black#022553 r0 c0 flip=no
+    cargo 022554 CargoPants_Black 5x4 items=0 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022511 slot=Legs
+    cargo 022559 PlateCarrierPouches 5x3 items=0 children accessible=yes mismatches=0 at ATT PlateCarrierVest#022556 slot=VestPouch
+    cargo 022557 TaloonBag_Blue 6x5 items=4 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022511 slot=Back
+    cargo 022571 SmallProtectorCase 3x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022557 r0 c3 flip=no
+    cargo 022572 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022557 r2 c0 flip=no
+=== #4 dump ok=yes frame=231353 t=139.4 args: op=dump
+    dump: 24 items -> server_dump.txt; cargos=7 cells asked=149 model-vs-engine mismatches=0
+    probe entity Paper 1x1 made=yes
+    cargo 022553 M65Jacket_Black 6x4 items=2 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022511 slot=Body
+    cargo 022574 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO M65Jacket_Black#022553 r0 c0 flip=no
+    cargo 022554 CargoPants_Black 5x4 items=0 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022511 slot=Legs
+    cargo 022559 PlateCarrierPouches 5x3 items=0 children accessible=yes mismatches=0 at ATT PlateCarrierVest#022556 slot=VestPouch
+    cargo 022557 TaloonBag_Blue 6x5 items=4 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022511 slot=Back
+    cargo 022571 SmallProtectorCase 3x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022557 r0 c3 flip=no
+    cargo 022572 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022557 r2 c0 flip=no

@@ -316,7 +316,7 @@
                           "Scrollbar V": 1,
                           "style": "blank"
                         },
-                        "note": "The flat grid: twelve cells across, a tile takes half the item's inventory size, rounded up.",
+                        "note": "The flat grid: twelve cells across, a tile takes the cells the item takes in the inventory; the menu moves the grid down below as many rows of tabs as the categories need.",
                         "children": [
                           {
                             "frame": {
@@ -1142,7 +1142,7 @@
                           "Scrollbar V": 1,
                           "style": "blank"
                         },
-                        "note": "The flat grid: twelve cells across, a tile takes half the item's inventory size, rounded up.",
+                        "note": "The flat grid: twelve cells across, a tile takes the cells the item takes in the inventory; the menu moves the grid down below as many rows of tabs as the categories need.",
                         "children": [
                           {
                             "frame": {

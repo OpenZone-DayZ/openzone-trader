@@ -2,8 +2,9 @@
 //
 // A tile is a thing's picture with its marks. Four grids hold them: the
 // trader's shelf, the player's own things and the two carts. A grid is twelve
-// cells across; a tile takes half the item's inventory size, rounded up (the
-// true size is for the card), and tiles are packed first fit, row by row.
+// cells across; a tile takes as many cells as the thing takes in the
+// inventory (the owner, 2026-11-11), and tiles are packed first fit, row by
+// row.
 
 class OZT_Tile
 {
@@ -64,7 +65,7 @@ class OZT_Tile
         ReadFootprint();
     }
 
-    // Half the inventory size, rounded up, and never wider than the grid.
+    // The inventory size, never wider than the grid.
     protected void ReadFootprint()
     {
         InventoryItem ii = InventoryItem.Cast(Item);
@@ -73,16 +74,16 @@ class OZT_Tile
         int w;
         int h;
         GetGame().GetInventoryItemSize(ii, w, h);
-        W = (w + 1) / 2;
-        H = (h + 1) / 2;
+        W = w;
+        H = h;
         if (W < 1)
             W = 1;
         if (H < 1)
             H = 1;
         if (W > OZT_TileGrid.COLS)
             W = OZT_TileGrid.COLS;
-        if (H > 6)
-            H = 6;
+        if (H > 15)
+            H = 15;
     }
 
     bool Build(Widget parent)
@@ -147,11 +148,12 @@ class OZT_Tile
             return;
         if (m_PriceText)
         {
-            // A tile one cell wide has room for four digits.
-            if (Price > 0 && W == 1)
-                m_PriceText.SetText(OZT_Ui.Short(Price));
-            else if (Price > 0)
-                m_PriceText.SetText(OZT_Ui.Sum(Price));
+            // Short on every tile, so that a small thing's large price fits;
+            // the card has the exact sum. What the player pays is rounded up,
+            // what the player is paid down.
+            bool pays = Kind == SHELF || Kind == BUY;
+            if (Price > 0)
+                m_PriceText.SetText(OZT_Ui.Short(Price, pays));
             else if (Price < 0)
                 m_PriceText.SetText("...");
             else
@@ -258,6 +260,22 @@ class OZT_TileGrid
     bool IsReady()
     {
         return m_Scroll && m_Content;
+    }
+
+    // The scroll from `top` to `bottom`, pixels of its panel: the tab strip
+    // above it took what it needed.
+    void Reframe(float top, float bottom)
+    {
+        if (!m_Scroll || bottom <= top)
+            return;
+        float x;
+        float y;
+        m_Scroll.GetPos(x, y);
+        float w;
+        float h;
+        m_Scroll.GetSize(w, h);
+        m_Scroll.SetPos(x, top);
+        m_Scroll.SetSize(w, bottom - top);
     }
 
     float Cell()

@@ -118,22 +118,46 @@ class OZT_Ui
     }
 
     // A sum for a place four digits wide: 9 500, 12.5k, 125k, 1.2M.
-    static string Short(int amount)
+    // A price as a tile shows it (the owner, 2026-11-11): exact below ten
+    // thousand ("9 995"), then thousands with one decimal ("12.3k"), whole
+    // thousands from a hundred thousand ("125k"), millions ("1.2M", "12M");
+    // the letters are the string table's. The exact sum is on the card. `up`
+    // rounds up, for a price the player pays; otherwise down, for a price the
+    // player is paid: a tile never promises better than the deal.
+    static string Short(int amount, bool up)
     {
         if (amount < 10000)
             return Sum(amount);
-        string unit = "k";
-        int whole = amount / 1000;
-        int tenth = (amount - whole * 1000) / 100;
-        if (amount >= 1000000)
-        {
-            unit = "M";
-            whole = amount / 1000000;
-            tenth = (amount - whole * 1000000) / 100000;
-        }
-        if (whole >= 100 || tenth == 0)
+        string k = Words("STR_OZT_UI_K");
+        string m = Words("STR_OZT_UI_M");
+        int tenths = ShortSteps(amount, 100, up);
+        if (tenths < 1000)
+            return ShortTenths(tenths, k);
+        int thousands = ShortSteps(amount, 1000, up);
+        if (thousands < 1000)
+            return thousands.ToString() + k;
+        int millionTenths = ShortSteps(amount, 100000, up);
+        if (millionTenths < 100)
+            return ShortTenths(millionTenths, m);
+        int millions = ShortSteps(amount, 1000000, up);
+        return millions.ToString() + m;
+    }
+
+    protected static int ShortSteps(int amount, int step, bool up)
+    {
+        int n = amount / step;
+        if (up && n * step < amount)
+            n++;
+        return n;
+    }
+
+    protected static string ShortTenths(int tenths, string unit)
+    {
+        int whole = tenths / 10;
+        int dec = tenths - whole * 10;
+        if (dec == 0)
             return whole.ToString() + unit;
-        return whole.ToString() + "." + tenth.ToString() + unit;
+        return whole.ToString() + "." + dec.ToString() + unit;
     }
 
     static void Say(Widget root, string name, string text)

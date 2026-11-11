@@ -339,7 +339,7 @@ FrameWidgetClass OZT_Trade {
        priority 1
        style rover_sim_colorable
       }
-      // The flat grid: twelve cells across, a tile takes half the item's inventory size, rounded up.
+      // The flat grid: twelve cells across, a tile takes the cells the item takes in the inventory; the menu moves the grid down below as many rows of tabs as the categories need.
       ScrollWidgetClass ShelfScroll {
        visible 1
        position 16 96
@@ -1402,7 +1402,7 @@ FrameWidgetClass OZT_Trade {
        priority 1
        style rover_sim_colorable
       }
-      // The flat grid: twelve cells across, a tile takes half the item's inventory size, rounded up.
+      // The flat grid: twelve cells across, a tile takes the cells the item takes in the inventory; the menu moves the grid down below as many rows of tabs as the categories need.
       ScrollWidgetClass OwnScroll {
        visible 1
        position 16 96

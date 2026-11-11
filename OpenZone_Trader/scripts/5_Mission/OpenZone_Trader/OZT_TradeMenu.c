@@ -17,6 +17,17 @@ class OZT_TradeMenu : UIScriptedMenu
     static const string ROOT       = "OZT_Trade";
     static const string TAB_LAYOUT = "OpenZone_Trader/gui/layouts/ozt_trade_tab.layout";
     static const string TAB_ROOT   = "OZT_TradeTab";
+
+    // The tab strips, in layout units (ozt_trade.json): where a strip starts
+    // and where the grid under it ends; a tab's height in one row and in
+    // several; how wide a tab must be for its name.
+    static const float STRIP_TOP   = 48;
+    static const float GRID_BOTTOM = 492;
+    static const float TAB_HIGH    = 44;
+    static const float TAB_LOW     = 30;
+    static const float TAB_LETTER  = 7;
+    static const float TAB_AIR     = 24;
+    static const float TAB_LEAST   = 72;
     static const string SLOT_LAYOUT = "OpenZone_Trader/gui/layouts/ozt_trade_slot.layout";
     static const string SLOT_ROOT   = "OZT_TradeSlot";
     static const string SLOT_LIST   = "CfgVehicles SurvivorBase InventoryEquipment playerSlots";
@@ -756,16 +767,28 @@ class OZT_TradeMenu : UIScriptedMenu
             m_TabIds.Insert(m_Data.Categories[c].Id);
             names.Insert(m_Data.Categories[c].Name);
         }
-        MakeStrip("ShelfTabs", names, m_ShelfTabs);
-        MakeStrip("OwnTabs", names, m_OwnTabs);
+        float shelfStrip = MakeStrip("ShelfTabs", names, m_ShelfTabs);
+        float ownStrip = MakeStrip("OwnTabs", names, m_OwnTabs);
+        // The grid starts below its strip and ends where the layout ends it.
+        float px = OZT_Ui.Px();
+        float top = Math.Round(STRIP_TOP * px);
+        float gap = Math.Round(4 * px);
+        float bottom = Math.Round(GRID_BOTTOM * px);
+        m_ShelfGrid.Reframe(top + shelfStrip + gap, bottom);
+        m_OwnGrid.Reframe(top + ownStrip + gap, bottom);
         PaintTabs();
     }
 
-    protected void MakeStrip(string strip, array<string> names, array<Widget> into)
+    // The tabs of a strip, in as many rows as their names need: one row
+    // while every tab has room for the longest name, more when the admin's
+    // categories are many (the owner, 2026-11-11: categories are the admin's
+    // own). Tabs of a row share its width. Returns the strip's height in
+    // pixels; the grid below gives that height up.
+    protected float MakeStrip(string strip, array<string> names, array<Widget> into)
     {
         Widget host = layoutRoot.FindAnyWidget(strip);
         if (!host)
-            return;
+            return 0;
         for (int old = 0; old < into.Count(); old++)
         {
             if (into[old])
@@ -777,19 +800,51 @@ class OZT_TradeMenu : UIScriptedMenu
         float gap = Math.Round(4 * px);
         float all = OZT_TileGrid.COLS * Math.Floor(OZT_TileGrid.CELL_UNITS * px);
         int n = names.Count();
-        float w = Math.Floor((all - gap * (n - 1)) / n);
-        float h = Math.Round(44 * px);
+        if (n < 1)
+            return 0;
+
+        // The longest name by its letters: about seven units a letter in the
+        // tab's font, and some air on both sides.
+        int longest = 0;
+        for (int k = 0; k < n; k++)
+        {
+            int letters = names[k].LengthUtf8();
+            if (letters > longest)
+                longest = letters;
+        }
+        float need = (longest * TAB_LETTER + TAB_AIR) * px;
+        float least = TAB_LEAST * px;
+        if (need < least)
+            need = least;
+        int perRow = Math.Floor((all + gap) / (need + gap));
+        if (perRow < 1)
+            perRow = 1;
+        int rows = (n + perRow - 1) / perRow;
+        int inRow = (n + rows - 1) / rows;
+        float h = Math.Round(TAB_HIGH * px);
+        if (rows > 1)
+            h = Math.Round(TAB_LOW * px);
+
         for (int i = 0; i < n; i++)
         {
             Widget tab = OZT_Ui.Make(TAB_LAYOUT, host, TAB_ROOT);
             if (!tab)
                 continue;
+            int row = i / inRow;
+            int col = i - row * inRow;
+            int here = n - row * inRow;
+            if (here > inRow)
+                here = inRow;
+            float w = Math.Floor((all - gap * (here - 1)) / here);
             tab.SetUserID(i);
-            tab.SetPos(i * (w + gap), 0);
+            tab.SetPos(col * (w + gap), row * (h + gap));
             tab.SetSize(w, h);
             OZT_Ui.Say(tab, "TabText", names[i]);
             into.Insert(tab);
         }
+        float tall = rows * h + (rows - 1) * gap;
+        host.SetSize(all, tall);
+        return tall;
     }
 
     protected void PaintTabs()

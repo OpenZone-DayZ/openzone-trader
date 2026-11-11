@@ -47,6 +47,9 @@ and a pile of twelve 7.62x39 rounds in the pants. The screen is opened by the se
 | S.28 | key F | "Угоду укладено"; the rifle is gone from its slot and from the character; the suppressor, the buttstock and the handguard are among the player's things, each with the red corner; money 1 790 | `deal: <uid> at 'stand' net -1790 (items): -AKM=1790(3 sold, 3 kept)` |
 | S.29 | a double click on the backpack's slot tile (four things lie in it) | SELL holds the backpack, 200; the verdict, red: "Усередині лежать речі, яких немає в угоді: 4"; the panel's title stays УГОДА over a 0; Confirm unlit | `quote` refused: `STR_OZT_NO_NOT_EMPTY`, 4 |
 | S.30 | the same in English, a fresh kit with the magazine's rounds worn | the rifle's tile and its line read 1 765; with the backpack beside it: "4 thing(s) lie inside and are not in the deal"; after R and the rifle alone: YOU GET +1 765, "Parts that stay with you: 3" in the verdict and under the buttons | `quote` answered both times |
+| S.31 | tiles at the size things take in the inventory (the owner's word), Ukrainian, 1920x1080 | the rifle 8x3, the backpack 4x5, the helmet 4x3, the canteen 2x2, a round 1x1; the shelf scrolls where it did not | `open` answered |
+| S.32 | nine categories of an admin's own (a goods file and a trader written for the look) | the tabs in three rows, ALL and three, four, two; every name whole; the grid below starts under the third row; the same strip over the player's things | `open` answered, nine categories |
+| S.33 | prices written for the look: 9 995, 12 350 and 12 345, 125 000, 1 250 000 | on the shelf "9 995" on a tile one cell wide, "12.4к" twice (rounded up), "125к", "1.3М"; the player's bandage, which the trader pays 12 345 for, "12.3к" (rounded down) | nothing asked |
 
 No `SCRIPT (E)` line and no `ERROR` line in the client's or the server's log of any of
 these runs; the boots' verdicts were a pass.

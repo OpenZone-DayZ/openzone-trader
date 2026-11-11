@@ -1,6 +1,6 @@
 {
   "layout": "ozt_trade",
-  "note": "The trade screen (menu 136, OZT_TradeMenu), arranged as the mockup: the body is a block of 1840x1032 units in the middle of the screen, so the columns keep their widths on a wide one. Left: the BUY cart over the trader's shelf. Middle: the character, the selected thing, the deal panel fed by the server's quote, Confirm and Clear. Right: the SELL cart over the player's own things. The whole screen is covered: the world is not seen behind a deal. Names are read by the scripts in scripts/5_Mission/OpenZone_Trader. The big panels wear frames of worn metal plates (the owner, 2026-11-11, as in the trade screen of STALKER 2; the textures are our own, drawn by tools/plates.py): Plate* images over their edges, after them in the body, ignoring the pointer.",
+  "note": "The trade screen (menu 136, OZT_TradeMenu), arranged as the mockup: the body is a block of 1840x1032 units in the middle of the screen, so the columns keep their widths on a wide one. Left: the BUY cart over the trader's shelf. Middle: the character, the selected thing, the deal panel fed by the server's quote, Confirm and Clear. Right: the SELL cart over the player's own things. The whole screen is covered: the world is not seen behind a deal. Names are read by the scripts in scripts/5_Mission/OpenZone_Trader. The six big panels wear art of their own (the owner, 2026-11-11: very much like the inventory of STALKER 2; our own drawing, tools/panels.py): a dark plate framed in worn steel whose outline is not a true rectangle, plates laid over it, a plate for the title at the top. Each is an Art* image under its panel, three units bigger on every side, ignoring the pointer; the panels and their heads are transparent and the titles centred on the plate.",
   "root": {
     "frame": {
       "name": "OZT_Trade",
@@ -25,6 +25,23 @@
             ],
             "children": [
               {
+                "image": {
+                  "name": "ArtBuy",
+                  "at": [
+                    -3,
+                    -3
+                  ],
+                  "size": [
+                    566,
+                    378
+                  ],
+                  "file": "OpenZone_Trader/gui/textures/ozt_panel_buy_ca.paa",
+                  "props": {
+                    "ignorepointer": 1
+                  }
+                }
+              },
+              {
                 "panel": {
                   "name": "BuyPanel",
                   "at": [
@@ -35,8 +52,7 @@
                     560,
                     372
                   ],
-                  "color": "$panel",
-                  "edge": true,
+                  "color": "$none",
                   "children": [
                     {
                       "panel": {
@@ -49,7 +65,7 @@
                           560,
                           40
                         ],
-                        "color": "$head",
+                        "color": "$none",
                         "children": [
                           {
                             "panel": {
@@ -62,23 +78,24 @@
                                 8,
                                 8
                               ],
-                              "color": "$accent"
+                              "color": "$none"
                             }
                           },
                           {
                             "label": {
                               "name": "BuyTitle",
                               "at": [
-                                34,
-                                0
+                                0,
+                                4
                               ],
                               "size": [
-                                216,
-                                40
+                                560,
+                                30
                               ],
                               "text": "#STR_OZT_UI_BUY",
                               "font": "header",
-                              "color": "$text"
+                              "color": "$text",
+                              "align": "center"
                             }
                           },
                           {
@@ -208,6 +225,23 @@
                 }
               },
               {
+                "image": {
+                  "name": "ArtShelf",
+                  "at": [
+                    -3,
+                    383
+                  ],
+                  "size": [
+                    566,
+                    560
+                  ],
+                  "file": "OpenZone_Trader/gui/textures/ozt_panel_shelf_ca.paa",
+                  "props": {
+                    "ignorepointer": 1
+                  }
+                }
+              },
+              {
                 "panel": {
                   "name": "ShelfPanel",
                   "at": [
@@ -218,8 +252,7 @@
                     560,
                     554
                   ],
-                  "color": "$panel",
-                  "edge": true,
+                  "color": "$none",
                   "children": [
                     {
                       "panel": {
@@ -232,7 +265,7 @@
                           560,
                           40
                         ],
-                        "color": "$head",
+                        "color": "$none",
                         "children": [
                           {
                             "panel": {
@@ -245,23 +278,24 @@
                                 8,
                                 8
                               ],
-                              "color": "$accent"
+                              "color": "$none"
                             }
                           },
                           {
                             "label": {
                               "name": "ShelfTitle",
                               "at": [
-                                34,
-                                0
+                                0,
+                                4
                               ],
                               "size": [
-                                216,
-                                40
+                                560,
+                                30
                               ],
                               "text": "#STR_OZT_UI_TRADER",
                               "font": "header",
-                              "color": "$text"
+                              "color": "$text",
+                              "align": "center"
                             }
                           },
                           {
@@ -419,6 +453,23 @@
                 }
               },
               {
+                "image": {
+                  "name": "ArtChar",
+                  "at": [
+                    679,
+                    -3
+                  ],
+                  "size": [
+                    482,
+                    716
+                  ],
+                  "file": "OpenZone_Trader/gui/textures/ozt_panel_char_ca.paa",
+                  "props": {
+                    "ignorepointer": 1
+                  }
+                }
+              },
+              {
                 "panel": {
                   "name": "CharPanel",
                   "at": [
@@ -429,8 +480,7 @@
                     476,
                     710
                   ],
-                  "color": "$panel",
-                  "edge": true,
+                  "color": "$none",
                   "children": [
                     {
                       "panel": {
@@ -443,7 +493,7 @@
                           476,
                           40
                         ],
-                        "color": "$head",
+                        "color": "$none",
                         "children": [
                           {
                             "panel": {
@@ -456,23 +506,24 @@
                                 8,
                                 8
                               ],
-                              "color": "$accent"
+                              "color": "$none"
                             }
                           },
                           {
                             "label": {
                               "name": "CharTitle",
                               "at": [
-                                34,
-                                0
+                                0,
+                                4
                               ],
                               "size": [
-                                216,
-                                40
+                                476,
+                                30
                               ],
                               "text": "#STR_OZT_UI_CHARACTER",
                               "font": "header",
-                              "color": "$text"
+                              "color": "$text",
+                              "align": "center"
                             }
                           },
                           {
@@ -557,7 +608,7 @@
                         "name": "SelName",
                         "at": [
                           18,
-                          514
+                          512
                         ],
                         "size": [
                           300,
@@ -573,7 +624,7 @@
                         "name": "SelPrice",
                         "at": [
                           318,
-                          514
+                          512
                         ],
                         "size": [
                           140,
@@ -589,42 +640,26 @@
                         "name": "SelSub",
                         "at": [
                           18,
-                          542
+                          540
                         ],
                         "size": [
-                          440,
-                          20
+                          290,
+                          24
                         ],
                         "font": "small",
                         "color": "$muted"
                       }
                     },
                     {
-                      "text": {
-                        "name": "SelText",
-                        "at": [
-                          18,
-                          568
-                        ],
-                        "size": [
-                          440,
-                          84
-                        ],
-                        "font": "small",
-                        "color": "$muted",
-                        "grow": false
-                      }
-                    },
-                    {
                       "button": {
                         "name": "TryBtn",
                         "at": [
-                          298,
-                          658
+                          318,
+                          538
                         ],
                         "size": [
-                          160,
-                          40
+                          140,
+                          28
                         ],
                         "text": "#STR_OZT_UI_TRY_ON",
                         "font": "hint",
@@ -632,8 +667,56 @@
                         "hidden": true,
                         "note": "Shown while the selected thing is goods the character could wear; the menu turns its caption while they are tried on."
                       }
+                    },
+                    {
+                      "panel": {
+                        "name": "PartsStrip",
+                        "at": [
+                          18,
+                          572
+                        ],
+                        "size": [
+                          440,
+                          104
+                        ],
+                        "color": "$none",
+                        "note": "The parts strip: the menu lays one ozt_trade_slot per slot of the selected thing here, to any depth, a part's tile inside (OZT_TradeParts.c)."
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "PartsHint",
+                        "at": [
+                          18,
+                          678
+                        ],
+                        "size": [
+                          440,
+                          22
+                        ],
+                        "font": "small",
+                        "color": "$muted",
+                        "note": "What the strip's gestures do for the selected thing, or the slot the shelf is filtered for."
+                      }
                     }
                   ]
+                }
+              },
+              {
+                "image": {
+                  "name": "ArtDeal",
+                  "at": [
+                    679,
+                    721
+                  ],
+                  "size": [
+                    482,
+                    156
+                  ],
+                  "file": "OpenZone_Trader/gui/textures/ozt_panel_deal_ca.paa",
+                  "props": {
+                    "ignorepointer": 1
+                  }
                 }
               },
               {
@@ -647,8 +730,7 @@
                     476,
                     150
                   ],
-                  "color": "$panel",
-                  "edge": true,
+                  "color": "$none",
                   "children": [
                     {
                       "label": {
@@ -850,6 +932,23 @@
                 }
               },
               {
+                "image": {
+                  "name": "ArtSell",
+                  "at": [
+                    1277,
+                    -3
+                  ],
+                  "size": [
+                    566,
+                    378
+                  ],
+                  "file": "OpenZone_Trader/gui/textures/ozt_panel_sell_ca.paa",
+                  "props": {
+                    "ignorepointer": 1
+                  }
+                }
+              },
+              {
                 "panel": {
                   "name": "SellPanel",
                   "at": [
@@ -860,8 +959,7 @@
                     560,
                     372
                   ],
-                  "color": "$panel",
-                  "edge": true,
+                  "color": "$none",
                   "children": [
                     {
                       "panel": {
@@ -874,7 +972,7 @@
                           560,
                           40
                         ],
-                        "color": "$head",
+                        "color": "$none",
                         "children": [
                           {
                             "panel": {
@@ -887,23 +985,24 @@
                                 8,
                                 8
                               ],
-                              "color": "$accent"
+                              "color": "$none"
                             }
                           },
                           {
                             "label": {
                               "name": "SellTitle",
                               "at": [
-                                34,
-                                0
+                                0,
+                                4
                               ],
                               "size": [
-                                216,
-                                40
+                                560,
+                                30
                               ],
                               "text": "#STR_OZT_UI_SELL",
                               "font": "header",
-                              "color": "$text"
+                              "color": "$text",
+                              "align": "center"
                             }
                           },
                           {
@@ -1033,6 +1132,23 @@
                 }
               },
               {
+                "image": {
+                  "name": "ArtOwn",
+                  "at": [
+                    1277,
+                    383
+                  ],
+                  "size": [
+                    566,
+                    560
+                  ],
+                  "file": "OpenZone_Trader/gui/textures/ozt_panel_own_ca.paa",
+                  "props": {
+                    "ignorepointer": 1
+                  }
+                }
+              },
+              {
                 "panel": {
                   "name": "OwnPanel",
                   "at": [
@@ -1043,8 +1159,7 @@
                     560,
                     554
                   ],
-                  "color": "$panel",
-                  "edge": true,
+                  "color": "$none",
                   "children": [
                     {
                       "panel": {
@@ -1057,7 +1172,7 @@
                           560,
                           40
                         ],
-                        "color": "$head",
+                        "color": "$none",
                         "children": [
                           {
                             "panel": {
@@ -1070,23 +1185,24 @@
                                 8,
                                 8
                               ],
-                              "color": "$accent"
+                              "color": "$none"
                             }
                           },
                           {
                             "label": {
                               "name": "OwnTitle",
                               "at": [
-                                34,
-                                0
+                                0,
+                                4
                               ],
                               "size": [
-                                216,
-                                40
+                                560,
+                                30
                               ],
                               "text": "#STR_OZT_UI_YOURS",
                               "font": "header",
-                              "color": "$text"
+                              "color": "$text",
+                              "align": "center"
                             }
                           },
                           {
@@ -1261,822 +1377,6 @@
                   "font": "hint",
                   "color": "$muted",
                   "align": "center"
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateBuyTop",
-                  "at": [
-                    0,
-                    0
-                  ],
-                  "size": [
-                    560,
-                    8
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_h_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateBuyBottom",
-                  "at": [
-                    0,
-                    364
-                  ],
-                  "size": [
-                    560,
-                    8
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_h_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateBuyLeft",
-                  "at": [
-                    0,
-                    8
-                  ],
-                  "size": [
-                    8,
-                    356
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_v_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateBuyRight",
-                  "at": [
-                    552,
-                    8
-                  ],
-                  "size": [
-                    8,
-                    356
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_v_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateBuyBoltTl",
-                  "at": [
-                    -2,
-                    -2
-                  ],
-                  "size": [
-                    12,
-                    12
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_bolt_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateBuyBoltTr",
-                  "at": [
-                    550,
-                    -2
-                  ],
-                  "size": [
-                    12,
-                    12
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_bolt_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateBuyBoltBl",
-                  "at": [
-                    -2,
-                    362
-                  ],
-                  "size": [
-                    12,
-                    12
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_bolt_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateBuyBoltBr",
-                  "at": [
-                    550,
-                    362
-                  ],
-                  "size": [
-                    12,
-                    12
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_bolt_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateShelfTop",
-                  "at": [
-                    0,
-                    386
-                  ],
-                  "size": [
-                    560,
-                    8
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_h_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateShelfBottom",
-                  "at": [
-                    0,
-                    932
-                  ],
-                  "size": [
-                    560,
-                    8
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_h_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateShelfLeft",
-                  "at": [
-                    0,
-                    394
-                  ],
-                  "size": [
-                    8,
-                    538
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_v_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateShelfRight",
-                  "at": [
-                    552,
-                    394
-                  ],
-                  "size": [
-                    8,
-                    538
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_v_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateShelfBoltTl",
-                  "at": [
-                    -2,
-                    384
-                  ],
-                  "size": [
-                    12,
-                    12
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_bolt_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateShelfBoltTr",
-                  "at": [
-                    550,
-                    384
-                  ],
-                  "size": [
-                    12,
-                    12
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_bolt_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateShelfBoltBl",
-                  "at": [
-                    -2,
-                    930
-                  ],
-                  "size": [
-                    12,
-                    12
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_bolt_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateShelfBoltBr",
-                  "at": [
-                    550,
-                    930
-                  ],
-                  "size": [
-                    12,
-                    12
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_bolt_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateCharTop",
-                  "at": [
-                    682,
-                    0
-                  ],
-                  "size": [
-                    476,
-                    8
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_h_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateCharBottom",
-                  "at": [
-                    682,
-                    702
-                  ],
-                  "size": [
-                    476,
-                    8
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_h_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateCharLeft",
-                  "at": [
-                    682,
-                    8
-                  ],
-                  "size": [
-                    8,
-                    694
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_v_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateCharRight",
-                  "at": [
-                    1150,
-                    8
-                  ],
-                  "size": [
-                    8,
-                    694
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_v_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateCharBoltTl",
-                  "at": [
-                    680,
-                    -2
-                  ],
-                  "size": [
-                    12,
-                    12
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_bolt_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateCharBoltTr",
-                  "at": [
-                    1148,
-                    -2
-                  ],
-                  "size": [
-                    12,
-                    12
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_bolt_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateCharBoltBl",
-                  "at": [
-                    680,
-                    700
-                  ],
-                  "size": [
-                    12,
-                    12
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_bolt_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateCharBoltBr",
-                  "at": [
-                    1148,
-                    700
-                  ],
-                  "size": [
-                    12,
-                    12
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_bolt_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateDealTop",
-                  "at": [
-                    682,
-                    724
-                  ],
-                  "size": [
-                    476,
-                    8
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_h_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateDealBottom",
-                  "at": [
-                    682,
-                    866
-                  ],
-                  "size": [
-                    476,
-                    8
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_h_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateDealLeft",
-                  "at": [
-                    682,
-                    732
-                  ],
-                  "size": [
-                    8,
-                    134
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_vs_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateDealRight",
-                  "at": [
-                    1150,
-                    732
-                  ],
-                  "size": [
-                    8,
-                    134
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_vs_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateDealBoltTl",
-                  "at": [
-                    680,
-                    722
-                  ],
-                  "size": [
-                    12,
-                    12
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_bolt_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateDealBoltTr",
-                  "at": [
-                    1148,
-                    722
-                  ],
-                  "size": [
-                    12,
-                    12
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_bolt_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateDealBoltBl",
-                  "at": [
-                    680,
-                    864
-                  ],
-                  "size": [
-                    12,
-                    12
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_bolt_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateDealBoltBr",
-                  "at": [
-                    1148,
-                    864
-                  ],
-                  "size": [
-                    12,
-                    12
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_bolt_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateSellTop",
-                  "at": [
-                    1280,
-                    0
-                  ],
-                  "size": [
-                    560,
-                    8
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_h_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateSellBottom",
-                  "at": [
-                    1280,
-                    364
-                  ],
-                  "size": [
-                    560,
-                    8
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_h_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateSellLeft",
-                  "at": [
-                    1280,
-                    8
-                  ],
-                  "size": [
-                    8,
-                    356
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_v_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateSellRight",
-                  "at": [
-                    1832,
-                    8
-                  ],
-                  "size": [
-                    8,
-                    356
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_v_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateSellBoltTl",
-                  "at": [
-                    1278,
-                    -2
-                  ],
-                  "size": [
-                    12,
-                    12
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_bolt_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateSellBoltTr",
-                  "at": [
-                    1830,
-                    -2
-                  ],
-                  "size": [
-                    12,
-                    12
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_bolt_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateSellBoltBl",
-                  "at": [
-                    1278,
-                    362
-                  ],
-                  "size": [
-                    12,
-                    12
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_bolt_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateSellBoltBr",
-                  "at": [
-                    1830,
-                    362
-                  ],
-                  "size": [
-                    12,
-                    12
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_bolt_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateOwnTop",
-                  "at": [
-                    1280,
-                    386
-                  ],
-                  "size": [
-                    560,
-                    8
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_h_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateOwnBottom",
-                  "at": [
-                    1280,
-                    932
-                  ],
-                  "size": [
-                    560,
-                    8
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_h_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateOwnLeft",
-                  "at": [
-                    1280,
-                    394
-                  ],
-                  "size": [
-                    8,
-                    538
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_v_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateOwnRight",
-                  "at": [
-                    1832,
-                    394
-                  ],
-                  "size": [
-                    8,
-                    538
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_v_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateOwnBoltTl",
-                  "at": [
-                    1278,
-                    384
-                  ],
-                  "size": [
-                    12,
-                    12
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_bolt_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateOwnBoltTr",
-                  "at": [
-                    1830,
-                    384
-                  ],
-                  "size": [
-                    12,
-                    12
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_bolt_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateOwnBoltBl",
-                  "at": [
-                    1278,
-                    930
-                  ],
-                  "size": [
-                    12,
-                    12
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_bolt_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
-                }
-              },
-              {
-                "image": {
-                  "name": "PlateOwnBoltBr",
-                  "at": [
-                    1830,
-                    930
-                  ],
-                  "size": [
-                    12,
-                    12
-                  ],
-                  "file": "OpenZone_Trader/gui/textures/ozt_plate_bolt_ca.paa",
-                  "props": {
-                    "ignorepointer": 1
-                  }
                 }
               }
             ]

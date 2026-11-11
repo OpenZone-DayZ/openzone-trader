@@ -84,3 +84,16 @@ STR_OZT_UI_LIST_NOTE,"Торговець платить вказану суму 
 STR_OZT_UI_TRY_ON,ПРИМIРЯТИ,TRY ON
 STR_OZT_UI_TAKE_OFF,ЗНЯТИ,TAKE OFF
 STR_OZT_UI_TRYING,примірка: ще не куплено,trying on: not bought yet
+# The parts strip.
+STR_OZT_UI_PARTS_ROUNDS,Набої,Rounds
+STR_OZT_UI_PARTS_NONE,Частин у цієї речі немає,This item takes no parts
+STR_OZT_UI_PARTS_HINT_SELL,"2×ЛКМ по частині — залишити або продати","Double-click a part to keep it or sell it"
+STR_OZT_UI_PARTS_HINT_OWN,"Слот — підібрати частину, 2×ЛКМ — продати частину","Click a slot to fit a part, double-click a part to sell it"
+STR_OZT_UI_PARTS_HINT_GOODS,"Слот — підібрати частину, 2×ЛКМ — зняти поставлену","Click a slot to fit a part, double-click a fitted one to take it off"
+STR_OZT_UI_PARTS_FILTER,"«%1»: 2×ЛКМ по товару, Esc — скасувати","«%1»: double-click goods, Esc to cancel"
+STR_OZT_UI_PARTS_FOR,Підбір: %1,Fitting: %1
+STR_OZT_UI_PARTS_NO_FIT,Ця річ не стає в цей слот,This does not fit that slot
+STR_OZT_UI_PARTS_INCLUDED,Іде в комплекті з товаром,It comes with the goods
+STR_OZT_UI_PARTS_NOT_TAKEN,Торговець це не бере: частина залишиться у вас,The trader does not take this: the part stays with you
+STR_OZT_UI_PARTS_RIDES,"Іде разом із частиною, на якій стоїть",It goes with the part it is on
+STR_OZT_UI_PARTS_SELLING,Річ продається: частини на неї не ставляться,The item is being sold: no parts go onto it

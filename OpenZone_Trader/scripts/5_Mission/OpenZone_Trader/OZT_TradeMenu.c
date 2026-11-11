@@ -102,9 +102,12 @@ class OZT_TradeMenu : UIScriptedMenu
     protected ref array<Widget> m_SlotWidgets;
     protected ref array<ref OZT_Tile> m_SlotTiles;
 
-    // The selected thing: a tile's kind and key.
+    // The selected thing: a tile's kind and key. A part taken off in the
+    // strip leaves with its tile; the thing it was on is selected instead and
+    // painted once the grids are laid again.
     protected int m_PickKind;
     protected string m_PickKey;
+    protected bool m_PaintPickSoon;
 
     // The last press, for the double click.
     protected int m_PressAt;
@@ -154,6 +157,16 @@ class OZT_TradeMenu : UIScriptedMenu
     // True while the info line holds what stays with the player: the next
     // quote that keeps nothing takes it away.
     protected bool m_SaidStays;
+
+    // The parts strip: the selected thing's slots; what it shows; the empty
+    // slot the shelf is filtered for; the part a double click or a drag
+    // acts on, and the strip's cell a drop landed on.
+    protected ref OZT_PartsStrip m_Parts;
+    protected ref OZT_PartsAt m_PartsAt;
+    protected bool m_DirtyParts;
+    protected ref OZT_PartsEntry m_Filter;
+    protected ref OZT_PartsEntry m_ActEntry;
+    protected ref OZT_PartsEntry m_ActDropEntry;
 
     // Trying on: the character shown in goods that are not bought.
     protected ref OZT_TryOn m_Try;
@@ -228,6 +241,7 @@ class OZT_TradeMenu : UIScriptedMenu
         m_CharPanel = layoutRoot.FindAnyWidget("CharPanel");
         m_View = PlayerPreviewWidget.Cast(layoutRoot.FindAnyWidget("CharView"));
         m_Try = new OZT_TryOn(m_View);
+        m_Parts = new OZT_PartsStrip(layoutRoot.FindAnyWidget("PartsStrip"));
         m_Qty = new OZT_QtyDialog(this);
         m_Card = new OZT_Card();
         m_List = new OZT_PriceList();
@@ -277,6 +291,10 @@ class OZT_TradeMenu : UIScriptedMenu
         m_Hover = null;
         if (m_Try)
             m_Try.Drop();
+        if (m_Parts)
+            m_Parts.Clear();
+        m_Filter = null;
+        m_PartsAt = null;
         if (m_Qty)
             m_Qty.Destroy();
         if (m_Card)
@@ -339,6 +357,8 @@ class OZT_TradeMenu : UIScriptedMenu
                 m_Qty.Shut();
             else if (m_List && m_List.IsOpen())
                 m_List.Shut();
+            else if (m_Filter)
+                ClearFilter();
             else
             {
                 CloseTrade();
@@ -370,6 +390,10 @@ class OZT_TradeMenu : UIScriptedMenu
                 FillSlots();
             if (m_DirtyCarts)
                 FillCarts();
+            if (m_DirtyParts)
+                FillParts();
+            if (m_PaintPickSoon)
+                RepaintPick();
             if (m_PickKind != 0 && !PickStands())
                 Unpick();
         }
@@ -474,8 +498,9 @@ class OZT_TradeMenu : UIScriptedMenu
             MakeTabs();
             SayInfo(OZT_Ui.Words("STR_OZT_UI_HELLO"), OZT_Look.Text());
         }
-        OZT_Ui.Say(layoutRoot, "ShelfMeta", res.Name);
+        SayShelfMeta();
         OZT_Ui.Say(layoutRoot, "OwnMoney", OZT_Ui.Sum(res.Balance));
+        m_DirtyParts = true;
 
         if (m_Cart.Prune(res) > 0)
             m_Quote = null;
@@ -927,8 +952,16 @@ class OZT_TradeMenu : UIScriptedMenu
             OZT_WireGoods g = m_Data.Goods[i];
             if (g.Buy <= 0)
                 continue;
-            if (cat != "" && g.Category != cat)
+            // Under a slot's filter: what fits the slot, from every category.
+            if (m_Filter)
+            {
+                if (!OZT_Fit.SlotOf(m_Filter.HostType, g.ClassName, m_Filter.SlotName))
+                    continue;
+            }
+            else if (cat != "" && g.Category != cat)
+            {
                 continue;
+            }
             EntityAI e = m_Shelf.Of(g.ClassName);
             if (!e)
                 continue;
@@ -1222,6 +1255,7 @@ class OZT_TradeMenu : UIScriptedMenu
             bt.Count = 0;
             if (buy.Count > 1)
                 bt.Count = buy.Count;
+            bt.Parts = buy.Fits.Count();
             bt.PaintMarks();
             toPay = toPay + buy.Shown();
         }
@@ -1422,6 +1456,7 @@ class OZT_TradeMenu : UIScriptedMenu
         m_PickKind = t.Kind;
         m_PickKey = KeyOf(t);
         m_PickType = t.Type;
+        AimParts(t);
         if (m_Try && m_Try.IsOn() && m_Try.Tried() != t.Type)
             EndTry();
         RepaintPicks(m_ShelfGrid);
@@ -1441,8 +1476,20 @@ class OZT_TradeMenu : UIScriptedMenu
     // Is the selected thing still on the screen?
     protected bool PickStands()
     {
+        // While the shelf shows what fits a slot, the thing whose slot it is
+        // stays selected, though its tile may be off the filtered shelf.
+        if (m_Filter)
+            return true;
         if (PickIn(m_ShelfGrid) || PickIn(m_OwnGrid) || PickIn(m_BuyGrid) || PickIn(m_SellGrid))
             return true;
+        if (m_Parts)
+        {
+            for (int p = 0; p < m_Parts.TileCount(); p++)
+            {
+                if (IsPick(m_Parts.TileOfIndex(p)))
+                    return true;
+            }
+        }
         for (int s = 0; s < m_SlotTiles.Count(); s++)
         {
             if (IsPick(m_SlotTiles[s]))
@@ -1471,9 +1518,61 @@ class OZT_TradeMenu : UIScriptedMenu
         OZT_Ui.Say(layoutRoot, "SelName", "");
         OZT_Ui.Say(layoutRoot, "SelPrice", "");
         OZT_Ui.Say(layoutRoot, "SelSub", "");
-        RichTextWidget text = RichTextWidget.Cast(layoutRoot.FindAnyWidget("SelText"));
-        if (text)
-            text.SetText("");
+        m_PartsAt = null;
+        ClearFilter();
+        m_DirtyParts = true;
+    }
+
+    // The thing the strip shows becomes the selection again: a part taken off
+    // left the strip with its tile.
+    protected void PickHost()
+    {
+        if (!m_PartsAt)
+            return;
+        m_PickKind = m_PartsAt.Kind;
+        if (m_PartsAt.Kind == OZT_Tile.OWN || m_PartsAt.Kind == OZT_Tile.SELL)
+            m_PickKey = m_PartsAt.Low.ToString() + ":" + m_PartsAt.High.ToString();
+        else
+            m_PickKey = m_PartsAt.Type;
+        m_PickType = m_PartsAt.Type;
+        m_PaintPickSoon = true;
+    }
+
+    protected void RepaintPick()
+    {
+        m_PaintPickSoon = false;
+        RepaintPicks(m_ShelfGrid);
+        RepaintPicks(m_OwnGrid);
+        RepaintPicks(m_BuyGrid);
+        RepaintPicks(m_SellGrid);
+        OZT_Tile found = PickedIn(m_BuyGrid);
+        if (!found)
+            found = PickedIn(m_SellGrid);
+        if (!found)
+            found = PickedIn(m_OwnGrid);
+        if (!found)
+            found = PickedIn(m_ShelfGrid);
+        for (int s = 0; s < m_SlotTiles.Count(); s++)
+        {
+            OZT_Tile held = m_SlotTiles[s];
+            bool lit = IsPick(held);
+            if (lit != held.IsPicked())
+                held.SetPicked(lit);
+            if (lit && !found)
+                found = held;
+        }
+        if (found)
+            PaintPick(found);
+    }
+
+    protected OZT_Tile PickedIn(OZT_TileGrid grid)
+    {
+        for (int i = 0; i < grid.Count(); i++)
+        {
+            if (IsPick(grid.Get(i)))
+                return grid.Get(i);
+        }
+        return null;
     }
 
     protected void RepaintPicks(OZT_TileGrid grid)
@@ -1516,18 +1615,307 @@ class OZT_TradeMenu : UIScriptedMenu
             if (t.Price > 0)
                 price = OZT_Ui.Sum(t.Price);
         }
-        string about = "";
-        InventoryItem ii = InventoryItem.Cast(t.Item);
-        if (ii)
-            about = ii.GetTooltip();
-
         OZT_Ui.Say(layoutRoot, "SelName", name);
         OZT_Ui.Say(layoutRoot, "SelPrice", price);
         OZT_Ui.Say(layoutRoot, "SelSub", sub);
-        RichTextWidget text = RichTextWidget.Cast(layoutRoot.FindAnyWidget("SelText"));
-        if (text)
-            text.SetText(about);
         PaintTry();
+    }
+
+    // ---- the parts strip ---------------------------------------------------------------------------------
+
+    // The strip shows the thing just selected; a part picked in the strip
+    // leaves it where it is.
+    protected void AimParts(OZT_Tile t)
+    {
+        if (t.Kind == OZT_Tile.PART)
+            return;
+        // While the shelf shows what fits a slot, a click on its goods
+        // chooses and leaves the strip where it is (design §3.4).
+        if (m_Filter && t.Kind == OZT_Tile.SHELF)
+            return;
+        OZT_PartsAt at = new OZT_PartsAt();
+        at.Kind = t.Kind;
+        at.Item = t.Item;
+        at.Type = t.Type;
+        at.Low = t.Low;
+        at.High = t.High;
+        if (t.Kind == OZT_Tile.BUY || t.Kind == OZT_Tile.SELL)
+            at.Line = t.Index;
+        m_PartsAt = at;
+        ClearFilter();
+        m_DirtyParts = true;
+    }
+
+    // The strip for a BUY line: after a part was fitted to new goods.
+    protected void AimLine(int line)
+    {
+        if (line < 0 || line >= m_Cart.Buys.Count())
+            return;
+        OZT_PartsAt at = new OZT_PartsAt();
+        at.Kind = OZT_Tile.BUY;
+        at.Line = line;
+        at.Type = m_Cart.Buys[line].Type;
+        at.Item = m_Shelf.Of(at.Type);
+        m_PartsAt = at;
+        m_PickKind = OZT_Tile.BUY;
+        m_PickKey = at.Type;
+        m_PickType = at.Type;
+        m_DirtyParts = true;
+        m_PaintPickSoon = true;
+    }
+
+    protected void FillParts()
+    {
+        m_DirtyParts = false;
+        if (!m_Parts)
+            return;
+        bool gone = !m_PartsAt || !m_Data;
+        if (!gone && m_PartsAt.Kind == OZT_Tile.BUY && m_PartsAt.Line >= m_Cart.Buys.Count())
+            gone = true;
+        if (!gone && m_PartsAt.Kind == OZT_Tile.SELL)
+        {
+            // The line of a sold thing is found by the thing: lines move.
+            m_PartsAt.Line = -1;
+            for (int s = 0; s < m_Cart.Sells.Count(); s++)
+            {
+                if (m_Cart.Sells[s].Item == m_PartsAt.Item)
+                    m_PartsAt.Line = s;
+            }
+            if (m_PartsAt.Line < 0)
+                m_PartsAt.Kind = OZT_Tile.OWN;
+        }
+        if (gone)
+        {
+            m_Parts.Clear();
+            SayParts();
+            return;
+        }
+        array<ref OZT_PartsEntry> entries = new array<ref OZT_PartsEntry>();
+        OZT_PartsReader.Read(m_PartsAt, m_Data, m_Cart, m_Shelf, entries);
+        m_Parts.Lay(entries);
+        int lit = -1;
+        if (m_Filter)
+        {
+            for (int i = 0; i < m_Parts.Count(); i++)
+            {
+                OZT_PartsEntry e = m_Parts.Entry(i);
+                if (e.What == OZT_PartsEntry.EMPTY && e.Host == m_Filter.Host && e.HostFit == m_Filter.HostFit && e.SlotName == m_Filter.SlotName)
+                    lit = i;
+            }
+        }
+        m_Parts.Light(lit);
+        SayParts();
+    }
+
+    // The line under the strip: what its gestures do here.
+    protected void SayParts()
+    {
+        string hint = "";
+        if (m_Filter)
+        {
+            hint = OZT_Ui.Words1("STR_OZT_UI_PARTS_FILTER", SlotWords(m_Filter));
+        }
+        else if (m_PartsAt && m_Parts && m_Parts.Count() == 0)
+        {
+            hint = OZT_Ui.Words("STR_OZT_UI_PARTS_NONE");
+        }
+        else if (m_PartsAt)
+        {
+            if (m_PartsAt.Kind == OZT_Tile.SELL)
+                hint = OZT_Ui.Words("STR_OZT_UI_PARTS_HINT_SELL");
+            else if (m_PartsAt.Kind == OZT_Tile.OWN)
+                hint = OZT_Ui.Words("STR_OZT_UI_PARTS_HINT_OWN");
+            else
+                hint = OZT_Ui.Words("STR_OZT_UI_PARTS_HINT_GOODS");
+        }
+        OZT_Ui.Say(layoutRoot, "PartsHint", hint);
+    }
+
+    protected string SlotWords(OZT_PartsEntry e)
+    {
+        string label = InventorySlots.GetSlotDisplayName(e.SlotId);
+        if (label.IndexOf("#") == 0)
+            label = Widget.TranslateString(label);
+        if (label == "")
+            label = e.SlotName;
+        return label;
+    }
+
+    // The shelf's head: the trader's name, or the slot the shelf is
+    // filtered for.
+    protected void SayShelfMeta()
+    {
+        if (!m_Data)
+            return;
+        if (m_Filter)
+        {
+            OZT_Ui.Say(layoutRoot, "ShelfMeta", OZT_Ui.Words1("STR_OZT_UI_PARTS_FOR", SlotWords(m_Filter)));
+            OZT_Ui.Tint(layoutRoot, "ShelfMeta", OZT_Look.Accent());
+            return;
+        }
+        OZT_Ui.Say(layoutRoot, "ShelfMeta", m_Data.Name);
+        OZT_Ui.Tint(layoutRoot, "ShelfMeta", OZT_Look.Muted());
+    }
+
+    // A click on an empty slot: the shelf shows what fits it.
+    protected void AimFilter(OZT_PartsEntry slot, int cell)
+    {
+        if (!m_PartsAt || !slot)
+            return;
+        if (m_PartsAt.Kind == OZT_Tile.SELL)
+        {
+            SayInfo(OZT_Ui.Words("STR_OZT_UI_PARTS_SELLING"), OZT_Look.Alert());
+            return;
+        }
+        if (m_Filter && m_Filter.Host == slot.Host && m_Filter.HostFit == slot.HostFit && m_Filter.SlotName == slot.SlotName)
+        {
+            ClearFilter();
+            return;
+        }
+        m_Filter = slot;
+        if (m_Parts)
+            m_Parts.Light(cell);
+        m_DirtyShelf = true;
+        SayShelfMeta();
+        SayParts();
+    }
+
+    protected void ClearFilter()
+    {
+        if (!m_Filter)
+            return;
+        m_Filter = null;
+        if (m_Parts)
+            m_Parts.Light(-1);
+        m_DirtyShelf = true;
+        SayShelfMeta();
+        SayParts();
+    }
+
+    // Goods onto an empty slot: a part fitted to goods bought in this deal,
+    // or bought onto the player's own thing.
+    protected void FitGoods(string type, OZT_PartsEntry slot)
+    {
+        if (!slot || !m_PartsAt || !m_Data)
+            return;
+        if (!OZT_Fit.SlotOf(slot.HostType, type, slot.SlotName))
+        {
+            SayInfo(OZT_Ui.Words("STR_OZT_UI_PARTS_NO_FIT"), OZT_Look.Alert());
+            return;
+        }
+        OZT_WireGoods part = GoodsOf(type);
+        if (!part || part.Buy <= 0)
+            return;
+        int kind = m_PartsAt.Kind;
+        if (kind == OZT_Tile.SELL)
+        {
+            SayInfo(OZT_Ui.Words("STR_OZT_UI_PARTS_SELLING"), OZT_Look.Alert());
+            return;
+        }
+        if (kind == OZT_Tile.SHELF)
+        {
+            OZT_WireGoods host = GoodsOf(m_PartsAt.Type);
+            if (!host || host.Buy <= 0)
+                return;
+            int fresh = m_Cart.BuyOne(m_PartsAt.Type, host.Buy);
+            m_Cart.AddFit(fresh, type, slot.SlotName, slot.HostFit, part.Buy);
+            AimLine(fresh);
+        }
+        else if (kind == OZT_Tile.BUY)
+        {
+            int one = m_Cart.SplitOne(m_PartsAt.Line);
+            m_Cart.AddFit(one, type, slot.SlotName, slot.HostFit, part.Buy);
+            AimLine(one);
+        }
+        else if (kind == OZT_Tile.OWN)
+        {
+            if (!slot.Host)
+                return;
+            int low;
+            int high;
+            slot.Host.GetNetworkID(low, high);
+            m_Cart.BuyOnto(type, part.Buy, low, high, slot.SlotName);
+        }
+        ClearFilter();
+        CartChanged();
+    }
+
+    // A double click on a part, or a part dropped on a side: keep it, sell
+    // it again, sell it on its own, take a fitted part off.
+    protected void PartAct(OZT_PartsEntry e, int zone)
+    {
+        if (!e || !m_PartsAt)
+            return;
+        if (e.State == OZT_PartsEntry.INCLUDED)
+        {
+            SayInfo(OZT_Ui.Words("STR_OZT_UI_PARTS_INCLUDED"), OZT_Look.Alert());
+            return;
+        }
+        if (e.State == OZT_PartsEntry.RIDES)
+        {
+            SayInfo(OZT_Ui.Words("STR_OZT_UI_PARTS_RIDES"), OZT_Look.Alert());
+            return;
+        }
+        if (e.State == OZT_PartsEntry.NOT_TAKEN)
+        {
+            SayInfo(OZT_Ui.Words("STR_OZT_UI_PARTS_NOT_TAKEN"), OZT_Look.Alert());
+            return;
+        }
+        if (e.State == OZT_PartsEntry.FITTED)
+        {
+            m_Cart.DropFit(m_PartsAt.Line, e.Fit);
+            PickHost();
+            CartChanged();
+            return;
+        }
+        if (e.State == OZT_PartsEntry.ONTO)
+        {
+            m_Cart.BuyCount(e.Line, 0);
+            PickHost();
+            CartChanged();
+            return;
+        }
+        if (m_PartsAt.Kind == OZT_Tile.SELL)
+        {
+            int rounds = 0;
+            if (e.What == OZT_PartsEntry.ROUNDS)
+                rounds = 1;
+            bool kept = e.State == OZT_PartsEntry.KEPT;
+            bool want = !kept;
+            if (zone == ZONE_OWN)
+                want = true;
+            else if (zone == ZONE_SELL)
+                want = false;
+            if (want != kept)
+            {
+                m_Cart.ToggleKeep(m_PartsAt.Line, e.Low, e.High, rounds);
+                CartChanged();
+            }
+            return;
+        }
+        if (m_PartsAt.Kind == OZT_Tile.OWN && e.What == OZT_PartsEntry.PART)
+        {
+            // Sold on its own, or, when it is already, out of the deal again.
+            int line = SellLineOf(e.Low, e.High);
+            if (line > -1)
+            {
+                m_Cart.Unsell(line);
+                CartChanged();
+                return;
+            }
+            if (zone == ZONE_NONE || zone == ZONE_SELL)
+                AddSell(e.Low, e.High);
+        }
+    }
+
+    protected int SellLineOf(int low, int high)
+    {
+        for (int i = 0; i < m_Cart.Sells.Count(); i++)
+        {
+            if (m_Cart.Sells[i].Low == low && m_Cart.Sells[i].High == high)
+                return i;
+        }
+        return -1;
     }
 
     // ---- what the player does ----------------------------------------------------------------------
@@ -1541,6 +1929,8 @@ class OZT_TradeMenu : UIScriptedMenu
             t = m_BuyGrid.Of(w);
         if (!t)
             t = m_SellGrid.Of(w);
+        if (!t && m_Parts)
+            t = m_Parts.TileAt(w);
         if (t)
             return t;
         // A slot's tile: the widget itself or anything inside it.
@@ -1595,6 +1985,10 @@ class OZT_TradeMenu : UIScriptedMenu
         m_ToldKey = told;
         m_ToldAt = now;
         OZT_Log.Dbg("act: " + told);
+        m_ActEntry = null;
+        m_ActDropEntry = null;
+        if (t.Kind == OZT_Tile.PART && m_Parts)
+            m_ActEntry = m_Parts.EntryOfTile(t);
         m_ActKind = t.Kind;
         m_ActType = t.Type;
         m_ActLow = t.Low;
@@ -1638,6 +2032,17 @@ class OZT_TradeMenu : UIScriptedMenu
             GetMousePos(m_TurnFrom, my);
             m_Turning = true;
             return true;
+        }
+
+        if (m_Parts)
+        {
+            int cell = m_Parts.EntryAt(w);
+            OZT_PartsEntry slot = m_Parts.Entry(cell);
+            if (slot && slot.What == OZT_PartsEntry.EMPTY)
+            {
+                AimFilter(slot, cell);
+                return true;
+            }
         }
 
         OZT_Tile t = TileOf(w);
@@ -1850,7 +2255,11 @@ class OZT_TradeMenu : UIScriptedMenu
             OZT_Log.Dbg("drop: " + m_Dragged.Type + " on '" + name + "', zone " + onto.ToString());
             // A drop on nothing asks for nothing.
             if (onto != ZONE_NONE)
+            {
                 AskAct(m_Dragged, onto);
+                if (m_Parts)
+                    m_ActDropEntry = m_Parts.Entry(m_Parts.EntryAt(under));
+            }
             EndDrag();
         }
         m_Held = null;
@@ -1907,6 +2316,8 @@ class OZT_TradeMenu : UIScriptedMenu
             return zone != ZONE_BUY && zone != ZONE_NONE;
         if (kind == OZT_Tile.SELL)
             return zone != ZONE_SELL && zone != ZONE_NONE;
+        if (kind == OZT_Tile.PART)
+            return zone == ZONE_OWN || zone == ZONE_SELL;
         return false;
     }
 
@@ -1941,6 +2352,27 @@ class OZT_TradeMenu : UIScriptedMenu
             return;
         if (m_ActZone != ZONE_NONE && !ZoneTakes(kind, m_ActZone))
             return;
+
+        if (kind == OZT_Tile.PART)
+        {
+            PartAct(m_ActEntry, m_ActZone);
+            return;
+        }
+        // Goods onto an empty slot of the strip: dropped there, or a double
+        // click while the shelf shows what fits the slot.
+        if (kind == OZT_Tile.SHELF)
+        {
+            OZT_PartsEntry onto = m_ActDropEntry;
+            if (!onto || onto.What != OZT_PartsEntry.EMPTY)
+                onto = null;
+            if (!onto && m_ActZone == ZONE_NONE)
+                onto = m_Filter;
+            if (onto)
+            {
+                FitGoods(m_ActType, onto);
+                return;
+            }
+        }
 
         if (kind == OZT_Tile.SHELF)
             AddBuy(m_ActType);
@@ -2035,6 +2467,7 @@ class OZT_TradeMenu : UIScriptedMenu
         m_DirtyOwn = true;
         m_DirtySlots = true;
         m_DirtyCarts = true;
+        m_DirtyParts = true;
         if (m_Cart.IsEmpty())
             m_QuoteIn = -1;
         else

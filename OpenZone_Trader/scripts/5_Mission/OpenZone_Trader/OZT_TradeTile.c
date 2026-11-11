@@ -13,6 +13,7 @@ class OZT_Tile
     static const int OWN   = 2;   // a thing the player carries
     static const int BUY   = 3;   // a line of the BUY cart
     static const int SELL  = 4;   // a line of the SELL cart
+    static const int PART  = 5;   // a part in the parts strip
 
     static const string LAYOUT = "OpenZone_Trader/gui/layouts/ozt_trade_tile.layout";
     static const string ROOT   = "OZT_TradeTile";
@@ -32,8 +33,14 @@ class OZT_Tile
     int Price;
     int Count;
 
-    // 0: can be sold. 1: the trader does not take it. 2: not empty.
+    // 0: can be sold. 1: the trader does not take it. 2: not empty (in the
+    // strip: kept). 3: bought in this deal. 4: rides on a part that stays.
     int Why;
+
+    // A part's price the player pays (rounded up on the tile), and the
+    // number of parts a BUY line fits to its thing.
+    bool Pays;
+    int Parts;
 
     // A line of a cart, or the place in the list the tile was made from.
     int Index;
@@ -151,7 +158,7 @@ class OZT_Tile
             // Short on every tile, so that a small thing's large price fits;
             // the card has the exact sum. What the player pays is rounded up,
             // what the player is paid down.
-            bool pays = Kind == SHELF || Kind == BUY;
+            bool pays = Kind == SHELF || Kind == BUY || Pays;
             if (Price > 0)
                 m_PriceText.SetText(OZT_Ui.Short(Price, pays));
             else if (Price < 0)
@@ -170,13 +177,18 @@ class OZT_Tile
         }
         if (m_QtyTop)
         {
-            m_QtyTop.Show(Count > 0 && !wide);
-            if (Count > 0)
-                m_QtyTop.SetText(Count.ToString());
+            bool top = Count > 0 && !wide;
+            string word = "";
+            if (top)
+                word = Count.ToString();
+            else if (Parts > 0)
+                word = "+" + Parts.ToString();
+            m_QtyTop.Show(word != "");
+            m_QtyTop.SetText(word);
         }
         if (m_No)
         {
-            m_No.Show(Why != 0);
+            m_No.Show(Why == 1 || Why == 2);
             if (Why == 2)
                 m_No.SetColor(OZT_Look.Alert());
             else
@@ -210,6 +222,14 @@ class OZT_Tile
         {
             edge = OZT_Look.FullEdge();
             bed = OZT_Look.FullTile();
+        }
+        else if (Why == 3)
+        {
+            edge = OZT_Look.Accent();
+        }
+        else if (Why == 4)
+        {
+            bed = OZT_Look.Dark();
         }
         if (on)
         {

@@ -52,6 +52,14 @@ and a pile of twelve 7.62x39 rounds in the pants. The screen is opened by the se
 | S.34 | a later build: the cursor rests on the pistol, which comes with its magazine | the card: ИЖ-70, the price 710, "У комплекті: Магазин ИЖ-70, 12 пат.", "Торговець дає за нову 325" | nothing asked |
 | S.35 | a double click on the pistol, F | BUY holds the pistol at 710, ВИ ПЛАТИТЕ -710, "Усе вміщується у ваші речі"; the first F came before the quote and did nothing, the second made the deal | `deal ... +MakarovIJ70x1=710(1 parts)` |
 | S.33 | prices written for the look: 9 995, 12 350 and 12 345, 125 000, 1 250 000 | on the shelf "9 995" on a tile one cell wide, "12.4к" twice (rounded up), "125к", "1.3М"; the player's bandage, which the trader pays 12 345 for, "12.3к" (rounded down) | nothing asked |
+| S.36 | phase 3c's build with the panel art (`tools/panels.py`, the owner: "very much like the inventory of STALKER 2"), Ukrainian, 1920x1080 | six dark plates in worn steel whose outlines are not true rectangles, a title band on each, the grids and tabs inside; the palette of S.31 under them | `open` answered |
+| S.37 | the shelf's helmet selected; a click on the empty NVG slot of its strip; a double click on the goggles | the strip under the character: the NVG and flashlight slots; the shelf filtered to what fits the slot, its head "Підбір: ..." in amber; then BUY holds the helmet with "+1", 2 400, and the quote stands | `quote` answered |
+| S.38 | the goggles' empty battery slot in the strip, then a double click on the shelf's 9 V battery (the only tile left), F | "Підбір: Батарея на 9 В"; the line "+2", 2 420; "Угоду укладено", 17 580 | the dump: the helmet on the head, the goggles in its NVG slot, a battery in them; client and server the same (`task3c-fitted-from-screen`) |
+| S.39 | a double click on the rifle's slot tile, then a click on its tile in SELL | SELL 1 790; the strip: the handguard, the buttstock and the suppressor red (not taken), the magazine 90, its thirty rounds 150, the scope 300 and the scope's battery slot, the bayonet's empty slot; "Залишаться у вас частини: 3" | `quote` answered |
+| S.40 | a double click on the magazine in the strip, again, then on the rounds | the magazine kept with its rounds: 1 550, "частини: 4"; sold again: 1 790; the rounds kept alone: 1 640, "Залишаться у вас частини: 3. Повернуться набої: 30" | `quote` answered each time |
+| S.41 | F | "Угоду укладено", 19 220 | the dump: the rifle and its magazine gone, the three parts in the jacket, the thirty rounds back as piles of 20 and 10; the same on both sides (`task3c-sold-keep-rounds`) |
+| S.42 | a scope of the player's own in the hands (the bridge put it there), selected; a click on its empty battery slot, a double click on the battery | the strip shows the battery in the scope's slot with the accent edge, BUY a line of 20; F: done, 19 200 | the dump: the battery on the scope in the hands; the same on both sides (`task3c-onto-own-scope`) |
+| S.43 | the shelf's helmet bought, the goggles fitted (+1, 2 400), a double click on the fitted goggles | the helmet back to 900. The first build lost the selection with the part's tile and the strip went empty; the next keeps the helmet selected and its strip open (the thing the strip shows is picked again when a part leaves it) | `quote` answered |
 
 No `SCRIPT (E)` line and no `ERROR` line in the client's or the server's log of any of
 these runs; the boots' verdicts were a pass.
@@ -60,8 +68,8 @@ Not covered by these runs: walking after the screen has closed (the calls that g
 controls back are the probe menu's, measured in phase 2a; the gamepad was left alone, the
 owner was at the machine); real input at 3840x1600 (S.20 is a look, the window stood off the
 desktop); the price list with more lines than it shows at once; a deal refused for want of
-room, seen from the screen; a second client; choosing on the screen which parts to keep
-(the screen sells a thing whole: phase 3c).
+room, seen from the screen; a second client; the parts strip in English (its hints were
+seen in English, S.43, the gestures in Ukrainian).
 
 ## What was learned on the way
 

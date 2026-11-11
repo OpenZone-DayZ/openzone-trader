@@ -5,6 +5,16 @@
 // price for one times the count (the server's own rule for a buy), and a sold
 // line shows what `open` said the thing brings as it is, with everything on it.
 
+// A part fitted to the thing a BUY line buys: goods of the trader at their
+// own price, hanging on the thing (On below zero) or on an earlier part.
+class OZT_CartFit
+{
+    string Type;
+    string SlotName;
+    int On;
+    int Each;
+}
+
 class OZT_CartLine
 {
     bool Selling;
@@ -28,16 +38,55 @@ class OZT_CartLine
     // What the last quote said for the line; below zero until it answers.
     int Price;
 
+    // Bought: the parts fitted to the thing, and, for a part bought onto a
+    // thing the player carries, that thing and the slot.
+    ref array<ref OZT_CartFit> Fits;
+    int OnLow;
+    int OnHigh;
+    string OnSlot;
+
+    // Sold: the parts that come off and stay, and the things whose loaded
+    // rounds stay (Rounds 1).
+    ref array<ref OZT_WireKeep> Keep;
+
+    void OZT_CartLine()
+    {
+        Fits = new array<ref OZT_CartFit>();
+        Keep = new array<ref OZT_WireKeep>();
+    }
+
+    bool IsOnto()
+    {
+        return OnLow != 0 || OnHigh != 0;
+    }
+
     // What the line shows before a quote answers.
     int Shown()
     {
         if (Price >= 0)
             return Price;
         if (!Selling)
-            return Each * Count;
+        {
+            int sum = Each * Count;
+            for (int i = 0; i < Fits.Count(); i++)
+                sum = sum + Fits[i].Each;
+            return sum;
+        }
         if (Count == 0 || Count >= Units)
             return Whole;
         return -1;
+    }
+
+    // Does the line keep this part, or the rounds loaded in this thing?
+    bool Keeps(int low, int high, int rounds)
+    {
+        for (int i = 0; i < Keep.Count(); i++)
+        {
+            OZT_WireKeep k = Keep[i];
+            if (k.Low == low && k.High == high && k.Rounds == rounds)
+                return true;
+        }
+        return false;
     }
 }
 
@@ -77,14 +126,16 @@ class OZT_Cart
             Sells[s].Price = -1;
     }
 
-    // More of a class into the BUY cart; one line per class.
+    // More of a class into the BUY cart; one line per class, besides the
+    // lines that carry parts or go onto a thing (those buy one each).
     void Buy(string type, int count, int each, int most)
     {
         OZT_CartLine line;
         for (int i = 0; i < Buys.Count(); i++)
         {
-            if (Buys[i].Type == type)
-                line = Buys[i];
+            OZT_CartLine have = Buys[i];
+            if (have.Type == type && have.Fits.Count() == 0 && !have.IsOnto())
+                line = have;
         }
         if (!line)
         {
@@ -96,6 +147,128 @@ class OZT_Cart
         line.Count = line.Count + count;
         if (line.Count > most)
             line.Count = most;
+        MarkChanged();
+    }
+
+    // One piece of goods on a line of its own, to fit parts to. Returns the
+    // line's index.
+    int BuyOne(string type, int each)
+    {
+        OZT_CartLine line = new OZT_CartLine();
+        line.Type = type;
+        line.Each = each;
+        line.Count = 1;
+        Buys.Insert(line);
+        MarkChanged();
+        return Buys.Count() - 1;
+    }
+
+    // A line that buys more than one piece gives one piece a line of its own,
+    // to fit parts to. Returns the index of the line of one.
+    int SplitOne(int index)
+    {
+        if (index < 0 || index >= Buys.Count())
+            return -1;
+        OZT_CartLine line = Buys[index];
+        if (line.Count <= 1)
+            return index;
+        line.Count = line.Count - 1;
+        return BuyOne(line.Type, line.Each);
+    }
+
+    void AddFit(int index, string type, string slot, int on, int each)
+    {
+        if (index < 0 || index >= Buys.Count())
+            return;
+        OZT_CartFit fit = new OZT_CartFit();
+        fit.Type = type;
+        fit.SlotName = slot;
+        fit.On = on;
+        fit.Each = each;
+        Buys[index].Fits.Insert(fit);
+        MarkChanged();
+    }
+
+    // A fitted part off its line, and every part that hangs on it.
+    void DropFit(int index, int fit)
+    {
+        if (index < 0 || index >= Buys.Count())
+            return;
+        array<ref OZT_CartFit> fits = Buys[index].Fits;
+        if (fit < 0 || fit >= fits.Count())
+            return;
+        array<int> gone = new array<int>();
+        gone.Insert(fit);
+        bool grew = true;
+        while (grew)
+        {
+            grew = false;
+            for (int i = 0; i < fits.Count(); i++)
+            {
+                if (gone.Find(i) < 0 && gone.Find(fits[i].On) > -1)
+                {
+                    gone.Insert(i);
+                    grew = true;
+                }
+            }
+        }
+        array<ref OZT_CartFit> kept = new array<ref OZT_CartFit>();
+        array<int> moved = new array<int>();
+        for (int k = 0; k < fits.Count(); k++)
+        {
+            if (gone.Find(k) > -1)
+            {
+                moved.Insert(-1);
+                continue;
+            }
+            moved.Insert(kept.Count());
+            kept.Insert(fits[k]);
+        }
+        for (int m = 0; m < kept.Count(); m++)
+        {
+            if (kept[m].On >= 0)
+                kept[m].On = moved[kept[m].On];
+        }
+        Buys[index].Fits = kept;
+        MarkChanged();
+    }
+
+    // A part bought onto a thing the player carries. Returns the line.
+    int BuyOnto(string type, int each, int low, int high, string slot)
+    {
+        OZT_CartLine line = new OZT_CartLine();
+        line.Type = type;
+        line.Each = each;
+        line.Count = 1;
+        line.OnLow = low;
+        line.OnHigh = high;
+        line.OnSlot = slot;
+        Buys.Insert(line);
+        MarkChanged();
+        return Buys.Count() - 1;
+    }
+
+    // Keep a part of a sold thing, or its loaded rounds, or sell it again.
+    void ToggleKeep(int index, int low, int high, int rounds)
+    {
+        if (index < 0 || index >= Sells.Count())
+            return;
+        OZT_CartLine line = Sells[index];
+        for (int i = 0; i < line.Keep.Count(); i++)
+        {
+            OZT_WireKeep k = line.Keep[i];
+            if (k.Low == low && k.High == high && k.Rounds == rounds)
+            {
+                line.Keep.RemoveOrdered(i);
+                MarkChanged();
+                return;
+            }
+        }
+        OZT_WireKeep add = new OZT_WireKeep();
+        add.Low = low;
+        add.High = high;
+        add.Rounds = rounds;
+        line.Keep.Insert(add);
         MarkChanged();
     }
 
@@ -197,6 +370,13 @@ class OZT_Cart
         }
         for (int b = Buys.Count() - 1; b >= 0; b--)
         {
+            OZT_CartLine onto = Buys[b];
+            if (onto.IsOnto() && !GetGame().GetObjectByNetworkId(onto.OnLow, onto.OnHigh))
+            {
+                Buys.RemoveOrdered(b);
+                dropped++;
+                continue;
+            }
             bool sold = false;
             for (int g = 0; g < data.Goods.Count(); g++)
             {
@@ -229,13 +409,27 @@ class OZT_Cart
             ws.Low = Sells[s].Low;
             ws.High = Sells[s].High;
             ws.Count = Sells[s].Count;
+            for (int k = 0; k < Sells[s].Keep.Count(); k++)
+                ws.Keep.Insert(Sells[s].Keep[k].Copy());
             req.Sells.Insert(ws);
         }
         for (int b = 0; b < Buys.Count(); b++)
         {
+            OZT_CartLine line = Buys[b];
             OZT_WireBuy wb = new OZT_WireBuy();
-            wb.ClassName = Buys[b].Type;
-            wb.Count = Buys[b].Count;
+            wb.ClassName = line.Type;
+            wb.Count = line.Count;
+            wb.OnLow = line.OnLow;
+            wb.OnHigh = line.OnHigh;
+            wb.SlotName = line.OnSlot;
+            for (int f = 0; f < line.Fits.Count(); f++)
+            {
+                OZT_WireFit wf = new OZT_WireFit();
+                wf.ClassName = line.Fits[f].Type;
+                wf.SlotName = line.Fits[f].SlotName;
+                wf.On = line.Fits[f].On;
+                wb.Fit.Insert(wf);
+            }
             req.Buys.Insert(wb);
         }
         string json;

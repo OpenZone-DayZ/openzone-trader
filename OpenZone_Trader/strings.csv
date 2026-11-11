@@ -45,7 +45,7 @@ STR_OZT_UI_EMPTY_DEAL,Куплене й решта лягають у перше 
 STR_OZT_UI_LOADING,Чекаємо на торговця...,Waiting for the trader...
 STR_OZT_UI_HELLO,"Клацніть річ, щоб вибрати її. Двічі клацніть або перетягніть, щоб додати до угоди.","Click an item to select it. Double-click or drag it to move it into the deal."
 STR_OZT_UI_DONE,Угоду укладено,The deal is done
-STR_OZT_UI_KEYS,ЛКМ - вибрати     2xЛКМ або перетягнути - в угоду     F - підтвердити     R - очистити     Esc - закрити,LMB - select     2xLMB or drag - into the deal     F - confirm     R - clear     Esc - close
+STR_OZT_UI_KEYS,ЛКМ - вибрати     2xЛКМ або перетягнути - в угоду     F - підтвердити     R - очистити     P - прайс     Esc - закрити,LMB - select     2xLMB or drag - into the deal     F - confirm     R - clear     P - price list     Esc - close
 STR_OZT_UI_WHY_NOT_TAKEN,Торговець це не бере,The trader does not take this
 STR_OZT_UI_WHY_NOT_EMPTY,"Спершу спорожніть: щось лежить у ній або закріплене на ній","Empty it first: something is in it or on it"
 STR_OZT_UI_PRICE,Ціна,Price
@@ -59,3 +59,18 @@ STR_OZT_UI_OK_BUY,КУПИТИ,BUY
 STR_OZT_UI_OK_SELL,ПРОДАТИ,SELL
 STR_OZT_UI_EACH,%1 за одиницю,%1 each
 STR_OZT_UI_WHOLE,%1 за все,%1 for all of it
+# The item card and the price list.
+STR_OZT_UI_PER_UNIT,Ціна за одиницю,Price per unit
+STR_OZT_UI_SIZE,Розмір в інвентарі,Size in inventory
+STR_OZT_UI_HOLDS,Місткість,Cargo
+STR_OZT_UI_IN_STACK,У стосі,In the stack
+STR_OZT_UI_FULL_STACK,Повний стос,A full stack
+STR_OZT_UI_COUNT,Кількість,Count
+STR_OZT_UI_PAYS_NEW,Торговець дає за нову,The trader pays for a pristine one
+STR_OZT_UI_SELLS_FOR,Ціна в торговця,The trader sells it for
+STR_OZT_UI_CLOSE,ЗАКРИТИ,CLOSE
+STR_OZT_UI_COL_ITEM,ТОВАР,ITEM
+STR_OZT_UI_COL_SELLS,ТОРГОВЕЦЬ ПРОДАЄ,TRADER SELLS FOR
+STR_OZT_UI_COL_PAYS,ТОРГОВЕЦЬ ПЛАТИТЬ,TRADER PAYS YOU
+STR_OZT_UI_PER_UNIT_NOTE,за одиницю,per unit
+STR_OZT_UI_LIST_NOTE,"Торговець платить вказану суму за нову річ. Знос її зменшує: зношена - %1%, пошкоджена - %2%, сильно пошкоджена - %3%. Зруйновані речі торговець не бере.","What the trader pays is shown for a pristine item. Wear lowers it: worn %1%, damaged %2%, badly damaged %3%. Ruined items are not taken."

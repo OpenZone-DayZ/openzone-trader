@@ -412,9 +412,7 @@
                         ],
                         "text": "#STR_OZT_UI_PRICE_LIST",
                         "font": "hint",
-                        "color": "$text",
-                        "hidden": true,
-                        "note": "Shown when the price list is built."
+                        "color": "$text"
                       }
                     }
                   ]

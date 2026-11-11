@@ -1,0 +1,330 @@
+{
+  "layout": "ozt_trade_card",
+  "note": "The item card of the trade screen (OZT_TradeCard.c): what a tile under the resting cursor is. A window of its own on the workspace at 952, over the screen and its pictures; it ignores the pointer whole, so the tile under it stays the tile under the cursor. ItemWeightWidget and ItemDamageWidget with their Background chips carry the names the game's own inspect window fills (InspectMenuNew.UpdateItemInfoWeight and UpdateItemInfoDamage), so weight and condition read as they do in the inventory. CardBody is a spacer: the description and the lines under it take the height they need, and the menu sizes the card to it.",
+  "root": {
+    "panel": {
+      "name": "OZT_TradeCard",
+      "size": [
+        400,
+        320
+      ],
+      "color": "$edge",
+      "priority": 952,
+      "children": [
+        {
+          "panel": {
+            "name": "CardIn",
+            "size": "fill",
+            "color": "$none",
+            "children": [
+              {
+                "panel": {
+                  "name": "CardBg",
+                  "at": [
+                    1,
+                    1
+                  ],
+                  "size": [
+                    398,
+                    318
+                  ],
+                  "color": "$panel"
+                }
+              },
+              {
+                "panel": {
+                  "name": "CardHead",
+                  "at": [
+                    1,
+                    1
+                  ],
+                  "size": [
+                    398,
+                    44
+                  ],
+                  "color": "$head",
+                  "children": [
+                    {
+                      "label": {
+                        "name": "CardName",
+                        "size": "fill",
+                        "font": "header",
+                        "color": "$text",
+                        "align": "center"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "panel": {
+                  "name": "ItemWeightWidgetBackground",
+                  "at": [
+                    16,
+                    56
+                  ],
+                  "size": [
+                    170,
+                    24
+                  ],
+                  "color": "$none",
+                  "hidden": true
+                }
+              },
+              {
+                "label": {
+                  "name": "ItemWeightWidget",
+                  "at": [
+                    22,
+                    56
+                  ],
+                  "size": [
+                    160,
+                    24
+                  ],
+                  "font": "small",
+                  "color": "$text"
+                }
+              },
+              {
+                "panel": {
+                  "name": "ItemDamageWidgetBackground",
+                  "at": [
+                    16,
+                    84
+                  ],
+                  "size": [
+                    170,
+                    24
+                  ],
+                  "color": "$none",
+                  "hidden": true
+                }
+              },
+              {
+                "label": {
+                  "name": "ItemDamageWidget",
+                  "at": [
+                    22,
+                    84
+                  ],
+                  "size": [
+                    160,
+                    24
+                  ],
+                  "font": "small",
+                  "color": "$text"
+                }
+              },
+              {
+                "label": {
+                  "name": "CardPriceLabel",
+                  "at": [
+                    190,
+                    54
+                  ],
+                  "size": [
+                    194,
+                    22
+                  ],
+                  "font": "small",
+                  "color": "$muted",
+                  "align": "right"
+                }
+              },
+              {
+                "label": {
+                  "name": "CardPrice",
+                  "at": [
+                    190,
+                    76
+                  ],
+                  "size": [
+                    194,
+                    32
+                  ],
+                  "font": "sum",
+                  "color": "$gold",
+                  "align": "right"
+                }
+              },
+              {
+                "stack": {
+                  "name": "CardBody",
+                  "at": [
+                    16,
+                    120
+                  ],
+                  "w": 368,
+                  "children": [
+                    {
+                      "text": {
+                        "name": "CardDesc",
+                        "font": "small",
+                        "color": "$text"
+                      }
+                    },
+                    {
+                      "gap": {
+                        "name": "CardGap",
+                        "h": 8
+                      }
+                    },
+                    {
+                      "frame": {
+                        "name": "CardRow0",
+                        "size": [
+                          368,
+                          20
+                        ],
+                        "children": [
+                          {
+                            "label": {
+                              "name": "CardKey0",
+                              "size": "fill",
+                              "font": "small",
+                              "color": "$muted"
+                            }
+                          },
+                          {
+                            "label": {
+                              "name": "CardVal0",
+                              "size": "fill",
+                              "font": "small",
+                              "color": "$text",
+                              "align": "right"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "frame": {
+                        "name": "CardRow1",
+                        "size": [
+                          368,
+                          20
+                        ],
+                        "children": [
+                          {
+                            "label": {
+                              "name": "CardKey1",
+                              "size": "fill",
+                              "font": "small",
+                              "color": "$muted"
+                            }
+                          },
+                          {
+                            "label": {
+                              "name": "CardVal1",
+                              "size": "fill",
+                              "font": "small",
+                              "color": "$text",
+                              "align": "right"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "frame": {
+                        "name": "CardRow2",
+                        "size": [
+                          368,
+                          20
+                        ],
+                        "children": [
+                          {
+                            "label": {
+                              "name": "CardKey2",
+                              "size": "fill",
+                              "font": "small",
+                              "color": "$muted"
+                            }
+                          },
+                          {
+                            "label": {
+                              "name": "CardVal2",
+                              "size": "fill",
+                              "font": "small",
+                              "color": "$text",
+                              "align": "right"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "frame": {
+                        "name": "CardRow3",
+                        "size": [
+                          368,
+                          20
+                        ],
+                        "children": [
+                          {
+                            "label": {
+                              "name": "CardKey3",
+                              "size": "fill",
+                              "font": "small",
+                              "color": "$muted"
+                            }
+                          },
+                          {
+                            "label": {
+                              "name": "CardVal3",
+                              "size": "fill",
+                              "font": "small",
+                              "color": "$text",
+                              "align": "right"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "frame": {
+                        "name": "CardRow4",
+                        "size": [
+                          368,
+                          20
+                        ],
+                        "children": [
+                          {
+                            "label": {
+                              "name": "CardKey4",
+                              "size": "fill",
+                              "font": "small",
+                              "color": "$muted"
+                            }
+                          },
+                          {
+                            "label": {
+                              "name": "CardVal4",
+                              "size": "fill",
+                              "font": "small",
+                              "color": "$text",
+                              "align": "right"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "text": {
+                        "name": "CardWhy",
+                        "font": "small",
+                        "color": "$bad",
+                        "hidden": true
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

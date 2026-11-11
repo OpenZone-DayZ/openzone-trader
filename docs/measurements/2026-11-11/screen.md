@@ -32,14 +32,20 @@ and a pile of twelve 7.62x39 rounds in the pants. The screen is opened by the se
 | S.13 | key F in the dialog, then the pile sold whole through its dialog (ALL, SELL), key F | BUY nails 99 for 495, SELL rounds 12 for 60; YOU PAY -435, money after 1 565; then the deal is done | `net 435 (items): -Ammo_762x39x12=60 +Nailx99=495` |
 | S.14 | a tab of the shelf, a drag on the live view, key Esc | the tab's goods only; the character turns with the mouse; the screen closes, the cursor goes, the HUD is back | nothing asked |
 | S.15 | the Ukrainian strings at 1920x1080: S.4's deal put together again, then S.8's | every title, label and line of the screen in Ukrainian and inside its box; the tiles 44 pixels a cell; "Бракує грошей" and "Бракує 500" in red | `quote` answered, then refused |
+| S.16 | the cursor rested on the shelf's backpack (`tools/hover.py`), 1920x1080, English and Ukrainian | the card beside the tile, over the pictures of the tiles under it: the name, "about 1 kg" and "pristine" on the game's own chips, Price 400, the game's description, Size in inventory 4 x 5, Cargo 6 x 5, The trader pays for a pristine one 200 | nothing asked |
+| S.17 | the cursor rested on a case of the player's that the trader does not take, by the right edge | the card on the left of the tile; The trader pays: a dash; "The trader does not take this" in red | nothing asked |
+| S.18 | key P (and the button PRICE LIST) | the price list over the screen: the trader's name, tabs, ten lines with a picture, the name, what the trader sells it for and what he pays ("per unit" under rounds and nails, a dash where he does not take a thing), the note on wear with the server's own factors (85, 60, 35) | nothing asked: built from the answer of `open` |
+| S.19 | a tab of the list, key Esc, key P twice, the button PRICE LIST, the list's CLOSE | the tab's three lines; Esc closes the list and leaves the screen; P opens it and closes it; the button opens it and CLOSE closes it | nothing asked |
+| S.20 | the screen at 3840x1600, Ukrainian (the window moved off the desktop, the frame captured there) | the body in the middle of the wide screen, 65 pixels a cell, every tile on its grid lines, every text inside its box | `open` answered |
 
 No `SCRIPT (E)` line and no `ERROR` line in the client's or the server's log of any of
 these runs; the boots' verdicts were a pass.
 
 Not covered by these runs: walking after the screen has closed (the calls that give the
 controls back are the probe menu's, measured in phase 2a; the gamepad was left alone, the
-owner was at the machine); the screen at 3840x1600; a deal refused for want of room, seen
-from the screen; a second client.
+owner was at the machine); real input at 3840x1600 (S.20 is a look, the window stood off the
+desktop); the price list with more lines than it shows at once; a deal refused for want of
+room, seen from the screen; a second client.
 
 ## What was learned on the way
 
@@ -72,6 +78,23 @@ from the screen; a second client.
   descriptions are the game's own strings: on the stand's Ukrainian check they are Russian,
   as they are for a Ukrainian player on a Russian client. Two slot names of that language
   are wider than a slot tile and are cut ("Верхняя одежда", "Нарукавная повязка").
+- **The game's own inspect helpers fill any window that names its widgets their way.**
+  `InspectMenuNew.UpdateItemInfoWeight(root, item)` and `UpdateItemInfoDamage(root, item)`
+  are static; they set `ItemWeightWidget` and `ItemDamageWidget` under the root they are
+  given and colour `ItemWeightWidgetBackground` and `ItemDamageWidgetBackground`. The card
+  has those four and says weight and condition in the game's words and colours, in the
+  client's language, for a real thing and for a shelf's stand-in alike.
+- **Rows that size themselves to their text share a line in a wrap spacer**: two short
+  rows of the card stood side by side. A row of the spacer's own width, the key at its
+  left and the value at its right, stands alone.
+- **A spacer takes the pointer unless told otherwise**; the card's are flagged
+  `IGNOREPOINTER` when it is made, so that nothing of the card ever lies under the cursor.
+- **A card's height is its content's two frames later.** The card is laid out off the
+  screen (`SetPos(-4000, 0)`, shown), and two frames on its spacer's `GetScreenSize` is the
+  content's height; then it is sized and put beside the tile. No flicker was seen.
+- **A window moved off the desktop is still captured.** The client at 3840x1600 was moved
+  to x = 3900 as soon as its window existed (`SetWindowPos`, no activation); the MCP's
+  screenshot of it was a full, live frame, and the owner's desktop was never covered.
 - **A trap of this machine, not of the screen.** The owner's taskbar stands at the left
   edge of the desktop, 80 pixels wide, and the client's window opens in the top left
   corner, under it. Real clicks at client x below 77 went to the taskbar: for an hour the

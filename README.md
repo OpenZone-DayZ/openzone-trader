@@ -12,10 +12,11 @@ The server half works for plain items: the three JSON files, the price book, ite
 the inventory model and the deal, driven on the test stand by scripted deals
 ([docs/measurements](docs/measurements)). The trade screen works for plain items too: the
 shelf, your own things and your character's slots, a deal put together by double click or
-by dragging, how many of a stack, the server's verdict before you confirm
+by dragging, how many of a stack, the server's verdict before you confirm, a card for the
+thing under the cursor and the trader's price list
 ([screen.md](docs/measurements/2026-11-11/screen.md)). It is opened by a stand command:
-the trader's action in the world, items with parts, the card and the price list come with
-their own phases, so there is still nothing to play. The plans are in [docs](docs); the
+the trader's action in the world and items with parts come with their own phases, so
+there is still nothing to play. The plans are in [docs](docs); the
 design note lives beside the repositories of the series, in
 `docs/specs/2026-11-10-openzone-trader-design.md`.
 
@@ -34,8 +35,9 @@ tools. They are never published and no server should load them.
 предметами, модель інвентаря та угода), її перевірено на стенді сценарними угодами. Екран
 обміну теж працює для простих речей: полиця торговця, ваші речі, слоти персонажа, угода
 подвійним клацанням або перетягуванням, кількість зі стосу, вердикт сервера до
-підтвердження. Відкривається він поки що командою стенда: дія торговця у світі, речі з
-частинами, картка товару та прайс — попереду, тож грати ще нема в що.
+підтвердження, картка речі під курсором і прайс торговця. Відкривається він поки що
+командою стенда: дія торговця у світі та речі з частинами — попереду, тож грати ще нема
+в що.
 
 ## Licence
 

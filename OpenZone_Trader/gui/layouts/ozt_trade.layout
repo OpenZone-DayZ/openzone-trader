@@ -441,9 +441,8 @@ FrameWidgetClass OZT_Trade {
        "text halign" left
        "text valign" center
       }
-      // Shown when the price list is built.
       ButtonWidgetClass ListBtn {
-       visible 0
+       visible 1
        position 404 506
        size 140 42
        hexactpos 1

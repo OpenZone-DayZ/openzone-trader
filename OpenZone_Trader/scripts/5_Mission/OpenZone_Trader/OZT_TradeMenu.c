@@ -38,6 +38,9 @@ class OZT_TradeMenu : UIScriptedMenu
     // A press becomes a drag after this many pixels.
     static const int DRAG_FROM = 6;
 
+    // The card comes up when the cursor has rested on a tile this long.
+    static const float CARD_AFTER = 0.35;
+
     // Where a tile was dropped.
     static const int ZONE_NONE  = 0;
     static const int ZONE_BUY   = 1;
@@ -137,6 +140,12 @@ class OZT_TradeMenu : UIScriptedMenu
     protected bool m_OpenFlying;
     protected bool m_DealFlying;
 
+    // The item card and the tile the cursor rests on; the price list.
+    protected ref OZT_Card m_Card;
+    protected ref OZT_PriceList m_List;
+    protected OZT_Tile m_Hover;
+    protected float m_HoverFor;
+
     // The quantity dialog, and what it wants the server to price: a part of
     // one stack, asked as a quote of that one line when no other is on its way.
     protected ref OZT_QtyDialog m_Qty;
@@ -200,6 +209,8 @@ class OZT_TradeMenu : UIScriptedMenu
         m_CharPanel = layoutRoot.FindAnyWidget("CharPanel");
         m_View = PlayerPreviewWidget.Cast(layoutRoot.FindAnyWidget("CharView"));
         m_Qty = new OZT_QtyDialog(this);
+        m_Card = new OZT_Card();
+        m_List = new OZT_PriceList();
         m_Ghost = layoutRoot.FindAnyWidget("TradeGhost");
         m_GhostPic = ItemPreviewWidget.Cast(layoutRoot.FindAnyWidget("GhostPic"));
         return layoutRoot;
@@ -243,8 +254,13 @@ class OZT_TradeMenu : UIScriptedMenu
         ClearSlots();
         m_Held = null;
         m_Dragged = null;
+        m_Hover = null;
         if (m_Qty)
             m_Qty.Destroy();
+        if (m_Card)
+            m_Card.Destroy();
+        if (m_List)
+            m_List.Destroy();
         if (m_ShelfGrid)
         {
             m_ShelfGrid.Clear();
@@ -299,6 +315,8 @@ class OZT_TradeMenu : UIScriptedMenu
         {
             if (m_Qty && m_Qty.IsOpen())
                 m_Qty.Shut();
+            else if (m_List && m_List.IsOpen())
+                m_List.Shut();
             else
             {
                 CloseTrade();
@@ -316,6 +334,7 @@ class OZT_TradeMenu : UIScriptedMenu
 
         TurnPlayer();
         DragFrame();
+        HoverFrame(timeslice);
 
         if (!LeftDown() && !m_Dragged)
         {
@@ -758,6 +777,7 @@ class OZT_TradeMenu : UIScriptedMenu
     protected void FillShelf()
     {
         m_DirtyShelf = false;
+        DropHover();
         if (!m_Data || !m_ShelfGrid.IsReady())
             return;
         m_ShelfGrid.Clear();
@@ -787,6 +807,7 @@ class OZT_TradeMenu : UIScriptedMenu
     protected void FillOwn()
     {
         m_DirtyOwn = false;
+        DropHover();
         if (!m_Data || !m_OwnGrid.IsReady())
             return;
         m_OwnGrid.Clear();
@@ -882,6 +903,7 @@ class OZT_TradeMenu : UIScriptedMenu
     protected void FillSlots()
     {
         m_DirtySlots = false;
+        DropHover();
         Widget host = layoutRoot.FindAnyWidget("CharSlots");
         PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
         if (!m_Data || !host || !player)
@@ -976,6 +998,7 @@ class OZT_TradeMenu : UIScriptedMenu
     protected void FillCarts()
     {
         m_DirtyCarts = false;
+        DropHover();
         if (!m_BuyGrid.IsReady() || !m_SellGrid.IsReady())
             return;
         m_BuyGrid.Clear();
@@ -1463,6 +1486,11 @@ class OZT_TradeMenu : UIScriptedMenu
             ClearDeal();
             return true;
         }
+        if (w && w.GetName() == "ListBtn")
+        {
+            ToggleList();
+            return true;
+        }
         return super.OnClick(w, x, y, button);
     }
 
@@ -1476,10 +1504,70 @@ class OZT_TradeMenu : UIScriptedMenu
                 m_Qty.Accept();
             return;
         }
+        if (key == KeyCode.KC_P)
+        {
+            ToggleList();
+            return;
+        }
+        if (m_List && m_List.IsOpen())
+            return;
         if (key == KeyCode.KC_F)
             ConfirmDeal();
         else if (key == KeyCode.KC_R)
             ClearDeal();
+    }
+
+    // ---- the card and the price list -------------------------------------------------------------------
+
+    protected void DropHover()
+    {
+        m_Hover = null;
+        m_HoverFor = 0;
+        if (m_Card)
+            m_Card.Hide();
+    }
+
+    // The card of the tile the cursor rests on: not while a button is held,
+    // something is dragged, or a window is over the screen.
+    protected void HoverFrame(float dt)
+    {
+        if (!m_Card)
+            return;
+        bool over = false;
+        if (m_Qty && m_Qty.IsOpen())
+            over = true;
+        if (m_List && m_List.IsOpen())
+            over = true;
+        OZT_Tile t;
+        if (!over && !m_Held && !m_Dragged && !LeftDown())
+            t = TileOf(GetWidgetUnderCursor());
+        if (t != m_Hover)
+        {
+            DropHover();
+            m_Hover = t;
+            return;
+        }
+        if (!t)
+            return;
+        m_HoverFor = m_HoverFor + dt;
+        if (m_HoverFor >= CARD_AFTER && !m_Card.IsShown())
+            m_Card.Open(t, GoodsOf(t.Type));
+        m_Card.Frame();
+    }
+
+    void ToggleList()
+    {
+        if (!m_List || !m_Data)
+            return;
+        if (m_List.IsOpen())
+        {
+            m_List.Shut();
+            return;
+        }
+        if (m_Qty && m_Qty.IsOpen())
+            return;
+        DropHover();
+        m_List.Open(m_Data, m_Shelf);
     }
 
     // ---- drag and drop ---------------------------------------------------------------------------------

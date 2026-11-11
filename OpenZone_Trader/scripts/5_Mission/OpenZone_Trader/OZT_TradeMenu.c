@@ -1763,20 +1763,26 @@ class OZT_TradeMenu : UIScriptedMenu
             return;
         m_HoverFor = m_HoverFor + dt;
         if (m_HoverFor >= CARD_AFTER && !m_Card.IsShown())
-            // What the goods come with at this trader, by the game's names.
-            OZT_WireGoods entry = GoodsOf(t.Type);
-            string comes = "";
-            if (entry && entry.With)
-            {
-                for (int w = 0; w < entry.With.Count(); w++)
-                {
-                    if (comes != "")
-                        comes = comes + ", ";
-                    comes = comes + OZT_Ui.NameOf(m_Shelf.Of(entry.With[w]));
-                }
-            }
-            m_Card.Open(t, entry, comes);
+            OpenCard(t);
         m_Card.Frame();
+    }
+
+    // The card of a tile, with what the goods come with at this trader, by
+    // the game's names.
+    protected void OpenCard(OZT_Tile t)
+    {
+        OZT_WireGoods entry = GoodsOf(t.Type);
+        string comes = "";
+        if (entry && entry.With)
+        {
+            for (int w = 0; w < entry.With.Count(); w++)
+            {
+                if (comes != "")
+                    comes = comes + ", ";
+                comes = comes + OZT_Ui.NameOf(m_Shelf.Of(entry.With[w]));
+            }
+        }
+        m_Card.Open(t, entry, comes);
     }
 
     void ToggleList()

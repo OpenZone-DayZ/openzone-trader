@@ -111,7 +111,7 @@ The first build did not compile: a field named `Slot` in a World class is refuse
 
 - [x] **Step 7:** Commit (the server half and the card's line; the record below is owed).
 
-**As the stand answered** (one boot, verdict a pass with `goods=15 problems=0`; the rows not yet copied into `deals.md`):
+**As the stand answered** (one boot, verdict a pass with `goods=15 problems=0`; in `deals.md` as rows E.1 to E.15):
 
 | what was sent | answer |
 |---|---|
@@ -135,14 +135,14 @@ The first build did not compile: a field named `Slot` in a World class is refuse
 
 The rows of the table above that were not sent: `open`'s answer read for the pistol's `Buy` and `With` (the deal's 710 says the sum is charged; the screen's shelf was not looked at).
 
-**Stopped here on the owner's word (2026-11-11, "we pause for now").** Owed when the work goes on: Task 3 whole; a clean boot for the verdict (this boot's log holds the three warnings of the last rows); the rows into `deals.md`.
+Stopped here on the owner's word (2026-11-11, "we pause for now"), and taken up again the same night.
 
 ### Task 3: The card, and the record
 
-- [x] **Step 1:** `OZT_TradeCard.c`, `strings.csv`: a line "comes with" naming the parts. Written and compiled on the client (it joined the stand); not yet looked at.
-- [ ] **Step 2:** On a live client, both languages: the pistol's tile reads 710, its card names the magazine; bought, it arrives with the magazine on it.
-- [ ] **Step 3:** `deals.md`: a section "Phase 3b"; the design's §4.2, §6.2 and §8.1; the skills.
-- [ ] **Step 4:** Commit.
+- [x] **Step 1:** `OZT_TradeCard.c`, `strings.csv`: a line "comes with" naming the parts. The first build opened the card anew every frame and it never showed: the call was put under a braceless `if` with more lines than one. The card has its own method now.
+- [x] **Step 2:** On a live client, Ukrainian: the pistol's tile reads 710, its card names the magazine; bought from the screen, it arrives with the magazine on it (`deals.md` E.16, `screen.md` S.34). English is seen with phase 3c.
+- [x] **Step 3:** `deals.md`: a section "Phase 3b"; the design's §4.2, §6.2 and §8.1; the skills.
+- [x] **Step 4:** Commit.
 
 ---
 

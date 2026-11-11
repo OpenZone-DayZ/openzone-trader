@@ -49,6 +49,8 @@ and a pile of twelve 7.62x39 rounds in the pants. The screen is opened by the se
 | S.30 | the same in English, a fresh kit with the magazine's rounds worn | the rifle's tile and its line read 1 765; with the backpack beside it: "4 thing(s) lie inside and are not in the deal"; after R and the rifle alone: YOU GET +1 765, "Parts that stay with you: 3" in the verdict and under the buttons | `quote` answered both times |
 | S.31 | tiles at the size things take in the inventory (the owner's word), Ukrainian, 1920x1080 | the rifle 8x3, the backpack 4x5, the helmet 4x3, the canteen 2x2, a round 1x1; the shelf scrolls where it did not | `open` answered |
 | S.32 | nine categories of an admin's own (a goods file and a trader written for the look) | the tabs in three rows, ALL and three, four, two; every name whole; the grid below starts under the third row; the same strip over the player's things | `open` answered, nine categories |
+| S.34 | a later build: the cursor rests on the pistol, which comes with its magazine | the card: ИЖ-70, the price 710, "У комплекті: Магазин ИЖ-70, 12 пат.", "Торговець дає за нову 325" | nothing asked |
+| S.35 | a double click on the pistol, F | BUY holds the pistol at 710, ВИ ПЛАТИТЕ -710, "Усе вміщується у ваші речі"; the first F came before the quote and did nothing, the second made the deal | `deal ... +MakarovIJ70x1=710(1 parts)` |
 | S.33 | prices written for the look: 9 995, 12 350 and 12 345, 125 000, 1 250 000 | on the shelf "9 995" on a tile one cell wide, "12.4к" twice (rounded up), "125к", "1.3М"; the player's bandage, which the trader pays 12 345 for, "12.3к" (rounded down) | nothing asked |
 
 No `SCRIPT (E)` line and no `ERROR` line in the client's or the server's log of any of

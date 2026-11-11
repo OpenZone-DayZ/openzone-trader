@@ -407,3 +407,37 @@ verdict is a pass with no warning and no error line.
 Not covered: a second client watching a kept part come off; a part whose holder's gate refuses
 it (every kept part of these runs was taken by the first cargo that had room); a deal of
 trees with a provider that is not items.
+
+## Phase 3b: goods with parts
+
+The same day (`docs/2026-11-11-phase-3b-plan.md`): goods that come with parts (`With` in the
+price book), parts fitted to bought goods (`Fit` in a buy line), parts bought onto a thing
+the player carries (`OnLow`, `OnHigh`, `SlotName`). The stand's goods gained a pistol that
+comes with its magazine (650 + 60), the magazine on its own, goggles (1 500) and a battery
+(20): fifteen goods. One boot for the rows; the kit and twenty notes of 500.
+
+| # | what is asked | command | answer | as expected? |
+|---|---|---|---|---|
+| E.1 | the slot of a scope on a rifle, by config, and the engine's word | `{"op": "fits", "host": "AKM", "part": "PSO1Optic"}` | `fits: PSO1Optic on AKM: slot by config 'weaponOpticsAK'; the engine's gates yes, with occupancy yes` (a local stand-in of the rifle) | yes |
+| E.2 | a pistol's magazine on a rifle | `{"op": "fits", "host": "AKM", "part": "Mag_IJ70_8Rnd"}` | `slot by config ''` | yes |
+| E.3 | the pistol's magazine on the pistol | `{"op": "fits", "host": "MakarovIJ70", "part": "Mag_IJ70_8Rnd"}` | `'magazine'; the engine's gates yes, with occupancy yes` | yes |
+| E.4 | a scope on the carried rifle, which has one | `{"op": "fits", "host": "AKM", "part": "PSO1Optic", "carried": "1"}` | `'weaponOpticsAK'; the engine's gates yes, with occupancy no` | yes |
+| E.5 | goggles on a helmet; a battery in goggles | `fits` twice | `'NVG'` and `'BatteryD'`, the gates yes both | yes |
+| E.6 | the pistol, which comes with its magazine | `{"op": "deal", "buy": "MakarovIJ70:1"}` | `deal ok=yes net=710`; the pistol in the jacket with its magazine on it, 0 of 12 rounds; the weapon names its magazine and is idle | yes |
+| E.7 | the kit's rifle sold and a new one bought with a scope and a magazine | `{"op": "deal", "sell": "AKM", "buy": "AKM:1+PSO1Optic+Mag_AKM_30Rnd"}` | `deal ok=yes net=1490 ... sold=1790 kept=3`: 3 280 for the new rifle with both parts (2 500 + 600 + 180), 1 790 for the old; the new one on the shoulder with the scope and an empty magazine; it names the magazine, idle, stable state 4 | yes |
+| E.8 | a helmet with goggles on it and a battery in them | `{"op": "deal", "buy": "Mich2001Helmet:1+NVGoggles>Battery9V"}` | `deal ok=yes net=2420`; the helmet on the head, the goggles on it, the battery in the goggles. `dump 21`: SAME, 31 lines | yes |
+| E.9 | a scope onto the rifle, whose slot is taken | `{"op": "deal", "buy": "PSO1Optic:1", "on": "AKM"}` | `deal ok=no why=STR_OZT_NO_CHANGED` | yes |
+| E.10 | a rifle with a pistol's magazine | `{"op": "quote", "buy": "AKM:1+Mag_IJ70_8Rnd"}` | `quote ok=no why=STR_OZT_NO_CHANGED` | yes |
+| E.11 | two rifles with a scope | `{"op": "quote", "buy": "AKM:2+PSO1Optic"}` | `quote ok=no why=STR_OZT_NO_INTERNAL`: a line with parts buys one | yes |
+| E.12 | the rifle's own magazine sold and a new one bought onto the rifle, in one deal | `{"op": "deal", "sell": "Mag_AKM_30Rnd", "buy": "Mag_AKM_30Rnd:1", "on": "AKM"}` | `deal ok=yes net=90 ... sold=90`: the slot the sale frees takes the new magazine; the rifle names it, idle, stable state 4 | yes |
+| E.13 | a battery into the scope on the rifle on the shoulder | `{"op": "deal", "buy": "Battery9V:1", "on": "PSO1Optic"}` | `deal ok=yes net=20`; the battery in the scope. `dump 22`: SAME, 32 lines | yes |
+| E.14 | the pistol's `With` set to a class without a price, a class that does not exist and one that does not fit | `{"op": "reload"}` | `problems=3`: "it has no price to buy in the price book", "no such class", "it does not fit, or its slot is taken by a part named before it"; the pistol then quotes 650, bare | yes |
+| E.15 | the file back | `{"op": "reload"}` | `problems=0` | yes |
+| E.16 | the pistol from the screen, on a later build | a double click on its shelf tile, F | the tile reads 710; its card says "У комплекті: Магазин ИЖ-70, 12 пат."; `deal: <uid> at 'stand' net 710 (items): +MakarovIJ70x1=710(1 parts)`; the pistol in the jacket with an empty magazine. `dump 31`: SAME | yes |
+
+The verdict of the boot of rows E.1 to E.15 was a pass; the verdict of the final build's
+boot (row E.16) is a pass with no warning. The comparisons kept:
+`*-dump-task3b-bought-with-parts.txt`, `*-dump-task3b-parts-onto-own-things.txt`.
+
+A field named `Slot` in a class of the World module did not compile (`Variable name 'Slot'
+already used as type name`): the request's fields are `SlotName`.

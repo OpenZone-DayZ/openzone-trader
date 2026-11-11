@@ -90,7 +90,7 @@ Added to phase 2b part 1's (`docs/2026-11-11-phase-2b-wire-plan.md`):
 
 ### Task 6: Record
 
-- [x] `docs/measurements/2026-11-11/screen.md`: twenty-four rows and what was learned.
+- [x] `docs/measurements/2026-11-11/screen.md`: twenty-five rows and what was learned.
 - [x] The design's §3 and §4 say what is built and what was measured.
 
 ---
@@ -107,7 +107,7 @@ What the builds found, in the order they found it:
 4. A double click "lost its second press" for every tile in a grid's first column. Three builds went into it (the engine's own double click as a second road, the screen's own drag instead of the engine's) before `WindowFromPoint` named the cause: the owner's taskbar, 80 pixels wide at the left edge of the desktop, over the left strip of the client's window. The clicks had gone to the taskbar. The window is moved clear of it now.
 5. The screen's own drag stayed: it asks nothing of the engine (no flag, no answer a press must give, no tile moved under the cursor). `screen.md` says what the engine's needed.
 6. The card and the price list came up as written; one build went into the card's lines, which stood two to a line. The screen was then seen in Ukrainian with both, and at 3840x1600 (rows S.16 to S.20).
-7. Trying on came up as written, on phase 2a's recipe (rows S.21 to S.24).
+7. Trying on came up as written, on phase 2a's recipe (rows S.21 to S.24). The owner asked that the copy be hidden from other players: it is this client's alone, and the server was asked (S.25).
 
 ## What is not built
 

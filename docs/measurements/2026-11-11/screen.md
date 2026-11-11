@@ -41,6 +41,7 @@ and a pile of twelve 7.62x39 rounds in the pants. The screen is opened by the se
 | S.22 | another thing of the shelf selected | the trying ends: the character as they are, the slot Head empty, the button TRY ON again (the backpack can be worn too) | nothing asked |
 | S.23 | the helmet tried on again, a double click on its tile in the slot Head | the helmet is a line of BUY, 900; YOU PAY -900; the trying goes on; the card comes up for the tried tile as for any | `quote` answered |
 | S.24 | key Esc while the helmet is tried on and in the cart | the screen closes; the world is as it was, no second character in it; no error line in either log | nothing asked |
+| S.25 | the helmet tried on; the SERVER asked what stands at the player's place (`world_entities`, class `Man`, 10 m; it leaves out only a person with an identity) | the live view shows the character in the helmet | `listed 0 of 0 object(s) within 10m`, `players=1`: the server has no second character there |
 
 No `SCRIPT (E)` line and no `ERROR` line in the client's or the server's log of any of
 these runs; the boots' verdicts were a pass.
@@ -103,6 +104,11 @@ room, seen from the screen; a second client.
   the player's own place, facing as the player faces, with its simulation on: its face was
   natural (S.21), the screen covers it, and the player did not move on the server while it
   stood there. It is deleted when the trying ends and when the screen closes (S.24).
+- **The copy is nobody's but this client's** (the owner, 2026-11-11: the doll must be hidden
+  from other players). It is made on the client with `ECE_LOCAL`: its network id is `00`
+  (phase 2a, `client-results-run*.txt`), and the server, asked while it stood there, had no
+  second character at the player's place (S.25). What the server does not have no other
+  client is sent. A second client standing beside was not put there to look.
 - **A trap of this machine, not of the screen.** The owner's taskbar stands at the left
   edge of the desktop, 80 pixels wide, and the client's window opens in the top left
   corner, under it. Real clicks at client x below 77 went to the taskbar: for an hour the

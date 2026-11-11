@@ -28,6 +28,8 @@ class OZT_QtyDialog : ScriptedWidgetEventHandler
 
     protected bool m_Shown;
     protected bool m_Selling;
+    // Notes at the change tab: given and taken, not sold and bought.
+    protected bool m_Change;
     protected string m_Type;
     protected EntityAI m_Item;
     protected int m_Low;
@@ -87,9 +89,10 @@ class OZT_QtyDialog : ScriptedWidgetEventHandler
     }
 
     // Units of goods priced by the unit: `count` to begin with, `most` at most.
-    void ToBuy(string type, EntityAI stand, int each, int most, int count)
+    void ToBuy(string type, EntityAI stand, int each, int most, int count, bool change)
     {
         m_Selling = false;
+        m_Change = change;
         m_Type = type;
         m_Item = stand;
         m_Low = 0;
@@ -99,17 +102,18 @@ class OZT_QtyDialog : ScriptedWidgetEventHandler
         Begin(most, count);
     }
 
-    // Units of a stack the player carries: all of them to begin with.
-    void ToSell(EntityAI item, int low, int high, int units, int whole)
+    // Units of a stack the player carries: `count` of them to begin with.
+    void ToSell(EntityAI item, int low, int high, int units, int whole, int count, bool change)
     {
         m_Selling = true;
+        m_Change = change;
         m_Type = item.GetType();
         m_Item = item;
         m_Low = low;
         m_High = high;
         m_Each = 0;
         m_Whole = whole;
-        Begin(units, units);
+        Begin(units, count);
     }
 
     protected void Begin(int most, int count)
@@ -135,6 +139,16 @@ class OZT_QtyDialog : ScriptedWidgetEventHandler
             title = OZT_Ui.Words("STR_OZT_UI_HOW_MANY_SELL");
             go = OZT_Ui.Words("STR_OZT_UI_OK_SELL");
             unit = OZT_Ui.Words1("STR_OZT_UI_WHOLE", OZT_Ui.Sum(m_Whole));
+        }
+        if (m_Change && m_Selling)
+        {
+            title = OZT_Ui.Words("STR_OZT_UI_HOW_MANY_GIVE");
+            go = OZT_Ui.Words("STR_OZT_UI_OK_GIVE");
+        }
+        else if (m_Change)
+        {
+            title = OZT_Ui.Words("STR_OZT_UI_HOW_MANY_TAKE");
+            go = OZT_Ui.Words("STR_OZT_UI_OK_TAKE");
         }
         OZT_Ui.Say(m_Root, "QtyTitle", title);
         OZT_Ui.Say(m_Root, "QtyOkText", go);

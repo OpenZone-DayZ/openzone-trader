@@ -97,3 +97,8 @@ STR_OZT_UI_PARTS_INCLUDED,Іде в комплекті з товаром,It come
 STR_OZT_UI_PARTS_NOT_TAKEN,Торговець це не бере: частина залишиться у вас,The trader does not take this: the part stays with you
 STR_OZT_UI_PARTS_RIDES,"Іде разом із частиною, на якій стоїть",It goes with the part it is on
 STR_OZT_UI_PARTS_SELLING,Річ продається: частини на неї не ставляться,The item is being sold: no parts go onto it
+STR_OZT_UI_CHANGE,Розмін,Change
+STR_OZT_UI_HOW_MANY_GIVE,СКIЛЬКИ ВIДДАТИ,HOW MANY TO GIVE
+STR_OZT_UI_OK_GIVE,ВIДДАТИ,GIVE
+STR_OZT_UI_HOW_MANY_TAKE,СКIЛЬКИ ОТРИМАТИ,HOW MANY TO TAKE
+STR_OZT_UI_OK_TAKE,ОТРИМАТИ,TAKE

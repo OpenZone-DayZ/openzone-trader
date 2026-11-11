@@ -151,6 +151,12 @@ class OZT_Deal
     protected int m_Give;
     protected string m_Lines;
 
+    // The notes the player gives and takes at the change tab, by face value.
+    // They are money already: the money after the deal counts them, the net
+    // does not know them from goods.
+    protected int m_NotesOut;
+    protected int m_NotesIn;
+
     // The whole of it, as the JSON of an OZT_DealRes. `commit` false is a quote:
     // every check and the whole plan, nothing changed, the net not compared.
     static string Run(PlayerBase player, string json, bool commit, out bool ok, out string error)
@@ -282,7 +288,7 @@ class OZT_Deal
 
         if (!commit)
         {
-            m_Res.Balance = m_Money.Balance(m_Player) - m_Net;
+            m_Res.Balance = m_Money.Balance(m_Player) - m_Net - m_NotesOut + m_NotesIn;
             return "";
         }
 
@@ -399,6 +405,8 @@ class OZT_Deal
                 price = OZT_Book.SellPrice(m_Trader, entry, e, units);
                 if (price <= 0)
                     return OZT_Const.NO_NOT_TAKEN;
+                if (entry.Category == OZT_Const.CATEGORY_CHANGE)
+                    m_NotesOut = m_NotesOut + price;
                 if (entire)
                     m_Gone.Insert(e);
                 else
@@ -536,6 +544,8 @@ class OZT_Deal
             if (why != "")
                 return why;
             price = price + extra;
+            if (entry.Category == OZT_Const.CATEGORY_CHANGE)
+                m_NotesIn = m_NotesIn + price;
 
             total = total + price;
             m_Res.BuyPrices.Insert(price);
@@ -706,6 +716,13 @@ class OZT_Deal
 
         array<ref OZT_NoteStack> stacks;
         OZT_ItemMoney.Stacks(m_Player, m_Gone, stacks);
+        // Notes the player gives at the change tab leave first: a stack that
+        // gives some pays with the rest of it, never with them again.
+        for (int g = 0; g < m_Grows.Count(); g++)
+        {
+            if (m_Grows[g].Units < 0)
+                OZT_ItemMoney.Spent(stacks, m_Grows[g].Stack, -m_Grows[g].Units);
+        }
         int change = OZT_ItemMoney.Pay(stacks, m_Net);
         if (change < 0)
             return OZT_Const.NO_MONEY;
@@ -715,12 +732,27 @@ class OZT_Deal
             if (s.Spend <= 0)
                 continue;
             if (s.Spend >= s.Units)
+            {
+                // What the giving left of the stack pays: it goes whole.
+                DropGrows(s.Item);
                 m_Gone.Insert(s.Item);
+            }
             else
+            {
                 AddGrow(s.Item, -s.Spend);
+            }
         }
         m_Give = change;
         return "";
+    }
+
+    protected void DropGrows(EntityAI stack)
+    {
+        for (int i = m_Grows.Count() - 1; i >= 0; i--)
+        {
+            if (m_Grows[i].Stack == stack)
+                m_Grows.RemoveOrdered(i);
+        }
     }
 
     // ---- 5. the places ----------------------------------------------------------------

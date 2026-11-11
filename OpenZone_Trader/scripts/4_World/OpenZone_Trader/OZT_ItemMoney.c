@@ -88,6 +88,28 @@ class OZT_ItemMoney : OZT_MoneyProvider
         }
     }
 
+    // Units a deal takes from a stack before it pays: notes the player gives
+    // at the change tab. A stack left with nothing drops out; the rest keep
+    // the order Stacks() gave them.
+    static void Spent(array<ref OZT_NoteStack> stacks, EntityAI item, int units)
+    {
+        for (int i = 0; i < stacks.Count(); i++)
+        {
+            OZT_NoteStack s = stacks[i];
+            if (s.Item != item)
+                continue;
+            s.Units = s.Units - units;
+            stacks.RemoveOrdered(i);
+            if (s.Units <= 0)
+                return;
+            int at = 0;
+            while (at < stacks.Count() && Before(stacks[at], s))
+                at++;
+            stacks.InsertAt(s, at);
+            return;
+        }
+    }
+
     private static bool Before(OZT_NoteStack a, OZT_NoteStack b)
     {
         if (a.Value != b.Value)

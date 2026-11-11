@@ -95,6 +95,27 @@ class OZT_Open
             }
         }
 
+        // The change tab: the server's notes at face value, when this trader
+        // changes them. The screen names the tab itself.
+        if (OZT_Book.Changes(trader))
+        {
+            OZT_WireCategory change = new OZT_WireCategory();
+            change.Id = OZT_Const.CATEGORY_CHANGE;
+            change.Name = "";
+            res.Categories.Insert(change);
+            array<ref OZT_Note> changed = OZT_Config.Get().Settings().Notes;
+            for (int m = 0; m < changed.Count(); m++)
+            {
+                OZT_WireGoods note = new OZT_WireGoods();
+                note.ClassName = changed[m].ClassName;
+                note.Category = OZT_Const.CATEGORY_CHANGE;
+                note.Buy = changed[m].Value;
+                note.Sell = changed[m].Value;
+                note.Rule = OZT_Const.RULE_UNIT;
+                res.Goods.Insert(note);
+            }
+        }
+
         // What the player carries that this trader pays for, each with what it
         // brings as it is now. The screen marks everything else as not taken.
         array<EntityAI> all = new array<EntityAI>();

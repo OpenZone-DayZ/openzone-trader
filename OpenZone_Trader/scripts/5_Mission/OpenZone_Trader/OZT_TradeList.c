@@ -121,6 +121,9 @@ class OZT_PriceList : ScriptedWidgetEventHandler
         names.Insert(OZT_Ui.Words("STR_OZT_UI_ALL"));
         for (int c = 0; c < m_Data.Categories.Count(); c++)
         {
+            // The change tab's notes are money, not goods with a price.
+            if (m_Data.Categories[c].Id == OZT_Const.CATEGORY_CHANGE)
+                continue;
             m_TabIds.Insert(m_Data.Categories[c].Id);
             names.Insert(m_Data.Categories[c].Name);
         }
@@ -203,6 +206,8 @@ class OZT_PriceList : ScriptedWidgetEventHandler
         {
             OZT_WireGoods g = m_Data.Goods[i];
             if (cat != "" && g.Category != cat)
+                continue;
+            if (g.Category == OZT_Const.CATEGORY_CHANGE)
                 continue;
             EntityAI stand = m_Shelf.Of(g.ClassName);
             if (!stand)

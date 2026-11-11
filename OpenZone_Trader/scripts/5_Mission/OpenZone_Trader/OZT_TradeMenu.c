@@ -790,7 +790,12 @@ class OZT_TradeMenu : UIScriptedMenu
         for (int c = 0; c < m_Data.Categories.Count(); c++)
         {
             m_TabIds.Insert(m_Data.Categories[c].Id);
-            names.Insert(m_Data.Categories[c].Name);
+            // The change tab is the server's, not an admin's category: the
+            // screen names it in the player's language.
+            if (m_Data.Categories[c].Id == OZT_Const.CATEGORY_CHANGE)
+                names.Insert(OZT_Ui.Words("STR_OZT_UI_CHANGE"));
+            else
+                names.Insert(m_Data.Categories[c].Name);
         }
         float shelfStrip = MakeStrip("ShelfTabs", names, m_ShelfTabs);
         float ownStrip = MakeStrip("OwnTabs", names, m_OwnTabs);
@@ -878,6 +883,47 @@ class OZT_TradeMenu : UIScriptedMenu
         PaintStrip(m_OwnTabs, m_OwnTab);
     }
 
+    protected bool IsChangeTab(int tab)
+    {
+        if (tab < 0 || tab >= m_TabIds.Count())
+            return false;
+        return m_TabIds[tab] == OZT_Const.CATEGORY_CHANGE;
+    }
+
+    // The change tab is one for both sides: the trader's notes on the shelf
+    // and the player's own beside them. Opened on one side it opens on the
+    // other; left on one side, the other goes back to everything.
+    protected void FollowChange(int tab, bool fromShelf)
+    {
+        bool change = IsChangeTab(tab);
+        if (fromShelf)
+        {
+            if (change && m_OwnTab != tab)
+            {
+                m_OwnTab = tab;
+                m_DirtyOwn = true;
+                m_DirtySlots = true;
+            }
+            else if (!change && IsChangeTab(m_OwnTab))
+            {
+                m_OwnTab = 0;
+                m_DirtyOwn = true;
+                m_DirtySlots = true;
+            }
+            return;
+        }
+        if (change && m_ShelfTab != tab)
+        {
+            m_ShelfTab = tab;
+            m_DirtyShelf = true;
+        }
+        else if (!change && IsChangeTab(m_ShelfTab))
+        {
+            m_ShelfTab = 0;
+            m_DirtyShelf = true;
+        }
+    }
+
     protected void PaintStrip(array<Widget> tabs, int current)
     {
         for (int i = 0; i < tabs.Count(); i++)
@@ -962,6 +1008,11 @@ class OZT_TradeMenu : UIScriptedMenu
             {
                 continue;
             }
+            else if (cat == "" && g.Category == OZT_Const.CATEGORY_CHANGE)
+            {
+                // Money is not goods: the notes stand only in their own tab.
+                continue;
+            }
             EntityAI e = m_Shelf.Of(g.ClassName);
             if (!e)
                 continue;
@@ -997,7 +1048,11 @@ class OZT_TradeMenu : UIScriptedMenu
             if (!e || e == player)
                 continue;
             string type = e.GetType();
-            if (m_Data.Notes.Find(type) > -1)
+            // Money is counted in the footer; the change tab shows the notes
+            // and nothing else.
+            bool note = m_Data.Notes.Find(type) > -1;
+            bool changing = cat == OZT_Const.CATEGORY_CHANGE;
+            if (note != changing)
                 continue;
             // What is worn or held has a slot's tile; a part of another thing
             // is that thing's business (phase 3). The grid is the bags.
@@ -1062,6 +1117,11 @@ class OZT_TradeMenu : UIScriptedMenu
             // nobody has asked.
             t.Count = t.Count - line.Count;
             t.Price = 0;
+            // A note is worth its face value whatever the count, and `open`
+            // said what one is worth.
+            OZT_WireGoods money = GoodsOf(t.Type);
+            if (money && money.Category == OZT_Const.CATEGORY_CHANGE)
+                t.Price = money.Sell * t.Count;
         }
         return t;
     }
@@ -2009,6 +2069,7 @@ class OZT_TradeMenu : UIScriptedMenu
             {
                 m_ShelfTab = tab;
                 m_DirtyShelf = true;
+                FollowChange(tab, true);
                 PaintTabs();
             }
             return true;
@@ -2021,6 +2082,7 @@ class OZT_TradeMenu : UIScriptedMenu
                 m_OwnTab = tab;
                 m_DirtyOwn = true;
                 m_DirtySlots = true;
+                FollowChange(tab, false);
                 PaintTabs();
             }
             return true;
@@ -2390,6 +2452,34 @@ class OZT_TradeMenu : UIScriptedMenu
         }
     }
 
+    // What the notes the cart gives come to, less the notes it takes: what is
+    // still to be taken in other notes. Below zero the cart takes more notes
+    // than it gives, and the rest is paid like any purchase.
+    protected int NotesLeft()
+    {
+        int left = 0;
+        for (int s = 0; s < m_Cart.Sells.Count(); s++)
+        {
+            OZT_CartLine given = m_Cart.Sells[s];
+            OZT_WireGoods gs = GoodsOf(given.Type);
+            if (!gs || gs.Category != OZT_Const.CATEGORY_CHANGE)
+                continue;
+            int units = given.Count;
+            if (units <= 0)
+                units = given.Units;
+            left = left + gs.Sell * units;
+        }
+        for (int b = 0; b < m_Cart.Buys.Count(); b++)
+        {
+            OZT_CartLine taken = m_Cart.Buys[b];
+            OZT_WireGoods gb = GoodsOf(taken.Type);
+            if (!gb || gb.Category != OZT_Const.CATEGORY_CHANGE)
+                continue;
+            left = left - gb.Buy * taken.Count;
+        }
+        return left;
+    }
+
     protected void AddBuy(string type)
     {
         OZT_WireGoods g = GoodsOf(type);
@@ -2408,7 +2498,19 @@ class OZT_TradeMenu : UIScriptedMenu
             int most = full * 5;
             if (most > OZT_Deal.MAX_UNITS)
                 most = OZT_Deal.MAX_UNITS;
-            m_Qty.ToBuy(type, stand, g.Buy, most, full);
+            if (g.Category == OZT_Const.CATEGORY_CHANGE)
+            {
+                // A note: as many as the notes given leave room for, one when
+                // they leave none (the owner's example: a 100 given, the 20
+                // taken five times).
+                most = OZT_Deal.MAX_UNITS;
+                full = NotesLeft() / g.Buy;
+                if (full < 1)
+                    full = 1;
+                m_Qty.ToBuy(type, stand, g.Buy, most, full, true);
+                return;
+            }
+            m_Qty.ToBuy(type, stand, g.Buy, most, full, false);
             return;
         }
         m_Cart.Buy(type, 1, g.Buy, OZT_Deal.MAX_PIECES);
@@ -2453,7 +2555,12 @@ class OZT_TradeMenu : UIScriptedMenu
         // More than one unit: the player says how many.
         if (own.Units > 1)
         {
-            m_Qty.ToSell(item, low, high, own.Units, Brings(own));
+            // Notes are given one to begin with: a note is broken more often
+            // than a whole wad.
+            if (m_Data.Notes.Find(item.GetType()) > -1)
+                m_Qty.ToSell(item, low, high, own.Units, Brings(own), 1, true);
+            else
+                m_Qty.ToSell(item, low, high, own.Units, Brings(own), own.Units, false);
             return;
         }
         m_Cart.Sell(item, low, high, 0, own.Units, Brings(own));

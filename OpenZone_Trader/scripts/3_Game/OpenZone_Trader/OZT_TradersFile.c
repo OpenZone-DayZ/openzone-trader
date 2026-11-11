@@ -20,6 +20,10 @@ class OZT_Point
     float SellFactor = 1;
     string Provider = "";
 
+    // 1: the trader changes the server's banknotes at face value (the screen's
+    // change tab); 0: it does not. Only item money has notes to change.
+    int Exchange = 1;
+
     OZT_Point Copy()
     {
         OZT_Point c = new OZT_Point();
@@ -44,6 +48,7 @@ class OZT_Point
         c.BuyFactor = BuyFactor;
         c.SellFactor = SellFactor;
         c.Provider = Provider;
+        c.Exchange = Exchange;
         return c;
     }
 

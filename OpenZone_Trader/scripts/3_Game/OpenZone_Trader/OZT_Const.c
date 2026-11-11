@@ -40,6 +40,12 @@ class OZT_Const
     // The money provider that counts items in the inventory.
     static const string PROVIDER_ITEMS = "items";
 
+    // The category of the screen's change tab: the server's banknotes, given
+    // and taken at face value (the owner, 2026-11-11: a 100 into five 20s).
+    // `@` is not a letter of an admin's id, so no category of the goods file
+    // can be it.
+    static const string CATEGORY_CHANGE = "@change";
+
     // Why a deal was refused: KEYS of the string table, never ready text. The
     // client knows the player's language, the server does not.
     static const string NO_TOO_FAR   = "STR_OZT_NO_TOO_FAR";

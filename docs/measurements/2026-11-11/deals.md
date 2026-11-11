@@ -441,3 +441,23 @@ boot (row E.16) is a pass with no warning. The comparisons kept:
 
 A field named `Slot` in a class of the World module did not compile (`Variable name 'Slot'
 already used as type name`): the request's fields are `SlotName`.
+
+## The change tab: notes at face value
+
+2026-11-12, the owner's word of the night before: a tab where the player changes notes for
+the notes they need, a 100 into five 20s. The server's notes stand in the price book under
+the category `@change` at face value both ways, with no factor of the trader's and no
+rounding; a trader changes them unless its `Exchange` is 0, and only item money with two
+notes or more has a change tab. Notes given are sold stack units, notes taken are bought
+units, and what the given notes leave over comes back as change in the largest notes. The
+stand's money gained notes of 10, 20 and 100 (5, 10, 20, 50, 100, 500). The kit: three
+notes of 100 and four of 500 in the jacket's wallet, 2 300.
+
+| # | what is asked | command | answer | as expected? |
+|---|---|---|---|---|
+| F.1 | a 500 given, two 100s taken | `{"op": "quote", "sell": "OZT_ProbeNote500:1", "buy": "OZT_ProbeNote100:2"}` | `net=-300 received=300 balance=2600`: the deal right, the money after wrong. The money after the deal took the given note for income and the taken notes for spending, though both are money already | no |
+| F.2 | the same, after the money after the deal counts given and taken notes (`m_NotesOut`, `m_NotesIn`) | the same `quote`, a later build | `net=-300 received=300 balance=2300` | yes |
+| F.3 | the deal of F.1 | `{"op": "deal", ...}` as F.1 | `deal: <uid> at 'stand' net -300 (items): -OZT_ProbeNote500x1=500 +OZT_ProbeNote100x2=200`; the 100s 2 to 7 (two taken and three of change), the 500s 4 to 3. `dump 52`: SAME (`change-500-into-100s-with-rest`) | yes |
+| F.4 | six 100s given and eight taken: the payment of the 200 left takes the five 20s and the one 100 the giving left | `{"op": "deal", "sell": "OZT_ProbeNote100:6", "buy": "OZT_ProbeNote100:8"}` | `net 200`; the stack of 100s that gave six and paid one is deleted whole (its giving's shrink dropped, `DropGrows`), the 20s too, a new stack of eight 100s; 2 300 before and after. `dump 53`: SAME (`change-paid-from-given-stack`). Written so from the start: the given units leave the stacks before the payment is laid (`OZT_ItemMoney.Spent`) | yes |
+
+No `SCRIPT (E)` line and no `ERROR` line in either log; the boots' verdicts were a pass.

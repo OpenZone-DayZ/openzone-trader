@@ -3,6 +3,6 @@
     "Traders": [
         { "Id": "stand", "Name": "Стендовий торговець", "Kind": "object", "ClassName": "Land_City_Stand_Grocery",
           "Pos": [4690.0, 340.77, 10198.0], "Yaw": 0, "Radius": 8,
-          "Categories": ["gear", "weapons", "ammo"], "BuyFactor": 1, "SellFactor": 1, "Provider": "" }
+          "Categories": ["gear", "weapons", "ammo"], "BuyFactor": 1, "SellFactor": 1, "Provider": "", "Exchange": 1 }
     ]
 }

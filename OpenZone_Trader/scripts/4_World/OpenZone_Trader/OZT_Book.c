@@ -137,6 +137,22 @@ class OZT_Book
                 s_ByClass.Set(e.ClassName, e);
             }
         }
+
+        // The server's banknotes, for the change tab: given and taken at face
+        // value. The goods check keeps them out of the goods file, so no class
+        // stands here twice.
+        array<ref OZT_Note> notes = OZT_Config.Get().Settings().Notes;
+        for (int n = 0; n < notes.Count(); n++)
+        {
+            OZT_BookEntry money = new OZT_BookEntry();
+            money.ClassName = notes[n].ClassName;
+            money.Category = OZT_Const.CATEGORY_CHANGE;
+            money.Buy = notes[n].Value;
+            money.Sell = notes[n].Value;
+            money.Rule = OZT_Const.RULE_UNIT;
+            money.With = new array<string>();
+            s_ByClass.Set(money.ClassName, money);
+        }
     }
 
     // A 4_World class held by a static: let go at mission end.
@@ -154,7 +170,21 @@ class OZT_Book
     {
         if (!trader || !e)
             return false;
+        if (e.Category == OZT_Const.CATEGORY_CHANGE)
+            return Changes(trader);
         return trader.Categories.Find(e.Category) > -1;
+    }
+
+    // Does this trader change banknotes? Only item money has notes, and it
+    // takes two kinds of them to change one into the other.
+    static bool Changes(OZT_Point trader)
+    {
+        if (!trader || trader.Exchange != 1)
+            return false;
+        OZT_MoneyProvider money = OZT_Money.Of(trader);
+        if (!money || !money.Physical())
+            return false;
+        return OZT_Config.Get().Settings().Notes.Count() > 1;
     }
 
     // What the player pays this trader for `count` of it: units of a stack
@@ -167,6 +197,9 @@ class OZT_Book
             return 0;
         if (e.Buy <= 0)
             return 0;
+        // A note at face value: no factor of the trader's, nothing to round.
+        if (e.Category == OZT_Const.CATEGORY_CHANGE)
+            return e.Buy * count;
         int unit = OZT_Config.Get().Unit();
         int piece = OZT_Config.RoundUpTo(e.Buy * trader.BuyFactor, unit);
         return piece * count;
@@ -217,6 +250,9 @@ class OZT_Book
         int level = item.GetHealthLevel();
         if (level >= OZT_Const.LEVEL_RUINED)
             return 0;
+        // A note at face value, worn or not: what money counts it as.
+        if (e.Category == OZT_Const.CATEGORY_CHANGE)
+            return e.Sell * count;
         float price = e.Sell * trader.SellFactor * OZT_Config.Get().Settings().Condition.Of(level);
         if (e.Rule == OZT_Const.RULE_UNIT)
         {

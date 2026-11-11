@@ -3,7 +3,10 @@
     "Provider": "items",
     "Notes": [
         { "ClassName": "OZT_ProbeNote", "Value": 5 },
+        { "ClassName": "OZT_ProbeNote10", "Value": 10 },
+        { "ClassName": "OZT_ProbeNote20", "Value": 20 },
         { "ClassName": "OZT_ProbeNote50", "Value": 50 },
+        { "ClassName": "OZT_ProbeNote100", "Value": 100 },
         { "ClassName": "OZT_ProbeNote500", "Value": 500 }
     ],
     "Holders": [ "OZT_ProbeWallet" ],

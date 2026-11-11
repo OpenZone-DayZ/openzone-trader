@@ -3,7 +3,7 @@
 // The cart holds no price of its own. A line shows what the server's quote
 // said for it; until the quote answers, a bought line shows the catalogue's
 // price for one times the count (the server's own rule for a buy), and a sold
-// line shows what `open` said for the whole thing.
+// line shows what `open` said the thing brings as it is, with everything on it.
 
 class OZT_CartLine
 {
@@ -177,11 +177,13 @@ class OZT_Cart
                 for (int y = 0; y < data.Yours.Count(); y++)
                 {
                     OZT_WireOwn own = data.Yours[y];
-                    if (own.Low == line.Low && own.High == line.High && own.Why == 0)
+                    if (own.Low == line.Low && own.High == line.High)
                     {
                         keep = true;
                         line.Units = own.Units;
                         line.Whole = own.Price;
+                        if (own.Tree > 0)
+                            line.Whole = own.Tree;
                         if (line.Count > 0 && line.Count >= own.Units)
                             line.Count = 0;
                     }

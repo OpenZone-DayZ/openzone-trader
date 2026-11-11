@@ -140,6 +140,10 @@ class OZT_TradeMenu : UIScriptedMenu
     protected bool m_OpenFlying;
     protected bool m_DealFlying;
 
+    // True while the info line holds what stays with the player: the next
+    // quote that keeps nothing takes it away.
+    protected bool m_SaidStays;
+
     // Trying on: the character shown in goods that are not bought.
     protected ref OZT_TryOn m_Try;
     protected string m_PickType;
@@ -554,6 +558,21 @@ class OZT_TradeMenu : UIScriptedMenu
         PaintDeal();
         if (!ok && error == OZT_Const.NO_TOO_FAR)
             SayInfo(OZT_Ui.Words(error), OZT_Look.Bad());
+
+        // What comes off the sold things and stays: said in the line below as
+        // well, where the verdict's two lines may be taken by the hands.
+        string stays = "";
+        if (ok)
+            stays = StaysWords(res);
+        if (stays != "")
+        {
+            SayInfo(stays, OZT_Look.Alert());
+            m_SaidStays = true;
+        }
+        else if (m_SaidStays)
+        {
+            SayInfo("", OZT_Look.Text());
+        }
     }
 
     protected void TakeDeal(bool ok, string json, string error)
@@ -631,6 +650,8 @@ class OZT_TradeMenu : UIScriptedMenu
 
     void SayInfo(string text, int color)
     {
+        // Whatever is said replaces what the line held.
+        m_SaidStays = false;
         TextWidget t = TextWidget.Cast(layoutRoot.FindAnyWidget("TradeInfo"));
         if (!t)
             return;
@@ -909,6 +930,16 @@ class OZT_TradeMenu : UIScriptedMenu
         m_OwnGrid.Arrange();
     }
 
+    // What a thing of the player's brings sold as it is: with what hangs on it
+    // and what is loaded in it, as far as the trader takes that (`open` says
+    // it; the quote says it again for the deal as a whole).
+    protected int Brings(OZT_WireOwn own)
+    {
+        if (own.Tree > 0)
+            return own.Tree;
+        return own.Price;
+    }
+
     // The tile of one thing of the player's: what the trader pays for it, or
     // why it cannot be sold. Null for what the cart sells whole.
     protected OZT_Tile OwnTile(EntityAI e)
@@ -922,7 +953,7 @@ class OZT_TradeMenu : UIScriptedMenu
         t.High = high;
         if (own)
         {
-            t.Price = own.Price;
+            t.Price = Brings(own);
             t.Why = own.Why;
             t.Count = own.Units;
         }
@@ -1180,6 +1211,23 @@ class OZT_TradeMenu : UIScriptedMenu
             OZT_Ui.Say(layoutRoot, "SellTotal", "...");
     }
 
+    // What stays with the player of the things they sell, as the server
+    // counted it: parts that come off (the trader does not take them, or the
+    // player keeps them) and loaded rounds that come back. "" when nothing.
+    protected string StaysWords(OZT_DealRes res)
+    {
+        string s = "";
+        if (res.Kept > 0)
+            s = OZT_Ui.Words1("STR_OZT_UI_STAYS_PARTS", res.Kept.ToString());
+        if (res.KeptRounds > 0)
+        {
+            if (s != "")
+                s = s + ". ";
+            s = s + OZT_Ui.Words1("STR_OZT_UI_STAYS_ROUNDS", res.KeptRounds.ToString());
+        }
+        return s;
+    }
+
     // The deal panel: the server's answer to the last quote, or what the
     // screen is waiting for.
     protected void PaintDeal()
@@ -1225,7 +1273,7 @@ class OZT_TradeMenu : UIScriptedMenu
                 net = "+" + OZT_Ui.Sum(-sum);
                 netColor = OZT_Look.Good();
             }
-            else
+            else if (m_QuoteOk)
             {
                 title = OZT_Ui.Words("STR_OZT_UI_EVEN");
                 netColor = OZT_Look.Text();
@@ -1236,6 +1284,12 @@ class OZT_TradeMenu : UIScriptedMenu
                 stands = true;
                 after = OZT_Ui.Sum(m_Quote.Balance);
                 space = OZT_Ui.Words("STR_OZT_UI_FITS");
+                string kept = StaysWords(m_Quote);
+                if (kept != "")
+                {
+                    space = kept;
+                    spaceColor = OZT_Look.Text();
+                }
                 if (m_Quote.InHands != "")
                 {
                     string what = OZT_Ui.NameOf(m_Shelf.Of(m_Quote.InHands));
@@ -1398,6 +1452,8 @@ class OZT_TradeMenu : UIScriptedMenu
         else if (t.Why == 2)
         {
             sub = OZT_Ui.Words("STR_OZT_UI_WHY_NOT_EMPTY");
+            if (t.Price > 0)
+                price = OZT_Ui.Sum(t.Price);
         }
         else
         {
@@ -1870,9 +1926,9 @@ class OZT_TradeMenu : UIScriptedMenu
         }
         OZT_WireOwn own = OwnOf(low, high);
         EntityAI item = EntityAI.Cast(GetGame().GetObjectByNetworkId(low, high));
-        if (!own || own.Why != 0 || !item)
+        if (!own || !item)
             return;
-        m_Cart.Sell(item, low, high, count, own.Units, own.Price);
+        m_Cart.Sell(item, low, high, count, own.Units, Brings(own));
         CartChanged();
     }
 
@@ -1884,21 +1940,18 @@ class OZT_TradeMenu : UIScriptedMenu
             SayInfo(OZT_Ui.Words("STR_OZT_UI_WHY_NOT_TAKEN"), OZT_Look.Alert());
             return;
         }
-        if (own.Why != 0)
-        {
-            SayInfo(OZT_Ui.Words("STR_OZT_UI_WHY_NOT_EMPTY"), OZT_Look.Alert());
-            return;
-        }
         EntityAI item = EntityAI.Cast(GetGame().GetObjectByNetworkId(low, high));
         if (!item)
             return;
+        // A thing with something inside goes with all of it or not at all: it
+        // may be put into the deal, and the quote says how much is in the way.
         // More than one unit: the player says how many.
         if (own.Units > 1)
         {
-            m_Qty.ToSell(item, low, high, own.Units, own.Price);
+            m_Qty.ToSell(item, low, high, own.Units, Brings(own));
             return;
         }
-        m_Cart.Sell(item, low, high, 0, own.Units, own.Price);
+        m_Cart.Sell(item, low, high, 0, own.Units, Brings(own));
         CartChanged();
     }
 

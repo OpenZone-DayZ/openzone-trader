@@ -39,6 +39,7 @@ Two of this part's own:
 | `.../OZT_TradeQty.c` | `OZT_QtyDialog` |
 | `ui/OpenZone_Trader/ozt_trade_card.json`, `.../OZT_TradeCard.c` | the item card, `OZT_Card` |
 | `ui/OpenZone_Trader/ozt_trade_list.json` (and its row), `.../OZT_TradeList.c` | the price list, `OZT_PriceList` |
+| `.../OZT_TradeTryOn.c` | trying on, `OZT_TryOn` |
 | `.../OZT_Shelf.c` | the shelf's stand-ins: one client-local entity per class |
 | `.../OZT_Ui.c` | pixels in a unit, a layout made with the mix-up guard, words, sums, the palette |
 | `tools/click.py`, `tools/drag.py`, `tools/hover.py` | real clicks, drags and a resting cursor in the client's window |
@@ -81,9 +82,15 @@ Added to phase 2b part 1's (`docs/2026-11-11-phase-2b-wire-plan.md`):
 - [x] `OZT_Card`: a window of its own that ignores the pointer; it comes up when the cursor has rested on a tile for 0.35 s and goes at a press, a drag, a window over the screen or a grid laid anew. Name, the game's own words for weight and condition, the sum that applies here (the price, the price per unit, what the trader pays, a cart line's total), the game's description, then lines: size, cargo, the stack or the count, the other side of the same trader's book, and in red why the thing cannot be sold.
 - [x] `OZT_PriceList`: a window of its own, opened by the button and by P, closed by its button, P and Esc; tabs ALL and the trader's categories; a line per goods of the answer of `open`, so what is locked for the player is not there; the note on wear from the answer's condition factors.
 
-### Task 5: Record
+### Task 5: Trying on
 
-- [x] `docs/measurements/2026-11-11/screen.md`: twenty rows and what was learned.
+- [x] `OZT_TryOn`: a client-local copy of the character at the player's own place, dressed in copies of what the player wears (parts two levels down) and in the goods on the first slot of the character their class names, what stood there removed; the live view shows the copy. `SlotFor` says whether a class can be worn at all.
+- [x] The button under the selected thing is there for goods of the shelf or of BUY that the character could wear; it reads TRY ON or TAKE OFF. The tried slot's tile shows the goods, lit; it is a tile of the shelf, so a double click on it buys them.
+- [x] The trying ends when another thing is selected, when the selection goes, when the button is pressed again, when a deal is made and when the screen closes.
+
+### Task 6: Record
+
+- [x] `docs/measurements/2026-11-11/screen.md`: twenty-four rows and what was learned.
 - [x] The design's §3 and §4 say what is built and what was measured.
 
 ---
@@ -100,12 +107,13 @@ What the builds found, in the order they found it:
 4. A double click "lost its second press" for every tile in a grid's first column. Three builds went into it (the engine's own double click as a second road, the screen's own drag instead of the engine's) before `WindowFromPoint` named the cause: the owner's taskbar, 80 pixels wide at the left edge of the desktop, over the left strip of the client's window. The clicks had gone to the taskbar. The window is moved clear of it now.
 5. The screen's own drag stayed: it asks nothing of the engine (no flag, no answer a press must give, no tile moved under the cursor). `screen.md` says what the engine's needed.
 6. The card and the price list came up as written; one build went into the card's lines, which stood two to a line. The screen was then seen in Ukrainian with both, and at 3840x1600 (rows S.16 to S.20).
+7. Trying on came up as written, on phase 2a's recipe (rows S.21 to S.24).
 
 ## What is not built
 
 - On the card: what a thing takes and what it fits, what is on it, why it is discounted (design §3.5): they come with parts (phase 3) and gates (phase 5).
 - The parts strip, items with parts, containers with things in them: phase 3. Until then a thing that is not empty shows its price and an amber corner, and a double click says why it cannot be sold.
-- TRY ON (design §3.7).
+- Trying on shows one thing at a time, and only goods: a thing of the player's own cannot be tried against another slot.
 - A bought line's count cannot be lowered by one: its tile leaves the cart whole.
 - More than seven tabs on a side narrow the tabs; beyond four columns of slots the slots narrow and their labels are cut.
 - The gallery as `ui_gallery` runs it (`openzone-core/CONTRIBUTING.md`): there is no preview index yet. The screen was looked at by hand: 1600x900 and 1920x1080 in English, 1920x1080 and 3840x1600 in Ukrainian.

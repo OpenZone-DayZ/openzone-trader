@@ -608,11 +608,29 @@
                         ],
                         "size": [
                           440,
-                          128
+                          84
                         ],
                         "font": "small",
                         "color": "$muted",
                         "grow": false
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "TryBtn",
+                        "at": [
+                          298,
+                          658
+                        ],
+                        "size": [
+                          160,
+                          40
+                        ],
+                        "text": "#STR_OZT_UI_TRY_ON",
+                        "font": "hint",
+                        "color": "$text",
+                        "hidden": true,
+                        "note": "Shown while the selected thing is goods the character could wear; the menu turns its caption while they are tried on."
                       }
                     }
                   ]

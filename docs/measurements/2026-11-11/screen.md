@@ -37,6 +37,10 @@ and a pile of twelve 7.62x39 rounds in the pants. The screen is opened by the se
 | S.18 | key P (and the button PRICE LIST) | the price list over the screen: the trader's name, tabs, ten lines with a picture, the name, what the trader sells it for and what he pays ("per unit" under rounds and nails, a dash where he does not take a thing), the note on wear with the server's own factors (85, 60, 35) | nothing asked: built from the answer of `open` |
 | S.19 | a tab of the list, key Esc, key P twice, the button PRICE LIST, the list's CLOSE | the tab's three lines; Esc closes the list and leaves the screen; P opens it and closes it; the button opens it and CLOSE closes it | nothing asked |
 | S.20 | the screen at 3840x1600, Ukrainian (the window moved off the desktop, the frame captured there) | the body in the middle of the wide screen, 65 pixels a cell, every tile on its grid lines, every text inside its box | `open` answered |
+| S.21 | the shelf's helmet selected, the button TRY ON (the player wears no helmet) | the live view shows the character in the helmet, its face as in life; the slot tile Head shows the helmet, lit, with its price; the panel's head says "trying on: not bought yet"; the button reads TAKE OFF | nothing asked, nothing changed: the player's position on the server is the same half a minute later |
+| S.22 | another thing of the shelf selected | the trying ends: the character as they are, the slot Head empty, the button TRY ON again (the backpack can be worn too) | nothing asked |
+| S.23 | the helmet tried on again, a double click on its tile in the slot Head | the helmet is a line of BUY, 900; YOU PAY -900; the trying goes on; the card comes up for the tried tile as for any | `quote` answered |
+| S.24 | key Esc while the helmet is tried on and in the cart | the screen closes; the world is as it was, no second character in it; no error line in either log | nothing asked |
 
 No `SCRIPT (E)` line and no `ERROR` line in the client's or the server's log of any of
 these runs; the boots' verdicts were a pass.
@@ -95,6 +99,10 @@ room, seen from the screen; a second client.
 - **A window moved off the desktop is still captured.** The client at 3840x1600 was moved
   to x = 3900 as soon as its window existed (`SetWindowPos`, no activation); the MCP's
   screenshot of it was a full, live frame, and the owner's desktop was never covered.
+- **Trying on stands where phase 2a said it must.** The copy of the character is made at
+  the player's own place, facing as the player faces, with its simulation on: its face was
+  natural (S.21), the screen covers it, and the player did not move on the server while it
+  stood there. It is deleted when the trying ends and when the screen closes (S.24).
 - **A trap of this machine, not of the screen.** The owner's taskbar stands at the left
   edge of the desktop, 80 pixels wide, and the client's window opens in the top left
   corner, under it. Real clicks at client x below 77 went to the taskbar: for an hour the

@@ -140,6 +140,10 @@ class OZT_TradeMenu : UIScriptedMenu
     protected bool m_OpenFlying;
     protected bool m_DealFlying;
 
+    // Trying on: the character shown in goods that are not bought.
+    protected ref OZT_TryOn m_Try;
+    protected string m_PickType;
+
     // The item card and the tile the cursor rests on; the price list.
     protected ref OZT_Card m_Card;
     protected ref OZT_PriceList m_List;
@@ -208,6 +212,7 @@ class OZT_TradeMenu : UIScriptedMenu
         m_OwnPanel = layoutRoot.FindAnyWidget("OwnPanel");
         m_CharPanel = layoutRoot.FindAnyWidget("CharPanel");
         m_View = PlayerPreviewWidget.Cast(layoutRoot.FindAnyWidget("CharView"));
+        m_Try = new OZT_TryOn(m_View);
         m_Qty = new OZT_QtyDialog(this);
         m_Card = new OZT_Card();
         m_List = new OZT_PriceList();
@@ -255,6 +260,8 @@ class OZT_TradeMenu : UIScriptedMenu
         m_Held = null;
         m_Dragged = null;
         m_Hover = null;
+        if (m_Try)
+            m_Try.Drop();
         if (m_Qty)
             m_Qty.Destroy();
         if (m_Card)
@@ -553,6 +560,7 @@ class OZT_TradeMenu : UIScriptedMenu
     {
         if (ok)
         {
+            EndTry();
             m_Cart.Clear();
             m_Quote = null;
             m_DirtyOwn = true;
@@ -635,11 +643,67 @@ class OZT_TradeMenu : UIScriptedMenu
         if (!m_View)
             return;
         DayZPlayer me = GetGame().GetPlayer();
+        m_View.SetModelOrientation(m_Turned);
+        if (m_Try && m_Try.IsOn())
+            return;
         m_View.SetPlayer(me);
         m_View.SetModelPosition("0 0 0.605");
-        m_View.SetModelOrientation(m_Turned);
         if (me)
             m_View.UpdateItemInHands(me.GetHumanInventory().GetEntityInHands());
+    }
+
+    // ---- trying on ---------------------------------------------------------------------------------
+
+    // The button under the selected thing: there for goods the character
+    // could wear, and it says what a press would do.
+    protected void PaintTry()
+    {
+        bool goods = m_PickKind == OZT_Tile.SHELF || m_PickKind == OZT_Tile.BUY;
+        bool wearable = false;
+        if (goods && m_PickType != "" && OZT_TryOn.SlotFor(m_PickType) != InventorySlots.INVALID)
+            wearable = true;
+        OZT_Ui.Show(layoutRoot, "TryBtn", wearable);
+        bool on = false;
+        if (m_Try && m_Try.IsOn())
+            on = true;
+        if (on)
+        {
+            OZT_Ui.Say(layoutRoot, "TryBtnText", OZT_Ui.Words("STR_OZT_UI_TAKE_OFF"));
+            OZT_Ui.Say(layoutRoot, "CharMeta", OZT_Ui.Words("STR_OZT_UI_TRYING"));
+            OZT_Ui.Tint(layoutRoot, "CharMeta", OZT_Look.Accent());
+        }
+        else
+        {
+            OZT_Ui.Say(layoutRoot, "TryBtnText", OZT_Ui.Words("STR_OZT_UI_TRY_ON"));
+            OZT_Ui.Say(layoutRoot, "CharMeta", "");
+        }
+    }
+
+    // The button: on with the selected goods, or off.
+    protected void ToggleTry()
+    {
+        if (!m_Try)
+            return;
+        if (m_Try.IsOn())
+        {
+            EndTry();
+            return;
+        }
+        if (m_PickType == "" || !m_Try.Put(m_PickType))
+            return;
+        m_DirtySlots = true;
+        PaintTry();
+    }
+
+    // Trying ends when something else is selected, when the goods are taken
+    // off, when a deal is made and when the screen closes.
+    protected void EndTry()
+    {
+        if (!m_Try || !m_Try.IsOn())
+            return;
+        m_Try.Drop();
+        m_DirtySlots = true;
+        PaintTry();
     }
 
     // The vanilla inventory's way: the yaw follows the mouse while the button
@@ -912,6 +976,7 @@ class OZT_TradeMenu : UIScriptedMenu
 
         array<string> labels = new array<string>();
         array<string> icons = new array<string>();
+        array<int> ids = new array<int>();
         array<EntityAI> worn = new array<EntityAI>();
         array<string> names = new array<string>();
         GetGame().ConfigGetTextArray(SLOT_LIST, names);
@@ -930,10 +995,12 @@ class OZT_TradeMenu : UIScriptedMenu
                 label = Widget.TranslateString(label);
             labels.Insert(label);
             icons.Insert(icon);
+            ids.Insert(id);
             worn.Insert(player.GetInventory().FindAttachment(id));
         }
         labels.Insert(OZT_Ui.Words("STR_OZT_UI_HANDS"));
         icons.Insert("set:dayz_inventory image:hands");
+        ids.Insert(InventorySlots.INVALID);
         worn.Insert(player.GetHumanInventory().GetEntityInHands());
 
         // Units of the layout: the block is 440 wide and 442 high, a slot 64
@@ -980,11 +1047,33 @@ class OZT_TradeMenu : UIScriptedMenu
             if (img && icons[i] != "")
                 img.LoadImageFile(0, StaticGUIUtils.VerifyIconImageString(StaticGUIUtils.IMAGESETGROUP_INVENTORY, icons[i]));
 
+            Widget into = sw.FindAnyWidget("SlotHold");
+            // The slot of what is tried on shows the goods, lit: a tile of the
+            // shelf, so a double click on it buys them.
+            if (m_Try && m_Try.IsOn() && ids[i] != InventorySlots.INVALID && ids[i] == m_Try.SlotId())
+            {
+                EntityAI stand = m_Shelf.Of(m_Try.Tried());
+                OZT_WireGoods tg = GoodsOf(m_Try.Tried());
+                if (stand && tg && into)
+                {
+                    OZT_Tile tried = new OZT_Tile(OZT_Tile.SHELF, m_Try.Tried(), stand);
+                    tried.Price = tg.Buy;
+                    if (tried.Build(into))
+                    {
+                        tried.Fill(w, hold);
+                        tried.SetPicked(true);
+                        m_SlotTiles.Insert(tried);
+                        if (img)
+                            img.Show(false);
+                    }
+                    continue;
+                }
+            }
+
             EntityAI on = worn[i];
             if (!on || m_Data.Notes.Find(on.GetType()) > -1)
                 continue;
             OZT_Tile tile = OwnTile(on);
-            Widget into = sw.FindAnyWidget("SlotHold");
             if (!tile || !into || !tile.Build(into))
                 continue;
             tile.Fill(w, hold);
@@ -1223,6 +1312,9 @@ class OZT_TradeMenu : UIScriptedMenu
     {
         m_PickKind = t.Kind;
         m_PickKey = KeyOf(t);
+        m_PickType = t.Type;
+        if (m_Try && m_Try.IsOn() && m_Try.Tried() != t.Type)
+            EndTry();
         RepaintPicks(m_ShelfGrid);
         RepaintPicks(m_OwnGrid);
         RepaintPicks(m_BuyGrid);
@@ -1264,6 +1356,9 @@ class OZT_TradeMenu : UIScriptedMenu
     {
         m_PickKind = 0;
         m_PickKey = "";
+        m_PickType = "";
+        EndTry();
+        PaintTry();
         OZT_Ui.Say(layoutRoot, "SelName", "");
         OZT_Ui.Say(layoutRoot, "SelPrice", "");
         OZT_Ui.Say(layoutRoot, "SelSub", "");
@@ -1321,6 +1416,7 @@ class OZT_TradeMenu : UIScriptedMenu
         RichTextWidget text = RichTextWidget.Cast(layoutRoot.FindAnyWidget("SelText"));
         if (text)
             text.SetText(about);
+        PaintTry();
     }
 
     // ---- what the player does ----------------------------------------------------------------------
@@ -1489,6 +1585,11 @@ class OZT_TradeMenu : UIScriptedMenu
         if (w && w.GetName() == "ListBtn")
         {
             ToggleList();
+            return true;
+        }
+        if (w && w.GetName() == "TryBtn")
+        {
+            ToggleTry();
             return true;
         }
         return super.OnClick(w, x, y, button);

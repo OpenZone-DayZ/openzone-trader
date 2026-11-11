@@ -700,7 +700,7 @@ FrameWidgetClass OZT_Trade {
        visible 1
        ignorepointer 1
        position 18 568
-       size 440 128
+       size 440 84
        hexactpos 1
        vexactpos 1
        hexactsize 1
@@ -716,6 +716,64 @@ FrameWidgetClass OZT_Trade {
        wrap 1
        "size to text h" 0
        "size to text v" 0
+      }
+      // Shown while the selected thing is goods the character could wear; the menu turns its caption while they are tried on.
+      ButtonWidgetClass TryBtn {
+       visible 0
+       position 298 658
+       size 160 40
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text ""
+       priority 9
+       {
+        PanelWidgetClass TryBtnEdge {
+         visible 1
+         ignorepointer 1
+         position -1 -1
+         size 162 42
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.22 0.3 0.38 1
+         priority 0
+         style rover_sim_colorable
+        }
+        PanelWidgetClass TryBtnBg {
+         visible 1
+         ignorepointer 1
+         position 0 0
+         size 160 40
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.135 0.18 0.225 1
+         priority 1
+         style rover_sim_colorable
+        }
+        TextWidgetClass TryBtnText {
+         visible 1
+         ignorepointer 1
+         position 0 0
+         size 160 40
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.9 0.93 0.95 1
+         priority 2
+         text "#STR_OZT_UI_TRY_ON"
+         font "gui/fonts/sdf_MetronBook24"
+         "exact text" 1
+         "exact text size" 14
+         "text halign" center
+         "text valign" center
+        }
+       }
       }
      }
     }

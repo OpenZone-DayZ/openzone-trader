@@ -74,3 +74,7 @@ STR_OZT_UI_COL_SELLS,ТОРГОВЕЦЬ ПРОДАЄ,TRADER SELLS FOR
 STR_OZT_UI_COL_PAYS,ТОРГОВЕЦЬ ПЛАТИТЬ,TRADER PAYS YOU
 STR_OZT_UI_PER_UNIT_NOTE,за одиницю,per unit
 STR_OZT_UI_LIST_NOTE,"Торговець платить вказану суму за нову річ. Знос її зменшує: зношена - %1%, пошкоджена - %2%, сильно пошкоджена - %3%. Зруйновані речі торговець не бере.","What the trader pays is shown for a pristine item. Wear lowers it: worn %1%, damaged %2%, badly damaged %3%. Ruined items are not taken."
+# Trying on.
+STR_OZT_UI_TRY_ON,ПРИМIРЯТИ,TRY ON
+STR_OZT_UI_TAKE_OFF,ЗНЯТИ,TAKE OFF
+STR_OZT_UI_TRYING,примірка: ще не куплено,trying on: not bought yet

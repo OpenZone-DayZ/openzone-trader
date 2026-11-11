@@ -13,7 +13,8 @@ the inventory model and the deal, driven on the test stand by scripted deals
 ([docs/measurements](docs/measurements)). The trade screen works for plain items too: the
 shelf, your own things and your character's slots, a deal put together by double click or
 by dragging, how many of a stack, the server's verdict before you confirm, a card for the
-thing under the cursor and the trader's price list
+thing under the cursor, the trader's price list, and goods tried on your character before
+you buy them
 ([screen.md](docs/measurements/2026-11-11/screen.md)). It is opened by a stand command:
 the trader's action in the world and items with parts come with their own phases, so
 there is still nothing to play. The plans are in [docs](docs); the
@@ -35,7 +36,8 @@ tools. They are never published and no server should load them.
 предметами, модель інвентаря та угода), її перевірено на стенді сценарними угодами. Екран
 обміну теж працює для простих речей: полиця торговця, ваші речі, слоти персонажа, угода
 подвійним клацанням або перетягуванням, кількість зі стосу, вердикт сервера до
-підтвердження, картка речі під курсором і прайс торговця. Відкривається він поки що
+підтвердження, картка речі під курсором, прайс торговця і примірка товару на персонажі
+до купівлі. Відкривається він поки що
 командою стенда: дія торговця у світі та речі з частинами — попереду, тож грати ще нема
 в що.
 

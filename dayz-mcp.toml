@@ -1,0 +1,23 @@
+# Portable half of the profile for dayz-agentic-modding-mcp.
+# Machine paths live in dayz-mcp.local.toml, which is not committed.
+
+[project]
+name = "openzone-trader"
+
+[build]
+# Phase 0 (2026-11-11): only the measurement probe exists. The mod itself, OpenZone_Trader,
+# joins this list in phase 1.
+#
+# OpenZone_TraderProbe        -- client + server: the stand-in wallet, banknote and wear slot,
+#                                the op engine and the client's inventory dump.
+# OpenZone_TraderProbe_Bridge -- server only: the `ozt_probe` verb for the MCP bridge
+#                                (world_exec). Requires @DZMCP_Bridge.
+mods = ["OpenZone_TraderProbe", "OpenZone_TraderProbe_Bridge"]
+
+[expect]
+# Printed by the probe's MissionServer.OnInit.
+ready_line   = "trader probe loaded"
+max_warnings = 0
+forbid       = ["Bad type", "Can't compile", "NULL pointer to instance"]
+error_regex  = ["SCRIPT\\s+\\(E\\).*OZT_"]
+noise        = []

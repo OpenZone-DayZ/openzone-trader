@@ -282,6 +282,19 @@ loop comes from a trader's factor (`Sell 60, Buy 120`). They now name both sums.
 The verdict of the second boot, taken before row B.24, is a pass with no warning. A reload
 needs no client: these three rows ran with nobody connected.
 
+### A banknote in the price book (the third boot)
+
+Found re-reading the cross-checks: nothing stopped a banknote of the server from standing in
+the price book, where a note bought below its value, or sold above it, is a money press. A
+note class there is now skipped at load.
+
+| # | what is asked | command | answer | as expected? |
+|---|---|---|---|---|
+| B.27 | the goods file with `{ "ClassName": "OZT_ProbeNote500", "Buy": 400 }` added | `{"op": "reload"}` | `reloaded: traders=1 goods=11 money=items gates=none problems=1 revision=2`; `WARNING: Goods: 'OZT_ProbeNote500' in category 'gear' is skipped: it is one of this server's banknotes, and money is not goods` | yes |
+| B.28 | the file back | `{"op": "reload"}` | `problems=0 revision=3` | yes |
+
+The verdict of the third boot, taken before row B.27, is a pass with no warning.
+
 Not covered here either: a second client watching such a deal; a thing bought into a
 container bought in the same deal (it is not planned: a backpack and things for it, with full
 bags, are two deals).

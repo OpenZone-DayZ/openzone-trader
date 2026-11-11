@@ -220,8 +220,8 @@ class OZT_Config
         return false;
     }
 
-    // Goods: the class exists, stands in the book once, and both prices are
-    // whole multiples of the smallest note.
+    // Goods: the class exists, is not one of the server's banknotes, stands in
+    // the book once, and both prices are whole multiples of the smallest note.
     private void CheckGoods()
     {
         int unit = Unit();
@@ -237,6 +237,13 @@ class OZT_Config
                 if (!ClassKnown(e.ClassName))
                 {
                     Problem("Goods: '" + e.ClassName + "' in category '" + cat.Id + "' is skipped: no such class");
+                    continue;
+                }
+                if (NoteIn(m_Settings.Notes, e.ClassName))
+                {
+                    // Money sold for money: bought below its value or sold
+                    // above it, a note would be a money press.
+                    Problem("Goods: '" + e.ClassName + "' in category '" + cat.Id + "' is skipped: it is one of this server's banknotes, and money is not goods");
                     continue;
                 }
                 if (seen.Find(e.ClassName) > -1)

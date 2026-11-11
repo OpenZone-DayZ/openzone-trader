@@ -1,0 +1,308 @@
+=== #1 strip ok=yes frame=124277 t=85 args: op=strip
+    deleted 7 top-level item(s); send dress as the next command
+=== #2 dress ok=yes frame=133681 t=90 args: op=dress
+    dressed: 23 of 23 handles; a missing one has a 'dress: NOT' line in results.log
+=== #3 dump ok=yes frame=155806 t=102 args: op=dump
+    dump: 23 items -> server_dump.txt; cargos=7 cells asked=149 model-vs-engine mismatches=0
+    probe entity Paper 1x1 made=yes
+    cargo 022613 M65Jacket_Black 6x4 items=2 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022555 slot=Body
+    cargo 022634 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO M65Jacket_Black#022613 r0 c0 flip=no
+    cargo 022614 CargoPants_Black 5x4 items=0 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022555 slot=Legs
+    cargo 022619 PlateCarrierPouches 5x3 items=0 children accessible=yes mismatches=0 at ATT PlateCarrierVest#022616 slot=VestPouch
+    cargo 022617 TaloonBag_Blue 6x5 items=4 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022555 slot=Back
+    cargo 022631 SmallProtectorCase 3x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022617 r0 c3 flip=no
+    cargo 022632 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022617 r2 c0 flip=no
+=== #4 create ok=yes frame=194494 t=124 args: via=loc into=bag as=p1 class=Paper op=create cell=free
+    create Paper asked CARGO TaloonBag_Blue r3 c2 flip=no via=loc -> got CARGO TaloonBag_Blue#022617 r3 c2 flip=no | - | entity 1x1 | 0 ms
+    config size of Paper: 1x1 found=yes
+    watching created Paper from CARGO TaloonBag_Blue#022617 r3 c2 flip=no
+    watch #4 created Paper ends +3000 ms, 5517 frames: CARGO TaloonBag_Blue#022617 r3 c2 flip=no
+=== #5 create ok=yes frame=208127 t=131 args: via=loc into=bag flip=1 as=m1 class=Mag_AKM_30Rnd op=create cell=free
+    create Mag_AKM_30Rnd asked CARGO TaloonBag_Blue r4 c0 flip=yes via=loc -> got CARGO TaloonBag_Blue#022617 r4 c0 flip=yes | ammo 30/30 | entity 1x3 | 0 ms
+    config size of Mag_AKM_30Rnd: 1x3 found=yes
+    watching created Mag_AKM_30Rnd from CARGO TaloonBag_Blue#022617 r4 c0 flip=yes
+    watch #5 created Mag_AKM_30Rnd ends +3000 ms, 5932 frames: CARGO TaloonBag_Blue#022617 r4 c0 flip=yes
+=== #6 create ok=yes frame=216050 t=135 args: via=loc into=bag class=Paper op=create cell=taken
+    create Paper asked CARGO TaloonBag_Blue r0 c0 flip=no via=loc -> the engine returned nothing
+    config size of Paper: 1x1 found=yes
+=== #7 create ok=yes frame=231931 t=143 args: via=loc into=bag class=Mag_AKM_30Rnd op=create cell=last
+    create Mag_AKM_30Rnd asked CARGO TaloonBag_Blue r4 c5 flip=no via=loc -> the engine returned nothing
+    config size of Mag_AKM_30Rnd: 1x3 found=yes
+=== #8 create ok=yes frame=246263 t=150 args: via=ex into=bag as=p2 class=Paper op=create cell=free
+    create Paper asked CARGO TaloonBag_Blue r4 c3 flip=no via=ex -> got CARGO TaloonBag_Blue#022617 r4 c3 flip=no | - | entity 1x1 | 0 ms
+    config size of Paper: 1x1 found=yes
+    watching created Paper from CARGO TaloonBag_Blue#022617 r4 c3 flip=no
+    watch #8 created Paper ends +3000 ms, 6050 frames: CARGO TaloonBag_Blue#022617 r4 c3 flip=no
+=== #9 create ok=yes frame=259939 t=157 args: via=ex into=bag flip=1 as=m2 class=Mag_AKM_30Rnd op=create cell=free
+    create Mag_AKM_30Rnd asked cell=free in TaloonBag_Blue (no such cell: no cargo, or nothing free by the map) -> the engine returned nothing
+    config size of Mag_AKM_30Rnd: 1x3 found=yes
+=== #10 create ok=yes frame=284117 t=170 args: via=ex into=pants flip=1 as=m2 class=Mag_AKM_30Rnd op=create cell=2,1
+    create Mag_AKM_30Rnd asked CARGO CargoPants_Black r2 c1 flip=yes via=ex -> got CARGO CargoPants_Black#022614 r2 c1 flip=yes | ammo 30/30 | entity 1x3 | 0 ms
+    config size of Mag_AKM_30Rnd: 1x3 found=yes
+    watching created Mag_AKM_30Rnd from CARGO CargoPants_Black#022614 r2 c1 flip=yes
+    watch #10 created Mag_AKM_30Rnd ends +3000 ms, 6165 frames: CARGO CargoPants_Black#022614 r2 c1 flip=yes
+=== #11 create ok=yes frame=298311 t=177 args: via=loc into=pants as=p4 class=Paper op=create cell=3,4
+    create Paper asked CARGO CargoPants_Black r3 c4 flip=no via=loc -> got CARGO CargoPants_Black#022614 r3 c4 flip=no | - | entity 1x1 | 0 ms
+    config size of Paper: 1x1 found=yes
+    watching created Paper from CARGO CargoPants_Black#022614 r3 c4 flip=no
+    watch #11 created Paper ends +3000 ms, 5593 frames: CARGO CargoPants_Black#022614 r3 c4 flip=no
+=== #12 create ok=yes frame=305942 t=181 args: via=ex into=bag class=Paper op=create cell=taken
+    create Paper asked CARGO TaloonBag_Blue r0 c0 flip=no via=ex -> the engine returned nothing
+    config size of Paper: 1x1 found=yes
+=== #13 create ok=yes frame=324293 t=190 args: via=ex into=bag class=Mag_AKM_30Rnd op=create cell=last
+    create Mag_AKM_30Rnd asked CARGO TaloonBag_Blue r4 c5 flip=no via=ex -> the engine returned nothing
+    config size of Mag_AKM_30Rnd: 1x3 found=yes
+=== #14 create ok=yes frame=344364 t=200 args: via=loc into=pouches as=p3 class=Paper op=create cell=free
+    create Paper asked CARGO PlateCarrierPouches r0 c0 flip=no via=loc -> got CARGO PlateCarrierPouches#022619 r0 c0 flip=no | - | entity 1x1 | 0 ms
+    config size of Paper: 1x1 found=yes
+    watching created Paper from CARGO PlateCarrierPouches#022619 r0 c0 flip=no
+    watch #14 created Paper ends +3001 ms, 6215 frames: CARGO PlateCarrierPouches#022619 r0 c0 flip=no
+=== #15 create ok=yes frame=362423 t=209 args: via=loc into=pants class=Mag_AKM_30Rnd op=create cell=0,2
+    create Mag_AKM_30Rnd asked CARGO CargoPants_Black r0 c2 flip=no via=loc -> the engine returned nothing
+    config size of Mag_AKM_30Rnd: 1x3 found=yes
+=== #16 create ok=yes frame=373340 t=215 args: via=ex into=pants class=Mag_AKM_30Rnd op=create cell=0,2
+    create Mag_AKM_30Rnd asked CARGO CargoPants_Black r0 c2 flip=no via=ex -> the engine returned nothing
+    config size of Mag_AKM_30Rnd: 1x3 found=yes
+=== #17 dump ok=yes frame=388124 t=223 args: op=dump
+    dump: 29 items -> server_dump.txt; cargos=7 cells asked=149 model-vs-engine mismatches=0
+    probe entity Paper 1x1 made=yes
+    cargo 022613 M65Jacket_Black 6x4 items=2 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022555 slot=Body
+    cargo 022634 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO M65Jacket_Black#022613 r0 c0 flip=no
+    cargo 022614 CargoPants_Black 5x4 items=2 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022555 slot=Legs
+    cargo 022619 PlateCarrierPouches 5x3 items=1 children accessible=yes mismatches=0 at ATT PlateCarrierVest#022616 slot=VestPouch
+    cargo 022617 TaloonBag_Blue 6x5 items=7 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022555 slot=Back
+    cargo 022631 SmallProtectorCase 3x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022617 r0 c3 flip=no
+    cargo 022632 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022617 r2 c0 flip=no
+=== #18 create ok=yes frame=411958 t=235 args: slot=Headgear via=loc into=player as=helmet class=Mich2001Helmet op=create kind=slot
+    create Mich2001Helmet asked ATT SurvivorM_Boris slot=Headgear via=loc -> got ATT SurvivorM_Boris#022555 slot=Headgear | - | entity 4x3 | 0 ms
+    config size of Mich2001Helmet: 4x3 found=yes
+    watching created Mich2001Helmet from ATT SurvivorM_Boris#022555 slot=Headgear
+    watch #18 created Mich2001Helmet ends +3001 ms, 6062 frames: ATT SurvivorM_Boris#022555 slot=Headgear
+=== #19 create ok=yes frame=427686 t=243 args: slot=Back via=loc into=player class=TaloonBag_Blue op=create kind=slot
+    create TaloonBag_Blue asked ATT SurvivorM_Boris slot=Back via=loc -> the engine returned nothing
+    config size of TaloonBag_Blue: 4x5 found=yes
+    the slot Back already holds 022617 TaloonBag_Blue
+=== #20 create ok=yes frame=441726 t=250 args: slot=NVG via=att into=helmet as=nvg class=NVGoggles op=create kind=slot
+    create NVGoggles asked ATT Mich2001Helmet slot=NVG via=att -> got ATT Mich2001Helmet#022694 slot=NVG | - | entity 2x2 | 0 ms
+    config size of NVGoggles: 2x2 found=yes
+    watching created NVGoggles from ATT Mich2001Helmet#022694 slot=NVG
+    watch #20 created NVGoggles ends +3000 ms, 5019 frames: ATT Mich2001Helmet#022694 slot=NVG
+=== #21 create ok=yes frame=448715 t=254 args: slot=BatteryD via=att into=nvg as=nvg_battery class=Battery9V op=create kind=slot
+    create Battery9V asked ATT NVGoggles slot=BatteryD via=att -> got ATT NVGoggles#022695 slot=BatteryD | qty 50/50 | entity 1x1 | 0 ms
+    config size of Battery9V: 1x1 found=yes
+    watching created Battery9V from ATT NVGoggles#022695 slot=BatteryD
+    watch #21 created Battery9V ends +3001 ms, 6145 frames: ATT NVGoggles#022695 slot=BatteryD
+=== #22 create ok=yes frame=477262 t=268 args: slot=OZT_ProbeWear via=loc into=player as=badge class=OZT_ProbeBadge op=create kind=slot
+    create OZT_ProbeBadge asked ATT SurvivorM_Boris slot=OZT_ProbeWear via=loc -> got ATT SurvivorM_Boris#022555 slot=OZT_ProbeWear | - | entity 2x2 | 1 ms
+    config size of OZT_ProbeBadge: 2x2 found=yes
+    watching created OZT_ProbeBadge from ATT SurvivorM_Boris#022555 slot=OZT_ProbeWear
+    watch #22 created OZT_ProbeBadge ends +3000 ms, 6491 frames: ATT SurvivorM_Boris#022555 slot=OZT_ProbeWear
+=== #23 create ok=yes frame=502314 t=281 args: slot=Melee via=loc into=player as=rifle2 class=AKM op=create kind=slot
+    create AKM asked ATT SurvivorM_Boris slot=Melee via=loc -> got ATT SurvivorM_Boris#022555 slot=Melee | - | entity 8x3 | 1 ms
+    config size of AKM: 8x3 found=yes
+    watching created AKM from ATT SurvivorM_Boris#022555 slot=Melee
+    watch #23 created AKM ends +3002 ms, 5452 frames: ATT SurvivorM_Boris#022555 slot=Melee
+=== #24 create ok=yes frame=535003 t=297 args: via=att into=rifle2 as=rifle2_mag class=Mag_AKM_30Rnd op=create kind=slot
+    create Mag_AKM_30Rnd asked ATT AKM slot=(the engine's choice) via=CreateAttachment -> got ATT AKM#022708 slot=magazine | ammo 30/30 | entity 1x3 | 0 ms
+    config size of Mag_AKM_30Rnd: 1x3 found=yes
+    watching created Mag_AKM_30Rnd from ATT AKM#022708 slot=magazine
+    watch #24 created Mag_AKM_30Rnd ends +3000 ms, 5956 frames: ATT AKM#022708 slot=magazine
+=== #25 weapon ok=yes frame=542908 t=301 args: op=weapon item=rifle2
+    AKM at ATT SurvivorM_Boris#022555 slot=Melee | GetMagazine=022709 Mag_AKM_30Rnd | IsIdle=yes | attachments=1
+      022709 Mag_AKM_30Rnd | ATT AKM#022708 slot=magazine | 1x3 | ammo 30/30
+=== #26 weapon ok=yes frame=550499 t=305 args: op=weapon item=rifle
+    AKM at ATT SurvivorM_Boris#022555 slot=Shoulder | GetMagazine=022623 Mag_AKM_30Rnd | IsIdle=yes | attachments=5
+      022623 Mag_AKM_30Rnd | ATT AKM#022618 slot=magazine | 1x3 | ammo 30/30
+      022624 PSO1Optic | ATT AKM#022618 slot=weaponOpticsAK | 3x2 | -
+      022625 AK_Suppressor | ATT AKM#022618 slot=weaponMuzzleAK | 3x1 | -
+      022626 AK_WoodBttstck | ATT AKM#022618 slot=weaponButtstockAK | 3x1 | -
+      022627 AK_WoodHndgrd | ATT AKM#022618 slot=weaponHandguardAK | 2x1 | -
+=== #27 dump ok=yes frame=623458 t=342 args: op=dump
+    dump: 35 items -> server_dump.txt; cargos=8 cells asked=173 model-vs-engine mismatches=0
+    probe entity Paper 1x1 made=yes
+    cargo 022613 M65Jacket_Black 6x4 items=2 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022555 slot=Body
+    cargo 022634 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO M65Jacket_Black#022613 r0 c0 flip=no
+    cargo 022614 CargoPants_Black 5x4 items=2 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022555 slot=Legs
+    cargo 022619 PlateCarrierPouches 5x3 items=1 children accessible=yes mismatches=0 at ATT PlateCarrierVest#022616 slot=VestPouch
+    cargo 022617 TaloonBag_Blue 6x5 items=7 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022555 slot=Back
+    cargo 022631 SmallProtectorCase 3x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022617 r0 c3 flip=no
+    cargo 022632 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022617 r2 c0 flip=no
+    cargo 022707 OZT_ProbeBadge 6x4 items=0 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022555 slot=OZT_ProbeWear
+=== #28 hands ok=yes frame=652349 t=356 args: op=hands
+    hands hold null | inventory processing=no | CanDeleteItems=yes | action running=no | in vehicle=no
+    alive=yes unconscious=no restrained=no
+=== #29 create ok=yes frame=660920 t=360 args: via=hands as=h1 class=Canteen op=create kind=hands
+    create Canteen asked HANDS via=hands (the hands hold null) -> got HANDS SurvivorM_Boris#022555 | qty 1000/1000 | entity 2x2 | 0 ms
+    config size of Canteen: 2x2 found=yes
+    watching created Canteen from HANDS SurvivorM_Boris#022555
+    watch #29 created Canteen ends +3000 ms, 5425 frames: HANDS SurvivorM_Boris#022555
+=== #30 hands ok=yes frame=668320 t=364 args: op=hands
+    hands hold 022718 Canteen | inventory processing=no | CanDeleteItems=yes | action running=no | in vehicle=no
+    alive=yes unconscious=no restrained=no
+    juncture on the held item=no
+=== #31 create ok=yes frame=702776 t=380 args: class=Paper op=create via=hands kind=hands
+    create Paper asked HANDS via=hands (the hands hold 022718 Canteen) -> the engine returned nothing
+    config size of Paper: 1x1 found=yes
+=== #32 create ok=yes frame=711688 t=384 args: class=Paper op=create via=loc kind=hands
+    create Paper asked HANDS via=loc (the hands hold 022718 Canteen) -> the engine returned nothing
+    config size of Paper: 1x1 found=yes
+=== #33 dump ok=yes frame=727565 t=392 args: op=dump
+    dump: 36 items -> server_dump.txt; cargos=8 cells asked=173 model-vs-engine mismatches=0
+    probe entity Paper 1x1 made=yes
+    cargo 022613 M65Jacket_Black 6x4 items=2 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022555 slot=Body
+    cargo 022634 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO M65Jacket_Black#022613 r0 c0 flip=no
+    cargo 022614 CargoPants_Black 5x4 items=2 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022555 slot=Legs
+    cargo 022619 PlateCarrierPouches 5x3 items=1 children accessible=yes mismatches=0 at ATT PlateCarrierVest#022616 slot=VestPouch
+    cargo 022617 TaloonBag_Blue 6x5 items=7 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022555 slot=Back
+    cargo 022631 SmallProtectorCase 3x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022617 r0 c3 flip=no
+    cargo 022632 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022617 r2 c0 flip=no
+    cargo 022707 OZT_ProbeBadge 6x4 items=0 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022555 slot=OZT_ProbeWear
+=== #34 create ok=yes frame=759808 t=411 args: qty=35 into=pants as=nails class=Nail op=create cell=free
+    create Nail asked CARGO CargoPants_Black r0 c0 flip=no via=loc -> got CARGO CargoPants_Black#022614 r0 c0 flip=no | qty 35/99 | entity 1x1 | 0 ms
+    config size of Nail: 1x1 found=yes
+    watching created Nail from CARGO CargoPants_Black#022614 r0 c0 flip=no
+    watch #34 created Nail ends +3000 ms, 5882 frames: CARGO CargoPants_Black#022614 r0 c0 flip=no
+=== #35 qty ok=yes frame=774924 t=419 args: add=20 op=qty item=nails
+    Nail: qty 35/99 -> AddQuantity(20) answered no -> qty 55/99
+    GetQuantityMax=99 GetTargetQuantityMax=99 varStackMax=99 CanBeSplit=yes IsFullQuantity=no
+    watching amount of Nail from CARGO CargoPants_Black#022614 r0 c0 flip=no
+    watch #35 amount of Nail ends +3000 ms, 5235 frames: CARGO CargoPants_Black#022614 r0 c0 flip=no
+=== #36 qty ok=yes frame=795649 t=430 args: set=70 op=qty item=nails
+    Nail: qty 55/99 -> SetQuantity(70) answered no -> qty 70/99
+    GetQuantityMax=99 GetTargetQuantityMax=99 varStackMax=99 CanBeSplit=yes IsFullQuantity=no
+    watching amount of Nail from CARGO CargoPants_Black#022614 r0 c0 flip=no
+    watch #36 amount of Nail ends +3000 ms, 5984 frames: CARGO CargoPants_Black#022614 r0 c0 flip=no
+=== #37 qty ok=yes frame=815146 t=440 args: set=500 op=qty item=nails
+    Nail: qty 70/99 -> SetQuantity(500) answered no -> qty 99/99
+    GetQuantityMax=99 GetTargetQuantityMax=99 varStackMax=99 CanBeSplit=yes IsFullQuantity=yes
+    watching amount of Nail from CARGO CargoPants_Black#022614 r0 c0 flip=no
+    watch #37 amount of Nail ends +3000 ms, 5715 frames: CARGO CargoPants_Black#022614 r0 c0 flip=no
+=== #38 qty ok=yes frame=822661 t=444 args: add=-69 op=qty item=nails
+    Nail: qty 99/99 -> AddQuantity(-69) answered no -> qty 30/99
+    GetQuantityMax=99 GetTargetQuantityMax=99 varStackMax=99 CanBeSplit=yes IsFullQuantity=no
+    watching amount of Nail from CARGO CargoPants_Black#022614 r0 c0 flip=no
+    watch #38 amount of Nail ends +3000 ms, 5831 frames: CARGO CargoPants_Black#022614 r0 c0 flip=no
+=== #39 create ok=yes frame=830378 t=448 args: qty=120 into=pants as=note1 class=OZT_ProbeNote op=create cell=free
+    create OZT_ProbeNote asked CARGO CargoPants_Black r0 c1 flip=no via=loc -> got CARGO CargoPants_Black#022614 r0 c1 flip=no | qty 120/500 | entity 2x1 | 0 ms
+    config size of OZT_ProbeNote: 2x1 found=yes
+    watching created OZT_ProbeNote from CARGO CargoPants_Black#022614 r0 c1 flip=no
+    watch #39 created OZT_ProbeNote ends +3000 ms, 5166 frames: CARGO CargoPants_Black#022614 r0 c1 flip=no
+=== #40 qty ok=yes frame=856358 t=460 args: set=500 op=qty item=note1
+    OZT_ProbeNote: qty 120/500 -> SetQuantity(500) answered no -> qty 500/500
+    GetQuantityMax=500 GetTargetQuantityMax=500 varStackMax=0 CanBeSplit=yes IsFullQuantity=yes
+    watching amount of OZT_ProbeNote from CARGO CargoPants_Black#022614 r0 c1 flip=no
+    watch #40 amount of OZT_ProbeNote ends +3000 ms, 7336 frames: CARGO CargoPants_Black#022614 r0 c1 flip=no
+=== #41 qty ok=yes frame=885781 t=472 args: set=501 op=qty item=note1
+    OZT_ProbeNote: qty 500/500 -> SetQuantity(501) answered no -> qty 500/500
+    GetQuantityMax=500 GetTargetQuantityMax=500 varStackMax=0 CanBeSplit=yes IsFullQuantity=yes
+    watching amount of OZT_ProbeNote from CARGO CargoPants_Black#022614 r0 c1 flip=no
+    watch #41 amount of OZT_ProbeNote ends +3000 ms, 7114 frames: CARGO CargoPants_Black#022614 r0 c1 flip=no
+=== #42 create ok=yes frame=904803 t=480 args: ammo=7 into=pants as=pile class=Ammo_762x39 op=create cell=free
+    create Ammo_762x39 asked CARGO CargoPants_Black r0 c3 flip=no via=loc -> got CARGO CargoPants_Black#022614 r0 c3 flip=no | ammo 7/20 | entity 1x1 | 0 ms
+    config size of Ammo_762x39: 1x1 found=yes
+    watching created Ammo_762x39 from CARGO CargoPants_Black#022614 r0 c3 flip=no
+    watch #42 created Ammo_762x39 ends +3000 ms, 7141 frames: CARGO CargoPants_Black#022614 r0 c3 flip=no
+=== #43 qty ok=yes frame=921671 t=487 args: ammo=20 op=qty item=pile
+    Ammo_762x39: ammo 7/20 -> ServerSetAmmoCount(20) -> ammo 20/20
+    GetQuantityMax=1 GetTargetQuantityMax=1 varStackMax=0 CanBeSplit=yes IsFullQuantity=yes
+    watching amount of Ammo_762x39 from CARGO CargoPants_Black#022614 r0 c3 flip=no
+    watch #43 amount of Ammo_762x39 ends +3000 ms, 7233 frames: CARGO CargoPants_Black#022614 r0 c3 flip=no
+=== #44 create ok=yes frame=938692 t=494 args: ammo=11 into=pants as=mag11 class=Mag_AKM_30Rnd op=create cell=free
+    create Mag_AKM_30Rnd asked CARGO CargoPants_Black r0 c4 flip=no via=loc -> got CARGO CargoPants_Black#022614 r0 c4 flip=no | ammo 11/30 | entity 1x3 | 0 ms
+    config size of Mag_AKM_30Rnd: 1x3 found=yes
+    watching created Mag_AKM_30Rnd from CARGO CargoPants_Black#022614 r0 c4 flip=no
+    watch #44 created Mag_AKM_30Rnd ends +3000 ms, 7299 frames: CARGO CargoPants_Black#022614 r0 c4 flip=no
+=== #45 qty ok=yes frame=958332 t=502 args: ammo=45 op=qty item=pile
+    Ammo_762x39: ammo 20/20 -> ServerSetAmmoCount(45) -> ammo 20/20
+    GetQuantityMax=1 GetTargetQuantityMax=1 varStackMax=0 CanBeSplit=yes IsFullQuantity=yes
+    watching amount of Ammo_762x39 from CARGO CargoPants_Black#022614 r0 c3 flip=no
+    watch #45 amount of Ammo_762x39 ends +3000 ms, 7056 frames: CARGO CargoPants_Black#022614 r0 c3 flip=no
+=== #46 dump ok=yes frame=974392 t=509 args: op=dump
+    dump: 40 items -> server_dump.txt; cargos=8 cells asked=173 model-vs-engine mismatches=0
+    probe entity Paper 1x1 made=yes
+    cargo 022613 M65Jacket_Black 6x4 items=2 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022555 slot=Body
+    cargo 022634 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO M65Jacket_Black#022613 r0 c0 flip=no
+    cargo 022614 CargoPants_Black 5x4 items=6 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022555 slot=Legs
+    cargo 022619 PlateCarrierPouches 5x3 items=1 children accessible=yes mismatches=0 at ATT PlateCarrierVest#022616 slot=VestPouch
+    cargo 022617 TaloonBag_Blue 6x5 items=7 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022555 slot=Back
+    cargo 022631 SmallProtectorCase 3x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022617 r0 c3 flip=no
+    cargo 022632 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022617 r2 c0 flip=no
+    cargo 022707 OZT_ProbeBadge 6x4 items=0 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022555 slot=OZT_ProbeWear
+=== #47 qty ok=yes frame=1010778 t=524 args: set=0 op=qty item=nails
+    Nail: qty 30/99 -> SetQuantity(0) answered yes -> qty 0/99
+    GetQuantityMax=99 GetTargetQuantityMax=99 varStackMax=99 CanBeSplit=no IsFullQuantity=no
+    watching amount of Nail from CARGO CargoPants_Black#022614 r0 c0 flip=no
+    watch #47 amount of Nail changed +2 ms, 1 frames: GONE
+=== #48 qty ok=yes frame=1025375 t=530 args: ammo=0 op=qty item=pile
+    Ammo_762x39: ammo 20/20 -> ServerSetAmmoCount(0) -> ammo 0/20
+    GetQuantityMax=1 GetTargetQuantityMax=1 varStackMax=0 CanBeSplit=no IsFullQuantity=no
+    watching amount of Ammo_762x39 from CARGO CargoPants_Black#022614 r0 c3 flip=no
+    watch #48 amount of Ammo_762x39 ends +3000 ms, 7193 frames: CARGO CargoPants_Black#022614 r0 c3 flip=no
+=== #49 dump ok=yes frame=1041896 t=537 args: op=dump
+    dump: 39 items -> server_dump.txt; cargos=8 cells asked=173 model-vs-engine mismatches=0
+    probe entity Paper 1x1 made=yes
+    cargo 022613 M65Jacket_Black 6x4 items=2 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022555 slot=Body
+    cargo 022634 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO M65Jacket_Black#022613 r0 c0 flip=no
+    cargo 022614 CargoPants_Black 5x4 items=5 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022555 slot=Legs
+    cargo 022619 PlateCarrierPouches 5x3 items=1 children accessible=yes mismatches=0 at ATT PlateCarrierVest#022616 slot=VestPouch
+    cargo 022617 TaloonBag_Blue 6x5 items=7 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022555 slot=Back
+    cargo 022631 SmallProtectorCase 3x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022617 r0 c3 flip=no
+    cargo 022632 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022617 r2 c0 flip=no
+    cargo 022707 OZT_ProbeBadge 6x4 items=0 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022555 slot=OZT_ProbeWear
+=== #50 create ok=yes frame=1105004 t=563 args: qty=50 via=loc into=wallet_jacket as=n_wj class=OZT_ProbeNote op=create cell=free
+    create OZT_ProbeNote asked CARGO OZT_ProbeWallet r0 c0 flip=no via=loc -> got CARGO OZT_ProbeWallet#022634 r0 c0 flip=no | qty 50/500 | entity 2x1 | 0 ms
+    config size of OZT_ProbeNote: 2x1 found=yes
+    watching created OZT_ProbeNote from CARGO OZT_ProbeWallet#022634 r0 c0 flip=no
+    watch #50 created OZT_ProbeNote ends +3000 ms, 7399 frames: CARGO OZT_ProbeWallet#022634 r0 c0 flip=no
+=== #51 create ok=yes frame=1122233 t=570 args: qty=50 via=ex into=wallet_jacket class=OZT_ProbeNote op=create cell=free
+    create OZT_ProbeNote asked CARGO OZT_ProbeWallet r0 c2 flip=no via=ex -> got CARGO OZT_ProbeWallet#022634 r0 c2 flip=no | qty 50/500 | entity 2x1 | 0 ms
+    config size of OZT_ProbeNote: 2x1 found=yes
+    watching created OZT_ProbeNote from CARGO OZT_ProbeWallet#022634 r0 c2 flip=no
+    watch #51 created OZT_ProbeNote ends +3000 ms, 7205 frames: CARGO OZT_ProbeWallet#022634 r0 c2 flip=no
+=== #52 create ok=yes frame=1141718 t=578 args: qty=50 via=find into=wallet_jacket class=OZT_ProbeNote op=create cell=free
+    create OZT_ProbeNote asked CARGO OZT_ProbeWallet r0 c4 flip=no via=find -> got CARGO OZT_ProbeWallet#022634 r0 c4 flip=no | qty 50/500 | entity 2x1 | 1 ms
+    config size of OZT_ProbeNote: 2x1 found=yes
+    watching created OZT_ProbeNote from CARGO OZT_ProbeWallet#022634 r0 c4 flip=no
+    watch #52 created OZT_ProbeNote ends +3000 ms, 7269 frames: CARGO OZT_ProbeWallet#022634 r0 c4 flip=no
+=== #53 create ok=yes frame=1158748 t=585 args: qty=50 via=loc into=wallet_bag as=n_wb class=OZT_ProbeNote op=create cell=free
+    create OZT_ProbeNote asked CARGO OZT_ProbeWallet r0 c0 flip=no via=loc -> got CARGO OZT_ProbeWallet#022632 r0 c0 flip=no | qty 50/500 | entity 2x1 | 0 ms
+    config size of OZT_ProbeNote: 2x1 found=yes
+    watching created OZT_ProbeNote from CARGO OZT_ProbeWallet#022632 r0 c0 flip=no
+    watch #53 created OZT_ProbeNote ends +3000 ms, 7206 frames: CARGO OZT_ProbeWallet#022632 r0 c0 flip=no
+=== #54 create ok=yes frame=1180724 t=594 args: qty=50 via=loc into=badge as=n_badge class=OZT_ProbeNote op=create cell=free
+    create OZT_ProbeNote asked CARGO OZT_ProbeBadge r0 c0 flip=no via=loc -> got CARGO OZT_ProbeBadge#022707 r0 c0 flip=no | qty 50/500 | entity 2x1 | 0 ms
+    config size of OZT_ProbeNote: 2x1 found=yes
+    watching created OZT_ProbeNote from CARGO OZT_ProbeBadge#022707 r0 c0 flip=no
+    watch #54 created OZT_ProbeNote ends +3000 ms, 7231 frames: CARGO OZT_ProbeBadge#022707 r0 c0 flip=no
+=== #55 create ok=yes frame=1192874 t=599 args: via=loc into=wallet_jacket class=Paper op=create cell=free
+    create Paper asked CARGO OZT_ProbeWallet r1 c0 flip=no via=loc -> the engine returned nothing
+    config size of Paper: 1x1 found=yes
+=== #56 create ok=yes frame=1212367 t=607 args: via=loc into=case class=Paper op=create cell=free
+    create Paper asked CARGO SmallProtectorCase r0 c0 flip=no via=loc -> the engine returned nothing
+    config size of Paper: 1x1 found=yes
+=== #57 create ok=yes frame=1231847 t=615 args: via=loc into=jacket as=slotwallet class=OZT_ProbeSlotWallet op=create cell=free
+    create OZT_ProbeSlotWallet asked CARGO M65Jacket_Black r0 c3 flip=no via=loc -> got CARGO M65Jacket_Black#022613 r0 c3 flip=no | - | entity 2x2 | 0 ms
+    config size of OZT_ProbeSlotWallet: 2x2 found=yes
+    watching created OZT_ProbeSlotWallet from CARGO M65Jacket_Black#022613 r0 c3 flip=no
+    watch #57 created OZT_ProbeSlotWallet ends +3000 ms, 7382 frames: CARGO M65Jacket_Black#022613 r0 c3 flip=no
+=== #58 create ok=yes frame=1256302 t=625 args: slot=OZT_ProbeNote qty=200 via=att into=slotwallet as=n_slot class=OZT_ProbeNote op=create kind=slot
+    create OZT_ProbeNote asked ATT OZT_ProbeSlotWallet slot=OZT_ProbeNote via=att -> got ATT OZT_ProbeSlotWallet#022747 slot=OZT_ProbeNote | qty 200/500 | entity 2x1 | 1 ms
+    config size of OZT_ProbeNote: 2x1 found=yes
+    watching created OZT_ProbeNote from ATT OZT_ProbeSlotWallet#022747 slot=OZT_ProbeNote
+    watch #58 created OZT_ProbeNote ends +3000 ms, 6620 frames: ATT OZT_ProbeSlotWallet#022747 slot=OZT_ProbeNote
+=== #59 qty ok=yes frame=1265214 t=629 args: add=25 op=qty item=n_wb
+    OZT_ProbeNote: qty 50/500 -> AddQuantity(25) answered no -> qty 75/500
+    GetQuantityMax=500 GetTargetQuantityMax=500 varStackMax=0 CanBeSplit=yes IsFullQuantity=no
+    watching amount of OZT_ProbeNote from CARGO OZT_ProbeWallet#022632 r0 c0 flip=no
+    watch #59 amount of OZT_ProbeNote ends +3000 ms, 7106 frames: CARGO OZT_ProbeWallet#022632 r0 c0 flip=no
+=== #60 dump ok=yes frame=1285345 t=638 args: op=dump
+    dump: 46 items -> server_dump.txt; cargos=8 cells asked=173 model-vs-engine mismatches=0
+    probe entity Paper 1x1 made=yes
+    cargo 022613 M65Jacket_Black 6x4 items=3 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022555 slot=Body
+    cargo 022634 OZT_ProbeWallet 6x4 items=3 children accessible=no mismatches=0 at CARGO M65Jacket_Black#022613 r0 c0 flip=no
+    cargo 022614 CargoPants_Black 5x4 items=5 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022555 slot=Legs
+    cargo 022619 PlateCarrierPouches 5x3 items=1 children accessible=yes mismatches=0 at ATT PlateCarrierVest#022616 slot=VestPouch
+    cargo 022617 TaloonBag_Blue 6x5 items=7 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022555 slot=Back
+    cargo 022631 SmallProtectorCase 3x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022617 r0 c3 flip=no
+    cargo 022632 OZT_ProbeWallet 6x4 items=1 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022617 r2 c0 flip=no
+    cargo 022707 OZT_ProbeBadge 6x4 items=1 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022555 slot=OZT_ProbeWear

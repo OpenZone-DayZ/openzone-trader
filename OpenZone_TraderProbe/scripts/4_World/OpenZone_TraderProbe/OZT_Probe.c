@@ -124,6 +124,12 @@ class OZT_Probe
             return OpWhere(player, args, detail);
         if (op == "weapon")
             return OpWeapon(player, args, detail);
+        if (op == "create")
+            return OZT_ProbeOpsCreate.MakeOne(this, player, args, detail);
+        if (op == "qty")
+            return OZT_ProbeOpsCreate.ChangeAmount(this, player, args, detail);
+        if (op == "hands")
+            return OZT_ProbeOpsGate.HandsState(this, player, detail);
         // -- routes of the later tasks go above this line --
         detail = "unknown op '" + op + "'; known: " + KnownOps();
         return false;
@@ -131,7 +137,7 @@ class OZT_Probe
 
     protected string KnownOps()
     {
-        return "status, strip, dress, dump, find, where, weapon";
+        return "status, strip, dress, dump, find, where, weapon, create, qty, hands";
     }
 
     protected bool OpStatus(out string detail)

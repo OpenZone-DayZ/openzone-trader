@@ -189,6 +189,12 @@ class OZT_DealRes
     // in the way (not empty).
     int Left = 0;
 
+    // What stays with the player of the things they sell: the parts that come
+    // off (kept by choice, or not taken by the trader) and the loaded rounds
+    // that come back as piles.
+    int Kept = 0;
+    int KeptRounds = 0;
+
     // What the lines come to, on a refusal too as far as they were read: what
     // the trader pays for everything sold, what everything bought costs, and
     // each line's own sum in the order of the request. The screen shows these

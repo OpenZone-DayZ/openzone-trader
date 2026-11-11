@@ -8,6 +8,11 @@
 // only, with a local entity of the class that no client ever sees: how big the
 // thing is, and whether a holder's script gate takes it.
 //
+// A part the player keeps of a sold thing is the one exception: it exists, and
+// it moves before anything is deleted. It is placed in a picture of the
+// inventory as it is, and the engine is asked about the thing itself at the
+// very cell (PlaceMoved).
+//
 // What this rests on was measured in phase 0
 // (docs/measurements/2026-11-11/answers.md): a picture built from each item's
 // own inventory location agrees with the engine on every cell; a creation at a
@@ -118,6 +123,7 @@ class OZT_InvModel
 {
     protected PlayerBase m_Player;
     protected ref array<EntityAI> m_Gone;
+    protected ref array<EntityAI> m_Shut;
     protected ref array<ref OZT_Grid> m_Grids;
     protected ref array<int> m_SlotsTaken;
     protected bool m_HandsFree;
@@ -131,7 +137,11 @@ class OZT_InvModel
 
     // `gone` is what leaves in this deal: the things sold whole and the note
     // stacks a payment spends whole. Their cells, slots and hands count as free.
-    void OZT_InvModel(PlayerBase player, array<EntityAI> gone)
+    // `shut` is what stays where it is in this picture and still takes nothing:
+    // a part that moves in this deal, or, in the picture as it is, a thing that
+    // is about to be sold. Neither list has to name what hangs on its things or
+    // lies in them: all of that takes nothing either.
+    void OZT_InvModel(PlayerBase player, array<EntityAI> gone, array<EntityAI> shut)
     {
         m_Player = player;
         m_Gone = new array<EntityAI>();
@@ -139,6 +149,12 @@ class OZT_InvModel
         {
             for (int i = 0; i < gone.Count(); i++)
                 m_Gone.Insert(gone[i]);
+        }
+        m_Shut = new array<EntityAI>();
+        if (shut)
+        {
+            for (int k = 0; k < shut.Count(); k++)
+                m_Shut.Insert(shut[k]);
         }
         m_Grids = new array<ref OZT_Grid>();
         m_SlotsTaken = new array<int>();
@@ -162,7 +178,7 @@ class OZT_InvModel
             EntityAI e = all[i];
             if (!e || e == m_Player)
                 continue;
-            if (m_Gone.Find(e) > -1)
+            if (Leaves(e))
                 continue;
             if (OZT_Stack.Countable(e) && !e.IsRuined())
             {
@@ -191,6 +207,20 @@ class OZT_InvModel
         if (held && m_Gone.Find(held) < 0)
             free = false;
         m_HandsFree = free;
+    }
+
+    // Does the thing leave or move in this deal, or hang on or lie in one that
+    // does? Such a thing is no holder and no stack of the plan's.
+    protected bool Leaves(EntityAI e)
+    {
+        EntityAI at = e;
+        while (at && at != m_Player)
+        {
+            if (m_Gone.Find(at) > -1 || m_Shut.Find(at) > -1)
+                return true;
+            at = at.GetHierarchyParent();
+        }
+        return false;
     }
 
     protected OZT_Grid GridOf(EntityAI holder, CargoBase cargo)
@@ -447,6 +477,82 @@ class OZT_InvModel
         place.Turned = false;
         place.SlotId = InventorySlots.INVALID;
         return true;
+    }
+
+    // ---- a thing that exists and moves ------------------------------------------------
+
+    static void SizeOf(EntityAI e, out int w, out int h)
+    {
+        w = 0;
+        h = 0;
+        GetGame().GetInventoryItemSize(InventoryItem.Cast(e), w, h);
+    }
+
+    // A cell for a part the player keeps, in this picture: holders in the
+    // engine's order, the first free place of each, and the engine's own word
+    // about the thing itself at that very cell (occupancy and every gate, so a
+    // pouch with something in it is not laid where the game would not let it
+    // be). Marks the cells.
+    bool PlaceMoved(EntityAI e, out OZT_Place place)
+    {
+        place = null;
+        int w;
+        int h;
+        SizeOf(e, w, h);
+        if (w <= 0 || h <= 0)
+            return false;
+        for (int i = 0; i < m_Grids.Count(); i++)
+        {
+            OZT_Grid g = m_Grids[i];
+            int row;
+            int col;
+            bool turned;
+            if (!g.Seek(w, h, row, col, turned))
+                continue;
+            InventoryLocation dst = new InventoryLocation();
+            dst.SetCargo(g.Holder, e, 0, row, col, turned);
+            if (!GameInventory.LocationCanAddEntity(dst))
+                continue;
+            if (turned)
+                g.Mark(row, col, h, w);
+            else
+                g.Mark(row, col, w, h);
+            place = new OZT_Place();
+            place.Kind = InventoryLocationType.CARGO;
+            place.Holder = g.Holder;
+            place.Row = row;
+            place.Col = col;
+            place.Turned = turned;
+            place.SlotId = InventorySlots.INVALID;
+            return true;
+        }
+        return false;
+    }
+
+    // The cells of a place another picture gave to a part that moves there:
+    // taken in this one. `w` and `h` are the part's own, unturned.
+    void Reserve(OZT_Place place, int w, int h)
+    {
+        if (!place)
+            return;
+        if (place.Kind == InventoryLocationType.HANDS)
+        {
+            m_HandsFree = false;
+            return;
+        }
+        if (place.Kind != InventoryLocationType.CARGO)
+            return;
+        for (int i = 0; i < m_Grids.Count(); i++)
+        {
+            OZT_Grid g = m_Grids[i];
+            if (g.Holder != place.Holder)
+                continue;
+            if (place.Turned)
+                g.Mark(place.Row, place.Col, h, w);
+            else
+                g.Mark(place.Row, place.Col, w, h);
+            return;
+        }
     }
 
     // ---- stacks the player keeps -------------------------------------------------

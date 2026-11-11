@@ -47,6 +47,8 @@ class OZT_VerbOps
             return OpShow(player, args, detail);
         if (op == "tree")
             return OpTree(player, args, detail);
+        if (op == "load")
+            return OpLoad(player, args, detail);
         // -- ops of the later tasks go above this line --
         detail = "unknown op '" + op + "'; known: " + KnownOps();
         return false;
@@ -54,7 +56,7 @@ class OZT_VerbOps
 
     static string KnownOps()
     {
-        return "status, reload, balance, price, pay, damage, open, fit, quote, deal, show, tree";
+        return "status, reload, balance, price, pay, damage, open, fit, quote, deal, show, tree, load";
     }
 
     // ---- what the ops share ---------------------------------------------------
@@ -230,7 +232,7 @@ class OZT_VerbOps
             gone.Insert(leaving);
         }
 
-        OZT_InvModel model = new OZT_InvModel(player, gone);
+        OZT_InvModel model = new OZT_InvModel(player, gone, null);
         bool wear = OZT_Config.Get().Settings().WearBought == 1;
         array<string> classes = new array<string>();
         array<ref OZT_Place> places = new array<ref OZT_Place>();
@@ -323,17 +325,27 @@ class OZT_VerbOps
     }
 
     // quote / deal: [trader=<id>] [sell=Class[:units][#nth],...] [sellnear=Class]
-    // [buy=Class:n,...] [net=<n>]
+    // [keep=Class[#nth],...] [keeprounds=Class[#nth],...] [buy=Class:n,...]
+    // [net=<n>] [refuse=<1..3>]
     //
     // `sell` names things the player carries; `sellnear` a thing lying within
-    // five metres (to ask for something that is not the player's). A quote runs
-    // every check and the whole plan and changes nothing. A deal is sent through
-    // the service handler, as a client's is; without net= it carries the net the
-    // server itself quotes, as an honest client would.
+    // five metres (to ask for something that is not the player's). `keep` names
+    // parts of the sold things that stay with the player, `keeprounds` things
+    // whose loaded rounds stay; both go onto every sell line, and a line reads
+    // only what is its own. A quote runs every check and the whole plan and
+    // changes nothing. A deal is sent through the service handler, as a
+    // client's is; without net= it carries the net the server itself quotes, as
+    // an honest client would. refuse= makes the commit treat the planned place
+    // of every kept part as refused (1), the engine's own choice too (2), the
+    // ground as well (3): the ways out of a wrong plan.
     static bool OpDeal(PlayerBase player, map<string, string> args, bool commit, out string detail)
     {
         OZT_DealReq req = new OZT_DealReq();
         req.Trader = Arg(args, "trader", "stand");
+
+        array<ref OZT_WireKeep> keep;
+        if (!Keeps(player, args, keep, detail))
+            return false;
 
         array<string> names;
         array<int> counts;
@@ -347,7 +359,10 @@ class OZT_VerbOps
                 detail = "the player carries no " + names[s] + " number " + nths[s].ToString();
                 return false;
             }
-            req.Sells.Insert(SellOf(sold, counts[s]));
+            OZT_WireSell line = SellOf(sold, counts[s]);
+            for (int k = 0; k < keep.Count(); k++)
+                line.Keep.Insert(keep[k].Copy());
+            req.Sells.Insert(line);
         }
 
         string near = Arg(args, "sellnear", "");
@@ -402,7 +417,10 @@ class OZT_VerbOps
             req.Net = q.Net;
         }
         JsonFileLoader<OZT_DealReq>.MakeData(req, json, err, false);
+        if (args.Contains("refuse"))
+            OZT_Deal.StandRefuse(Arg(args, "refuse", "0").ToInt());
         string body = Ask(player, OZT_Const.OP_DEAL, json, ok, why);
+        OZT_Deal.StandRefuse(0);
         detail = "deal " + Told(body, ok, why);
         return true;
     }
@@ -448,6 +466,17 @@ class OZT_VerbOps
             s = "ok=no why=" + why;
         s = s + " net=" + res.Net.ToString() + " paid=" + res.Paid.ToString() + " received=" + res.Received.ToString();
         s = s + " balance=" + res.Balance.ToString() + " hands=" + res.InHands + " left=" + res.Left.ToString();
+        s = s + " sold=" + res.Sold.ToString() + " lines=";
+        if (res.SellPrices)
+        {
+            for (int i = 0; i < res.SellPrices.Count(); i++)
+            {
+                if (i > 0)
+                    s = s + "+";
+                s = s + res.SellPrices[i].ToString();
+            }
+        }
+        s = s + " kept=" + res.Kept.ToString() + " rounds=" + res.KeptRounds.ToString();
         return s;
     }
 
@@ -523,6 +552,42 @@ class OZT_VerbOps
         else
             detail = "tree: the trader does not take it: " + tree.Text();
         SaveAnswer(detail);
+        return true;
+    }
+
+    // load class=<Weapon> [nth=<k>] [inner=<pile class>] [chamber=<pile class>]:
+    // a stand helper. The weapon's internal magazine filled with rounds of
+    // that pile, every chamber loaded with a round of that pile: the game's
+    // own calls for a spawned weapon.
+    static bool OpLoad(PlayerBase player, map<string, string> args, out string detail)
+    {
+        string type = Arg(args, "class", "");
+        Weapon_Base wpn = Weapon_Base.Cast(Carried(player, type, Arg(args, "nth", "0").ToInt()));
+        if (!wpn)
+        {
+            detail = "load: the player carries no weapon " + type;
+            return false;
+        }
+        string inner = Arg(args, "inner", "");
+        if (inner != "")
+            wpn.FillInnerMagazine(inner, WeaponWithAmmoFlags.NONE);
+        string chamber = Arg(args, "chamber", "");
+        if (chamber != "")
+            wpn.FillChamber(chamber, WeaponWithAmmoFlags.CHAMBER);
+
+        detail = type + ":";
+        for (int m = 0; m < wpn.GetMuzzleCount(); m++)
+        {
+            string state = "empty";
+            if (!wpn.IsChamberEmpty(m))
+            {
+                state = "loaded";
+                if (wpn.IsChamberFiredOut(m))
+                    state = "fired";
+            }
+            detail = detail + " muzzle " + m.ToString() + " chamber " + state;
+            detail = detail + " inner " + wpn.GetInternalMagazineCartridgeCount(m).ToString();
+        }
         return true;
     }
 

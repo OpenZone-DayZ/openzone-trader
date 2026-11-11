@@ -9,6 +9,9 @@
 //   not taken   the trader pays nothing for it: it comes off and stays, and the
 //               player cannot change that
 //   rides       it hangs on a kept part and goes wherever that part goes
+//   built in    it sits in a slot the game does not show the player (a
+//               revolver's cylinder, whatever a mod builds into a weapon): it
+//               is the thing itself, neither priced nor kept, and goes with it
 //
 // What lies in a thing's cargo is not in its tree: it is a thing of its own.
 // A sold node with a cargo can go only when everything inside goes with it in
@@ -60,6 +63,7 @@ class OZT_Tree
     static const int KEPT      = 1;
     static const int NOT_TAKEN = 2;
     static const int RIDES     = 3;
+    static const int BUILT_IN  = 4;
 
     // The root first, then every node under it, a part after what it hangs on.
     ref array<ref OZT_Node> Nodes;
@@ -173,6 +177,11 @@ class OZT_Tree
             EntityAI part = e.GetInventory().GetAttachmentFromIndex(i);
             if (!part)
                 continue;
+            if (BuiltIn(e, part))
+            {
+                AddNode(part, node, BUILT_IN);
+                continue;
+            }
             if (m_Keep.Find(part) > -1)
             {
                 OZT_Node kept = AddNode(part, node, KEPT);
@@ -194,6 +203,20 @@ class OZT_Tree
             Gone.Insert(part);
             Walk(sold);
         }
+    }
+
+    // Does the part sit in a slot its host does not show the player? The
+    // game's own test, the one its inventory screen draws slots by: what is not
+    // shown cannot be taken off by hand, so it is no part of the player's.
+    static bool BuiltIn(EntityAI host, EntityAI part)
+    {
+        InventoryLocation il = new InventoryLocation();
+        if (!part.GetInventory().GetCurrentInventoryLocation(il))
+            return false;
+        if (il.GetType() != InventoryLocationType.ATTACHMENT)
+            return false;
+        int slot = il.GetSlot();
+        return !host.CanDisplayAttachmentSlot(slot);
     }
 
     // Everything on a part that stays: listed, never priced, never touched.
@@ -386,6 +409,8 @@ class OZT_Tree
                 word = word + ":kept";
             else if (n.State == NOT_TAKEN)
                 word = word + ":no";
+            else if (n.State == BUILT_IN)
+                word = word + ":built-in";
             else
                 word = word + ":rides";
             if (s != "")

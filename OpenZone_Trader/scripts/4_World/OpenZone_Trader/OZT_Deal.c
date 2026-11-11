@@ -4,19 +4,22 @@
 // price itself, and plans every place before anything changes (design §4.3):
 //
 //   1. the player and the trader      who, where, doing nothing else
-//   2. the sells                      yours, taken here, plain
+//   2. the sells                      yours, taken here; a stack, or a tree
 //   3. the buys and the net           compared with what the client showed
 //   4. the money                      enough of it; which notes; what comes back
-//   5. the places                     everything bought and every note given
+//   5. the places                     kept parts first, then everything bought,
+//                                     every round that comes back, every note given
 //   6. the commit                     ONE script call
 //
-// The commit's order is phase 0's: what leaves is deleted with ObjectDelete,
-// which frees its place at once; stacks shrink; new things are created at their
+// The commit's order is phase 0's: the parts the player keeps move off what is
+// sold, while it still stands; what leaves is deleted with ObjectDelete, which
+// frees its place at once; stacks shrink; new things are created at their
 // planned places; stacks grow. No frame passes in between.
 //
-// Phase 1 sells and buys plain things. An item that has something hanging on
-// it, lying in it or loaded into it is refused as "not empty"; phase 3 sells
-// such an item as a tree.
+// A thing that is not a stack is sold as a tree (OZT_Tree): itself, what hangs
+// on it and what is loaded in it, each part by its own line of the book. What
+// lies inside a thing is no part of it: a container is sold when everything in
+// it is sold by the same deal.
 
 // A stack the player keeps, grown (a merge) or shrunk (a part sold or paid).
 class OZT_Grow
@@ -34,6 +37,19 @@ class OZT_Make
     // Above zero: a stack of this many units. Zero: as the game makes it, a
     // magazine with no rounds in it.
     int Units;
+
+    // Below zero: new. Otherwise the health of rounds that come back, 0..1.
+    float Health;
+}
+
+// A part the player keeps: it comes off the sold thing and goes to a place the
+// plan chose in the inventory as it was. No place: none was found.
+class OZT_Move
+{
+    EntityAI Item;
+    ref OZT_Place Place;
+    int W;
+    int H;
 }
 
 class OZT_Deal
@@ -50,12 +66,20 @@ class OZT_Deal
     protected static ref map<string, int> s_Last = new map<string, int>();
     protected static ref map<string, int> s_LastQuote = new map<string, int>();
 
+    // The stand's switch, for one commit: 1 treats the planned place of every
+    // kept part as refused, 2 the engine's own choice too, 3 the ground as
+    // well. It is how the three ways out of a wrong plan are seen working;
+    // nothing but the stand verb sets it.
+    protected static int s_StandRefuse = 0;
+
     protected PlayerBase m_Player;
     protected OZT_Point m_Trader;
     protected OZT_MoneyProvider m_Money;
     protected ref OZT_InvModel m_Model;
     protected ref OZT_DealRes m_Res;
 
+    // Everything that is deleted: every sold node of every tree, the stacks
+    // sold whole, the note stacks spent whole.
     protected ref array<EntityAI> m_Gone;
     protected ref array<ref OZT_Grow> m_Grows;
     protected ref array<ref OZT_Make> m_Makes;
@@ -64,6 +88,14 @@ class OZT_Deal
     protected ref array<string> m_BuyRules;
     protected ref array<string> m_Homeless;
     protected ref array<int> m_HomelessUnits;
+    protected ref array<float> m_HomelessHealth;
+
+    // The sold trees; the parts that come off them; the same parts as a list
+    // for the pictures; the lots of rounds that come back.
+    protected ref array<ref OZT_Tree> m_Trees;
+    protected ref array<ref OZT_Move> m_Moves;
+    protected ref array<EntityAI> m_Shut;
+    protected ref array<OZT_RoundLot> m_KeptLots;
 
     // True while a plan is laid with the first thing that needs cells set aside
     // for the hands: the second laying of PlanPlaces.
@@ -90,6 +122,12 @@ class OZT_Deal
     {
         s_Last.Clear();
         s_LastQuote.Clear();
+        s_StandRefuse = 0;
+    }
+
+    static void StandRefuse(int ways)
+    {
+        s_StandRefuse = ways;
     }
 
     void OZT_Deal(PlayerBase player)
@@ -104,6 +142,11 @@ class OZT_Deal
         m_BuyRules = new array<string>();
         m_Homeless = new array<string>();
         m_HomelessUnits = new array<int>();
+        m_HomelessHealth = new array<float>();
+        m_Trees = new array<ref OZT_Tree>();
+        m_Moves = new array<ref OZT_Move>();
+        m_Shut = new array<EntityAI>();
+        m_KeptLots = new array<OZT_RoundLot>();
         m_Lines = "";
     }
 
@@ -193,7 +236,15 @@ class OZT_Deal
             m_Res.Balance = m_Money.Balance(m_Player) - m_Net;
             return "";
         }
-        return Commit();
+
+        // A commit that stops has paid nothing and given nothing.
+        why = Commit();
+        if (why != "")
+        {
+            m_Res.Paid = 0;
+            m_Res.Received = 0;
+        }
+        return why;
     }
 
     // ---- 1. the player and the trader ------------------------------------------
@@ -251,88 +302,143 @@ class OZT_Deal
 
     protected string ReadSells(array<ref OZT_WireSell> sells)
     {
+        // Every line's thing first: a container goes when everything that
+        // lies in it goes in the same deal, so each line has to know them all.
+        array<EntityAI> roots = new array<EntityAI>();
+        array<EntityAI> whole = new array<EntityAI>();
+        for (int r = 0; r < sells.Count(); r++)
+        {
+            OZT_WireSell asked = sells[r];
+            EntityAI thing = EntityAI.Cast(GetGame().GetObjectByNetworkId(asked.Low, asked.High));
+            if (!thing || thing.GetHierarchyRootPlayer() != m_Player)
+                return OZT_Const.NO_NOT_YOURS;
+            if (roots.Find(thing) > -1)
+                return OZT_Const.NO_INTERNAL;
+            roots.Insert(thing);
+            bool part = false;
+            if (OZT_Stack.Countable(thing) && asked.Count > 0 && asked.Count < OZT_Stack.Units(thing))
+                part = true;
+            if (!part)
+                whole.Insert(thing);
+        }
+
+        // A thing that hangs on another line's thing is that line's part
+        // already, sold or kept: no screen sends it twice.
+        for (int h = 0; h < roots.Count(); h++)
+        {
+            if (HangsOn(roots[h], roots))
+                return OZT_Const.NO_INTERNAL;
+        }
+
         int total = 0;
         for (int i = 0; i < sells.Count(); i++)
         {
             OZT_WireSell line = sells[i];
-            EntityAI e = EntityAI.Cast(GetGame().GetObjectByNetworkId(line.Low, line.High));
-            if (!e || e.GetHierarchyRootPlayer() != m_Player)
-                return OZT_Const.NO_NOT_YOURS;
-            if (m_Gone.Find(e) > -1 || Shrinking(e))
-                return OZT_Const.NO_INTERNAL;
-
-            int units = 1;
-            bool whole = true;
+            EntityAI e = roots[i];
+            int price = 0;
             if (OZT_Stack.Countable(e))
             {
-                units = OZT_Stack.Units(e);
+                int units = OZT_Stack.Units(e);
+                bool entire = true;
                 if (line.Count > 0 && line.Count < units)
                 {
                     units = line.Count;
-                    whole = false;
+                    entire = false;
                 }
+                // A ruined thing prices at zero.
+                OZT_BookEntry entry = OZT_Book.EntryOf(e.GetType());
+                price = OZT_Book.SellPrice(m_Trader, entry, e, units);
+                if (price <= 0)
+                    return OZT_Const.NO_NOT_TAKEN;
+                if (entire)
+                    m_Gone.Insert(e);
+                else
+                    AddGrow(e, -units);
+                m_Lines = m_Lines + " -" + e.GetType() + "x" + units.ToString() + "=" + price.ToString();
             }
-
-            // "Not taken" before "not empty": if the trader does not want the
-            // thing, emptying it would not help. A ruined thing prices at zero.
-            OZT_BookEntry entry = OZT_Book.EntryOf(e.GetType());
-            int price = OZT_Book.SellPrice(m_Trader, entry, e, units);
-            if (price <= 0)
-                return OZT_Const.NO_NOT_TAKEN;
-
-            int inside = InTheWay(e);
-            if (inside > 0)
+            else
             {
-                m_Res.Left = inside;
-                return OZT_Const.NO_NOT_EMPTY;
+                // "Not taken" before "not empty": if the trader does not want
+                // the thing, emptying it would not help.
+                OZT_Tree tree = OZT_Tree.Read(m_Trader, e, line.Keep, whole);
+                if (!tree.Taken())
+                    return OZT_Const.NO_NOT_TAKEN;
+                if (tree.Inside > 0)
+                {
+                    m_Res.Left = tree.Inside;
+                    return OZT_Const.NO_NOT_EMPTY;
+                }
+                price = tree.Total;
+                int back = m_Res.KeptRounds;
+                TakeTree(tree);
+                back = m_Res.KeptRounds - back;
+                string word = " -" + e.GetType() + "=" + price.ToString();
+                word = word + "(" + tree.Gone.Count().ToString() + " sold, " + tree.Moves.Count().ToString() + " kept";
+                if (back > 0)
+                    word = word + ", " + back.ToString() + " rounds back";
+                m_Lines = m_Lines + word + ")";
             }
 
             total = total + price;
             m_Res.SellPrices.Insert(price);
             m_Res.Sold = total;
-            if (whole)
-                m_Gone.Insert(e);
-            else
-                AddGrow(e, -units);
-            m_Lines = m_Lines + " -" + e.GetType() + "x" + units.ToString() + "=" + price.ToString();
         }
         m_Net = m_Net - total;
         return "";
     }
 
-    protected bool Shrinking(EntityAI e)
+    // Does the thing hang, by attachments alone, on one of the others?
+    protected bool HangsOn(EntityAI e, array<EntityAI> roots)
     {
-        for (int i = 0; i < m_Grows.Count(); i++)
+        EntityAI at = e;
+        while (at)
         {
-            if (m_Grows[i].Stack == e)
+            InventoryLocation il = new InventoryLocation();
+            if (!at.GetInventory().GetCurrentInventoryLocation(il))
+                return false;
+            if (il.GetType() != InventoryLocationType.ATTACHMENT)
+                return false;
+            EntityAI up = il.GetParent();
+            if (!up || up == m_Player)
+                return false;
+            if (roots.Find(up) > -1)
                 return true;
+            at = up;
         }
         return false;
     }
 
-    // What hangs on a thing, lies in it or is loaded into it.
-    static int InTheWay(EntityAI e)
+    // What a sold tree means for the deal: its sold nodes are deleted, the
+    // parts that come off it move, the rounds that are not sold come back.
+    protected void TakeTree(OZT_Tree tree)
     {
-        int n = e.GetInventory().AttachmentCount();
-        CargoBase cargo = e.GetInventory().GetCargo();
-        if (cargo)
-            n = n + cargo.GetItemCount();
-
-        Magazine mag = Magazine.Cast(e);
-        if (mag && !mag.IsAmmoPile())
-            n = n + mag.GetAmmoCount();
-
-        Weapon wpn = Weapon.Cast(e);
-        if (wpn)
+        m_Trees.Insert(tree);
+        for (int g = 0; g < tree.Gone.Count(); g++)
+            m_Gone.Insert(tree.Gone[g]);
+        for (int m = 0; m < tree.Moves.Count(); m++)
         {
-            for (int m = 0; m < wpn.GetMuzzleCount(); m++)
-            {
-                if (!wpn.IsChamberEmpty(m))
-                    n++;
-                n = n + wpn.GetInternalMagazineCartridgeCount(m);
-            }
+            EntityAI part = tree.Moves[m];
+            int w;
+            int h;
+            OZT_InvModel.SizeOf(part, w, h);
+            OZT_Move move = new OZT_Move();
+            move.Item = part;
+            move.W = w;
+            move.H = h;
+            m_Moves.Insert(move);
+            m_Shut.Insert(part);
         }
-        return n;
+        int rounds = m_Res.KeptRounds;
+        for (int l = 0; l < tree.Lots.Count(); l++)
+        {
+            OZT_RoundLot lot = tree.Lots[l];
+            if (!lot.Kept)
+                continue;
+            m_KeptLots.Insert(lot);
+            rounds = rounds + lot.Count;
+        }
+        m_Res.KeptRounds = rounds;
+        m_Res.Kept = m_Moves.Count();
     }
 
     // ---- 3. the buys -------------------------------------------------------------
@@ -417,29 +523,39 @@ class OZT_Deal
     // leave; and when more than one thing is left without a place, everything is
     // laid once more with the first thing that needs cells -- the largest -- set
     // aside for the hands, because its cells free the most room.
+    //
+    // The parts the player keeps are laid before all of that and in another
+    // picture, the inventory as it is: they move while what they hang on still
+    // stands, so the room a sale frees is not theirs (decisions 22 and 23 of
+    // the phase 3a plan). What has no place is counted together.
     protected string PlanPlaces()
     {
+        int adrift = PlanMoves();
         int kept = m_Grows.Count();
         string why = LayThings(false);
         if (why != "")
             return why;
-        int left = m_Homeless.Count();
+        int left = m_Homeless.Count() + adrift;
         if (left == 0)
             return "";
 
-        if (left == 1)
+        if (left == 1 && adrift == 1)
+        {
+            if (MoveToHands())
+                return "";
+        }
+        else if (left == 1)
         {
             OZT_Place hands;
             if (m_Model.PlaceInHands(m_Homeless[0], hands))
             {
-                AddMake(m_Homeless[0], hands, m_HomelessUnits[0]);
+                AddMake(m_Homeless[0], hands, m_HomelessUnits[0], m_HomelessHealth[0]);
                 m_Res.InHands = m_Homeless[0];
-                m_Homeless.Clear();
-                m_HomelessUnits.Clear();
+                ForgetHomeless();
                 return "";
             }
         }
-        else
+        else if (adrift == 0)
         {
             UnlayThings(kept);
             why = LayThings(true);
@@ -456,14 +572,110 @@ class OZT_Deal
         return OZT_Const.NO_SPACE;
     }
 
-    // Lays everything the deal brings into a fresh picture of the inventory: the
-    // bought lines largest first, then the change or the payout. With `aside`
-    // the first thing that needs cells goes to the hands instead. What finds no
-    // place is left in m_Homeless. Returns "" or the key of an internal refusal.
+    // A cell for every part the player keeps, the largest first, in the
+    // inventory as it is with everything that leaves or moves in this deal
+    // shut. Returns how many found none.
+    protected int PlanMoves()
+    {
+        int count = m_Moves.Count();
+        if (count == 0)
+            return 0;
+
+        array<EntityAI> shut = new array<EntityAI>();
+        for (int g = 0; g < m_Gone.Count(); g++)
+            shut.Insert(m_Gone[g]);
+        for (int s = 0; s < m_Shut.Count(); s++)
+            shut.Insert(m_Shut[s]);
+        OZT_InvModel now = new OZT_InvModel(m_Player, null, shut);
+
+        array<int> order = new array<int>();
+        for (int n = 0; n < count; n++)
+        {
+            int best = -1;
+            for (int i = 0; i < count; i++)
+            {
+                if (order.Find(i) > -1)
+                    continue;
+                if (best < 0)
+                {
+                    best = i;
+                    continue;
+                }
+                if (m_Moves[i].W * m_Moves[i].H > m_Moves[best].W * m_Moves[best].H)
+                    best = i;
+            }
+            order.Insert(best);
+        }
+
+        int adrift = 0;
+        for (int o = 0; o < order.Count(); o++)
+        {
+            OZT_Move move = m_Moves[order[o]];
+            OZT_Place place;
+            if (now.PlaceMoved(move.Item, place))
+            {
+                move.Place = place;
+                continue;
+            }
+            move.Place = null;
+            adrift++;
+        }
+        now.Dispose();
+        return adrift;
+    }
+
+    // The one kept part that found no cell: to the hands as they are now, for
+    // it moves before anything is deleted.
+    protected bool MoveToHands()
+    {
+        if (m_Player.GetHumanInventory().GetEntityInHands() || m_Player.IsInVehicle())
+            return false;
+        for (int i = 0; i < m_Moves.Count(); i++)
+        {
+            OZT_Move move = m_Moves[i];
+            if (move.Place)
+                continue;
+            InventoryLocation dst = new InventoryLocation();
+            dst.SetHands(m_Player, move.Item);
+            if (!GameInventory.LocationCanAddEntity(dst))
+                return false;
+            OZT_Place hands = new OZT_Place();
+            hands.Kind = InventoryLocationType.HANDS;
+            hands.Holder = m_Player;
+            hands.Row = -1;
+            hands.Col = -1;
+            hands.Turned = false;
+            hands.SlotId = InventorySlots.INVALID;
+            move.Place = hands;
+            m_Res.InHands = move.Item.GetType();
+            return true;
+        }
+        return false;
+    }
+
+    protected void ForgetHomeless()
+    {
+        m_Homeless.Clear();
+        m_HomelessUnits.Clear();
+        m_HomelessHealth.Clear();
+    }
+
+    // Lays everything the deal brings into a fresh picture of the inventory as
+    // it will be: the bought lines largest first, then the rounds that come
+    // back, then the change or the payout. With `aside` the first thing that
+    // needs cells goes to the hands instead. What finds no place is left in
+    // m_Homeless. Returns "" or the key of an internal refusal.
     protected string LayThings(bool aside)
     {
-        m_Model = new OZT_InvModel(m_Player, m_Gone);
+        m_Model = new OZT_InvModel(m_Player, m_Gone, m_Shut);
         m_Aside = aside;
+
+        // The cells the kept parts were given are taken.
+        for (int k = 0; k < m_Moves.Count(); k++)
+        {
+            OZT_Move move = m_Moves[k];
+            m_Model.Reserve(move.Place, move.W, move.H);
+        }
 
         // Parts sold and parts paid shrink their stacks before anything is
         // merged into them.
@@ -493,6 +705,10 @@ class OZT_Deal
                 PlacePieces(type, m_BuyCounts[b], wear);
         }
 
+        // The rounds that come back: stacks of their own, as they were.
+        for (int l = 0; l < m_KeptLots.Count(); l++)
+            PlaceLot(m_KeptLots[l]);
+
         // The change or the payout, in the largest notes that make the sum.
         if (m_Give > 0)
         {
@@ -519,8 +735,7 @@ class OZT_Deal
     {
         m_Model.Dispose();
         m_Makes.Clear();
-        m_Homeless.Clear();
-        m_HomelessUnits.Clear();
+        ForgetHomeless();
         m_Res.InHands = "";
         while (m_Grows.Count() > kept)
         {
@@ -609,12 +824,35 @@ class OZT_Deal
             if (!placed)
                 placed = m_Model.PlaceInCargo(type, notes, place);
             if (placed)
-                AddMake(type, place, n);
+                AddMake(type, place, n, -1);
             else
-            {
-                m_Homeless.Insert(type);
-                m_HomelessUnits.Insert(n);
-            }
+                AddHomeless(type, n, -1);
+            left = left - n;
+        }
+    }
+
+    // Rounds that come back: new stacks of the pile's class in the condition
+    // the rounds were in, each no larger than a full pile, never merged into a
+    // stack the player has (decision 24: what differs in condition is not
+    // stacked, and these need not be new).
+    protected void PlaceLot(OZT_RoundLot lot)
+    {
+        int most = OZT_Tree.PileMax(lot.Pile);
+        float health = lot.Health();
+        int left = lot.Count;
+        while (left > 0)
+        {
+            int n = left;
+            if (n > most)
+                n = most;
+            OZT_Place place;
+            bool placed = AsideToHands(lot.Pile, place);
+            if (!placed)
+                placed = m_Model.PlaceInCargo(lot.Pile, false, place);
+            if (placed)
+                AddMake(lot.Pile, place, n, health);
+            else
+                AddHomeless(lot.Pile, n, health);
             left = left - n;
         }
     }
@@ -636,12 +874,18 @@ class OZT_Deal
                 placed = m_Model.PlaceInCargo(type, false, place);
             if (placed)
             {
-                AddMake(type, place, 0);
+                AddMake(type, place, 0, -1);
                 continue;
             }
-            m_Homeless.Insert(type);
-            m_HomelessUnits.Insert(0);
+            AddHomeless(type, 0, -1);
         }
+    }
+
+    protected void AddHomeless(string type, int units, float health)
+    {
+        m_Homeless.Insert(type);
+        m_HomelessUnits.Insert(units);
+        m_HomelessHealth.Insert(health);
     }
 
     protected void AddGrow(EntityAI stack, int units)
@@ -652,12 +896,13 @@ class OZT_Deal
         m_Grows.Insert(g);
     }
 
-    protected void AddMake(string type, OZT_Place place, int units)
+    protected void AddMake(string type, OZT_Place place, int units, float health)
     {
         OZT_Make m = new OZT_Make();
         m.ClassName = type;
         m.Place = place;
         m.Units = units;
+        m.Health = health;
         m_Makes.Insert(m);
     }
 
@@ -665,19 +910,29 @@ class OZT_Deal
 
     protected string Commit()
     {
-        // Money that is not items leaves first: if it cannot, nothing has
-        // changed yet.
+        // One script call from here on. The parts the player keeps come off
+        // first, while what they hang on still stands: nothing is paid and
+        // nothing is deleted before every one of them stands somewhere else.
+        string why = MoveParts();
+        if (why != "")
+            return why;
+
+        // Money that is not items leaves before anything is deleted: if it
+        // cannot, nothing is sold (parts that came off stay off).
         if (!m_Money.Physical() && m_Net > 0)
         {
             if (!m_Money.Take(m_Player, m_Net, "deal"))
                 return OZT_Const.NO_MONEY;
         }
 
-        // One script call from here on.
+        // A sold part goes with what it hangs on: only the topmost of what
+        // leaves is deleted by name.
         for (int d = 0; d < m_Gone.Count(); d++)
         {
-            if (m_Gone[d])
-                GetGame().ObjectDelete(m_Gone[d]);
+            EntityAI leaving = m_Gone[d];
+            if (!leaving || UnderGone(leaving))
+                continue;
+            GetGame().ObjectDelete(leaving);
         }
         for (int s = 0; s < m_Grows.Count(); s++)
         {
@@ -706,6 +961,122 @@ class OZT_Deal
         return "";
     }
 
+    // Does the thing hang on, or lie in, something else that leaves?
+    protected bool UnderGone(EntityAI e)
+    {
+        EntityAI at = e.GetHierarchyParent();
+        while (at && at != m_Player)
+        {
+            if (m_Gone.Find(at) > -1)
+                return true;
+            at = at.GetHierarchyParent();
+        }
+        return false;
+    }
+
+    // Is the holder one that leaves or moves in this deal, or inside one?
+    protected bool Leaving(EntityAI holder)
+    {
+        EntityAI at = holder;
+        while (at && at != m_Player)
+        {
+            if (m_Gone.Find(at) > -1 || m_Shut.Find(at) > -1)
+                return true;
+            at = at.GetHierarchyParent();
+        }
+        return false;
+    }
+
+    // Every kept part to its planned place. The plan asked the engine about
+    // each part at its very cell, so a refusal here is a defect of the plan;
+    // the part then goes to the engine's own choice, then to the ground at the
+    // player's feet, and the log says so. A part that can go nowhere stops the
+    // deal before anything is paid or deleted: a part is never lost.
+    protected string MoveParts()
+    {
+        int refuse = s_StandRefuse;
+        s_StandRefuse = 0;
+        for (int i = 0; i < m_Moves.Count(); i++)
+        {
+            OZT_Move move = m_Moves[i];
+            if (MoveOne(move, refuse))
+                continue;
+            string lost = "deal defect: the kept part ";
+            if (move.Item)
+                lost = lost + move.Item.GetType();
+            lost = lost + " could be moved nowhere; the deal is refused, nothing was sold";
+            OZT_Log.Error(lost);
+            return OZT_Const.NO_INTERNAL;
+        }
+        return "";
+    }
+
+    protected bool MoveOne(OZT_Move move, int refuse)
+    {
+        EntityAI e = move.Item;
+        if (!e)
+            return false;
+        InventoryLocation src = new InventoryLocation();
+        if (!e.GetInventory().GetCurrentInventoryLocation(src))
+            return false;
+
+        string was = "no place";
+        if (move.Place)
+            was = move.Place.Text();
+        if (move.Place && refuse < 1)
+        {
+            InventoryLocation dst = new InventoryLocation();
+            if (move.Place.Kind == InventoryLocationType.HANDS)
+                dst.SetHands(m_Player, e);
+            else
+                dst.SetCargo(move.Place.Holder, e, 0, move.Place.Row, move.Place.Col, move.Place.Turned);
+            if (SyncMove(src, dst, true))
+                return true;
+        }
+
+        // The engine's own choice among the cargos the player keeps.
+        string head = "deal defect: the engine refused the kept part " + e.GetType() + " at " + was;
+        InventoryLocation own = new InventoryLocation();
+        bool found = false;
+        if (refuse < 2)
+            found = m_Player.GetInventory().FindFreeLocationFor(e, FindInventoryLocationType.CARGO, own);
+        if (found && !Leaving(own.GetParent()))
+        {
+            if (SyncMove(src, own, true))
+            {
+                OZT_Log.Error(head + "; it went to the engine's own choice");
+                return true;
+            }
+        }
+
+        // The ground at the player's feet, as the game itself drops a thing
+        // off a holder that is no living player: its own place for it, then
+        // the same move.
+        if (refuse >= 3)
+            return false;
+        InventoryLocation ground = new InventoryLocation();
+        bool spot = GameInventory.SetGroundPosByOwner(m_Player, e, ground);
+        if (!spot)
+            return false;
+        if (!SyncMove(src, ground, false))
+            return false;
+        OZT_Log.Error(head + "; it lies at the player's feet");
+        return true;
+    }
+
+    // The engine's synchronous move and the word to the clients, as phase 0
+    // measured them. A place in an inventory is asked first: a destination the
+    // engine refuses is never handed to it.
+    protected bool SyncMove(InventoryLocation src, InventoryLocation dst, bool ask)
+    {
+        if (ask && !GameInventory.LocationCanAddEntity(dst))
+            return false;
+        if (!GameInventory.LocationSyncMoveEntity(src, dst))
+            return false;
+        InventoryInputUserData.SendServerMove(null, InventoryCommandType.SYNC_MOVE, src, dst);
+        return true;
+    }
+
     protected void CreateOne(OZT_Make make)
     {
         EntityAI made = OZT_InvModel.Make(m_Player, make.Place, make.ClassName);
@@ -718,11 +1089,29 @@ class OZT_Deal
             OZT_Stack.Set(made, make.Units);
         else if (made)
             Unload(made);
+        if (made && make.Health >= 0)
+            Wear(made, make.Health);
+    }
+
+    // Rounds that come back are as they were: the pile takes their health,
+    // then every round in it their damage -- in that order, the game's own
+    // (Ammunition_Base.SetFromProjectile): a change of health level rewrites
+    // the damage of every round.
+    protected void Wear(EntityAI made, float health)
+    {
+        made.SetHealth01("", "", health);
+        Magazine pile = Magazine.Cast(made);
+        if (!pile)
+            return;
+        float dmg = 1 - health;
+        int n = pile.GetAmmoCount();
+        for (int i = 0; i < n; i++)
+            pile.SetCartridgeDamageAtIndex(i, dmg);
     }
 
     // The game makes a magazine full, and its rounds are goods of their own:
-    // a bought magazine holds none (decision 16 of the plan). Phase 3 sells a
-    // magazine with rounds, each paid for.
+    // a bought magazine holds none (decision 16 of the phase 1 plan). A sold
+    // magazine's rounds are paid for one by one (OZT_Tree).
     protected void Unload(EntityAI made)
     {
         Magazine mag = Magazine.Cast(made);

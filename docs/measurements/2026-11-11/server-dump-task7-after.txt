@@ -1,0 +1,26 @@
+022378 M65Jacket_Black | ATT SurvivorM_Boris#022323 slot=Body | 4x3 | -
+022379 CargoPants_Black | ATT SurvivorM_Boris#022323 slot=Legs | 4x3 | -
+022380 MilitaryBoots_Black | ATT SurvivorM_Boris#022323 slot=Feet | 3x3 | -
+022381 PlateCarrierVest | ATT SurvivorM_Boris#022323 slot=Vest | 5x5 | -
+022382 TaloonBag_Blue | ATT SurvivorM_Boris#022323 slot=Back | 4x5 | -
+022383 AKM | ATT SurvivorM_Boris#022323 slot=Shoulder | 8x3 | -
+022384 PlateCarrierPouches | ATT PlateCarrierVest#022381 slot=VestPouch | 5x3 | -
+022385 PlateCarrierHolster | ATT PlateCarrierVest#022381 slot=VestHolster | 2x3 | -
+022386 MakarovIJ70 | ATT PlateCarrierHolster#022385 slot=Pistol | 2x2 | -
+022387 Mag_IJ70_8Rnd | ATT MakarovIJ70#022386 slot=magazine | 1x2 | ammo 12/12
+022388 Mag_AKM_30Rnd | ATT AKM#022383 slot=magazine | 1x3 | ammo 30/30
+022389 PSO1Optic | ATT AKM#022383 slot=weaponOpticsAK | 3x2 | -
+022390 AK_Suppressor | ATT AKM#022383 slot=weaponMuzzleAK | 3x1 | -
+022391 AK_WoodBttstck | ATT AKM#022383 slot=weaponButtstockAK | 3x1 | -
+022392 AK_WoodHndgrd | ATT AKM#022383 slot=weaponHandguardAK | 2x1 | -
+022393 FNX45 | CARGO TaloonBag_Blue#022382 r0 c0 flip=no | 3x2 | -
+022394 Mag_FNX45_15Rnd | ATT FNX45#022393 slot=magazine | 1x2 | ammo 15/15
+022395 PistolSuppressor | ATT FNX45#022393 slot=pistolMuzzle | 3x1 | -
+022396 SmallProtectorCase | CARGO TaloonBag_Blue#022382 r0 c3 flip=no | 3x4 | -
+022397 OZT_ProbeWallet | CARGO TaloonBag_Blue#022382 r2 c0 flip=no | 2x2 | -
+022398 Nail | CARGO TaloonBag_Blue#022382 r2 c2 flip=no | 1x1 | qty 70/99
+022399 OZT_ProbeWallet | CARGO M65Jacket_Black#022378 r0 c0 flip=no | 2x2 | -
+022400 BandageDressing | CARGO M65Jacket_Black#022378 r0 c2 flip=no | 1x2 | qty 4/4
+022401 OZT_ProbeBadge | ATT SurvivorM_Boris#022323 slot=OZT_ProbeWear | 2x2 | -
+022402 Mich2001Helmet | ATT SurvivorM_Boris#022323 slot=Headgear | 4x3 | -
+022727 Canteen | HANDS SurvivorM_Boris#022323 | 2x2 | qty 1000/1000

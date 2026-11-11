@@ -1,0 +1,200 @@
+=== #1 strip ok=yes frame=137413 t=87.1 args: op=strip
+    deleted 5 top-level item(s); send dress as the next command
+=== #2 dress ok=yes frame=150848 t=93.1 args: op=dress
+    dressed: 23 of 23 handles; a missing one has a 'dress: NOT' line in results.log
+=== #3 create ok=yes frame=160436 t=98.1 args: slot=OZT_ProbeWear via=loc into=player as=badge class=OZT_ProbeBadge op=create kind=slot
+    create OZT_ProbeBadge asked ATT SurvivorM_Boris slot=OZT_ProbeWear via=loc -> got ATT SurvivorM_Boris#022323 slot=OZT_ProbeWear | - | entity 2x2 | 1 ms
+    config size of OZT_ProbeBadge: 2x2 found=yes
+    watching created OZT_ProbeBadge from ATT SurvivorM_Boris#022323 slot=OZT_ProbeWear
+    watch #3 created OZT_ProbeBadge ends +3000 ms, 3833 frames: ATT SurvivorM_Boris#022323 slot=OZT_ProbeWear
+=== #4 create ok=yes frame=173757 t=105.1 args: slot=Headgear via=loc into=player as=helmet class=Mich2001Helmet op=create kind=slot
+    create Mich2001Helmet asked ATT SurvivorM_Boris slot=Headgear via=loc -> got ATT SurvivorM_Boris#022323 slot=Headgear | - | entity 4x3 | 0 ms
+    config size of Mich2001Helmet: 4x3 found=yes
+    watching created Mich2001Helmet from ATT SurvivorM_Boris#022323 slot=Headgear
+    watch #4 created Mich2001Helmet ends +3000 ms, 5496 frames: ATT SurvivorM_Boris#022323 slot=Headgear
+=== #5 dump ok=yes frame=186863 t=112.1 args: op=dump
+    dump: 25 items -> server_dump.txt; cargos=8 cells asked=173 model-vs-engine mismatches=0
+    probe entity Paper 1x1 made=yes
+    cargo 022378 M65Jacket_Black 6x4 items=2 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022323 slot=Body
+    cargo 022399 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO M65Jacket_Black#022378 r0 c0 flip=no
+    cargo 022379 CargoPants_Black 5x4 items=0 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022323 slot=Legs
+    cargo 022384 PlateCarrierPouches 5x3 items=0 children accessible=yes mismatches=0 at ATT PlateCarrierVest#022381 slot=VestPouch
+    cargo 022382 TaloonBag_Blue 6x5 items=4 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022323 slot=Back
+    cargo 022396 SmallProtectorCase 3x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022382 r0 c3 flip=no
+    cargo 022397 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022382 r2 c0 flip=no
+    cargo 022401 OZT_ProbeBadge 6x4 items=0 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022323 slot=OZT_ProbeWear
+=== #6 gate ok=yes frame=205537 t=121.1 args: class=Paper op=gate cell=free into=bag
+    gate Paper -> TaloonBag_Blue r3 c2 (free): gates=yes occupancy=yes map free=yes receive=yes 1 us/call
+    probe entity 00 Paper made in 0 ms, stands GROUND
+    at TaloonBag_Blue r3 c2 (free) at ATT SurvivorM_Boris#022323 slot=Back
+    CanAddEntityInCargoEx=yes Test(gates, no occupancy)=yes Test(occupancy alone)=yes Test(both)=yes LocationCanAddEntity=yes LocationTest(gates, no occupancy)=yes
+    map free=yes into.CanReceiveItemIntoCargo=yes item.CanPutInCargo=yes into children accessible=yes
+    Test(gates, no occupancy) costs 1 microseconds a call over 1000 calls
+    probe entity deleted, the call took 0 ms
+=== #7 gate ok=yes frame=215381 t=126.1 args: class=Paper op=gate cell=taken into=bag
+    gate Paper -> TaloonBag_Blue r0 c0 (taken): gates=yes occupancy=no map free=no receive=yes 1 us/call
+    probe entity 00 Paper made in 0 ms, stands GROUND
+    at TaloonBag_Blue r0 c0 (taken) at ATT SurvivorM_Boris#022323 slot=Back
+    CanAddEntityInCargoEx=no Test(gates, no occupancy)=yes Test(occupancy alone)=no Test(both)=no LocationCanAddEntity=no LocationTest(gates, no occupancy)=yes
+    map free=no into.CanReceiveItemIntoCargo=yes item.CanPutInCargo=yes into children accessible=yes
+    Test(gates, no occupancy) costs 1 microseconds a call over 1000 calls
+    probe entity deleted, the call took 0 ms
+=== #8 gate ok=yes frame=223945 t=130.1 args: class=Mag_AKM_30Rnd op=gate cell=last into=bag
+    gate Mag_AKM_30Rnd -> TaloonBag_Blue r4 c5 (last): gates=yes occupancy=no map free=no receive=yes 1 us/call
+    probe entity 00 Mag_AKM_30Rnd made in 0 ms, stands GROUND
+    at TaloonBag_Blue r4 c5 (last) at ATT SurvivorM_Boris#022323 slot=Back
+    CanAddEntityInCargoEx=no Test(gates, no occupancy)=yes Test(occupancy alone)=no Test(both)=no LocationCanAddEntity=no LocationTest(gates, no occupancy)=yes
+    map free=no into.CanReceiveItemIntoCargo=yes item.CanPutInCargo=yes into children accessible=yes
+    Test(gates, no occupancy) costs 1 microseconds a call over 1000 calls
+    probe entity deleted, the call took 0 ms
+=== #9 gate ok=yes frame=233030 t=134.1 args: class=AKM op=gate cell=free into=bag
+    gate AKM -> no such cell (free) in TaloonBag_Blue
+    probe entity 00 AKM made in 1 ms, stands GROUND
+    probe entity deleted, the call took 0 ms
+=== #10 gate ok=yes frame=251954 t=143.1 args: class=AKM op=gate cell=0,0 into=bag
+    gate AKM -> TaloonBag_Blue r0 c0 (0,0): gates=yes occupancy=no map free=no receive=yes 1 us/call
+    probe entity 00 AKM made in 0 ms, stands GROUND
+    at TaloonBag_Blue r0 c0 (0,0) at ATT SurvivorM_Boris#022323 slot=Back
+    CanAddEntityInCargoEx=no Test(gates, no occupancy)=yes Test(occupancy alone)=no Test(both)=no LocationCanAddEntity=no LocationTest(gates, no occupancy)=yes
+    map free=no into.CanReceiveItemIntoCargo=yes item.CanPutInCargo=yes into children accessible=yes
+    Test(gates, no occupancy) costs 1 microseconds a call over 1000 calls
+    probe entity deleted, the call took 0 ms
+=== #11 gate ok=yes frame=269441 t=151.3 args: into=bag class=Paper op=gate cell=free n=200000
+    gate Paper -> TaloonBag_Blue r3 c2 (free): gates=yes occupancy=yes map free=yes receive=yes 0.9 us/call
+    probe entity 00 Paper made in 0 ms, stands GROUND
+    at TaloonBag_Blue r3 c2 (free) at ATT SurvivorM_Boris#022323 slot=Back
+    CanAddEntityInCargoEx=yes Test(gates, no occupancy)=yes Test(occupancy alone)=yes Test(both)=yes LocationCanAddEntity=yes LocationTest(gates, no occupancy)=yes
+    map free=yes into.CanReceiveItemIntoCargo=yes item.CanPutInCargo=yes into children accessible=yes
+    Test(gates, no occupancy) costs 0.9 microseconds a call over 200000 calls
+    probe entity deleted, the call took 0 ms
+=== #12 gate ok=yes frame=282557 t=157.1 args: class=OZT_ProbeNote op=gate cell=free into=wallet_jacket
+    gate OZT_ProbeNote -> OZT_ProbeWallet r0 c0 (free): gates=yes occupancy=yes map free=yes receive=yes 2 us/call
+    probe entity 00 OZT_ProbeNote made in 0 ms, stands GROUND
+    at OZT_ProbeWallet r0 c0 (free) at CARGO M65Jacket_Black#022378 r0 c0 flip=no
+    CanAddEntityInCargoEx=yes Test(gates, no occupancy)=yes Test(occupancy alone)=yes Test(both)=yes LocationCanAddEntity=yes LocationTest(gates, no occupancy)=yes
+    map free=yes into.CanReceiveItemIntoCargo=yes item.CanPutInCargo=yes into children accessible=no
+    Test(gates, no occupancy) costs 2 microseconds a call over 1000 calls
+    probe entity deleted, the call took 0 ms
+=== #13 gate ok=yes frame=293483 t=162.1 args: class=Paper op=gate cell=free into=wallet_jacket
+    gate Paper -> OZT_ProbeWallet r0 c0 (free): gates=no occupancy=yes map free=yes receive=no 4 us/call
+    probe entity 00 Paper made in 0 ms, stands GROUND
+    at OZT_ProbeWallet r0 c0 (free) at CARGO M65Jacket_Black#022378 r0 c0 flip=no
+    CanAddEntityInCargoEx=no Test(gates, no occupancy)=no Test(occupancy alone)=yes Test(both)=no LocationCanAddEntity=no LocationTest(gates, no occupancy)=no
+    map free=yes into.CanReceiveItemIntoCargo=no item.CanPutInCargo=yes into children accessible=no
+    Test(gates, no occupancy) costs 4 microseconds a call over 1000 calls
+    probe entity deleted, the call took 0 ms
+=== #14 gate ok=yes frame=300701 t=166.1 args: class=OZT_ProbeNote op=gate cell=free into=wallet_bag
+    gate OZT_ProbeNote -> OZT_ProbeWallet r0 c0 (free): gates=yes occupancy=yes map free=yes receive=yes 2 us/call
+    probe entity 00 OZT_ProbeNote made in 0 ms, stands GROUND
+    at OZT_ProbeWallet r0 c0 (free) at CARGO TaloonBag_Blue#022382 r2 c0 flip=no
+    CanAddEntityInCargoEx=yes Test(gates, no occupancy)=yes Test(occupancy alone)=yes Test(both)=yes LocationCanAddEntity=yes LocationTest(gates, no occupancy)=yes
+    map free=yes into.CanReceiveItemIntoCargo=yes item.CanPutInCargo=yes into children accessible=no
+    Test(gates, no occupancy) costs 2 microseconds a call over 1000 calls
+    probe entity deleted, the call took 0 ms
+=== #15 gate ok=yes frame=311188 t=171.1 args: class=Paper op=gate cell=free into=wallet_bag
+    gate Paper -> OZT_ProbeWallet r0 c0 (free): gates=no occupancy=yes map free=yes receive=no 3 us/call
+    probe entity 00 Paper made in 0 ms, stands GROUND
+    at OZT_ProbeWallet r0 c0 (free) at CARGO TaloonBag_Blue#022382 r2 c0 flip=no
+    CanAddEntityInCargoEx=no Test(gates, no occupancy)=no Test(occupancy alone)=yes Test(both)=no LocationCanAddEntity=no LocationTest(gates, no occupancy)=no
+    map free=yes into.CanReceiveItemIntoCargo=no item.CanPutInCargo=yes into children accessible=no
+    Test(gates, no occupancy) costs 3 microseconds a call over 1000 calls
+    probe entity deleted, the call took 0 ms
+=== #16 gate ok=yes frame=326986 t=178.1 args: class=OZT_ProbeNote op=gate cell=free into=badge
+    gate OZT_ProbeNote -> OZT_ProbeBadge r0 c0 (free): gates=yes occupancy=yes map free=yes receive=yes 2 us/call
+    probe entity 00 OZT_ProbeNote made in 0 ms, stands GROUND
+    at OZT_ProbeBadge r0 c0 (free) at ATT SurvivorM_Boris#022323 slot=OZT_ProbeWear
+    CanAddEntityInCargoEx=yes Test(gates, no occupancy)=yes Test(occupancy alone)=yes Test(both)=yes LocationCanAddEntity=yes LocationTest(gates, no occupancy)=yes
+    map free=yes into.CanReceiveItemIntoCargo=yes item.CanPutInCargo=yes into children accessible=yes
+    Test(gates, no occupancy) costs 2 microseconds a call over 1000 calls
+    probe entity deleted, the call took 0 ms
+=== #17 gate ok=yes frame=339845 t=184.1 args: class=Paper op=gate cell=free into=case
+    gate Paper -> SmallProtectorCase r0 c0 (free): gates=no occupancy=yes map free=yes receive=no 1 us/call
+    probe entity 00 Paper made in 0 ms, stands GROUND
+    at SmallProtectorCase r0 c0 (free) at CARGO TaloonBag_Blue#022382 r0 c3 flip=no
+    CanAddEntityInCargoEx=no Test(gates, no occupancy)=no Test(occupancy alone)=yes Test(both)=no LocationCanAddEntity=no LocationTest(gates, no occupancy)=no
+    map free=yes into.CanReceiveItemIntoCargo=no item.CanPutInCargo=yes into children accessible=no
+    Test(gates, no occupancy) costs 1 microseconds a call over 1000 calls
+    probe entity deleted, the call took 0 ms
+=== #18 gate ok=yes frame=349415 t=188.1 args: class=Paper op=gate cell=free into=pouches
+    gate Paper -> PlateCarrierPouches r0 c0 (free): gates=yes occupancy=yes map free=yes receive=yes 2 us/call
+    probe entity 00 Paper made in 1 ms, stands GROUND
+    at PlateCarrierPouches r0 c0 (free) at ATT PlateCarrierVest#022381 slot=VestPouch
+    CanAddEntityInCargoEx=yes Test(gates, no occupancy)=yes Test(occupancy alone)=yes Test(both)=yes LocationCanAddEntity=yes LocationTest(gates, no occupancy)=yes
+    map free=yes into.CanReceiveItemIntoCargo=yes item.CanPutInCargo=yes into children accessible=yes
+    Test(gates, no occupancy) costs 2 microseconds a call over 1000 calls
+    probe entity deleted, the call took 0 ms
+=== #19 gate ok=yes frame=358024 t=192.1 args: class=SmallProtectorCase op=gate cell=free into=pouches
+    gate SmallProtectorCase -> no such cell (free) in PlateCarrierPouches
+    probe entity 00 SmallProtectorCase made in 0 ms, stands GROUND
+    probe entity deleted, the call took 0 ms
+=== #20 gate ok=yes frame=375649 t=200.1 args: into=pouches flip=1 class=SmallProtectorCase op=gate cell=free
+    gate SmallProtectorCase -> PlateCarrierPouches r0 c0 (free): gates=yes occupancy=yes map free=yes receive=yes 5 us/call
+    probe entity 00 SmallProtectorCase made in 0 ms, stands GROUND
+    at PlateCarrierPouches r0 c0 (free) at ATT PlateCarrierVest#022381 slot=VestPouch
+    CanAddEntityInCargoEx=yes Test(gates, no occupancy)=yes Test(occupancy alone)=yes Test(both)=yes LocationCanAddEntity=yes LocationTest(gates, no occupancy)=yes
+    map free=yes into.CanReceiveItemIntoCargo=yes item.CanPutInCargo=yes into children accessible=yes
+    Test(gates, no occupancy) costs 5 microseconds a call over 1000 calls
+    probe entity deleted, the call took 0 ms
+=== #21 gate ok=yes frame=384070 t=204.1 args: class=TaloonBag_Blue op=gate cell=0,0 into=bag
+    gate TaloonBag_Blue -> TaloonBag_Blue r0 c0 (0,0): gates=yes occupancy=no map free=no receive=yes 1 us/call
+    probe entity 00 TaloonBag_Blue made in 0 ms, stands GROUND
+    at TaloonBag_Blue r0 c0 (0,0) at ATT SurvivorM_Boris#022323 slot=Back
+    CanAddEntityInCargoEx=no Test(gates, no occupancy)=yes Test(occupancy alone)=no Test(both)=no LocationCanAddEntity=no LocationTest(gates, no occupancy)=yes
+    map free=no into.CanReceiveItemIntoCargo=yes item.CanPutInCargo=yes into children accessible=yes
+    Test(gates, no occupancy) costs 1 microseconds a call over 1000 calls
+    probe entity deleted, the call took 1 ms
+=== #22 gate ok=yes frame=399060 t=211.1 args: slot=Headgear into=player class=Mich2001Helmet op=gate kind=slot
+    gate Mich2001Helmet -> SurvivorM_Boris slot Headgear: CanAddAttachmentEx=no gates-only=yes receive=yes
+    probe entity 00 Mich2001Helmet made in 0 ms, stands GROUND
+    SurvivorM_Boris slot Headgear (holds 022402 Mich2001Helmet): declared=yes CanAddAttachmentEx=no CanAddAttachment(any slot)=no LocationCanAddEntity=no LocationTest(gates, no occupancy)=yes
+    into.CanReceiveAttachment=yes item.CanPutAsAttachment=yes
+    probe entity deleted, the call took 0 ms
+=== #23 gate ok=yes frame=407409 t=215.1 args: slot=Hips into=player class=TaloonBag_Blue op=gate kind=slot
+    gate TaloonBag_Blue -> SurvivorM_Boris slot Hips: CanAddAttachmentEx=no gates-only=no receive=yes
+    probe entity 00 TaloonBag_Blue made in 0 ms, stands GROUND
+    SurvivorM_Boris slot Hips (holds null): declared=yes CanAddAttachmentEx=no CanAddAttachment(any slot)=no LocationCanAddEntity=no LocationTest(gates, no occupancy)=no
+    into.CanReceiveAttachment=yes item.CanPutAsAttachment=yes
+    probe entity deleted, the call took 0 ms
+=== #24 gate ok=yes frame=421838 t=222.1 args: slot=Melee into=player class=AKM op=gate kind=slot
+    gate AKM -> SurvivorM_Boris slot Melee: CanAddAttachmentEx=yes gates-only=yes receive=yes
+    probe entity 00 AKM made in 1 ms, stands GROUND
+    SurvivorM_Boris slot Melee (holds null): declared=yes CanAddAttachmentEx=yes CanAddAttachment(any slot)=yes LocationCanAddEntity=yes LocationTest(gates, no occupancy)=yes
+    into.CanReceiveAttachment=yes item.CanPutAsAttachment=yes
+    probe entity deleted, the call took 0 ms
+=== #25 gate ok=yes frame=436591 t=229.1 args: slot=magazine into=rifle class=Mag_AKM_30Rnd op=gate kind=slot
+    gate Mag_AKM_30Rnd -> AKM slot magazine: CanAddAttachmentEx=no gates-only=yes receive=yes
+    probe entity 00 Mag_AKM_30Rnd made in 0 ms, stands GROUND
+    AKM slot magazine (holds 022388 Mag_AKM_30Rnd): declared=yes CanAddAttachmentEx=no CanAddAttachment(any slot)=no LocationCanAddEntity=no LocationTest(gates, no occupancy)=yes
+    into.CanReceiveAttachment=yes item.CanPutAsAttachment=yes
+    probe entity deleted, the call took 0 ms
+=== #26 gate ok=yes frame=447526 t=234.1 args: class=Canteen op=gate kind=hands
+    gate Canteen -> hands (hold null): CanAddEntityInHands=yes Test(gates, no occupancy)=yes Test(occupancy alone)=yes item.CanPutIntoHands=yes
+    probe entity 00 Canteen made in 0 ms, stands GROUND
+    hands (hold null): CanAddEntityInHands=yes Test(gates, no occupancy)=yes Test(occupancy alone)=yes item.CanPutIntoHands=yes
+    probe entity deleted, the call took 0 ms
+=== #27 gate ok=yes frame=456526 t=238.1 args: class=Barrel_Blue op=gate kind=hands
+    gate Barrel_Blue -> hands (hold null): CanAddEntityInHands=yes Test(gates, no occupancy)=yes Test(occupancy alone)=yes item.CanPutIntoHands=yes
+    probe entity 00 Barrel_Blue made in 0 ms, stands GROUND
+    hands (hold null): CanAddEntityInHands=yes Test(gates, no occupancy)=yes Test(occupancy alone)=yes item.CanPutIntoHands=yes
+    probe entity deleted, the call took 1 ms
+=== #28 create ok=yes frame=467674 t=243.1 args: via=hands as=h1 class=Canteen op=create kind=hands
+    create Canteen asked HANDS via=hands (the hands hold null) -> got HANDS SurvivorM_Boris#022323 | qty 1000/1000 | entity 2x2 | 0 ms
+    config size of Canteen: 2x2 found=yes
+    watching created Canteen from HANDS SurvivorM_Boris#022323
+    watch #28 created Canteen ends +3000 ms, 6389 frames: HANDS SurvivorM_Boris#022323
+=== #29 gate ok=yes frame=476507 t=247.1 args: class=Paper op=gate kind=hands
+    gate Paper -> hands (hold 022727 Canteen): CanAddEntityInHands=no Test(gates, no occupancy)=yes Test(occupancy alone)=no item.CanPutIntoHands=yes
+    probe entity 00 Paper made in 0 ms, stands GROUND
+    hands (hold 022727 Canteen): CanAddEntityInHands=no Test(gates, no occupancy)=yes Test(occupancy alone)=no item.CanPutIntoHands=yes
+    probe entity deleted, the call took 0 ms
+=== #30 dump ok=yes frame=490611 t=254.1 args: op=dump
+    dump: 26 items -> server_dump.txt; cargos=8 cells asked=173 model-vs-engine mismatches=0
+    probe entity Paper 1x1 made=yes
+    cargo 022378 M65Jacket_Black 6x4 items=2 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022323 slot=Body
+    cargo 022399 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO M65Jacket_Black#022378 r0 c0 flip=no
+    cargo 022379 CargoPants_Black 5x4 items=0 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022323 slot=Legs
+    cargo 022384 PlateCarrierPouches 5x3 items=0 children accessible=yes mismatches=0 at ATT PlateCarrierVest#022381 slot=VestPouch
+    cargo 022382 TaloonBag_Blue 6x5 items=4 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022323 slot=Back
+    cargo 022396 SmallProtectorCase 3x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022382 r0 c3 flip=no
+    cargo 022397 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022382 r2 c0 flip=no
+    cargo 022401 OZT_ProbeBadge 6x4 items=0 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022323 slot=OZT_ProbeWear

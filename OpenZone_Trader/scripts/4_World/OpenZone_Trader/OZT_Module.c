@@ -1,7 +1,9 @@
 // The server half of the trader: the order of its start, and the ready line.
 //
-// The ready line is printed LAST and in the form `key=value`: the stand's
-// verdict reads its counters from it.
+// The order matters: the files are read before anything that reads them, and
+// the services stand before the first client arrives. The ready line is
+// printed LAST and in the form `key=value`: the stand's verdict reads its
+// counters from it.
 [CF_RegisterModule(OZT_Module)]
 class OZT_Module : CF_ModuleWorld
 {
@@ -25,9 +27,17 @@ class OZT_Module : CF_ModuleWorld
         if (!GetGame().IsServer())
             return;
 
-        // The ready line one tick later: the order of CF modules is not
-        // promised, and a line printed here may speak before a neighbour has
-        // registered what it describes (the series' own lesson).
+        // The profile's folders first, before any read or write. The core
+        // builds them in its own OnMissionStart, but the order of CF modules is
+        // not promised. Idempotent.
+        OZ_Json.EnsureTree();
+
+        OZT_Config.ServerLoad();
+
+        // -- later tasks start their parts above this line --
+
+        // The ready line one tick later: a line printed here may speak before
+        // a neighbour module has registered what it describes.
         m_ReadyTimer = new Timer(CALL_CATEGORY_SYSTEM);
         m_ReadyTimer.Run(READY_DELAY, this, "Ready", NULL, false);
     }
@@ -44,10 +54,12 @@ class OZT_Module : CF_ModuleWorld
 
         if (m_ReadyTimer)
             m_ReadyTimer.Stop();
+
+        // -- later tasks stop their parts above this line --
     }
 
     static string ReadyLine()
     {
-        return "trader loaded: traders=0 goods=0 money=none gates=none problems=0";
+        return "trader loaded: " + OZT_Config.Get().Counters();
     }
 }

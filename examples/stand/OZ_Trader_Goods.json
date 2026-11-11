@@ -1,0 +1,24 @@
+{
+    "Version": 1,
+    "Categories": [
+        { "Id": "gear", "Name": "Спорядження", "Goods": [
+            { "ClassName": "Canteen", "Buy": 120, "Sell": 60, "Quantity": "fraction" },
+            { "ClassName": "BandageDressing", "Buy": 40, "Sell": 20, "Quantity": "fraction" },
+            { "ClassName": "Mich2001Helmet", "Buy": 900, "Sell": 450 },
+            { "ClassName": "TaloonBag_Blue", "Buy": 400, "Sell": 200 },
+            { "ClassName": "Paper", "Buy": 5 }
+        ] },
+        { "Id": "weapons", "Name": "Зброя", "Goods": [
+            { "ClassName": "AKM", "Buy": 2500, "Sell": 1250 },
+            { "ClassName": "Mag_AKM_30Rnd", "Buy": 180, "Sell": 90 },
+            { "ClassName": "PSO1Optic", "Buy": 600, "Sell": 300 }
+        ] },
+        { "Id": "ammo", "Name": "Набої", "Goods": [
+            { "ClassName": "Ammo_762x39", "Buy": 10, "Sell": 5, "Quantity": "unit" },
+            { "ClassName": "Nail", "Buy": 5, "Quantity": "unit" }
+        ] },
+        { "Id": "food", "Name": "Харчі", "Goods": [
+            { "ClassName": "TunaCan", "Buy": 35, "Sell": 15 }
+        ] }
+    ]
+}

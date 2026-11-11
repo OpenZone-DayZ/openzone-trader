@@ -13,7 +13,7 @@ class CfgPatches
 {
     class OpenZone_TraderProbe
     {
-        units[] = {"OZT_ProbeWallet", "OZT_ProbeBadge", "OZT_ProbeSlotWallet", "OZT_ProbeNote"};
+        units[] = {"OZT_ProbeWallet", "OZT_ProbeBadge", "OZT_ProbeSlotWallet", "OZT_ProbeNote", "OZT_ProbeNote50", "OZT_ProbeNote500"};
         weapons[] = {};
         requiredVersion = 0.1;
         requiredAddons[] =
@@ -104,6 +104,17 @@ class CfgVehicles
         varQuantityDestroyOnMin = 1;
         destroyOnEmpty = 1;
         inventorySlot[] = {"OZT_ProbeNote"};
+    };
+
+    // Two more denominations for the trader's stand: the same note, so the
+    // wallet's gate (IsKindOf "OZT_ProbeNote") takes them.
+    class OZT_ProbeNote50 : OZT_ProbeNote
+    {
+        displayName = "Probe note 50";
+    };
+    class OZT_ProbeNote500 : OZT_ProbeNote
+    {
+        displayName = "Probe note 500";
     };
 
     // A stand-in wallet shaped like the reference server's: an Inventory_Base,

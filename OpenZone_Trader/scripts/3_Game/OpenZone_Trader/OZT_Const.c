@@ -50,3 +50,27 @@ class OZT_Const
     // (GameConstants.STATE_PRISTINE .. STATE_RUINED are 0 .. 4).
     static const int LEVEL_RUINED = 4;
 }
+
+// Ids the admin types (a category, a trader) become keys, log words and, later,
+// file names: letters, digits, `_` and `-`, at most 64.
+class OZT_Ids
+{
+    static bool IsSafe(string id)
+    {
+        int n = id.Length();
+        if (n == 0 || n > 64)
+            return false;
+
+        for (int i = 0; i < n; i++)
+        {
+            int c = id.Get(i).ToAscii();
+            bool digit = c >= 48 && c <= 57;
+            bool upper = c >= 65 && c <= 90;
+            bool lower = c >= 97 && c <= 122;
+            bool punct = c == 95 || c == 45;
+            if (!digit && !upper && !lower && !punct)
+                return false;
+        }
+        return true;
+    }
+}

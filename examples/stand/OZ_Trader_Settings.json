@@ -1,0 +1,13 @@
+{
+    "Version": 1,
+    "Provider": "items",
+    "Notes": [
+        { "ClassName": "OZT_ProbeNote", "Value": 5 },
+        { "ClassName": "OZT_ProbeNote50", "Value": 50 },
+        { "ClassName": "OZT_ProbeNote500", "Value": 500 }
+    ],
+    "Holders": [ "OZT_ProbeWallet" ],
+    "Condition": { "Pristine": 1, "Worn": 0.85, "Damaged": 0.6, "BadlyDamaged": 0.35 },
+    "CooldownMs": 0,
+    "WearBought": 1
+}

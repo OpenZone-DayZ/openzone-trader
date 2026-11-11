@@ -1,0 +1,114 @@
+ui open #1 -> open: the screen is up
+ui drag reset #2 -> drag: counts cleared, tiles back
+    OnMouseButtonDown x1 | first: w=TileEngine x=248 y=132 reciever=null | last: w=TileEngine x=248 y=132 reciever=null
+    OnDrag x1 | first: w=TileEngine x=248 y=132 reciever=null | last: w=TileEngine x=248 y=132 reciever=null
+    OnDraggingOver x11 | first: w=TileEngine x=278 y=136 reciever=OZT_ProbeMenuRoot | last: w=TileEngine x=433 y=158 reciever=DropRight
+    OnDragging x11 | first: w=TileEngine x=278 y=136 reciever=OZT_ProbeMenuRoot | last: w=TileEngine x=433 y=158 reciever=DropRight
+    OnMouseButtonUp x1 | first: w=DropRight x=433 y=158 reciever=null | last: w=DropRight x=433 y=158 reciever=null
+    OnDropReceived x1 | first: w=TileEngine x=433 y=158 reciever=DropRight | last: w=TileEngine x=433 y=158 reciever=DropRight
+    OnDrop x1 | first: w=TileEngine x=433 y=158 reciever=DropRight | last: w=TileEngine x=433 y=158 reciever=DropRight
+ui drag report #3 -> drag: OnMouseButtonDown=1 OnDrag=1 OnDraggingOver=11 OnDragging=11 OnMouseButtonUp=1 OnDropReceived=1 OnDrop=1 | tiles now: TileEngine@208,92 TilePreview@208,192
+ui drag reset #11 -> drag: counts cleared, tiles back
+    OnMouseButtonDown x1 | first: w=TilePreview x=248 y=232 reciever=null | last: w=TilePreview x=248 y=232 reciever=null
+    OnDrag x1 | first: w=TilePreview x=248 y=232 reciever=null | last: w=TilePreview x=248 y=232 reciever=null
+    OnDraggingOver x11 | first: w=TilePreview x=223 y=219 reciever=OZT_ProbeMenuRoot | last: w=TilePreview x=100 y=158 reciever=DropLeft
+    OnDragging x11 | first: w=TilePreview x=223 y=219 reciever=OZT_ProbeMenuRoot | last: w=TilePreview x=100 y=158 reciever=DropLeft
+    OnMouseButtonUp x1 | first: w=DropLeft x=100 y=158 reciever=null | last: w=DropLeft x=100 y=158 reciever=null
+    OnDropReceived x1 | first: w=TilePreview x=100 y=158 reciever=DropLeft | last: w=TilePreview x=100 y=158 reciever=DropLeft
+    OnDrop x1 | first: w=TilePreview x=100 y=158 reciever=DropLeft | last: w=TilePreview x=100 y=158 reciever=DropLeft
+ui drag report #12 -> drag: OnMouseButtonDown=1 OnDrag=1 OnDraggingOver=11 OnDragging=11 OnMouseButtonUp=1 OnDropReceived=1 OnDrop=1 | tiles now: TileEngine@208,92 TilePreview@208,192
+ui drag reset #13 -> drag: counts cleared, tiles back
+    OnMouseButtonDown x1 | first: w=TileEngine x=248 y=132 reciever=null | last: w=TileEngine x=248 y=132 reciever=null
+    OnDrag x1 | first: w=TileEngine x=248 y=132 reciever=null | last: w=TileEngine x=248 y=132 reciever=null
+    OnDraggingOver x11 | first: w=TileEngine x=294 y=210 reciever=OZT_ProbeMenuRoot | last: w=TileEngine x=524 y=600 reciever=OZT_ProbeMenuRoot
+    OnDragging x11 | first: w=TileEngine x=294 y=210 reciever=OZT_ProbeMenuRoot | last: w=TileEngine x=524 y=600 reciever=OZT_ProbeMenuRoot
+    OnMouseButtonUp x1 | first: w=OZT_ProbeMenuRoot x=524 y=600 reciever=null | last: w=OZT_ProbeMenuRoot x=524 y=600 reciever=null
+    OnDropReceived x1 | first: w=TileEngine x=524 y=600 reciever=OZT_ProbeMenuRoot | last: w=TileEngine x=524 y=600 reciever=OZT_ProbeMenuRoot
+    OnDrop x1 | first: w=TileEngine x=524 y=600 reciever=OZT_ProbeMenuRoot | last: w=TileEngine x=524 y=600 reciever=OZT_ProbeMenuRoot
+ui drag report #14 -> drag: OnMouseButtonDown=1 OnDrag=1 OnDraggingOver=11 OnDragging=11 OnMouseButtonUp=1 OnDropReceived=1 OnDrop=1 | tiles now: TileEngine@208,92 TilePreview@208,192
+ui drag reset #15 -> drag: counts cleared, tiles back
+    OnMouseButtonDown x1 | first: w=TileEngine x=248 y=132 reciever=null | last: w=TileEngine x=248 y=132 reciever=null
+    OnDrag x1 | first: w=TileEngine x=248 y=132 reciever=null | last: w=TileEngine x=248 y=132 reciever=null
+    OnDraggingOver x10 | first: w=TileEngine x=248 y=157 reciever=OZT_ProbeMenuRoot | last: w=TileEngine x=248 y=232 reciever=TilePreview
+    OnDragging x10 | first: w=TileEngine x=248 y=157 reciever=OZT_ProbeMenuRoot | last: w=TileEngine x=248 y=232 reciever=TilePreview
+    OnMouseButtonUp x1 | first: w=TilePreview x=248 y=232 reciever=null | last: w=TilePreview x=248 y=232 reciever=null
+    OnDropReceived x1 | first: w=TileEngine x=248 y=232 reciever=TilePreview | last: w=TileEngine x=248 y=232 reciever=TilePreview
+    OnDrop x1 | first: w=TileEngine x=248 y=232 reciever=TilePreview | last: w=TileEngine x=248 y=232 reciever=TilePreview
+ui drag report #16 -> drag: OnMouseButtonDown=1 OnDrag=1 OnDraggingOver=10 OnDragging=10 OnMouseButtonUp=1 OnDropReceived=1 OnDrop=1 | tiles now: TileEngine@208,92 TilePreview@208,192
+ui drag reset #20 -> drag: counts cleared, tiles back
+    OnMouseButtonDown x4 | first: w=TileEngine x=248 y=132 reciever=null | last: w=OZT_ProbeMenuRoot x=877 y=46 reciever=null
+    OnDrag x1 | first: w=TileEngine x=248 y=132 reciever=null | last: w=TileEngine x=248 y=132 reciever=null
+    OnDraggingOver x11 | first: w=TileEngine x=278 y=136 reciever=OZT_ProbeMenuRoot | last: w=TileEngine x=433 y=158 reciever=DropRight
+    OnDragging x11 | first: w=TileEngine x=278 y=136 reciever=OZT_ProbeMenuRoot | last: w=TileEngine x=433 y=158 reciever=DropRight
+    OnMouseButtonUp x4 | first: w=DropRight x=433 y=158 reciever=null | last: w=OZT_ProbeMenuRoot x=877 y=46 reciever=null
+    OnDropReceived x1 | first: w=TileEngine x=433 y=158 reciever=DropRight | last: w=TileEngine x=433 y=158 reciever=DropRight
+    OnDrop x1 | first: w=TileEngine x=433 y=158 reciever=DropRight | last: w=TileEngine x=433 y=158 reciever=DropRight
+ui drag report #31 -> drag: OnMouseButtonDown=4 OnDrag=1 OnDraggingOver=11 OnDragging=11 OnMouseButtonUp=4 OnDropReceived=1 OnDrop=1 | tiles now: TileEngine@208,92 TilePreview@208,192
+ui drag returns 1 #32 -> drag: the menu's events now return yes
+ui drag reset #33 -> drag: counts cleared, tiles back
+    OnMouseButtonDown x1 | first: w=TileEngine x=248 y=132 reciever=null | last: w=TileEngine x=248 y=132 reciever=null
+    OnDrag x1 | first: w=TileEngine x=248 y=132 reciever=null | last: w=TileEngine x=248 y=132 reciever=null
+    OnDraggingOver x11 | first: w=TileEngine x=278 y=136 reciever=OZT_ProbeMenuRoot | last: w=TileEngine x=433 y=158 reciever=DropRight
+    OnDragging x11 | first: w=TileEngine x=278 y=136 reciever=OZT_ProbeMenuRoot | last: w=TileEngine x=433 y=158 reciever=DropRight
+    OnMouseButtonUp x1 | first: w=DropRight x=433 y=158 reciever=null | last: w=DropRight x=433 y=158 reciever=null
+    OnDropReceived x1 | first: w=TileEngine x=433 y=158 reciever=DropRight | last: w=TileEngine x=433 y=158 reciever=DropRight
+    OnDrop x1 | first: w=TileEngine x=433 y=158 reciever=DropRight | last: w=TileEngine x=433 y=158 reciever=DropRight
+ui drag report #34 -> drag: OnMouseButtonDown=1 OnDrag=1 OnDraggingOver=11 OnDragging=11 OnMouseButtonUp=1 OnDropReceived=1 OnDrop=1 | tiles now: TileEngine@208,92 TilePreview@208,192
+ui drag returns 0 #35 -> drag: the menu's events now return no
+ui drag reset #36 -> drag: counts cleared, tiles back
+    OnMouseButtonDown x1 | first: w=TilePoll x=248 y=332 reciever=null | last: w=TilePoll x=248 y=332 reciever=null
+    OnMouseButtonUp x1 | first: w=DropRight x=433 y=158 reciever=null | last: w=DropRight x=433 y=158 reciever=null
+ui drag report #37 -> drag: OnMouseButtonDown=1 OnMouseButtonUp=1 | tiles now: TileEngine@208,92 TilePreview@208,192 | by hand: moves=122 released at 433 158 over DropRight
+ui drag reset #38 -> drag: counts cleared, tiles back
+    OnMouseButtonDown x1 | first: w=TilePoll x=248 y=332 reciever=null | last: w=TilePoll x=248 y=332 reciever=null
+    OnMouseButtonUp x1 | first: w=TilePreview x=248 y=232 reciever=null | last: w=TilePreview x=248 y=232 reciever=null
+ui drag report #39 -> drag: OnMouseButtonDown=1 OnMouseButtonUp=1 | tiles now: TileEngine@208,92 TilePreview@208,192 | by hand: moves=122 released at 248 232 over TilePreview
+ui drag registered #41 -> drag: TileEngine and DropRight handed to WidgetEventHandler=yes
+ui drag reset #42 -> drag: counts cleared, tiles back
+    OnMouseButtonDown x1 | first: w=TileEngine x=248 y=132 reciever=null | last: w=TileEngine x=248 y=132 reciever=null
+    registered OnDrag x1 | first: w=TileEngine x=248 y=132 reciever=null | last: w=TileEngine x=248 y=132 reciever=null
+    OnDraggingOver x6 | first: w=TileEngine x=278 y=136 reciever=OZT_ProbeMenuRoot | last: w=TileEngine x=355 y=147 reciever=OZT_ProbeMenuRoot
+    OnDragging x11 | first: w=TileEngine x=278 y=136 reciever=OZT_ProbeMenuRoot | last: w=TileEngine x=433 y=158 reciever=DropRight
+    registered OnDraggingOver x5 | first: w=TileEngine x=371 y=149 reciever=DropRight | last: w=TileEngine x=433 y=158 reciever=DropRight
+    OnMouseButtonUp x1 | first: w=DropRight x=433 y=158 reciever=null | last: w=DropRight x=433 y=158 reciever=null
+    registered OnDropReceived x1 | first: w=TileEngine x=433 y=158 reciever=DropRight | last: w=TileEngine x=433 y=158 reciever=DropRight
+    registered OnDrop x1 | first: w=TileEngine x=433 y=158 reciever=null | last: w=TileEngine x=433 y=158 reciever=null
+ui drag report #43 -> drag: OnMouseButtonDown=1 registered OnDrag=1 OnDraggingOver=6 OnDragging=11 registered OnDraggingOver=5 OnMouseButtonUp=1 registered OnDropReceived=1 registered OnDrop=1 | tiles now: TileEngine@208,92 TilePreview@208,192
+ui drag reset #44 -> drag: counts cleared, tiles back
+    OnMouseButtonDown x1 | first: w=TileEngine x=248 y=132 reciever=null | last: w=TileEngine x=248 y=132 reciever=null
+    registered OnDrag x1 | first: w=TileEngine x=248 y=132 reciever=null | last: w=TileEngine x=248 y=132 reciever=null
+    OnDraggingOver x11 | first: w=TileEngine x=223 y=136 reciever=OZT_ProbeMenuRoot | last: w=TileEngine x=100 y=158 reciever=DropLeft
+    OnDragging x11 | first: w=TileEngine x=223 y=136 reciever=OZT_ProbeMenuRoot | last: w=TileEngine x=100 y=158 reciever=DropLeft
+    OnMouseButtonUp x1 | first: w=DropLeft x=100 y=158 reciever=null | last: w=DropLeft x=100 y=158 reciever=null
+    OnDropReceived x1 | first: w=TileEngine x=100 y=158 reciever=DropLeft | last: w=TileEngine x=100 y=158 reciever=DropLeft
+    registered OnDrop x1 | first: w=TileEngine x=100 y=158 reciever=null | last: w=TileEngine x=100 y=158 reciever=null
+ui drag report #45 -> drag: OnMouseButtonDown=1 registered OnDrag=1 OnDraggingOver=11 OnDragging=11 OnMouseButtonUp=1 OnDropReceived=1 registered OnDrop=1 | tiles now: TileEngine@208,92 TilePreview@208,192
+ui player on #46 -> player on: orientation=0 0 0 position=0 0 0.6 dummy=SurvivorM_Boris id=00 worn=0 same as the player=no | turned by mouse: moves=0
+ui player rot 90 #47 -> player rot: orientation=-90 0 0 position=0 0 0.6 dummy=SurvivorM_Boris id=00 worn=0 same as the player=no | turned by mouse: moves=0
+ui player state #51 -> player state: orientation=150 0 0 position=0 0 0.6 dummy=SurvivorM_Boris id=00 worn=0 same as the player=no | turned by mouse: moves=122
+ui item Shoulder #52 -> item Shoulder: shows=AKM view=0 orientation=0 0 0 position=0 0 0
+ui item flip 1 #53 -> item flip: shows=AKM view=0 orientation=0 0 0 position=0 0 0
+ui item flip 0 #61 -> item flip: shows=AKM view=0 orientation=0 0 0 position=0 0 0
+ui frames reset #71 -> frames: counting from now
+ui frames #72 -> frames=965 avg_ms=6.2 max_ms=8 over_33ms=0
+ui items 60 far #73 -> items 60 far: classes=60 made=60 not_made=0 tiles=60 | ms: find_classes=12 create=84 tiles=3
+ui frames #74 -> frames=1101 avg_ms=6.4 max_ms=158 over_33ms=1
+ui items where #75 -> items: listed=60 alive=60 first=TestObject at 0 0 0 id=00
+ui items 150 far #81 -> items 150 far: classes=150 made=150 not_made=0 tiles=150 | ms: find_classes=12 create=186 tiles=6
+ui frames #82 -> frames=1062 avg_ms=6.6 max_ms=300 over_33ms=1
+ui items 150 far #83 -> items 150 far: classes=150 made=150 not_made=0 tiles=150 | ms: find_classes=12 create=15 tiles=5
+ui frames #84 -> frames=958 avg_ms=6.3 max_ms=41 over_33ms=1
+ui items 300 far #85 -> items 300 far: classes=300 made=300 not_made=0 tiles=300 | ms: find_classes=11 create=201 tiles=13
+ui frames #86 -> frames=911 avg_ms=7.7 max_ms=300 over_33ms=1
+ui items clear #91 -> items: 300 deleted
+ui kit rifle #92 -> kit rifle: on it=5 ms=1 | PSO1Optic=yes AK_Suppressor=yes AK_WoodBttstck=yes AK_WoodHndgrd=yes Mag_AKM_30Rnd=yes
+ui kit vest #101 -> kit vest: on it=2 ms=2 | PlateCarrierPouches=yes PlateCarrierHolster=yes holster found=yes pistol in the holster=yes Mag_IJ70_8Rnd=yes
+ui slots #111 -> slots: listed=14 tiles=14 not_in_CfgSlots=0 without_icon=0 the probe's own slot=yes | client_slots.txt
+ui tryon dummy Mich2001Helmet #121 -> tryon dummy Mich2001Helmet: put on slot Headgear | dummy=SurvivorM_Boris id=00 same as the player=no worn before=0 after=1 ms=5
+ui tryon copy Mich2001Helmet far #131 -> tryon copy Mich2001Helmet: put on slot Headgear | copy=SurvivorM_Boris id=00 at 0 0 0 | the player wears 6, things made on the copy (parts of parts counted)=14 | ms=5 | players the client lists: 1 -> 2
+ui frames #132 -> frames=960 avg_ms=6.3 max_ms=33 over_33ms=0
+ui tryon clear #141 -> tryon clear: the player as it is, the dummy wears 0; players the client lists=2
+ui tryon copy AKM far #142 -> tryon copy AKM: put on slot Shoulder, in place of AKM | copy=SurvivorM_Boris id=00 at 0 0 0 | the player wears 6, things made on the copy (parts of parts counted)=14 | ms=6 | players the client lists: 1 -> 2
+ui tryon clear #143 -> tryon clear: the player as it is, the dummy wears 0; players the client lists=2
+ui tryon copy Mich2001Helmet near #144 -> tryon copy Mich2001Helmet: put on slot Headgear | copy=SurvivorM_Boris id=00 at 4690 339 10192 | the player wears 6, things made on the copy (parts of parts counted)=14 | ms=5 | players the client lists: 1 -> 2
+ui tryon clear #150 -> tryon clear: the player as it is, the dummy wears 0; players the client lists=2

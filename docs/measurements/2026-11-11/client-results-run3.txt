@@ -1,0 +1,14 @@
+ui open #301 -> open: the screen is up
+ui tryon copy Mich2001Helmet dy-3 still #302 -> tryon copy Mich2001Helmet dy-3: put on slot Headgear | copy=SurvivorM_Boris id=00 still=yes at 4690 336 10192 | the player wears 6, things made on the copy (parts of parts counted)=14 | ms=9 | players the client lists: 1 -> 2
+ui tryon copy Mich2001Helmet dy-10 still #311 -> tryon copy Mich2001Helmet dy-10: put on slot Headgear | copy=SurvivorM_Boris id=00 still=yes at 4690 329 10192 | the player wears 6, things made on the copy (parts of parts counted)=14 | ms=6 | players the client lists: 2 -> 3
+ui tryon copy Mich2001Helmet dy-20 still #321 -> tryon copy Mich2001Helmet dy-20: put on slot Headgear | copy=SurvivorM_Boris id=00 still=yes at 4690 319 10192 | the player wears 6, things made on the copy (parts of parts counted)=14 | ms=5 | players the client lists: 2 -> 3
+ui tryon copy Mich2001Helmet dy3 still #331 -> tryon copy Mich2001Helmet dy3: put on slot Headgear | copy=SurvivorM_Boris id=00 still=yes at 4690 342 10192 | the player wears 6, things made on the copy (parts of parts counted)=14 | ms=5 | players the client lists: 2 -> 3
+ui tryon copy Mich2001Helmet near still #341 -> tryon copy Mich2001Helmet near: put on slot Headgear | copy=SurvivorM_Boris id=00 still=yes at 4690 339 10192 | the player wears 6, things made on the copy (parts of parts counted)=14 | ms=6 | players the client lists: 2 -> 3
+ui tryon copy Mich2001Helmet dy-3 #351 -> tryon copy Mich2001Helmet dy-3: put on slot Headgear | copy=SurvivorM_Boris id=00 still=no at 4690 336 10192 | the player wears 6, things made on the copy (parts of parts counted)=14 | ms=6 | players the client lists: 2 -> 3
+ui tryon where #352 -> tryon where: the copy stands at 4690 336 10192
+ui tryon copy Mich2001Helmet dy-40 #361 -> tryon copy Mich2001Helmet dy-40: put on slot Headgear | copy=SurvivorM_Boris id=00 still=no at 4690 299 10192 | the player wears 6, things made on the copy (parts of parts counted)=14 | ms=6 | players the client lists: 2 -> 3
+ui tryon where #362 -> tryon where: the copy stands at 4690 299 10192
+ui tryon copy Mich2001Helmet near #371 -> tryon copy Mich2001Helmet near: put on slot Headgear | copy=SurvivorM_Boris id=00 still=no at 4690 339 10192 | the player wears 6, things made on the copy (parts of parts counted)=14 | ms=6 | players the client lists: 2 -> 3
+ui tryon clear #380 -> tryon clear: the player as it is, the dummy wears 0; players the client lists=2
+ui tryon clear #381 -> tryon clear: the player as it is, the dummy wears 0; players the client lists=1
+ui close #382 -> close: closing

@@ -1,0 +1,30 @@
+ui open #201 -> open: the screen is up
+ui kit rifle show #202 -> kit rifle: on it=5 ms=2 | PSO1Optic=yes AK_Suppressor=yes AK_WoodBttstck=yes AK_WoodHndgrd=yes Mag_AKM_30Rnd=yes magazine drawn by=show
+ui kit rifle sync #211 -> kit rifle: on it=5 ms=2 | PSO1Optic=yes AK_Suppressor=yes AK_WoodBttstck=yes AK_WoodHndgrd=yes Mag_AKM_30Rnd=yes magazine drawn by=sync
+ui frames reset #221 -> frames: counting from now
+ui frames #222 -> frames=805 avg_ms=6.2 max_ms=8 over_33ms=0
+ui items 60 far still #223 -> items 60 far still: classes=60 made=60 not_made=0 tiles=60 | ms: find_classes=12 create=85 tiles=2
+ui frames #224 -> frames=939 avg_ms=6.4 max_ms=157 over_33ms=1
+ui items draggable #225 -> items: 60 tiles take the pointer and can be dragged
+ui drag reset #226 -> drag: counts cleared, tiles back
+    OnMouseButtonDown x1 | first: w=OZT_ProbeTile x=1113 y=100 reciever=null | last: w=OZT_ProbeTile x=1113 y=100 reciever=null
+    OnDrag x1 | first: w=OZT_ProbeTile x=1113 y=100 reciever=null | last: w=OZT_ProbeTile x=1113 y=100 reciever=null
+    OnDraggingOver x11 | first: w=OZT_ProbeTile x=999 y=109 reciever=OZT_ProbeMenuRoot | last: w=OZT_ProbeTile x=433 y=158 reciever=DropRight
+    OnDragging x11 | first: w=OZT_ProbeTile x=999 y=109 reciever=OZT_ProbeMenuRoot | last: w=OZT_ProbeTile x=433 y=158 reciever=DropRight
+    OnMouseButtonUp x1 | first: w=DropRight x=433 y=158 reciever=null | last: w=DropRight x=433 y=158 reciever=null
+    OnDropReceived x1 | first: w=OZT_ProbeTile x=433 y=158 reciever=DropRight | last: w=OZT_ProbeTile x=433 y=158 reciever=DropRight
+    OnDrop x1 | first: w=OZT_ProbeTile x=433 y=158 reciever=DropRight | last: w=OZT_ProbeTile x=433 y=158 reciever=DropRight
+ui drag report #231 -> drag: OnMouseButtonDown=1 OnDrag=1 OnDraggingOver=11 OnDragging=11 OnMouseButtonUp=1 OnDropReceived=1 OnDrop=1 | tiles now: TileEngine@208,92 TilePreview@208,192
+ui items clear #241 -> items: 60 deleted
+ui items 60 near #242 -> items 60 near: classes=60 made=60 not_made=0 tiles=60 | ms: find_classes=12 create=30 tiles=2
+ui items where #243 -> items: listed=60 alive=60 first=TestObject at 4690 339 10192 id=00
+ui items keep #244 -> items: 60 will stay in the world when the screen closes
+ui close #245 -> close: closing
+ui open #261 -> open: the screen is up
+ui items drop #262 -> items: 60 kept ones deleted
+ui tryon copy Mich2001Helmet above #263 -> tryon copy Mich2001Helmet above: put on slot Headgear | copy=SurvivorM_Boris id=00 still=no at 4690 639 10192 | the player wears 6, things made on the copy (parts of parts counted)=14 | ms=10 | players the client lists: 1 -> 2
+ui tryon where #264 -> tryon where: the copy stands at 4690 639 10192
+ui tryon copy Mich2001Helmet above still #265 -> tryon copy Mich2001Helmet above: put on slot Headgear | copy=SurvivorM_Boris id=00 still=yes at 4690 639 10192 | the player wears 6, things made on the copy (parts of parts counted)=14 | ms=5 | players the client lists: 2 -> 3
+ui tryon where #266 -> tryon where: the copy stands at 4690 639 10192
+ui tryon copy Mich2001Helmet under still #281 -> tryon copy Mich2001Helmet under: put on slot Headgear | copy=SurvivorM_Boris id=00 still=yes at 4690 309 10192 | the player wears 6, things made on the copy (parts of parts counted)=14 | ms=5 | players the client lists: 2 -> 3
+ui tryon where #282 -> tryon where: the copy stands at 4690 309 10192

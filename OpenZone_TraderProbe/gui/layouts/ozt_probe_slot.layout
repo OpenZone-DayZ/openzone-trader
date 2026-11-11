@@ -1,0 +1,56 @@
+// One slot of the character as the trader probe lists it: the ghost icon the
+// config names and the slot's name.
+FrameWidgetClass OZT_ProbeSlot {
+ ignorepointer 1
+ position 0 0
+ size 144 52
+ hexactpos 1
+ vexactpos 1
+ hexactsize 1
+ vexactsize 1
+ priority 1
+ {
+  PanelWidgetClass SlotBg {
+   ignorepointer 1
+   color 0.17 0.18 0.2 1
+   position 0 0
+   size 1 1
+   hexactpos 1
+   vexactpos 1
+   hexactsize 0
+   vexactsize 0
+   priority 1
+   style rover_sim_colorable
+  }
+  ImageWidgetClass SlotIcon {
+   ignorepointer 1
+   position 2 2
+   size 48 48
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 2
+   mode blend
+   "src alpha" 1
+   stretch 1
+  }
+  TextWidgetClass SlotName {
+   ignorepointer 1
+   color 1 1 1 1
+   position 54 2
+   size 88 48
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 2
+   text "-"
+   font "gui/fonts/sdf_MetronBook24"
+   "exact text" 1
+   "exact text size" 12
+   "text halign" left
+   "text valign" center
+  }
+ }
+}

@@ -1,0 +1,267 @@
+// The screen of the trader probe's client half: a region for each question of
+// docs/2026-11-11-phase-2a-plan.md. Written by hand: a stand tool, never
+// published. Sizes are layout units (one unit is a pixel at 1080 rows).
+//
+// Every priority is below 100: an ItemPreviewWidget or a PlayerPreviewWidget
+// draws only when its own priority and every ancestor's are below 100, or its
+// own is exactly 201 (skill dayz-modding, gui-layouts, section 13).
+FrameWidgetClass OZT_ProbeMenuRoot {
+ position 0 0
+ size 1 1
+ hexactpos 1
+ vexactpos 1
+ hexactsize 0
+ vexactsize 0
+ priority 2
+ {
+  PanelWidgetClass Bg {
+   ignorepointer 1
+   color 0.05 0.06 0.07 0.94
+   position 0 0
+   size 1 1
+   hexactpos 1
+   vexactpos 1
+   hexactsize 0
+   vexactsize 0
+   priority 1
+   style rover_sim_colorable
+  }
+  TextWidgetClass Title {
+   ignorepointer 1
+   color 1 1 1 1
+   position 20 12
+   size 1200 28
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 2
+   text "Trader probe: the client facts"
+   font "gui/fonts/sdf_MetronBook24"
+   "exact text" 1
+   "exact text size" 20
+   "text halign" left
+   "text valign" center
+  }
+  TextWidgetClass Status {
+   ignorepointer 1
+   color 0.7 0.9 0.7 1
+   position 20 46
+   size 1880 26
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 2
+   text "-"
+   font "gui/fonts/sdf_MetronBook24"
+   "exact text" 1
+   "exact text size" 16
+   "text halign" left
+   "text valign" center
+  }
+  PanelWidgetClass DragZone {
+   ignorepointer 1
+   color 0.11 0.12 0.13 1
+   position 20 90
+   size 600 430
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 2
+   style rover_sim_colorable
+  }
+  PanelWidgetClass DropLeft {
+   color 0.16 0.24 0.16 1
+   position 30 100
+   size 180 180
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 3
+   style rover_sim_colorable
+  }
+  PanelWidgetClass DropRight {
+   color 0.16 0.16 0.3 1
+   position 430 100
+   size 180 180
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 3
+   style rover_sim_colorable
+  }
+  PanelWidgetClass TileEngine {
+   color 0.5 0.38 0.18 1
+   position 250 110
+   size 96 96
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 5
+   style rover_sim_colorable
+   {
+    ItemPreviewWidgetClass TileEnginePic {
+     ignorepointer 1
+     position 0 0
+     size 1 1
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     priority 1
+    }
+   }
+  }
+  ItemPreviewWidgetClass TilePreview {
+   position 250 230
+   size 96 96
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 5
+  }
+  PanelWidgetClass TilePoll {
+   color 0.18 0.38 0.5 1
+   position 250 350
+   size 96 96
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 5
+   style rover_sim_colorable
+  }
+  PanelWidgetClass Ghost {
+   visible 0
+   ignorepointer 1
+   color 1 1 1 0.35
+   position 0 0
+   size 96 96
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 60
+   style rover_sim_colorable
+  }
+  PanelWidgetClass PlayerZone {
+   ignorepointer 1
+   color 0.11 0.12 0.13 1
+   position 640 90
+   size 600 910
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 2
+   style rover_sim_colorable
+  }
+  PlayerPreviewWidgetClass PlayerView {
+   ignorepointer 1
+   position 650 100
+   size 280 600
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 3
+  }
+  PanelWidgetClass PlayerTurn {
+   color 1 1 1 0.02
+   position 650 100
+   size 280 600
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 4
+   style rover_sim_colorable
+  }
+  PlayerPreviewWidgetClass TryOnView {
+   ignorepointer 1
+   position 950 100
+   size 280 600
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 3
+  }
+  ItemPreviewWidgetClass ItemView {
+   ignorepointer 1
+   position 650 720
+   size 280 270
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 3
+  }
+  ItemPreviewWidgetClass KitView {
+   ignorepointer 1
+   position 950 720
+   size 280 270
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 3
+  }
+  PanelWidgetClass ItemsZone {
+   ignorepointer 1
+   color 0.11 0.12 0.13 1
+   position 1260 90
+   size 640 910
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 2
+   style rover_sim_colorable
+  }
+  WrapSpacerWidgetClass ItemsGrid {
+   ignorepointer 1
+   clipchildren 1
+   position 1265 95
+   size 630 900
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 3
+   Padding 0
+   Margin 2
+  }
+  PanelWidgetClass SlotsZone {
+   ignorepointer 1
+   color 0.11 0.12 0.13 1
+   position 20 540
+   size 600 460
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 2
+   style rover_sim_colorable
+  }
+  WrapSpacerWidgetClass SlotsGrid {
+   ignorepointer 1
+   clipchildren 1
+   position 25 545
+   size 590 450
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 3
+   Padding 0
+   Margin 2
+  }
+ }
+}

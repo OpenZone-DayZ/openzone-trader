@@ -32,4 +32,16 @@ modded class MissionGameplay
         if (m_OZT_ProbeClient)
             m_OZT_ProbeClient.OnFrame(timeslice);
     }
+
+    // The probe's own screen, made for its id; everybody else's menus first.
+    override UIScriptedMenu CreateScriptedMenu(int id)
+    {
+        UIScriptedMenu menu = super.CreateScriptedMenu(id);
+        if (!menu && id == OZT_ProbeMenu.ID)
+        {
+            menu = new OZT_ProbeMenu();
+            menu.SetID(id);
+        }
+        return menu;
+    }
 }

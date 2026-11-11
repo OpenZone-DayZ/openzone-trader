@@ -1,0 +1,14 @@
+Slot_Shoulder | name=Shoulder | id=-761289206 | display=#STR_CfgShoulder0 | ghost=set:dayz_inventory image:shoulderleft | worn=AKM
+Slot_Melee | name=Melee | id=209551192 | display=#STR_CfgShoulder0 | ghost=set:dayz_inventory image:shoulderright | worn=-
+Slot_Vest | name=Vest | id=6119694 | display=#STR_CfgVest0 | ghost=set:dayz_inventory image:vest | worn=PlateCarrierVest
+Slot_Body | name=Body | id=5119774 | display=#STR_CfgBody0 | ghost=set:dayz_inventory image:body | worn=M65Jacket_Black
+Slot_Hips | name=Hips | id=5415916 | display=#STR_CfgHips0 | ghost=set:dayz_inventory image:hips | worn=-
+Slot_Legs | name=Legs | id=5612719 | display=#STR_CfgLegs0 | ghost=set:dayz_inventory image:legs | worn=CargoPants_Black
+Slot_Back | name=Back | id=5100557 | display=#STR_CfgBack0 | ghost=set:dayz_inventory image:back | worn=TaloonBag_Blue
+Slot_Headgear | name=Headgear | id=-1445057555 | display=#STR_CfgHeadgear0 | ghost=set:dayz_inventory image:headgear | worn=-
+Slot_Mask | name=Mask | id=5658332 | display=#STR_CfgMask0 | ghost=set:dayz_inventory image:mask | worn=-
+Slot_Eyewear | name=Eyewear | id=1436473694 | display=#STR_CfgEyewear0 | ghost=set:dayz_inventory image:eyewear | worn=-
+Slot_Gloves | name=Gloves | id=-1239309756 | display=#STR_CfgGloves0 | ghost=set:dayz_inventory image:gloves | worn=-
+Slot_Feet | name=Feet | id=5308728 | display=#STR_CfgFeet0 | ghost=set:dayz_inventory image:feet | worn=MilitaryBoots_Black
+Slot_Armband | name=Armband | id=-707980483 | display=#STR_CfgArmband0 | ghost=set:dayz_inventory image:armband | worn=-
+Slot_OZT_ProbeWear | name=OZT_ProbeWear | id=-352377809 | display=Probe wear slot | ghost=set:dayz_inventory image:walkietalkie | worn=-

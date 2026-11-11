@@ -18,7 +18,7 @@ FrameWidgetClass OZT_TradeTab {
    vexactpos 1
    hexactsize 0
    vexactsize 0
-   color 0.135 0.18 0.225 1
+   color 0.118 0.118 0.114 1
    priority 0
    style rover_sim_colorable
   }
@@ -33,7 +33,7 @@ FrameWidgetClass OZT_TradeTab {
    vexactpos 1
    hexactsize 1
    vexactsize 1
-   color 0.31 0.71 0.91 1
+   color 0.91 0.47 0.17 1
    priority 1
    style rover_sim_colorable
   }
@@ -46,7 +46,7 @@ FrameWidgetClass OZT_TradeTab {
    vexactpos 1
    hexactsize 0
    vexactsize 0
-   color 0.58 0.65 0.71 1
+   color 0.55 0.545 0.525 1
    priority 2
    text ""
    font "gui/fonts/sdf_MetronBook24"

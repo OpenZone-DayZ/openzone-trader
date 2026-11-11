@@ -194,24 +194,33 @@ class OZT_Tile
         SetPicked(m_Picked);
     }
 
-    // The selected tile wears the accent on its border.
+    // The selected tile wears the accent on its border. A thing the trader
+    // does not take lies on dark red, one with something inside on dark amber.
     void SetPicked(bool on)
     {
         m_Picked = on;
+        int edge = OZT_Look.EdgeDim();
+        int bed = OZT_Look.Tile();
+        if (Why == 1 && Kind != SHELF && Kind != BUY)
+        {
+            edge = OZT_Look.NoEdge();
+            bed = OZT_Look.NoTile();
+        }
+        else if (Why == 2 && Kind != SHELF && Kind != BUY)
+        {
+            edge = OZT_Look.FullEdge();
+            bed = OZT_Look.FullTile();
+        }
+        if (on)
+        {
+            edge = OZT_Look.Accent();
+            if (Why == 0)
+                bed = OZT_Look.TileLit();
+        }
         if (m_Edge)
-        {
-            if (on)
-                m_Edge.SetColor(OZT_Look.Accent());
-            else
-                m_Edge.SetColor(OZT_Look.EdgeDim());
-        }
+            m_Edge.SetColor(edge);
         if (m_Bg)
-        {
-            if (on)
-                m_Bg.SetColor(OZT_Look.TileLit());
-            else
-                m_Bg.SetColor(OZT_Look.Tile());
-        }
+            m_Bg.SetColor(bed);
     }
 
     bool IsPicked()

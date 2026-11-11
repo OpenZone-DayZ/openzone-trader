@@ -1925,9 +1925,9 @@ class OZT_TradeMenu : UIScriptedMenu
     protected void PaintZone(string bed, bool on)
     {
         if (on)
-            OZT_Ui.Tint(layoutRoot, bed, ARGB(255, 27, 40, 52));
+            OZT_Ui.Tint(layoutRoot, bed, OZT_Look.BedLit());
         else
-            OZT_Ui.Tint(layoutRoot, bed, ARGB(255, 19, 26, 33));
+            OZT_Ui.Tint(layoutRoot, bed, OZT_Look.Bed());
     }
 
     // ---- the deal ------------------------------------------------------------------------------------------

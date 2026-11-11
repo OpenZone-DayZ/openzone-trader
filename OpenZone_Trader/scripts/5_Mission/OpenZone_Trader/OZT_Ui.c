@@ -2,24 +2,40 @@
 
 // The series' palette as the screen paints it from script (ui/tokens.json of
 // the core and of this mod name the same colours for the layouts).
+// The trade screen's colours, the same as its tokens (ui/tokens.json): the
+// palette of a trade screen in STALKER 2 (the owner, 2026-11-11), colours
+// only. Near-black panels, thin grey frames, white text, orange for what
+// matters, green for what the player gets, dark red for what is not taken.
 class OZT_Look
 {
-    static int Edge()    { return ARGB(255, 56, 77, 97); }
-    static int EdgeDim() { return ARGB(255, 42, 58, 73); }
-    static int Accent()  { return ARGB(255, 79, 181, 232); }
-    static int Text()    { return ARGB(255, 230, 237, 242); }
-    static int Muted()   { return ARGB(255, 148, 166, 181); }
-    static int Good()    { return ARGB(255, 99, 194, 92); }
-    static int Bad()     { return ARGB(255, 224, 82, 82); }
-    static int Alert()   { return ARGB(255, 240, 138, 36); }
-    static int Gold()    { return ARGB(255, 217, 191, 107); }
-    static int Raised()  { return ARGB(255, 34, 46, 57); }
-    static int Tile()    { return ARGB(255, 32, 43, 54); }
-    static int TileLit() { return ARGB(255, 44, 60, 76); }
-    static int Dark()    { return ARGB(255, 14, 19, 24); }
-    static int GridLine(){ return ARGB(14, 255, 255, 255); }
-    static int Zone()    { return ARGB(46, 79, 181, 232); }
+    static int Edge()    { return ARGB(255, 60, 60, 58); }
+    static int EdgeDim() { return ARGB(255, 38, 38, 37); }
+    static int Accent()  { return ARGB(255, 232, 120, 43); }
+    static int Text()    { return ARGB(255, 224, 223, 218); }
+    static int Muted()   { return ARGB(255, 140, 139, 134); }
+    static int Good()    { return ARGB(255, 102, 199, 92); }
+    static int Bad()     { return ARGB(255, 204, 56, 51); }
+    static int Alert()   { return ARGB(255, 245, 199, 64); }
+    static int Gold()    { return ARGB(255, 242, 158, 77); }
+    static int Raised()  { return ARGB(255, 30, 30, 29); }
+    static int Tile()    { return ARGB(255, 22, 22, 21); }
+    static int TileLit() { return ARGB(255, 48, 38, 30); }
+    static int Dark()    { return ARGB(255, 12, 12, 12); }
+    static int GridLine(){ return ARGB(12, 255, 255, 255); }
+    static int Zone()    { return ARGB(46, 232, 120, 43); }
     static int None()    { return ARGB(0, 0, 0, 0); }
+
+    // A thing the trader does not take lies on dark red, framed red, as a
+    // broken thing does in that trade screen; one with something inside on
+    // dark amber.
+    static int NoTile()  { return ARGB(255, 64, 18, 16); }
+    static int NoEdge()  { return ARGB(255, 128, 32, 28); }
+    static int FullTile(){ return ARGB(255, 52, 40, 14); }
+    static int FullEdge(){ return ARGB(255, 112, 86, 26); }
+
+    // The bed of a grid, and the bed of a grid a dragged tile may land in.
+    static int Bed()     { return ARGB(235, 7, 7, 7); }
+    static int BedLit()  { return ARGB(235, 40, 26, 14); }
 
     // The pip of a health level: nothing for pristine.
     static int Condition(int level)

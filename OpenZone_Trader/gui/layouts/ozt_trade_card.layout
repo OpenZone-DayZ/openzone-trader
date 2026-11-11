@@ -8,7 +8,7 @@ PanelWidgetClass OZT_TradeCard {
  vexactpos 1
  hexactsize 1
  vexactsize 1
- color 0.22 0.3 0.38 1
+ color 0.235 0.235 0.227 1
  style rover_sim_colorable
  priority 952
  {
@@ -34,7 +34,7 @@ PanelWidgetClass OZT_TradeCard {
      vexactpos 1
      hexactsize 1
      vexactsize 1
-     color 0.1 0.135 0.17 1
+     color 0.047 0.047 0.047 0.95
      priority 0
      style rover_sim_colorable
     }
@@ -47,7 +47,7 @@ PanelWidgetClass OZT_TradeCard {
      vexactpos 1
      hexactsize 1
      vexactsize 1
-     color 0.078 0.106 0.137 1
+     color 0.075 0.075 0.071 1
      priority 1
      style rover_sim_colorable
      {
@@ -60,7 +60,7 @@ PanelWidgetClass OZT_TradeCard {
        vexactpos 1
        hexactsize 0
        vexactsize 0
-       color 0.9 0.93 0.95 1
+       color 0.88 0.875 0.855 1
        priority 0
        text ""
        font "gui/fonts/sdf_MetronBook24"
@@ -93,7 +93,7 @@ PanelWidgetClass OZT_TradeCard {
      vexactpos 1
      hexactsize 1
      vexactsize 1
-     color 0.9 0.93 0.95 1
+     color 0.88 0.875 0.855 1
      priority 3
      text ""
      font "gui/fonts/sdf_MetronBook24"
@@ -124,7 +124,7 @@ PanelWidgetClass OZT_TradeCard {
      vexactpos 1
      hexactsize 1
      vexactsize 1
-     color 0.9 0.93 0.95 1
+     color 0.88 0.875 0.855 1
      priority 5
      text ""
      font "gui/fonts/sdf_MetronBook24"
@@ -142,7 +142,7 @@ PanelWidgetClass OZT_TradeCard {
      vexactpos 1
      hexactsize 1
      vexactsize 1
-     color 0.58 0.65 0.71 1
+     color 0.55 0.545 0.525 1
      priority 6
      text ""
      font "gui/fonts/sdf_MetronBook24"
@@ -160,7 +160,7 @@ PanelWidgetClass OZT_TradeCard {
      vexactpos 1
      hexactsize 1
      vexactsize 1
-     color 0.85 0.75 0.42 1
+     color 0.95 0.62 0.3 1
      priority 7
      text ""
      font "gui/fonts/sdf_MetronBook24"
@@ -191,7 +191,7 @@ PanelWidgetClass OZT_TradeCard {
        vexactpos 1
        hexactsize 1
        vexactsize 1
-       color 0.9 0.93 0.95 1
+       color 0.88 0.875 0.855 1
        priority 0
        text ""
        font "gui/fonts/sdf_MetronBook24"
@@ -235,7 +235,7 @@ PanelWidgetClass OZT_TradeCard {
          vexactpos 1
          hexactsize 0
          vexactsize 0
-         color 0.58 0.65 0.71 1
+         color 0.55 0.545 0.525 1
          priority 0
          text ""
          font "gui/fonts/sdf_MetronBook24"
@@ -253,7 +253,7 @@ PanelWidgetClass OZT_TradeCard {
          vexactpos 1
          hexactsize 0
          vexactsize 0
-         color 0.9 0.93 0.95 1
+         color 0.88 0.875 0.855 1
          priority 1
          text ""
          font "gui/fonts/sdf_MetronBook24"
@@ -283,7 +283,7 @@ PanelWidgetClass OZT_TradeCard {
          vexactpos 1
          hexactsize 0
          vexactsize 0
-         color 0.58 0.65 0.71 1
+         color 0.55 0.545 0.525 1
          priority 0
          text ""
          font "gui/fonts/sdf_MetronBook24"
@@ -301,7 +301,7 @@ PanelWidgetClass OZT_TradeCard {
          vexactpos 1
          hexactsize 0
          vexactsize 0
-         color 0.9 0.93 0.95 1
+         color 0.88 0.875 0.855 1
          priority 1
          text ""
          font "gui/fonts/sdf_MetronBook24"
@@ -331,7 +331,7 @@ PanelWidgetClass OZT_TradeCard {
          vexactpos 1
          hexactsize 0
          vexactsize 0
-         color 0.58 0.65 0.71 1
+         color 0.55 0.545 0.525 1
          priority 0
          text ""
          font "gui/fonts/sdf_MetronBook24"
@@ -349,7 +349,7 @@ PanelWidgetClass OZT_TradeCard {
          vexactpos 1
          hexactsize 0
          vexactsize 0
-         color 0.9 0.93 0.95 1
+         color 0.88 0.875 0.855 1
          priority 1
          text ""
          font "gui/fonts/sdf_MetronBook24"
@@ -379,7 +379,7 @@ PanelWidgetClass OZT_TradeCard {
          vexactpos 1
          hexactsize 0
          vexactsize 0
-         color 0.58 0.65 0.71 1
+         color 0.55 0.545 0.525 1
          priority 0
          text ""
          font "gui/fonts/sdf_MetronBook24"
@@ -397,7 +397,7 @@ PanelWidgetClass OZT_TradeCard {
          vexactpos 1
          hexactsize 0
          vexactsize 0
-         color 0.9 0.93 0.95 1
+         color 0.88 0.875 0.855 1
          priority 1
          text ""
          font "gui/fonts/sdf_MetronBook24"
@@ -427,7 +427,7 @@ PanelWidgetClass OZT_TradeCard {
          vexactpos 1
          hexactsize 0
          vexactsize 0
-         color 0.58 0.65 0.71 1
+         color 0.55 0.545 0.525 1
          priority 0
          text ""
          font "gui/fonts/sdf_MetronBook24"
@@ -445,7 +445,7 @@ PanelWidgetClass OZT_TradeCard {
          vexactpos 1
          hexactsize 0
          vexactsize 0
-         color 0.9 0.93 0.95 1
+         color 0.88 0.875 0.855 1
          priority 1
          text ""
          font "gui/fonts/sdf_MetronBook24"
@@ -465,7 +465,7 @@ PanelWidgetClass OZT_TradeCard {
        vexactpos 1
        hexactsize 1
        vexactsize 1
-       color 0.88 0.32 0.32 1
+       color 0.8 0.22 0.2 1
        priority 7
        text ""
        font "gui/fonts/sdf_MetronBook24"

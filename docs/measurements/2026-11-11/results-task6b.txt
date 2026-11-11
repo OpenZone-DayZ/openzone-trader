@@ -1,0 +1,185 @@
+=== #1 strip ok=yes frame=66013 t=92.8 args: op=strip
+    deleted 7 top-level item(s); send dress as the next command
+=== #2 dress ok=yes frame=72023 t=96.9 args: op=dress
+    dressed: 23 of 23 handles; a missing one has a 'dress: NOT' line in results.log
+=== #3 dump ok=yes frame=82285 t=103.8 args: op=dump
+    dump: 23 items -> server_dump.txt; cargos=7 cells asked=149 model-vs-engine mismatches=0
+    probe entity Paper 1x1 made=yes
+    cargo 022592 M65Jacket_Black 6x4 items=2 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022535 slot=Body
+    cargo 022613 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO M65Jacket_Black#022592 r0 c0 flip=no
+    cargo 022593 CargoPants_Black 5x4 items=0 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022535 slot=Legs
+    cargo 022598 PlateCarrierPouches 5x3 items=0 children accessible=yes mismatches=0 at ATT PlateCarrierVest#022595 slot=VestPouch
+    cargo 022596 TaloonBag_Blue 6x5 items=4 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022535 slot=Back
+    cargo 022610 SmallProtectorCase 3x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022596 r0 c3 flip=no
+    cargo 022611 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022596 r2 c0 flip=no
+=== #4 move ok=yes frame=94069 t=111.8 args: via=sync into=pants op=move cell=free item=rifle_optic
+    move PSO1Optic sync answered yes | same call: CARGO CargoPants_Black#022593 r0 c0 flip=no | host AKM children accessible=yes host.CanReleaseAttachment=yes | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    from ATT AKM#022597 slot=weaponOpticsAK to CARGO CargoPants_Black r0 c0 flip=no via=sync
+    gates: host AKM children accessible=yes host.CanReleaseAttachment=yes | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    LocationCanAddEntity(destination)=yes
+    watching moved PSO1Optic from ATT AKM#022597 slot=weaponOpticsAK
+    the call answered yes in 0 ms; same call the item reads: CARGO CargoPants_Black#022593 r0 c0 flip=no
+    the weapon in the same call: GetMagazine=022602 Mag_AKM_30Rnd IsIdle=yes
+    watch #4 moved PSO1Optic changed +4 ms, 1 frames: CARGO CargoPants_Black#022593 r0 c0 flip=no
+    watch #4 moved PSO1Optic ends +3000 ms, 4074 frames: CARGO CargoPants_Black#022593 r0 c0 flip=no
+=== #5 weapon ok=yes frame=100634 t=116.8 args: op=weapon item=rifle
+    AKM at ATT SurvivorM_Boris#022535 slot=Shoulder | GetMagazine=022602 Mag_AKM_30Rnd | IsIdle=yes | attachments=4 | stable state=4 internal=6
+      022602 Mag_AKM_30Rnd | ATT AKM#022597 slot=magazine | 1x3 | ammo 30/30
+      022606 AK_WoodHndgrd | ATT AKM#022597 slot=weaponHandguardAK | 2x1 | -
+      022604 AK_Suppressor | ATT AKM#022597 slot=weaponMuzzleAK | 3x1 | -
+      022605 AK_WoodBttstck | ATT AKM#022597 slot=weaponButtstockAK | 3x1 | -
+=== #6 dump ok=yes frame=110434 t=123.8 args: op=dump
+    dump: 23 items -> server_dump.txt; cargos=7 cells asked=149 model-vs-engine mismatches=0
+    probe entity Paper 1x1 made=yes
+    cargo 022592 M65Jacket_Black 6x4 items=2 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022535 slot=Body
+    cargo 022613 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO M65Jacket_Black#022592 r0 c0 flip=no
+    cargo 022593 CargoPants_Black 5x4 items=1 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022535 slot=Legs
+    cargo 022598 PlateCarrierPouches 5x3 items=0 children accessible=yes mismatches=0 at ATT PlateCarrierVest#022595 slot=VestPouch
+    cargo 022596 TaloonBag_Blue 6x5 items=4 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022535 slot=Back
+    cargo 022610 SmallProtectorCase 3x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022596 r0 c3 flip=no
+    cargo 022611 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022596 r2 c0 flip=no
+=== #7 move ok=yes frame=122379 t=132.8 args: via=syncraw into=jacket op=move cell=free item=rifle_muzzle
+    move AK_Suppressor syncraw answered yes | same call: CARGO M65Jacket_Black#022592 r0 c3 flip=no | host AKM children accessible=yes host.CanReleaseAttachment=yes | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    from ATT AKM#022597 slot=weaponMuzzleAK to CARGO M65Jacket_Black r0 c3 flip=no via=syncraw
+    gates: host AKM children accessible=yes host.CanReleaseAttachment=yes | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    LocationCanAddEntity(destination)=yes
+    watching moved AK_Suppressor from ATT AKM#022597 slot=weaponMuzzleAK
+    the call answered yes in 0 ms; same call the item reads: CARGO M65Jacket_Black#022592 r0 c3 flip=no
+    the weapon in the same call: GetMagazine=022602 Mag_AKM_30Rnd IsIdle=yes
+    watch #7 moved AK_Suppressor changed +4 ms, 1 frames: CARGO M65Jacket_Black#022592 r0 c3 flip=no
+    watch #7 moved AK_Suppressor ends +3000 ms, 4379 frames: CARGO M65Jacket_Black#022592 r0 c3 flip=no
+=== #8 dump ok=yes frame=132923 t=140.9 args: op=dump
+    dump: 23 items -> server_dump.txt; cargos=7 cells asked=149 model-vs-engine mismatches=0
+    probe entity Paper 1x1 made=yes
+    cargo 022592 M65Jacket_Black 6x4 items=3 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022535 slot=Body
+    cargo 022613 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO M65Jacket_Black#022592 r0 c0 flip=no
+    cargo 022593 CargoPants_Black 5x4 items=1 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022535 slot=Legs
+    cargo 022598 PlateCarrierPouches 5x3 items=0 children accessible=yes mismatches=0 at ATT PlateCarrierVest#022595 slot=VestPouch
+    cargo 022596 TaloonBag_Blue 6x5 items=4 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022535 slot=Back
+    cargo 022610 SmallProtectorCase 3x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022596 r0 c3 flip=no
+    cargo 022611 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022596 r2 c0 flip=no
+=== #9 move ok=yes frame=142856 t=149.9 args: via=sync into=bag flip=1 op=move cell=free item=rifle_mag
+    move Mag_AKM_30Rnd sync answered yes | same call: CARGO TaloonBag_Blue#022596 r4 c0 flip=yes | host AKM children accessible=yes host.CanReleaseAttachment=no | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    from ATT AKM#022597 slot=magazine to CARGO TaloonBag_Blue r4 c0 flip=yes via=sync
+    gates: host AKM children accessible=yes host.CanReleaseAttachment=no | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    LocationCanAddEntity(destination)=yes
+    watching moved Mag_AKM_30Rnd from ATT AKM#022597 slot=magazine
+    the call answered yes in 0 ms; same call the item reads: CARGO TaloonBag_Blue#022596 r4 c0 flip=yes
+    the weapon in the same call: GetMagazine=null IsIdle=yes
+    watch #9 moved Mag_AKM_30Rnd changed +4 ms, 1 frames: CARGO TaloonBag_Blue#022596 r4 c0 flip=yes
+    watch #9 moved Mag_AKM_30Rnd ends +3000 ms, 3269 frames: CARGO TaloonBag_Blue#022596 r4 c0 flip=yes
+=== #10 weapon ok=yes frame=150514 t=156.9 args: op=weapon item=rifle
+    AKM at ATT SurvivorM_Boris#022535 slot=Shoulder | GetMagazine=null | IsIdle=yes | attachments=2 | stable state=1 internal=0
+      022605 AK_WoodBttstck | ATT AKM#022597 slot=weaponButtstockAK | 3x1 | -
+      022606 AK_WoodHndgrd | ATT AKM#022597 slot=weaponHandguardAK | 2x1 | -
+=== #11 move ok=yes frame=160543 t=164.9 args: via=sync into=jacket op=move cell=free item=pistol_mag
+    move Mag_IJ70_8Rnd sync answered yes | same call: CARGO M65Jacket_Black#022592 r1 c3 flip=no | host MakarovIJ70 children accessible=no host.CanReleaseAttachment=no | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    from ATT MakarovIJ70#022600 slot=magazine to CARGO M65Jacket_Black r1 c3 flip=no via=sync
+    gates: host MakarovIJ70 children accessible=no host.CanReleaseAttachment=no | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    LocationCanAddEntity(destination)=yes
+    watching moved Mag_IJ70_8Rnd from ATT MakarovIJ70#022600 slot=magazine
+    the call answered yes in 0 ms; same call the item reads: CARGO M65Jacket_Black#022592 r1 c3 flip=no
+    the weapon in the same call: GetMagazine=null IsIdle=yes
+    watch #11 moved Mag_IJ70_8Rnd changed +4 ms, 1 frames: CARGO M65Jacket_Black#022592 r1 c3 flip=no
+    watch #11 moved Mag_IJ70_8Rnd ends +3000 ms, 3695 frames: CARGO M65Jacket_Black#022592 r1 c3 flip=no
+=== #12 weapon ok=yes frame=167764 t=170.9 args: op=weapon item=pistol
+    MakarovIJ70 at ATT PlateCarrierHolster#022599 slot=Pistol | GetMagazine=null | IsIdle=yes | attachments=0 | stable state=2 internal=2
+=== #13 dump ok=yes frame=175438 t=177.9 args: op=dump
+    dump: 23 items -> server_dump.txt; cargos=7 cells asked=149 model-vs-engine mismatches=0
+    probe entity Paper 1x1 made=yes
+    cargo 022592 M65Jacket_Black 6x4 items=4 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022535 slot=Body
+    cargo 022613 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO M65Jacket_Black#022592 r0 c0 flip=no
+    cargo 022593 CargoPants_Black 5x4 items=1 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022535 slot=Legs
+    cargo 022598 PlateCarrierPouches 5x3 items=0 children accessible=yes mismatches=0 at ATT PlateCarrierVest#022595 slot=VestPouch
+    cargo 022596 TaloonBag_Blue 6x5 items=5 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022535 slot=Back
+    cargo 022610 SmallProtectorCase 3x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022596 r0 c3 flip=no
+    cargo 022611 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022596 r2 c0 flip=no
+=== #14 move ok=yes frame=185403 t=185.9 args: via=sync into=jacket op=move cell=free item=bagpistol_muzzle
+    move PistolSuppressor sync answered yes | same call: CARGO M65Jacket_Black#022592 r2 c0 flip=no | host FNX45 children accessible=no host.CanReleaseAttachment=no | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    from ATT FNX45#022607 slot=pistolMuzzle to CARGO M65Jacket_Black r2 c0 flip=no via=sync
+    gates: host FNX45 children accessible=no host.CanReleaseAttachment=no | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    LocationCanAddEntity(destination)=yes
+    watching moved PistolSuppressor from ATT FNX45#022607 slot=pistolMuzzle
+    the call answered yes in 1 ms; same call the item reads: CARGO M65Jacket_Black#022592 r2 c0 flip=no
+    the weapon in the same call: GetMagazine=022608 Mag_FNX45_15Rnd IsIdle=yes
+    watch #14 moved PistolSuppressor changed +4 ms, 1 frames: CARGO M65Jacket_Black#022592 r2 c0 flip=no
+    watch #14 moved PistolSuppressor ends +3001 ms, 3493 frames: CARGO M65Jacket_Black#022592 r2 c0 flip=no
+=== #15 move ok=yes frame=195403 t=193.9 args: via=sync into=jacket op=move cell=free item=bagpistol_mag
+    move Mag_FNX45_15Rnd sync answered yes | same call: CARGO M65Jacket_Black#022592 r1 c4 flip=no | host FNX45 children accessible=no host.CanReleaseAttachment=no | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    from ATT FNX45#022607 slot=magazine to CARGO M65Jacket_Black r1 c4 flip=no via=sync
+    gates: host FNX45 children accessible=no host.CanReleaseAttachment=no | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    LocationCanAddEntity(destination)=yes
+    watching moved Mag_FNX45_15Rnd from ATT FNX45#022607 slot=magazine
+    the call answered yes in 0 ms; same call the item reads: CARGO M65Jacket_Black#022592 r1 c4 flip=no
+    the weapon in the same call: GetMagazine=null IsIdle=yes
+    watch #15 moved Mag_FNX45_15Rnd changed +5 ms, 1 frames: CARGO M65Jacket_Black#022592 r1 c4 flip=no
+    watch #15 moved Mag_FNX45_15Rnd ends +3000 ms, 3317 frames: CARGO M65Jacket_Black#022592 r1 c4 flip=no
+=== #16 weapon ok=yes frame=199994 t=197.9 args: op=weapon item=bagpistol
+    FNX45 at CARGO TaloonBag_Blue#022596 r0 c0 flip=no | GetMagazine=null | IsIdle=yes | attachments=0 | stable state=2 internal=2
+=== #17 move ok=yes frame=205198 t=201.9 args: via=sync into=pants follow=delhost op=move cell=free item=rifle_guard
+    move AK_WoodHndgrd sync answered yes | same call: CARGO CargoPants_Black#022593 r0 c3 flip=no | host AKM children accessible=yes host.CanReleaseAttachment=yes | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    from ATT AKM#022597 slot=weaponHandguardAK to CARGO CargoPants_Black r0 c3 flip=no via=sync
+    gates: host AKM children accessible=yes host.CanReleaseAttachment=yes | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    LocationCanAddEntity(destination)=yes
+    watching moved AK_WoodHndgrd from ATT AKM#022597 slot=weaponHandguardAK
+    the call answered yes in 0 ms; same call the item reads: CARGO CargoPants_Black#022593 r0 c3 flip=no
+    the weapon in the same call: GetMagazine=null IsIdle=yes
+    watching host of the kept part AKM from ATT SurvivorM_Boris#022535 slot=Shoulder
+    the host AKM deleted in the same call; the part now reads: CARGO CargoPants_Black#022593 r0 c3 flip=no
+    watch #17 host of the kept part AKM changed +5 ms, 1 frames: GONE
+    watch #17 moved AK_WoodHndgrd changed +5 ms, 1 frames: CARGO CargoPants_Black#022593 r0 c3 flip=no
+    watch #17 moved AK_WoodHndgrd ends +3002 ms, 3472 frames: CARGO CargoPants_Black#022593 r0 c3 flip=no
+=== #18 where ok=yes frame=209817 t=205.9 args: op=where item=rifle_guard
+    rifle_guard: 022606 AK_WoodHndgrd | CARGO CargoPants_Black#022593 r0 c3 flip=no | 2x1 | -
+=== #19 dump ok=yes frame=217778 t=212.9 args: op=dump
+    dump: 21 items -> server_dump.txt; cargos=7 cells asked=149 model-vs-engine mismatches=0
+    probe entity Paper 1x1 made=yes
+    cargo 022592 M65Jacket_Black 6x4 items=6 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022535 slot=Body
+    cargo 022613 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO M65Jacket_Black#022592 r0 c0 flip=no
+    cargo 022593 CargoPants_Black 5x4 items=2 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022535 slot=Legs
+    cargo 022598 PlateCarrierPouches 5x3 items=0 children accessible=yes mismatches=0 at ATT PlateCarrierVest#022595 slot=VestPouch
+    cargo 022596 TaloonBag_Blue 6x5 items=5 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022535 slot=Back
+    cargo 022610 SmallProtectorCase 3x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022596 r0 c3 flip=no
+    cargo 022611 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022596 r2 c0 flip=no
+=== #20 hands ok=yes frame=235169 t=227.9 args: op=hands
+    hands hold null | inventory processing=no | CanDeleteItems=yes | action running=no | in vehicle=no | hand state=1 idle=yes
+    alive=yes unconscious=no restrained=no
+=== #21 move ok=yes frame=243538 t=234.9 args: kind=hands op=move via=sync item=bandage
+    move BandageDressing to the hands by LocationSyncMoveEntity: LocationCanAddEntity=yes moved=yes; same call: HANDS SurvivorM_Boris#022535
+    from CARGO M65Jacket_Black#022592 r0 c2 flip=no; source gates: host M65Jacket_Black children accessible=yes host.CanReleaseCargo=yes item.CanRemoveFromCargo=yes
+    watching to the hands BandageDressing from CARGO M65Jacket_Black#022592 r0 c2 flip=no
+    watch #21 to the hands BandageDressing changed +3 ms, 1 frames: HANDS SurvivorM_Boris#022535
+    watch #21 to the hands BandageDressing ends +3000 ms, 3601 frames: HANDS SurvivorM_Boris#022535
+=== #22 hands ok=yes frame=248272 t=238.9 args: op=hands
+    hands hold 022614 BandageDressing | inventory processing=no | CanDeleteItems=yes | action running=no | in vehicle=no | hand state=2 idle=yes
+    alive=yes unconscious=no restrained=no
+    juncture on the held item=no
+=== #23 dump ok=yes frame=256660 t=246.9 args: op=dump
+    dump: 21 items -> server_dump.txt; cargos=7 cells asked=149 model-vs-engine mismatches=0
+    probe entity Paper 1x1 made=yes
+    cargo 022592 M65Jacket_Black 6x4 items=5 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022535 slot=Body
+    cargo 022613 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO M65Jacket_Black#022592 r0 c0 flip=no
+    cargo 022593 CargoPants_Black 5x4 items=2 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022535 slot=Legs
+    cargo 022598 PlateCarrierPouches 5x3 items=0 children accessible=yes mismatches=0 at ATT PlateCarrierVest#022595 slot=VestPouch
+    cargo 022596 TaloonBag_Blue 6x5 items=5 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022535 slot=Back
+    cargo 022610 SmallProtectorCase 3x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022596 r0 c3 flip=no
+    cargo 022611 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022596 r2 c0 flip=no
+=== #24 del ok=yes frame=293545 t=277.9 args: how=object op=del item=bandage
+    del object HANDS SurvivorM_Boris#022535 | same call: still there: pending=yes toDelete=yes setForDeletion=yes at NOLOC
+    watching doomed BandageDressing from HANDS SurvivorM_Boris#022535
+    deleted by object from HANDS SurvivorM_Boris#022535; same call: still there: pending=yes toDelete=yes setForDeletion=yes at NOLOC
+    items in the holder's cargo: -1 before, -1 in the same call
+    watch #24 doomed BandageDressing changed +3 ms, 1 frames: GONE
+=== #25 hands ok=yes frame=299424 t=282.9 args: op=hands
+    hands hold null | inventory processing=no | CanDeleteItems=yes | action running=no | in vehicle=no | hand state=1 idle=yes
+    alive=yes unconscious=no restrained=no
+=== #26 create ok=yes frame=308916 t=290.9 args: via=loc into=pouches as=sheet class=Paper op=create cell=free
+    create Paper asked CARGO PlateCarrierPouches r0 c0 flip=no via=loc -> got CARGO PlateCarrierPouches#022598 r0 c0 flip=no | - | entity 1x1 | 0 ms
+    config size of Paper: 1x1 found=yes
+    watching created Paper from CARGO PlateCarrierPouches#022598 r0 c0 flip=no
+    watch #26 created Paper ends +3000 ms, 3754 frames: CARGO PlateCarrierPouches#022598 r0 c0 flip=no
+=== #27 move ok=yes frame=313687 t=294.9 args: via=sync into=wallet_jacket op=move cell=free item=sheet
+    move NOT attempted: LocationCanAddEntity refused CARGO OZT_ProbeWallet r0 c0 flip=no | host PlateCarrierPouches children accessible=yes host.CanReleaseCargo=yes item.CanRemoveFromCargo=yes | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=no into children accessible=no
+    from CARGO PlateCarrierPouches#022598 r0 c0 flip=no to CARGO OZT_ProbeWallet r0 c0 flip=no via=sync
+    gates: host PlateCarrierPouches children accessible=yes host.CanReleaseCargo=yes item.CanRemoveFromCargo=yes | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=no into children accessible=no
+    LocationCanAddEntity(destination)=no

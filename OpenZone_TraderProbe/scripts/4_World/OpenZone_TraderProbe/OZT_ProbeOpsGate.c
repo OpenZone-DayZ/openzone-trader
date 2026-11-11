@@ -17,6 +17,10 @@ class OZT_ProbeOpsGate
         detail = detail + " | CanDeleteItems=" + OZT_ProbeLog.B(player.CanDeleteItems());
         detail = detail + " | action running=" + OZT_ProbeLog.B(acting);
         detail = detail + " | in vehicle=" + OZT_ProbeLog.B(player.IsInVehicle());
+        // The hand state machine's own picture (HumanInventoryWithFSM): a move
+        // that went around it leaves this where it was.
+        detail = detail + " | hand state=" + player.GetDayZPlayerInventory().GetCurrentStateID().ToString();
+        detail = detail + " idle=" + OZT_ProbeLog.B(player.GetDayZPlayerInventory().IsIdle());
         string body = "alive=" + OZT_ProbeLog.B(player.IsAlive()) + " unconscious=" + OZT_ProbeLog.B(player.IsUnconscious());
         body = body + " restrained=" + OZT_ProbeLog.B(player.IsRestrained());
         p.AddLine(body);

@@ -132,6 +132,10 @@ class OZT_Probe
             return OZT_ProbeOpsGate.HandsState(this, player, detail);
         if (op == "del")
             return OZT_ProbeOpsDelete.DeleteOne(this, player, args, detail);
+        if (op == "move")
+            return OZT_ProbeOpsMove.MoveOne(this, player, args, detail);
+        if (op == "recreate")
+            return OZT_ProbeOpsMove.RecreateOne(this, player, args, detail);
         // -- routes of the later tasks go above this line --
         detail = "unknown op '" + op + "'; known: " + KnownOps();
         return false;
@@ -139,7 +143,7 @@ class OZT_Probe
 
     protected string KnownOps()
     {
-        return "status, strip, dress, dump, find, where, weapon, create, qty, hands, del";
+        return "status, strip, dress, dump, find, where, weapon, create, qty, hands, del, move, recreate";
     }
 
     protected bool OpStatus(out string detail)

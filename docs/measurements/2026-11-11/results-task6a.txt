@@ -1,0 +1,245 @@
+=== #1 strip ok=yes frame=124000 t=83.2 args: op=strip
+    deleted 6 top-level item(s); send dress as the next command
+=== #2 dress ok=yes frame=132629 t=87.2 args: op=dress
+    dressed: 23 of 23 handles; a missing one has a 'dress: NOT' line in results.log
+=== #3 dump ok=yes frame=146772 t=94.2 args: op=dump
+    dump: 23 items -> server_dump.txt; cargos=7 cells asked=149 model-vs-engine mismatches=0
+    probe entity Paper 1x1 made=yes
+    cargo 022594 M65Jacket_Black 6x4 items=2 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022545 slot=Body
+    cargo 022615 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO M65Jacket_Black#022594 r0 c0 flip=no
+    cargo 022595 CargoPants_Black 5x4 items=0 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022545 slot=Legs
+    cargo 022600 PlateCarrierPouches 5x3 items=0 children accessible=yes mismatches=0 at ATT PlateCarrierVest#022597 slot=VestPouch
+    cargo 022598 TaloonBag_Blue 6x5 items=4 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022545 slot=Back
+    cargo 022612 SmallProtectorCase 3x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022598 r0 c3 flip=no
+    cargo 022613 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022598 r2 c0 flip=no
+=== #4 move ok=yes frame=163662 t=102.2 args: via=dst into=bag op=move cell=free item=rifle_optic
+    move: no such cell in TaloonBag_Blue for 3x2
+=== #5 move ok=yes frame=181827 t=111.2 args: via=dst into=pants op=move cell=free item=rifle_optic
+    move PSO1Optic dst answered yes | same call: ATT AKM#022599 slot=weaponOpticsAK | host AKM children accessible=yes host.CanReleaseAttachment=yes | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    from ATT AKM#022599 slot=weaponOpticsAK to CARGO CargoPants_Black r0 c0 flip=no via=dst
+    gates: host AKM children accessible=yes host.CanReleaseAttachment=yes | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    LocationCanAddEntity(destination)=yes
+    watching moved PSO1Optic from ATT AKM#022599 slot=weaponOpticsAK
+    the call answered yes in 0 ms; same call the item reads: ATT AKM#022599 slot=weaponOpticsAK
+    the weapon in the same call: GetMagazine=022604 Mag_AKM_30Rnd IsIdle=yes
+    watch #5 moved PSO1Optic changed +129 ms, 226 frames: CARGO CargoPants_Black#022595 r0 c0 flip=no
+    watch #5 moved PSO1Optic ends +3000 ms, 6198 frames: CARGO CargoPants_Black#022595 r0 c0 flip=no
+=== #6 weapon ok=yes frame=196464 t=118.2 args: op=weapon item=rifle
+    AKM at ATT SurvivorM_Boris#022545 slot=Shoulder | GetMagazine=022604 Mag_AKM_30Rnd | IsIdle=yes | attachments=4 | stable state=4 internal=6
+      022604 Mag_AKM_30Rnd | ATT AKM#022599 slot=magazine | 1x3 | ammo 30/30
+      022608 AK_WoodHndgrd | ATT AKM#022599 slot=weaponHandguardAK | 2x1 | -
+      022606 AK_Suppressor | ATT AKM#022599 slot=weaponMuzzleAK | 3x1 | -
+      022607 AK_WoodBttstck | ATT AKM#022599 slot=weaponButtstockAK | 3x1 | -
+=== #7 move ok=yes frame=206238 t=123.2 args: via=cargoex into=jacket op=move cell=free item=rifle_muzzle
+    move AK_Suppressor cargoex answered yes | same call: ATT AKM#022599 slot=weaponMuzzleAK | host AKM children accessible=yes host.CanReleaseAttachment=yes | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    from ATT AKM#022599 slot=weaponMuzzleAK to CARGO M65Jacket_Black r0 c3 flip=no via=cargoex
+    gates: host AKM children accessible=yes host.CanReleaseAttachment=yes | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    LocationCanAddEntity(destination)=yes
+    watching moved AK_Suppressor from ATT AKM#022599 slot=weaponMuzzleAK
+    the call answered yes in 0 ms; same call the item reads: ATT AKM#022599 slot=weaponMuzzleAK
+    the weapon in the same call: GetMagazine=022604 Mag_AKM_30Rnd IsIdle=yes
+    watch #7 moved AK_Suppressor changed +126 ms, 218 frames: CARGO M65Jacket_Black#022594 r0 c3 flip=no
+    watch #7 moved AK_Suppressor ends +3000 ms, 5917 frames: CARGO M65Jacket_Black#022594 r0 c3 flip=no
+=== #8 move ok=yes frame=221491 t=130.2 args: via=dst into=bag flip=1 op=move cell=free item=rifle_mag
+    move Mag_AKM_30Rnd dst answered yes | same call: ATT AKM#022599 slot=magazine | host AKM children accessible=yes host.CanReleaseAttachment=no | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    from ATT AKM#022599 slot=magazine to CARGO TaloonBag_Blue r4 c0 flip=yes via=dst
+    gates: host AKM children accessible=yes host.CanReleaseAttachment=no | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    LocationCanAddEntity(destination)=yes
+    watching moved Mag_AKM_30Rnd from ATT AKM#022599 slot=magazine
+    the call answered yes in 0 ms; same call the item reads: ATT AKM#022599 slot=magazine
+    the weapon in the same call: GetMagazine=022604 Mag_AKM_30Rnd IsIdle=yes
+    watch #8 moved Mag_AKM_30Rnd ends +3000 ms, 6415 frames: ATT AKM#022599 slot=magazine
+=== #9 weapon ok=yes frame=230183 t=134.2 args: op=weapon item=rifle
+    AKM at ATT SurvivorM_Boris#022545 slot=Shoulder | GetMagazine=022604 Mag_AKM_30Rnd | IsIdle=yes | attachments=3 | stable state=4 internal=6
+      022604 Mag_AKM_30Rnd | ATT AKM#022599 slot=magazine | 1x3 | ammo 30/30
+      022608 AK_WoodHndgrd | ATT AKM#022599 slot=weaponHandguardAK | 2x1 | -
+      022607 AK_WoodBttstck | ATT AKM#022599 slot=weaponButtstockAK | 3x1 | -
+=== #10 move ok=yes frame=374124 t=203.2 args: via=dst into=bag op=move cell=taken item=rifle_stock
+    move NOT attempted: LocationCanAddEntity refused CARGO TaloonBag_Blue r0 c0 flip=no | host AKM children accessible=yes host.CanReleaseAttachment=yes | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    from ATT AKM#022599 slot=weaponButtstockAK to CARGO TaloonBag_Blue r0 c0 flip=no via=dst
+    gates: host AKM children accessible=yes host.CanReleaseAttachment=yes | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    LocationCanAddEntity(destination)=no
+=== #11 dump ok=yes frame=387801 t=210.2 args: op=dump
+    dump: 23 items -> server_dump.txt; cargos=7 cells asked=149 model-vs-engine mismatches=0
+    probe entity Paper 1x1 made=yes
+    cargo 022594 M65Jacket_Black 6x4 items=3 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022545 slot=Body
+    cargo 022615 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO M65Jacket_Black#022594 r0 c0 flip=no
+    cargo 022595 CargoPants_Black 5x4 items=1 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022545 slot=Legs
+    cargo 022600 PlateCarrierPouches 5x3 items=0 children accessible=yes mismatches=0 at ATT PlateCarrierVest#022597 slot=VestPouch
+    cargo 022598 TaloonBag_Blue 6x5 items=4 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022545 slot=Back
+    cargo 022612 SmallProtectorCase 3x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022598 r0 c3 flip=no
+    cargo 022613 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022598 r2 c0 flip=no
+=== #12 move ok=yes frame=405644 t=219.2 args: via=dst into=jacket op=move cell=free item=pistol_mag
+    move Mag_IJ70_8Rnd dst answered yes | same call: ATT MakarovIJ70#022602 slot=magazine | host MakarovIJ70 children accessible=no host.CanReleaseAttachment=no | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    from ATT MakarovIJ70#022602 slot=magazine to CARGO M65Jacket_Black r1 c3 flip=no via=dst
+    gates: host MakarovIJ70 children accessible=no host.CanReleaseAttachment=no | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    LocationCanAddEntity(destination)=yes
+    watching moved Mag_IJ70_8Rnd from ATT MakarovIJ70#022602 slot=magazine
+    the call answered yes in 0 ms; same call the item reads: ATT MakarovIJ70#022602 slot=magazine
+    the weapon in the same call: GetMagazine=022603 Mag_IJ70_8Rnd IsIdle=yes
+    watch #12 moved Mag_IJ70_8Rnd ends +3000 ms, 6195 frames: ATT MakarovIJ70#022602 slot=magazine
+=== #13 weapon ok=yes frame=426379 t=229.2 args: op=weapon item=pistol
+    MakarovIJ70 at ATT PlateCarrierHolster#022601 slot=Pistol | GetMagazine=022603 Mag_IJ70_8Rnd | IsIdle=yes | attachments=1 | stable state=6 internal=8
+      022603 Mag_IJ70_8Rnd | ATT MakarovIJ70#022602 slot=magazine | 1x2 | ammo 12/12
+=== #14 move ok=yes frame=441291 t=236.2 args: via=dst into=pants op=move cell=free item=pistol
+    move MakarovIJ70 dst answered yes | same call: ATT PlateCarrierHolster#022601 slot=Pistol | host PlateCarrierHolster children accessible=yes host.CanReleaseAttachment=yes | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    from ATT PlateCarrierHolster#022601 slot=Pistol to CARGO CargoPants_Black r0 c3 flip=no via=dst
+    gates: host PlateCarrierHolster children accessible=yes host.CanReleaseAttachment=yes | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    LocationCanAddEntity(destination)=yes
+    watching moved MakarovIJ70 from ATT PlateCarrierHolster#022601 slot=Pistol
+    the call answered yes in 0 ms; same call the item reads: ATT PlateCarrierHolster#022601 slot=Pistol
+    watch #14 moved MakarovIJ70 changed +131 ms, 222 frames: CARGO CargoPants_Black#022595 r0 c3 flip=no
+    watch #14 moved MakarovIJ70 ends +3000 ms, 6518 frames: CARGO CargoPants_Black#022595 r0 c3 flip=no
+=== #15 where ok=yes frame=451865 t=241.2 args: op=where item=pistol_mag
+    pistol_mag: 022603 Mag_IJ70_8Rnd | ATT MakarovIJ70#022602 slot=magazine | 1x2 | ammo 12/12
+=== #16 dump ok=yes frame=465579 t=248.2 args: op=dump
+    dump: 23 items -> server_dump.txt; cargos=7 cells asked=149 model-vs-engine mismatches=0
+    probe entity Paper 1x1 made=yes
+    cargo 022594 M65Jacket_Black 6x4 items=3 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022545 slot=Body
+    cargo 022615 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO M65Jacket_Black#022594 r0 c0 flip=no
+    cargo 022595 CargoPants_Black 5x4 items=2 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022545 slot=Legs
+    cargo 022600 PlateCarrierPouches 5x3 items=0 children accessible=yes mismatches=0 at ATT PlateCarrierVest#022597 slot=VestPouch
+    cargo 022598 TaloonBag_Blue 6x5 items=4 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022545 slot=Back
+    cargo 022612 SmallProtectorCase 3x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022598 r0 c3 flip=no
+    cargo 022613 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022598 r2 c0 flip=no
+=== #17 move ok=yes frame=492049 t=262.2 args: via=dst into=jacket op=move cell=free item=bagpistol_muzzle
+    move PistolSuppressor dst answered yes | same call: ATT FNX45#022609 slot=pistolMuzzle | host FNX45 children accessible=no host.CanReleaseAttachment=no | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    from ATT FNX45#022609 slot=pistolMuzzle to CARGO M65Jacket_Black r1 c3 flip=no via=dst
+    gates: host FNX45 children accessible=no host.CanReleaseAttachment=no | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    LocationCanAddEntity(destination)=yes
+    watching moved PistolSuppressor from ATT FNX45#022609 slot=pistolMuzzle
+    the call answered yes in 0 ms; same call the item reads: ATT FNX45#022609 slot=pistolMuzzle
+    the weapon in the same call: GetMagazine=022610 Mag_FNX45_15Rnd IsIdle=yes
+    watch #17 moved PistolSuppressor ends +3000 ms, 6568 frames: ATT FNX45#022609 slot=pistolMuzzle
+=== #18 move ok=yes frame=503030 t=267.2 args: via=dst into=jacket op=move cell=free item=bagpistol_mag
+    move Mag_FNX45_15Rnd dst answered yes | same call: ATT FNX45#022609 slot=magazine | host FNX45 children accessible=no host.CanReleaseAttachment=no | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    from ATT FNX45#022609 slot=magazine to CARGO M65Jacket_Black r1 c3 flip=no via=dst
+    gates: host FNX45 children accessible=no host.CanReleaseAttachment=no | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    LocationCanAddEntity(destination)=yes
+    watching moved Mag_FNX45_15Rnd from ATT FNX45#022609 slot=magazine
+    the call answered yes in 0 ms; same call the item reads: ATT FNX45#022609 slot=magazine
+    the weapon in the same call: GetMagazine=022610 Mag_FNX45_15Rnd IsIdle=yes
+    watch #18 moved Mag_FNX45_15Rnd ends +3000 ms, 6772 frames: ATT FNX45#022609 slot=magazine
+=== #19 weapon ok=yes frame=518173 t=274.2 args: op=weapon item=bagpistol
+    FNX45 at CARGO TaloonBag_Blue#022598 r0 c0 flip=no | GetMagazine=022610 Mag_FNX45_15Rnd | IsIdle=yes | attachments=2 | stable state=7 internal=10
+      022610 Mag_FNX45_15Rnd | ATT FNX45#022609 slot=magazine | 1x2 | ammo 15/15
+      022611 PistolSuppressor | ATT FNX45#022609 slot=pistolMuzzle | 3x1 | -
+=== #20 dump ok=yes frame=526984 t=279.2 args: op=dump
+    dump: 23 items -> server_dump.txt; cargos=7 cells asked=149 model-vs-engine mismatches=0
+    probe entity Paper 1x1 made=yes
+    cargo 022594 M65Jacket_Black 6x4 items=3 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022545 slot=Body
+    cargo 022615 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO M65Jacket_Black#022594 r0 c0 flip=no
+    cargo 022595 CargoPants_Black 5x4 items=2 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022545 slot=Legs
+    cargo 022600 PlateCarrierPouches 5x3 items=0 children accessible=yes mismatches=0 at ATT PlateCarrierVest#022597 slot=VestPouch
+    cargo 022598 TaloonBag_Blue 6x5 items=4 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022545 slot=Back
+    cargo 022612 SmallProtectorCase 3x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022598 r0 c3 flip=no
+    cargo 022613 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022598 r2 c0 flip=no
+=== #21 move ok=yes frame=560398 t=295.2 args: via=dst into=bag follow=delhost op=move cell=free item=rifle_guard
+    move AK_WoodHndgrd dst answered yes | same call: ATT AKM#022599 slot=weaponHandguardAK | host AKM children accessible=yes host.CanReleaseAttachment=yes | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    from ATT AKM#022599 slot=weaponHandguardAK to CARGO TaloonBag_Blue r4 c0 flip=no via=dst
+    gates: host AKM children accessible=yes host.CanReleaseAttachment=yes | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    LocationCanAddEntity(destination)=yes
+    watching moved AK_WoodHndgrd from ATT AKM#022599 slot=weaponHandguardAK
+    the call answered yes in 0 ms; same call the item reads: ATT AKM#022599 slot=weaponHandguardAK
+    the weapon in the same call: GetMagazine=022604 Mag_AKM_30Rnd IsIdle=yes
+    watching host of the kept part AKM from ATT SurvivorM_Boris#022545 slot=Shoulder
+    the host AKM deleted in the same call; the part now reads: NOLOC
+    watch #21 host of the kept part AKM changed +3 ms, 1 frames: GONE
+    watch #21 moved AK_WoodHndgrd changed +3 ms, 1 frames: GONE
+=== #22 where ok=yes frame=572601 t=301.2 args: op=where item=rifle_guard
+    rifle_guard: null | GONE | 0x0 | -
+=== #23 create ok=yes frame=592077 t=310.2 args: slot=Shoulder via=loc into=player as=rifle3 class=AKM op=create kind=slot
+    create AKM asked ATT SurvivorM_Boris slot=Shoulder via=loc -> got ATT SurvivorM_Boris#022545 slot=Shoulder | - | entity 8x3 | 1 ms
+    config size of AKM: 8x3 found=yes
+    watching created AKM from ATT SurvivorM_Boris#022545 slot=Shoulder
+    watch #23 created AKM ends +3001 ms, 6809 frames: ATT SurvivorM_Boris#022545 slot=Shoulder
+=== #24 create ok=yes frame=602978 t=315.2 args: via=mag into=rifle3 as=rifle3_mag class=Mag_AKM_30Rnd op=create kind=slot
+    create Mag_AKM_30Rnd asked a magazine through Weapon_Base.SpawnAttachedMagazine on AKM -> got ATT AKM#022699 slot=magazine | ammo 30/30 | entity 1x3 | 1 ms
+    config size of Mag_AKM_30Rnd: 1x3 found=yes
+    watching created Mag_AKM_30Rnd from ATT AKM#022699 slot=magazine
+    watch #24 created Mag_AKM_30Rnd ends +3000 ms, 5177 frames: ATT AKM#022699 slot=magazine
+=== #25 create ok=yes frame=610204 t=319.2 args: via=att into=rifle3 as=rifle3_guard class=AK_WoodHndgrd op=create kind=slot
+    create AK_WoodHndgrd asked ATT AKM slot=(the engine's choice) via=CreateAttachment -> got ATT AKM#022699 slot=weaponHandguardAK | - | entity 2x1 | 0 ms
+    config size of AK_WoodHndgrd: 2x1 found=yes
+    watching created AK_WoodHndgrd from ATT AKM#022699 slot=weaponHandguardAK
+    watch #25 created AK_WoodHndgrd ends +3000 ms, 5797 frames: ATT AKM#022699 slot=weaponHandguardAK
+=== #26 qty ok=yes frame=620007 t=324.2 args: ammo=17 op=qty item=rifle3_mag
+    Mag_AKM_30Rnd: ammo 30/30 -> ServerSetAmmoCount(17) -> ammo 17/30
+    GetQuantityMax=1 GetTargetQuantityMax=1 varStackMax=0 CanBeSplit=no IsFullQuantity=no
+    watching amount of Mag_AKM_30Rnd from ATT AKM#022699 slot=magazine
+    watch #26 amount of Mag_AKM_30Rnd ends +3000 ms, 5835 frames: ATT AKM#022699 slot=magazine
+=== #27 recreate ok=yes frame=630440 t=329.2 args: into=pants as=rifle3_mag_new op=recreate cell=free item=rifle3_mag
+    recreate: no such cell in CargoPants_Black
+=== #28 recreate ok=yes frame=644849 t=336.2 args: into=pants flip=1 as=rifle3_mag_new op=recreate cell=free item=rifle3_mag
+    recreate Mag_AKM_30Rnd from ATT AKM#022699 slot=magazine (ammo 17/30) -> CARGO CargoPants_Black#022595 r2 c0 flip=yes (ammo 17/30, health 100%)
+    watching old Mag_AKM_30Rnd from ATT AKM#022699 slot=magazine
+    watching new Mag_AKM_30Rnd from CARGO CargoPants_Black#022595 r2 c0 flip=yes
+    watch #28 old Mag_AKM_30Rnd changed +2 ms, 1 frames: GONE
+    watch #28 new Mag_AKM_30Rnd ends +3000 ms, 6103 frames: CARGO CargoPants_Black#022595 r2 c0 flip=yes
+=== #29 weapon ok=yes frame=653083 t=340.2 args: op=weapon item=rifle3
+    AKM at ATT SurvivorM_Boris#022545 slot=Shoulder | GetMagazine=null | IsIdle=yes | attachments=1 | stable state=1 internal=0
+      022706 AK_WoodHndgrd | ATT AKM#022699 slot=weaponHandguardAK | 2x1 | -
+=== #30 move ok=yes frame=666446 t=346.2 args: via=dst into=bag follow=delhost_next op=move cell=free item=rifle3_guard
+    move AK_WoodHndgrd dst answered yes | same call: ATT AKM#022699 slot=weaponHandguardAK | host AKM children accessible=yes host.CanReleaseAttachment=yes | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    from ATT AKM#022699 slot=weaponHandguardAK to CARGO TaloonBag_Blue r4 c0 flip=no via=dst
+    gates: host AKM children accessible=yes host.CanReleaseAttachment=yes | item.CanPutInCargo=yes into.CanReceiveItemIntoCargo=yes into children accessible=yes
+    LocationCanAddEntity(destination)=yes
+    watching moved AK_WoodHndgrd from ATT AKM#022699 slot=weaponHandguardAK
+    the call answered yes in 0 ms; same call the item reads: ATT AKM#022699 slot=weaponHandguardAK
+    the weapon in the same call: GetMagazine=null IsIdle=yes
+    watching host of the kept part AKM from ATT SurvivorM_Boris#022545 slot=Shoulder
+    the host AKM queued for deletion on frame 666447
+    later #30 frame=666447 delete: 022699 AKM
+    watch #30 host of the kept part AKM changed +3 ms, 1 frames: NOLOC (pending deletion)
+    watch #30 moved AK_WoodHndgrd changed +3 ms, 1 frames: NOLOC (pending deletion)
+    watch #30 host of the kept part AKM changed +4 ms, 2 frames: GONE
+    watch #30 moved AK_WoodHndgrd changed +4 ms, 2 frames: GONE
+=== #31 where ok=yes frame=681154 t=353.2 args: op=where item=rifle3_guard
+    rifle3_guard: null | GONE | 0x0 | -
+=== #32 move ok=yes frame=696756 t=360.2 args: kind=hands op=move item=bandage
+    move BandageDressing to the hands by ServerTakeEntityToHands; same call: CARGO M65Jacket_Black#022594 r0 c2 flip=no
+    from CARGO M65Jacket_Black#022594 r0 c2 flip=no; source gates: host M65Jacket_Black children accessible=yes host.CanReleaseCargo=yes item.CanRemoveFromCargo=yes
+    watching to the hands BandageDressing from CARGO M65Jacket_Black#022594 r0 c2 flip=no
+    watch #32 to the hands BandageDressing changed +437 ms, 888 frames: HANDS SurvivorM_Boris#022545
+    watch #32 to the hands BandageDressing ends +3000 ms, 6002 frames: HANDS SurvivorM_Boris#022545
+=== #33 dump ok=yes frame=709725 t=367.2 args: op=dump
+    dump: 20 items -> server_dump.txt; cargos=7 cells asked=149 model-vs-engine mismatches=0
+    probe entity Paper 1x1 made=yes
+    cargo 022594 M65Jacket_Black 6x4 items=2 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022545 slot=Body
+    cargo 022615 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO M65Jacket_Black#022594 r0 c0 flip=no
+    cargo 022595 CargoPants_Black 5x4 items=3 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022545 slot=Legs
+    cargo 022600 PlateCarrierPouches 5x3 items=0 children accessible=yes mismatches=0 at ATT PlateCarrierVest#022597 slot=VestPouch
+    cargo 022598 TaloonBag_Blue 6x5 items=4 children accessible=yes mismatches=0 at ATT SurvivorM_Boris#022545 slot=Back
+    cargo 022612 SmallProtectorCase 3x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022598 r0 c3 flip=no
+    cargo 022613 OZT_ProbeWallet 6x4 items=0 children accessible=no mismatches=0 at CARGO TaloonBag_Blue#022598 r2 c0 flip=no
+=== #34 create ok=yes frame=749796 t=385.2 args: via=loc into=jacket as=resv class=Paper op=create cell=0,2
+    create Paper asked CARGO M65Jacket_Black r0 c2 flip=no via=loc -> got CARGO M65Jacket_Black#022594 r0 c2 flip=no | - | entity 1x1 | 0 ms
+    config size of Paper: 1x1 found=yes
+    watching created Paper from CARGO M65Jacket_Black#022594 r0 c2 flip=no
+    watch #34 created Paper ends +3000 ms, 6929 frames: CARGO M65Jacket_Black#022594 r0 c2 flip=no
+=== #35 del ok=yes frame=768810 t=394.2 args: how=object op=del item=bandage
+    del object HANDS SurvivorM_Boris#022545 | same call: still there: pending=yes toDelete=yes setForDeletion=yes at NOLOC
+    watching doomed BandageDressing from HANDS SurvivorM_Boris#022545
+    deleted by object from HANDS SurvivorM_Boris#022545; same call: still there: pending=yes toDelete=yes setForDeletion=yes at NOLOC
+    items in the holder's cargo: -1 before, -1 in the same call
+    watch #35 doomed BandageDressing changed +2 ms, 1 frames: GONE
+=== #36 create ok=yes frame=779562 t=399.2 args: slot=Shoulder via=loc into=player as=rifle4 class=AKM op=create kind=slot
+    create AKM asked ATT SurvivorM_Boris slot=Shoulder via=loc -> got ATT SurvivorM_Boris#022545 slot=Shoulder | - | entity 8x3 | 1 ms
+    config size of AKM: 8x3 found=yes
+    watching created AKM from ATT SurvivorM_Boris#022545 slot=Shoulder
+    watch #36 created AKM ends +3000 ms, 6188 frames: ATT SurvivorM_Boris#022545 slot=Shoulder
+=== #37 create ok=yes frame=787824 t=403.2 args: via=att into=rifle4 as=rifle4_stock class=AK_WoodBttstck op=create kind=slot
+    create AK_WoodBttstck asked ATT AKM slot=(the engine's choice) via=CreateAttachment -> got ATT AKM#022718 slot=weaponButtstockAK | - | entity 3x1 | 0 ms
+    config size of AK_WoodBttstck: 3x1 found=yes
+    watching created AK_WoodBttstck from ATT AKM#022718 slot=weaponButtstockAK
+    watch #37 created AK_WoodBttstck ends +3000 ms, 6713 frames: ATT AKM#022718 slot=weaponButtstockAK
+=== #38 move ok=yes frame=796038 t=407.2 args: kind=hands op=move item=rifle4_stock
+    move AK_WoodBttstck to the hands by ServerTakeEntityToHands; same call: ATT AKM#022718 slot=weaponButtstockAK
+    from ATT AKM#022718 slot=weaponButtstockAK; source gates: host AKM children accessible=yes host.CanReleaseAttachment=yes
+    watching to the hands AK_WoodBttstck from ATT AKM#022718 slot=weaponButtstockAK
+    watch #38 to the hands AK_WoodBttstck changed +439 ms, 617 frames: HANDS SurvivorM_Boris#022545
+    watch #38 to the hands AK_WoodBttstck ends +3000 ms, 5475 frames: HANDS SurvivorM_Boris#022545
+=== #39 hands ok=yes frame=803830 t=411.2 args: op=hands
+    hands hold 022719 AK_WoodBttstck | inventory processing=no | CanDeleteItems=yes | action running=no | in vehicle=no
+    alive=yes unconscious=no restrained=no
+    juncture on the held item=no

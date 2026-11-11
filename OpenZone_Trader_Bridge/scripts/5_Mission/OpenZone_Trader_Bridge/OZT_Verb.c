@@ -55,6 +55,8 @@ class OZT_VerbOps
             return OpFits(player, args, detail);
         if (op == "hurt")
             return OZT_VerbNpc.OpHurt(player, args, detail);
+        if (op == "admin")
+            return OZT_VerbNpc.OpAdmin(player, args, detail);
         // -- ops of the later tasks go above this line --
         detail = "unknown op '" + op + "'; known: " + KnownOps();
         return false;
@@ -62,7 +64,7 @@ class OZT_VerbOps
 
     static string KnownOps()
     {
-        return "status, reload, fps, balance, price, pay, damage, open, fit, quote, deal, show, tree, load, fits, hurt";
+        return "status, reload, fps, balance, price, pay, damage, open, fit, quote, deal, show, tree, load, fits, hurt, admin";
     }
 
     // ---- what the ops share ---------------------------------------------------
@@ -739,10 +741,7 @@ class OZT_VerbOps
     // The files again, as an admin's edit would be picked up.
     static bool OpReload(out string detail)
     {
-        OZT_Config.ServerLoad();
-        OZT_Book.Rebuild();
-        OZT_Points.Respawn();
-        // -- later tasks refresh their parts above this line --
+        OZT_Config.ReloadLive();
         detail = "reloaded: " + OZT_Config.Get().Counters() + " revision=" + OZT_Config.Get().Revision().ToString();
         return true;
     }

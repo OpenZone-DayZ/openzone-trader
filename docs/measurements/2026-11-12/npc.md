@@ -32,6 +32,12 @@ action manager, and the engine gets no callbacks to aim the infected's senses at
 | N.12 | the server's frames over 10 s (`oz_trader {"op": "fps"}`) | no player: 2 points 0.337 ms a frame, 22 points 0.377 ms. A player beside the grid: 2 points 0.521 ms, 22 points 0.792 ms -- about 13 µs a frame for each trader near a player, under 1 % of a 30 fps frame for twenty | yes |
 | N.13 | `oz_trader {"op": "hurt"}`: a 7.62 bullet to the torso of a trader and of a plain survivor beside it | `trader SurvivorM_Boris 100 -> 100; control SurvivorM_Boris 100 -> 0` | yes |
 | N.14 | an infected put 1.5 m from Ostap, the player 60 m away | nothing could be seen at that distance at night in rain; 13 s later it was still within 15 m of where it was put. Not measured: whether an infected goes for a trader. If one does, it does him no harm (N.13) | open |
+| N.15 | the admin section `traders`, called by the stand verb as the pane will call it (`oz_trader {"op": "admin"}`, the stand's player as the admin): `place` with Id adm1, kind npc, class SurvivorF_Linda | a third point in the file at the player's position, facing where the player faced (30.8), every category of the price book; made at once; the answer the list of three, with `Standing` 1 | yes |
+| N.16 | `outfit:adm1` | the point's outfit: the AKM on the shoulder with its handguard, magazine, buttstock, suppressor and scope, the backpack, jacket, boots, pants, the plate carrier with its holster and pouches, the bandage in the hands; Linda made again in all of it, the prompt "Торгувати" on her | yes |
+| N.17 | `set:adm1` with a name, radius 4, one category, factors 1.1 and 0.9, `NoExchange` 1 | the file holds them | yes |
+| N.18 | `place` with the taken Id adm1; `set:adm1` as an npc of a building's class; `move:nope` | `STR_OZT_ADMIN_BAD_ID`, `STR_OZT_ADMIN_BAD_CLASS`, `STR_OZT_ADMIN_NO_POINT`, nothing written | yes |
+| N.19 | `remove:adm1`, then `respawn` | the point gone from the file; no SurvivorF_Linda within 3 m of where she stood | yes |
+| N.20 | the pane TRADERS itself | not seen: VPP Admin Tools is not on this machine (the Workshop folder holds the series' own items only), and the glue pbo hard-requires it, so the stand cannot load it | open |
 
 No `SCRIPT (E)` line and no `ERROR` line in either log of these runs. The verdict of the
 boots read "fail" only for the stand's own count (`traders` 2 where the profile said 1),

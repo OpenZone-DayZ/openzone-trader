@@ -43,6 +43,13 @@ class OZT_Module : CF_ModuleWorld
         OZT_Points.Respawn();
         OZ_ServiceRegistry.Register(OZT_Const.SERVICE, new OZT_Service());
 
+        // The admin's side: the pane's section and the three files in the
+        // core's editor. The core empties its registries at mission end.
+        OZ_AdminRegistry.Register(OZT_Const.SECTION_ADMIN, new OZT_Admin());
+        OZ_AdminCfg.Register(OZT_Const.CFG_SETTINGS, OZT_Const.SETTINGS, new OZT_SettingsApplier(), OZT_Const.CFG_OWNER);
+        OZ_AdminCfg.Register(OZT_Const.CFG_GOODS, OZT_Const.GOODS, new OZT_GoodsApplier(), OZT_Const.CFG_OWNER);
+        OZ_AdminCfg.Register(OZT_Const.CFG_TRADERS, OZT_Const.TRADERS, new OZT_TradersApplier(), OZT_Const.CFG_OWNER);
+
         // -- later tasks start their parts above this line --
 
         // The ready line one tick later: a line printed here may speak before

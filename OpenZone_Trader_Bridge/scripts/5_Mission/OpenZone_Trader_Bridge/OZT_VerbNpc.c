@@ -93,6 +93,29 @@ class OZT_VerbNpc
         return true;
     }
 
+    // The admin section as the pane calls it, the stand's player as the admin
+    // (the core's dispatcher, which checks the rights, is not in the way
+    // here): {"op": "admin", "aop": "move:npc", "body": "{...}"}. The full
+    // answer goes to OZT_Const.LAST_ANSWER.
+    static bool OpAdmin(PlayerBase player, map<string, string> args, out string detail)
+    {
+        string aop = OZT_VerbOps.Arg(args, "aop", "list");
+        string body = OZT_VerbOps.Arg(args, "body", "{}");
+        OZT_Admin section = new OZT_Admin();
+        bool ok;
+        string error;
+        string answer = section.Handle(aop, body, player.GetIdentity(), ok, error);
+        FileHandle f = OpenFile(OZT_Const.LAST_ANSWER, FileMode.WRITE);
+        if (f)
+        {
+            FPrintln(f, answer);
+            CloseFile(f);
+        }
+        detail = "admin " + aop + ": ok=" + ok.ToString() + " error=" + error;
+        detail = detail + " " + answer.Length().ToString() + " bytes";
+        return true;
+    }
+
     // One bullet to the torso; the health before and after.
     protected static string Shot(EntityAI e)
     {

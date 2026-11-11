@@ -22,6 +22,14 @@ class OZT_Const
     // the trader's id.
     static const string SHOW_PREFIX = "trader:";
 
+    // The section of the core's admin registry the pane TRADERS talks to, and
+    // the names of the three files in the core's file editor (cfg_get/cfg_set).
+    static const string SECTION_ADMIN = "traders";
+    static const string CFG_OWNER     = "trader";
+    static const string CFG_SETTINGS  = "trader_settings";
+    static const string CFG_GOODS     = "trader_goods";
+    static const string CFG_TRADERS   = "trader_traders";
+
     // The op of a notice the trade action sends when it refuses (OZ_Rpc.Notice);
     // the client shows every notice whose op starts with "trader.".
     static const string NOTICE_OPEN = "trader.open";

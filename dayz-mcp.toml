@@ -16,6 +16,11 @@ name = "openzone-trader"
 # OpenZone_TraderProbe        -- client + server stand tool of phase 0: scenes, the two
 #                                inventory dumps, the stand's wallet and notes.
 # OpenZone_TraderProbe_Bridge -- server only: the `ozt_probe` verb.
+# OpenZone_Trader_VPP         -- the pane TRADERS of the OpenZone admin window, a glue
+#                                pbo that hard-requires VPP Admin Tools and the core's
+#                                OpenZone_VPP. It joins `mods` on a stand that loads
+#                                both: elsewhere the server stops at the missing addon.
+#                                Its layout is built by declaring it for one call.
 mods = ["OpenZone_Trader", "OpenZone_Trader_Bridge", "OpenZone_TraderProbe", "OpenZone_TraderProbe_Bridge"]
 # The layout generator reads the series' design tokens from the core, so the
 # trade screen wears the same palette and type as the PDA and the research tree.

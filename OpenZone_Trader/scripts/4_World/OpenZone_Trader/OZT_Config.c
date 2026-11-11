@@ -31,6 +31,17 @@ class OZT_Config
         Get().LoadAll();
     }
 
+    // Every file again and everything that stands on them: what the stand's
+    // reload, an admin's edit in the pane and the core's file editor all do.
+    // The points are made again, and their respawn sends the clients the sync
+    // packet again.
+    static void ReloadLive()
+    {
+        ServerLoad();
+        OZT_Book.Rebuild();
+        OZT_Points.Respawn();
+    }
+
     OZT_Settings Settings()
     {
         return m_Settings;

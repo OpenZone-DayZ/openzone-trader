@@ -121,7 +121,10 @@ class OZT_BookEntry
 
 class OZT_Book
 {
-    private static ref map<string, ref OZT_BookEntry> s_ByClass = new map<string, ref OZT_BookEntry>();
+    // Every line of the book by class: one per category that lists the class,
+    // in the file's order. A line belongs to its category, as in TraderPlus:
+    // one category can sell a thing dearer than another.
+    private static ref map<string, ref array<ref OZT_BookEntry>> s_ByClass = new map<string, ref array<ref OZT_BookEntry>>();
 
     // From the checked files; called after every load.
     static void Rebuild()
@@ -163,7 +166,7 @@ class OZT_Book
                     if (e.Floor <= 0)
                         e.Floor = OZT_Config.Get().Settings().StockFloor;
                 }
-                s_ByClass.Set(e.ClassName, e);
+                Put(e);
             }
         }
 
@@ -184,8 +187,19 @@ class OZT_Book
             money.Requires = new array<ref OZT_Condition>();
             money.Discounts = new array<ref OZT_Discount>();
             money.Coefficient = 1;
-            s_ByClass.Set(money.ClassName, money);
+            Put(money);
         }
+    }
+
+    private static void Put(OZT_BookEntry e)
+    {
+        array<ref OZT_BookEntry> lines = s_ByClass.Get(e.ClassName);
+        if (!lines)
+        {
+            lines = new array<ref OZT_BookEntry>();
+            s_ByClass.Set(e.ClassName, lines);
+        }
+        lines.Insert(e);
     }
 
     // A 4_World class held by a static: let go at mission end.
@@ -194,9 +208,43 @@ class OZT_Book
         s_ByClass.Clear();
     }
 
-    static OZT_BookEntry EntryOf(string type)
+    // The line of the class in that category; null: the category does not
+    // list it.
+    static OZT_BookEntry EntryIn(string category, string type)
     {
-        return s_ByClass.Get(type);
+        array<ref OZT_BookEntry> lines = s_ByClass.Get(type);
+        if (!lines)
+            return null;
+        for (int i = 0; i < lines.Count(); i++)
+        {
+            if (lines[i].Category == category)
+                return lines[i];
+        }
+        return null;
+    }
+
+    // The line this trader deals in the class by: the first of his categories,
+    // in his own order, that lists it (the load says where a trader has a class
+    // twice). A class he does not deal in gets the book's first line, which
+    // Deals refuses: "not here" stays apart from "no such goods". A banknote
+    // has its change line only.
+    static OZT_BookEntry EntryFor(OZT_Point trader, string type)
+    {
+        array<ref OZT_BookEntry> lines = s_ByClass.Get(type);
+        if (!lines || lines.Count() == 0)
+            return null;
+        if (!trader || lines.Count() == 1)
+            return lines[0];
+        for (int c = 0; c < trader.Categories.Count(); c++)
+        {
+            string cat = trader.Categories[c];
+            for (int i = 0; i < lines.Count(); i++)
+            {
+                if (lines[i].Category == cat)
+                    return lines[i];
+            }
+        }
+        return lines[0];
     }
 
     static bool Deals(OZT_Point trader, OZT_BookEntry e)
@@ -280,7 +328,7 @@ class OZT_Book
         for (int i = 0; i < e.With.Count(); i++)
         {
             string part = e.With[i];
-            if (BuyFor(player, trader, EntryOf(part), 1) > 0)
+            if (BuyFor(player, trader, EntryFor(trader, part), 1) > 0)
                 parts.Insert(part);
         }
     }
@@ -411,7 +459,7 @@ class OZT_Book
         parts = new array<string>();
         for (int i = 0; i < all.Count(); i++)
         {
-            OZT_BookEntry part = EntryOf(all[i]);
+            OZT_BookEntry part = EntryFor(trader, all[i]);
             if (part && part.Stocked && StockOf(trader, part, 0, cursor) < count)
                 continue;
             parts.Insert(all[i]);
@@ -429,7 +477,7 @@ class OZT_Book
         ComesAt(player, trader, e, 1, null, parts);
         int sum = own;
         for (int i = 0; i < parts.Count(); i++)
-            sum = sum + ShelfPrice(player, trader, EntryOf(parts[i]), 0);
+            sum = sum + ShelfPrice(player, trader, EntryFor(trader, parts[i]), 0);
         return sum;
     }
 
@@ -445,7 +493,7 @@ class OZT_Book
         Comes(player, trader, e, parts);
         int sum = own;
         for (int i = 0; i < parts.Count(); i++)
-            sum = sum + BuyFor(player, trader, EntryOf(parts[i]), count);
+            sum = sum + BuyFor(player, trader, EntryFor(trader, parts[i]), count);
         return sum;
     }
 

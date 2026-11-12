@@ -119,8 +119,10 @@ class OZT_Open
 
             for (int g = 0; g < cat.Goods.Count(); g++)
             {
-                OZT_BookEntry e = OZT_Book.EntryOf(cat.Goods[g].ClassName);
-                if (!e)
+                // A class in two of his categories stands in the first only:
+                // its line there is the one his deals use.
+                OZT_BookEntry e = OZT_Book.EntryFor(trader, cat.Goods[g].ClassName);
+                if (!e || e.Category != cat.Id)
                     continue;
                 if (!e.Stocked)
                 {
@@ -180,7 +182,7 @@ class OZT_Open
             EntityAI own = all[i];
             if (!own || own == player)
                 continue;
-            OZT_BookEntry entry = OZT_Book.EntryOf(own.GetType());
+            OZT_BookEntry entry = OZT_Book.EntryFor(trader, own.GetType());
             int units = OZT_Stack.Units(own);
             // A stocked line pays at the stock it holds now, as the deal will
             // (design §11.1): no ceiling, so where the curve brings less than

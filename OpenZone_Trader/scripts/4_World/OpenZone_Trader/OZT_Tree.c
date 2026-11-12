@@ -129,7 +129,7 @@ class OZT_Tree
         }
 
         OZT_Node top = t.AddNode(root, null, NOT_TAKEN);
-        int price = OZT_Book.SellPriceAt(trader, OZT_Book.EntryOf(root.GetType()), root, 1, cursor);
+        int price = OZT_Book.SellPriceAt(trader, OZT_Book.EntryFor(trader, root.GetType()), root, 1, cursor);
         if (price <= 0)
             return t;
         top.State = SOLD;
@@ -194,7 +194,7 @@ class OZT_Tree
                 Riders(kept);
                 continue;
             }
-            int price = OZT_Book.SellPriceAt(m_Trader, OZT_Book.EntryOf(part.GetType()), part, 1, m_Cursor);
+            int price = OZT_Book.SellPriceAt(m_Trader, OZT_Book.EntryFor(m_Trader, part.GetType()), part, 1, m_Cursor);
             if (price <= 0)
             {
                 OZT_Node stays = AddNode(part, node, NOT_TAKEN);
@@ -357,7 +357,7 @@ class OZT_Tree
         lot.Price = 0;
         if (keep)
             return;
-        OZT_BookEntry entry = OZT_Book.EntryOf(lot.Pile);
+        OZT_BookEntry entry = OZT_Book.EntryFor(m_Trader, lot.Pile);
         if (!OZT_Book.Deals(m_Trader, entry) || entry.Sell <= 0)
             return;
         if (lot.Level >= OZT_Const.LEVEL_RUINED)

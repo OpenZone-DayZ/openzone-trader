@@ -866,7 +866,7 @@ class OZT_VerbOps
     {
         OZT_Point trader = TraderOf(args);
         string type = Arg(args, "class", "");
-        OZT_BookEntry e = OZT_Book.EntryOf(type);
+        OZT_BookEntry e = OZT_Book.EntryFor(trader, type);
         if (!trader || !e)
         {
             detail = "price: trader or class not in the files (trader='" + Arg(args, "trader", "stand") + "' class='" + type + "')";

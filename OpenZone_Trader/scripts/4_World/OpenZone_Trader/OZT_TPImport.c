@@ -113,11 +113,11 @@ class OZT_TPImport
     protected ref array<string> m_TakenCategories;
     protected ref array<string> m_TakenLicences;
 
-    // The classes with a stock of ours, by the lower-case name: TraderPlus
-    // compares its stock lines without case.
+    // The lines with a stock of ours, by TraderPlus's category and the
+    // lower-case class (Key): TraderPlus compares its stock lines without case.
     protected ref map<string, string> m_Stocked;
     // How many units one trade of TraderPlus's moves of a pile we price by
-    // the unit: its stock counts trades, ours units.
+    // the unit, by Key: its stock counts trades, ours units.
     protected ref map<string, int> m_UnitsPer;
 
     // The stock to put on our shelves: stock, class, level, count.
@@ -439,7 +439,6 @@ class OZT_TPImport
         int gated = 0;
         string vehicleNames = "";
         string unknownNames = "";
-        array<string> seen = new array<string>();
         string keyword = m_General.LicenceKeyWord;
         for (int c = 0; c < m_Prices.TraderCategories.Count(); c++)
         {
@@ -464,6 +463,10 @@ class OZT_TPImport
 
             if (!tc.Products)
                 tc.Products = new array<string>();
+            // A class in another category keeps its line there too (as in
+            // TraderPlus, a line belongs to its category); listed twice in
+            // one category, the first line is the one TraderPlus finds.
+            array<string> seen = new array<string>();
             for (int p = 0; p < tc.Products.Count(); p++)
             {
                 array<string> f = new array<string>();
@@ -481,7 +484,7 @@ class OZT_TPImport
                     continue;
                 }
                 seen.Insert(low);
-                OZT_Goods g = Line(cls, f, keyword);
+                OZT_Goods g = Line(cls, f, keyword, tc.CategoryName);
                 if (!g)
                 {
                     if (IsVehicle(cls))
@@ -506,7 +509,7 @@ class OZT_TPImport
         Say("categories: " + m_Goods.Categories.Count().ToString() + ", behind a licence by their name: " + gated.ToString());
         Say("goods lines: " + lines.ToString());
         if (m_Twice > 0)
-            Say("a class listed again in another category, the first kept: " + m_Twice.ToString());
+            Say("a class listed twice in one category, the first line kept: " + m_Twice.ToString());
         if (m_Frozen > 0)
             Say("lines with MaxStock 0 (TraderPlus takes none of them from players), imported with no sell price: " + m_Frozen.ToString());
         if (m_Rounded > 0)
@@ -528,7 +531,7 @@ class OZT_TPImport
     // One product line of TraderPlus's to ours; null: a vehicle or a class
     // the game does not know. f: class, coefficient, max stock, trade
     // quantity, buy, sell[, destock].
-    protected OZT_Goods Line(string cls, array<string> f, string keyword)
+    protected OZT_Goods Line(string cls, array<string> f, string keyword, string category)
     {
         float coef = f[1].ToFloat();
         int most = f[2].ToInt();
@@ -577,8 +580,10 @@ class OZT_TPImport
         }
 
         // One trade of a pile moves so many units at once; ours prices one.
+        // A pile is priced by the unit even at one unit a trade: its line
+        // there is the price of one round, not of a pile.
         int per = Units(cls, qty);
-        if (per > 1)
+        if (per >= 1)
         {
             int unitBuy = Math.Ceil(1.0 * g.Buy / per);
             int unitSell = Math.Floor(1.0 * g.Sell / per);
@@ -591,14 +596,17 @@ class OZT_TPImport
             g.Quantity = OZT_Const.RULE_UNIT;
             g.Buy = unitBuy;
             g.Sell = unitSell;
-            m_UnitsPer.Set(cls, per);
+            m_UnitsPer.Set(Key(category, cls), per);
         }
 
         // MaxStock -1 is unlimited: no stock block, as before.
         if (most >= 0)
         {
             g.Stock = new OZT_GoodsStock();
-            g.Stock.Max = most * per;
+            int each = per;
+            if (each < 1)
+                each = 1;
+            g.Stock.Max = most * each;
             g.Stock.Coefficient = coef;
             if (g.Stock.Coefficient <= 0)
                 g.Stock.Coefficient = 1;
@@ -606,9 +614,7 @@ class OZT_TPImport
             if (per > 1)
                 g.Stock.Coefficient = Math.Pow(g.Stock.Coefficient, 1.0 / per);
             g.Stock.Destock = destock;
-            string low = cls;
-            low.ToLower();
-            m_Stocked.Set(low, cls);
+            m_Stocked.Set(Key(category, cls), cls);
         }
         Fit(g);
         return g;
@@ -656,9 +662,9 @@ class OZT_TPImport
     }
 
     // How many units one trade of TraderPlus's moves of a pile or of a stack
-    // that splits, as its TradeQuantity reads: -1 and 0 a full stack, a share
-    // below 1 that share of one, more than a stack a stack. 1: a thing sold
-    // whole.
+    // that splits, as its TradeQuantity reads (TraderPlus's CalculateTradeQty):
+    // -1 and 0 a full stack, a share below 1 that share of one, more than a
+    // stack a stack, else that many units. 0: no pile, a thing sold whole.
     protected int Units(string cls, float qty)
     {
         int most = 0;
@@ -672,7 +678,7 @@ class OZT_TPImport
             most = top;
         }
         if (most <= 1)
-            return 1;
+            return 0;
         if (qty <= 0 || qty >= most)
             return most;
         if (qty < 1)
@@ -791,9 +797,18 @@ class OZT_TPImport
 
     // ---- the stock and the licences ----
 
+    // A line of TraderPlus's: its category and the class, without case.
+    protected string Key(string category, string cls)
+    {
+        string low = cls;
+        low.ToLower();
+        return category + "|" + low;
+    }
+
     // TraderPlus's stock of each ID, in its own files: one per category, a
     // line "class count level", the count in trades. Unlimited lines it does
-    // not keep, and neither do we.
+    // not keep, and neither do we. Ours is one shelf for the trader: a class
+    // two of its categories held lands there as the sum.
     protected void TakeStock()
     {
         int lines = 0;
@@ -818,17 +833,16 @@ class OZT_TPImport
                     held.Products[p].Split(" ", f);
                     if (f.Count() < 3)
                         continue;
-                    string low = f[0];
-                    low.ToLower();
+                    string key = Key(tid.Categories[c], f[0]);
                     string cls;
-                    if (!m_Stocked.Find(low, cls))
+                    if (!m_Stocked.Find(key, cls))
                         continue;
                     int count = f[1].ToInt();
                     int level = f[2].ToInt();
                     if (count <= 0 || level < 0 || level >= OZT_Const.LEVEL_RUINED)
                         continue;
                     int per;
-                    if (m_UnitsPer.Find(cls, per))
+                    if (m_UnitsPer.Find(key, per))
                     {
                         count = count * per;
                         level = 0;

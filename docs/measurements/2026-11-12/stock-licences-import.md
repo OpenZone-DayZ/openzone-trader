@@ -55,3 +55,23 @@ for both IDs, one line with its class in lower case; the stand's own bank accoun
 | N.3 | the sellable filter at Kevin, then at the stand trader | the head of YOUR ITEMS turns to "only what can be sold" (orange): two lights at Kevin; at the stand trader the batteries and the nails go, the rounds, the lights and the handguard stay; in Ukrainian (the game in Russian) the head reads «усе, що у ваших сумках» and «лише те, що можна продати», the second edge to edge but whole |
 | N.4 | a container in the bags that the trader would take emptied (reason 2) | the engine refuses anything into a container that lies in another's cargo (`CanReceiveItemIntoCargo` false, its children not accessible; a hoodie and a first aid kit in the backpack), so it is filled in the hands first: done that way later the same evening and seen live (`owner-run.md` R.21): the filter shows the kit with its "not empty" corner, sold alone it is refused, sold with what lies in it it goes |
 | N.5 | the licence `car_licence` given while Kevin's screen is open, then news of his stock | the shelf's strip was made again: Weapons, Ammo, Car Licence, Change, the canister on the shelf. Before it the player's strip already had Car Licence (the trader takes canisters) and had no Ammo (he pays nothing for rounds after I.4) |
+
+## Lines per category (owner, 2026-11-12: "yes, as in TraderPlus")
+
+A class may stand in several categories, each by a line of its own; a trader deals by the first
+of its categories that lists the class (design §8.1). The stand's files for C.1 to C.5 add a
+category `npc_arms` (AKM 3000/2400 unlimited; `Ammo_762x39` 300/150 by the piece) to the NPC
+and, after `weapons`, to the stand trader; restored from `examples/stand` afterwards
+(`reloaded: goods=105 problems=0`).
+
+| | asked | answered |
+|---|---|---|
+| C.1 | the load | `goods=106 problems=3`: `Ammo_762x39` in `npc_arms` skipped, "it counts by the rule '', the line in 'ammo' by 'unit'"; "'stand' has 1 class(es) in both 'weapons' and 'npc_arms' ( AKM ): it deals in them by the lines of 'weapons'"; "'AKM' sells for 2400 at 'npc' and costs 2140 at 'stand': a money loop (Sell 2400 in 'npc_arms', Buy 2500 in 'weapons' ...; a discount of 10 %)": a loop between two lines of one class |
+| C.2 | `price class=AKM` at both | the NPC: buy 3000, sell 2400; the stand trader: 2500 and 1250 |
+| C.3 | `quote buy=AKM:1` at both | the NPC 3000 (unlimited line); the stand trader 2375 (2 in stock, 0.95) |
+| C.4 | `quote sell=AKM` (the player's, with its parts) | the NPC 2400 for the rifle, its five parts kept (he deals in none of them); the stand trader 2275 with the parts |
+| C.5 | the screens | the NPC: tabs All, Спорядження, Одяг, Набої, Зброя Остапа; in the last the AKM at 3 000 alone; the AKM on the shoulder 2 400. The stand trader: no tab Зброя Остапа (its one class stands under Зброя); Зброя: the AKM at 2 375, 2 in stock; on the shoulder 2 275 |
+| C.6 | the import's samples gain a line: `Ammo_762x39` in Weapons, one round a trade at 7/3 (it is in Ammo too, twenty a trade at 100/50; `TunaCan` was already in Food at 40 and in Ammo at 99/50); dry run | goods lines 13 (11 before: both lines of both classes kept), nothing "listed twice"; Ammo: `TunaCan` 100/50, `Ammo_762x39` 5/0 a round, `Stock` 200; Weapons: `Ammo_762x39` 10/0 a round, unlimited |
+| C.7 | apply | `tp-0` and `tp-2` (ID 1) have `TunaCan` in food and ammo, `tp-1` (ID 2) `Ammo_762x39` in weapons and ammo: named, the first category's line used; and "'TunaCan' sells for 50 at 'tp-1' and costs 40 at 'tp-0': a money loop (Sell 50 in 'ammo', Buy 40 in 'food')": a loop of the TraderPlus files themselves that keeping only the first line had hidden |
+| C.8 | prices after it | `TunaCan` 40 at Sidorovich, 100 at Kevin (who before had none: the first line was Food's, and his ID has no Food); 20 rounds 100 at Sidorovich, 200 at Kevin (7 a round, 10 by the smallest note) |
+| C.9 | a pile at `TradeQuantity` 1 | read in the code: such a line came in as the price of a whole pile, though TraderPlus's `CalculateTradeQty` trades one unit (one round at the price of twenty). Every pile is now priced by the unit, one unit a trade too (C.6) |

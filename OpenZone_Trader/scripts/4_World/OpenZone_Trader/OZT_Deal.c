@@ -424,7 +424,7 @@ class OZT_Deal
                     entire = false;
                 }
                 // A ruined thing prices at zero.
-                OZT_BookEntry entry = OZT_Book.EntryOf(e.GetType());
+                OZT_BookEntry entry = OZT_Book.EntryFor(m_Trader, e.GetType());
                 price = OZT_Book.SellPriceAt(m_Trader, entry, e, units, m_Cursor);
                 if (price <= 0)
                     return OZT_Const.NO_NOT_TAKEN;
@@ -535,7 +535,7 @@ class OZT_Deal
         for (int i = 0; i < buys.Count(); i++)
         {
             OZT_WireBuy line = buys[i];
-            OZT_BookEntry entry = OZT_Book.EntryOf(line.ClassName);
+            OZT_BookEntry entry = OZT_Book.EntryFor(m_Trader, line.ClassName);
 
             // Goods this trader does not sell: the catalogue the client holds
             // is stale.
@@ -684,7 +684,7 @@ class OZT_Deal
                 OZT_Log.Error("deal: '" + entry.ClassName + "' comes with '" + comes[c] + "', which found no slot on it");
                 return OZT_Const.NO_INTERNAL;
             }
-            extra = extra + OZT_Book.BuyForAt(m_Player, m_Trader, OZT_Book.EntryOf(comes[c]), 0, line.Count, m_Cursor);
+            extra = extra + OZT_Book.BuyForAt(m_Player, m_Trader, OZT_Book.EntryFor(m_Trader, comes[c]), 0, line.Count, m_Cursor);
         }
 
         // What the request fits: goods of this trader, an entry hanging on the
@@ -695,7 +695,7 @@ class OZT_Deal
         for (int f = 0; f < line.Fit.Count(); f++)
         {
             OZT_WireFit fit = line.Fit[f];
-            OZT_BookEntry sold = OZT_Book.EntryOf(fit.ClassName);
+            OZT_BookEntry sold = OZT_Book.EntryFor(m_Trader, fit.ClassName);
             if (OZT_Book.Locked(m_Player, m_Trader, sold))
                 return OZT_Const.NO_LOCKED;
             if (sold && sold.Stocked && m_Cursor.Count(sold.ClassName, 0) < 1)

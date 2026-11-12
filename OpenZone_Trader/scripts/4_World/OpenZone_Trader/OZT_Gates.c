@@ -240,8 +240,8 @@ class OZT_Gates
             for (int g = 0; g < cat.Goods.Count(); g++)
             {
                 OZT_Goods line = cat.Goods[g];
-                said = said + CheckList("'" + line.ClassName + "' Requires", line.Requires, false);
-                said = said + CheckDiscounts("'" + line.ClassName + "'", line.Discounts);
+                said = said + CheckList("'" + line.ClassName + "' in '" + cat.Id + "' Requires", line.Requires, false);
+                said = said + CheckDiscounts("'" + line.ClassName + "' in '" + cat.Id + "'", line.Discounts);
             }
         }
         return said;

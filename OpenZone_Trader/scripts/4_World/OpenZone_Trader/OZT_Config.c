@@ -167,6 +167,7 @@ class OZT_Config
         CheckNotes();
         CheckGoods();
         CheckTraders();
+        CheckTwice();
         CheckDiscounts();
         CheckLoops();
         m_Problems = OZT_Log.Warned();
@@ -233,18 +234,24 @@ class OZT_Config
     }
 
     // Goods: the class exists, is not one of the server's banknotes, stands in
-    // the book once, and both prices are whole multiples of the smallest note.
-    // What comes with goods is goods of the book too, with a price to buy,
-    // and fits them.
+    // its category once (another category may sell it by a line of its own,
+    // as in TraderPlus), and both prices are whole multiples of the smallest
+    // note. What comes with goods is goods of the book too, with a price to
+    // buy in some line, and fits them.
     private void CheckGoods()
     {
         int unit = Unit();
-        array<string> seen = new array<string>();
+        array<string> buyable = new array<string>();
         array<OZT_Goods> lines = new array<OZT_Goods>();
+        // How the first line of a class counts it, and its category: a price
+        // for one unit and a price for a stack cannot stand side by side.
+        map<string, string> ruleOf = new map<string, string>();
+        map<string, string> ruleIn = new map<string, string>();
         m_GoodsCount = 0;
         for (int c = 0; c < m_Goods.Categories.Count(); c++)
         {
             OZT_Category cat = m_Goods.Categories[c];
+            array<string> seen = new array<string>();
             array<ref OZT_Goods> kept = new array<ref OZT_Goods>();
             for (int g = 0; g < cat.Goods.Count(); g++)
             {
@@ -261,7 +268,7 @@ class OZT_Config
                     }
                     if (seen.Find(e.ClassName) > -1)
                     {
-                        Problem("Goods: '" + e.ClassName + "' in category '" + cat.Id + "' is skipped: the licence is in the price book already");
+                        Problem("Goods: '" + e.ClassName + "' in category '" + cat.Id + "' is skipped: the category lists the licence already");
                         continue;
                     }
                     seen.Insert(e.ClassName);
@@ -285,13 +292,28 @@ class OZT_Config
                 }
                 if (seen.Find(e.ClassName) > -1)
                 {
-                    Problem("Goods: '" + e.ClassName + "' in category '" + cat.Id + "' is skipped: the class is in the price book already");
+                    Problem("Goods: '" + e.ClassName + "' in category '" + cat.Id + "' is skipped: the category lists the class already");
                     continue;
+                }
+                string rule;
+                if (ruleOf.Find(e.ClassName, rule) && rule != e.Quantity)
+                {
+                    string odd = "Goods: '" + e.ClassName + "' in category '" + cat.Id + "' is skipped: it counts by the rule '" + e.Quantity + "'";
+                    odd = odd + ", the line in '" + ruleIn.Get(e.ClassName) + "' by '" + rule + "'; a class is counted one way in the whole book";
+                    Problem(odd);
+                    continue;
+                }
+                if (!ruleOf.Contains(e.ClassName))
+                {
+                    ruleOf.Set(e.ClassName, e.Quantity);
+                    ruleIn.Set(e.ClassName, cat.Id);
                 }
                 seen.Insert(e.ClassName);
                 lines.Insert(e);
                 e.Buy = Fitted(e.ClassName, "Buy", e.Buy, unit);
                 e.Sell = Fitted(e.ClassName, "Sell", e.Sell, unit);
+                if (e.Buy > 0 && buyable.Find(e.ClassName) < 0)
+                    buyable.Insert(e.ClassName);
                 kept.Insert(e);
             }
             cat.Goods = kept;
@@ -299,7 +321,7 @@ class OZT_Config
         }
 
         for (int w = 0; w < lines.Count(); w++)
-            CheckWith(lines[w], seen, lines);
+            CheckWith(lines[w], buyable);
     }
 
     private bool LicenceListed(string id)
@@ -316,7 +338,7 @@ class OZT_Config
     // What comes attached to goods: each a class of the book with a price to
     // buy (it is charged at that price: nothing comes free), in a slot of its
     // own. What fails is left out, here in memory: the file is the admin's.
-    private void CheckWith(OZT_Goods host, array<string> seen, array<OZT_Goods> lines)
+    private void CheckWith(OZT_Goods host, array<string> buyable)
     {
         if (!host.With || host.With.Count() == 0)
             return;
@@ -326,10 +348,9 @@ class OZT_Config
         {
             string part = host.With[p];
             string why = "";
-            int at = seen.Find(part);
             if (!ClassKnown(part))
                 why = "no such class";
-            else if (at < 0 || lines[at].Buy <= 0)
+            else if (buyable.Find(part) < 0)
                 why = "it has no price to buy in the price book";
             else
             {
@@ -438,69 +459,158 @@ class OZT_Config
         }
     }
 
+    // The lines a trader deals by, as OZT_Book.EntryFor picks them: each class
+    // by the first of its categories that lists it. `twice`, when given, gets
+    // "first|again|class" for each class a later category of its lists again.
+    private void LinesOf(OZT_Point p, array<OZT_Goods> lines, array<OZT_Category> cats, array<string> twice)
+    {
+        map<string, string> first = new map<string, string>();
+        array<string> done = new array<string>();
+        for (int c = 0; c < p.Categories.Count(); c++)
+        {
+            OZT_Category cat = FindCategory(p.Categories[c]);
+            if (!cat || done.Find(cat.Id) > -1)
+                continue;
+            done.Insert(cat.Id);
+            for (int g = 0; g < cat.Goods.Count(); g++)
+            {
+                OZT_Goods e = cat.Goods[g];
+                string was;
+                if (first.Find(e.ClassName, was))
+                {
+                    if (twice)
+                        twice.Insert(was + "|" + cat.Id + "|" + e.ClassName);
+                    continue;
+                }
+                first.Set(e.ClassName, cat.Id);
+                lines.Insert(e);
+                cats.Insert(cat);
+            }
+        }
+    }
+
+    // A trader whose categories list a class twice deals in it by the line of
+    // the first: said once for each pair of its categories, with a few of the
+    // classes.
+    private void CheckTwice()
+    {
+        for (int t = 0; t < m_Traders.Traders.Count(); t++)
+        {
+            OZT_Point p = m_Traders.Traders[t];
+            array<OZT_Goods> lines = new array<OZT_Goods>();
+            array<OZT_Category> cats = new array<OZT_Category>();
+            array<string> twice = new array<string>();
+            LinesOf(p, lines, cats, twice);
+            array<string> pairs = new array<string>();
+            array<int> counts = new array<int>();
+            array<string> names = new array<string>();
+            for (int i = 0; i < twice.Count(); i++)
+            {
+                array<string> f = new array<string>();
+                twice[i].Split("|", f);
+                string pair = f[0] + "|" + f[1];
+                int at = pairs.Find(pair);
+                if (at < 0)
+                {
+                    at = pairs.Insert(pair);
+                    counts.Insert(0);
+                    names.Insert("");
+                }
+                counts[at] = counts[at] + 1;
+                if (counts[at] <= 3)
+                    names[at] = names[at] + " " + f[2];
+            }
+            for (int k = 0; k < pairs.Count(); k++)
+            {
+                array<string> ab = new array<string>();
+                pairs[k].Split("|", ab);
+                string msg = "Traders: '" + p.Id + "' has " + counts[k].ToString() + " class(es) in both '" + ab[0] + "'";
+                msg = msg + " and '" + ab[1] + "' (" + names[k];
+                if (counts[k] > 3)
+                    msg = msg + " ...";
+                msg = msg + " ): it deals in them by the lines of '" + ab[0] + "', the first of its categories";
+                Problem(msg);
+            }
+        }
+    }
+
     // A thing that sells for more than it costs is a money press: bought at one
     // trader and sold at another, or at the same one, it makes money out of
     // nothing (the owner, 2026-11-11: no money dupes). The prices compared are
-    // the ones a deal would use: the least any trader asks for one piece, rounded
-    // up, against the most any trader pays for it in the best condition, rounded
-    // down. Under the unit rule a sale is rounded once for the whole stack, so
-    // there the pay for one unit is compared before rounding. A finding changes
-    // nothing, the prices are the admin's: it is said and counted.
+    // the ones a deal would use, each trader's by the line it deals by (a class
+    // can sell by different lines in different categories): the least any
+    // trader asks for one piece, rounded up, against the most any trader pays
+    // for it in the best condition, rounded down. Under the unit rule a sale
+    // is rounded once for the whole stack, so there the pay for one unit is
+    // compared before rounding. A finding changes nothing, the prices are the
+    // admin's: it is said and counted.
     private void CheckLoops()
     {
         int unit = Unit();
         float best = BestCondition();
+        map<string, ref OZT_LoopSide> cheap = new map<string, ref OZT_LoopSide>();
+        map<string, ref OZT_LoopSide> dear = new map<string, ref OZT_LoopSide>();
+        for (int t = 0; t < m_Traders.Traders.Count(); t++)
+        {
+            OZT_Point p = m_Traders.Traders[t];
+            array<OZT_Goods> lines = new array<OZT_Goods>();
+            array<OZT_Category> cats = new array<OZT_Category>();
+            LinesOf(p, lines, cats, null);
+            for (int i = 0; i < lines.Count(); i++)
+            {
+                OZT_Goods e = lines[i];
+                if (e.Buy > 0)
+                {
+                    // The largest discount the goods can get anywhere: a
+                    // discount that holds at the cheapest trader makes the
+                    // cheapest price (design §8.2, the money loop with
+                    // discounts).
+                    float most = MostDiscount(cats[i], e);
+                    // A stocked line: a unit sold and bought straight back
+                    // costs the coefficient's step more (design §11.1).
+                    float step = 1;
+                    if (e.Stock && e.Stock.Coefficient < 1)
+                        step = e.Stock.Coefficient;
+                    float costs = RoundUpTo(e.Buy * p.BuyFactor * (100 - most) / 100 * step, unit);
+                    OZT_LoopSide low = cheap.Get(e.ClassName);
+                    if (!low || costs < low.Price)
+                        cheap.Set(e.ClassName, OZT_LoopSide.Make(costs, p.Id, cats[i].Id, e.Buy, most));
+                }
+                if (e.Sell > 0)
+                {
+                    float pays = e.Sell * p.SellFactor * best;
+                    if (e.Quantity != OZT_Const.RULE_UNIT)
+                        pays = RoundDownTo(pays, unit);
+                    OZT_LoopSide high = dear.Get(e.ClassName);
+                    if (!high || pays > high.Price)
+                        dear.Set(e.ClassName, OZT_LoopSide.Make(pays, p.Id, cats[i].Id, e.Sell, 0));
+                }
+            }
+        }
+
+        // Said in the order of the book, each class once.
+        array<string> said = new array<string>();
         for (int c = 0; c < m_Goods.Categories.Count(); c++)
         {
             OZT_Category cat = m_Goods.Categories[c];
-            string cheapAt = "";
-            string dearAt = "";
-            float cheapest = 0;
-            float dearest = 0;
-            for (int t = 0; t < m_Traders.Traders.Count(); t++)
-            {
-                OZT_Point p = m_Traders.Traders[t];
-                if (p.Categories.Find(cat.Id) < 0)
-                    continue;
-                if (cheapAt == "" || p.BuyFactor < cheapest)
-                {
-                    cheapest = p.BuyFactor;
-                    cheapAt = p.Id;
-                }
-                if (dearAt == "" || p.SellFactor > dearest)
-                {
-                    dearest = p.SellFactor;
-                    dearAt = p.Id;
-                }
-            }
-            if (cheapAt == "")
-                continue;
-
             for (int g = 0; g < cat.Goods.Count(); g++)
             {
-                OZT_Goods e = cat.Goods[g];
-                if (e.Buy <= 0 || e.Sell <= 0)
+                string type = cat.Goods[g].ClassName;
+                if (said.Find(type) > -1)
                     continue;
-                // The largest discount the goods can get anywhere: a
-                // discount that holds at the cheapest trader makes the cheapest
-                // price (design §8.2, the money loop with discounts).
-                float most = MostDiscount(cat, e);
-                // A stocked line: a unit sold and bought straight back costs
-                // the coefficient's step more (design §11.1).
-                float step = 1;
-                if (e.Stock && e.Stock.Coefficient < 1)
-                    step = e.Stock.Coefficient;
-                int costs = RoundUpTo(e.Buy * cheapest * (100 - most) / 100 * step, unit);
-                float pays = e.Sell * dearest * best;
-                if (e.Quantity != OZT_Const.RULE_UNIT)
-                    pays = RoundDownTo(pays, unit);
-                float over = pays - costs;
-                if (over <= 0.001 + pays * 0.000001)
+                OZT_LoopSide buy = cheap.Get(type);
+                OZT_LoopSide sell = dear.Get(type);
+                if (!buy || !sell)
                     continue;
-                string msg = "Goods: '" + e.ClassName + "' sells for " + pays.ToString() + " at '" + dearAt + "'";
-                msg = msg + " and costs " + costs.ToString() + " at '" + cheapAt + "': a money loop";
-                msg = msg + " (Sell " + e.Sell.ToString() + ", Buy " + e.Buy.ToString() + " in the file; the factors are counted";
-                msg = msg + ", and a discount of " + most.ToString() + " %)";
+                float over = sell.Price - buy.Price;
+                if (over <= 0.001 + sell.Price * 0.000001)
+                    continue;
+                said.Insert(type);
+                string msg = "Goods: '" + type + "' sells for " + sell.Price.ToString() + " at '" + sell.At + "'";
+                msg = msg + " and costs " + buy.Price.ToString() + " at '" + buy.At + "': a money loop";
+                msg = msg + " (Sell " + sell.Filed.ToString() + " in '" + sell.Category + "'";
+                msg = msg + ", Buy " + buy.Filed.ToString() + " in '" + buy.Category + "' in the file";
+                msg = msg + "; the factors are counted, and a discount of " + buy.Discount.ToString() + " %)";
                 Problem(msg);
             }
         }
@@ -516,7 +626,7 @@ class OZT_Config
             OZT_Category cat = m_Goods.Categories[c];
             CheckDiscountList("category '" + cat.Id + "'", cat.Discounts);
             for (int g = 0; g < cat.Goods.Count(); g++)
-                CheckDiscountList("'" + cat.Goods[g].ClassName + "'", cat.Goods[g].Discounts);
+                CheckDiscountList("'" + cat.Goods[g].ClassName + "' in '" + cat.Id + "'", cat.Goods[g].Discounts);
         }
     }
 
@@ -575,5 +685,27 @@ class OZT_Config
                 best = f;
         }
         return best;
+    }
+}
+
+// One side of a money loop: the least a class costs or the most it brings,
+// where, and by what line.
+class OZT_LoopSide
+{
+    float Price;
+    string At;
+    string Category;
+    int Filed;
+    float Discount;
+
+    static OZT_LoopSide Make(float price, string at, string category, int filed, float discount)
+    {
+        OZT_LoopSide s = new OZT_LoopSide();
+        s.Price = price;
+        s.At = at;
+        s.Category = category;
+        s.Filed = filed;
+        s.Discount = discount;
+        return s;
     }
 }

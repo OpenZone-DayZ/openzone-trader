@@ -73,6 +73,8 @@ prices = {
             "AKM,0.95,3,1,3000,1500,0.25",
             "Mag_AKM_30Rnd,1,-1,0,300,150",
             "UniversalLight,1,5,1,200,0.5",
+            # Listed in Ammo too, by its own line: one round a trade.
+            "Ammo_762x39,1,-1,1,7,3",
         ]},
         {"CategoryName": "Car Licence", "Products": [
             "Hatchback_02,1,-1,1,10000,5000",

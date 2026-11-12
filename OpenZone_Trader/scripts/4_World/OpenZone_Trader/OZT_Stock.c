@@ -170,8 +170,9 @@ class OZT_Stock
         }
     }
 
-    // The stocked goods a stock sells: the stocked lines of every category
-    // of every point that sells from it, each class once.
+    // The stocked goods a stock sells: the stocked lines its points deal by,
+    // each class once. Points that share a stock and price a class by
+    // different lines: the first point's line fills and destocks it.
     static void GoodsOf(string stock, array<OZT_BookEntry> into)
     {
         array<ref OZT_Point> points = OZT_Config.Get().Traders().Traders;
@@ -188,8 +189,8 @@ class OZT_Stock
                     continue;
                 for (int g = 0; g < cat.Goods.Count(); g++)
                 {
-                    OZT_BookEntry e = OZT_Book.EntryOf(cat.Goods[g].ClassName);
-                    if (!e || !e.Stocked || seen.Find(e.ClassName) > -1)
+                    OZT_BookEntry e = OZT_Book.EntryFor(p, cat.Goods[g].ClassName);
+                    if (!e || e.Category != cat.Id || !e.Stocked || seen.Find(e.ClassName) > -1)
                         continue;
                     seen.Insert(e.ClassName);
                     into.Insert(e);
@@ -227,19 +228,28 @@ class OZT_Stock
                 }
             }
             if (cfg.DestockAtStart == 1)
-                Destock(shelf);
+                Destock(shelf, goods);
             Save(stock);
             OZT_Log.Info("stock '" + stock + "': " + shelf.Classes.Count().ToString() + " line(s) at the start");
         }
     }
 
-    // A line at or above its Max loses its Destock share.
-    protected static void Destock(OZT_StockShelf shelf)
+    // A line at or above its Max loses its Destock share; `goods`: the lines
+    // the stock is sold by (GoodsOf).
+    protected static void Destock(OZT_StockShelf shelf, array<OZT_BookEntry> goods)
     {
         for (int i = shelf.Classes.Count() - 1; i >= 0; i--)
         {
-            OZT_BookEntry e = OZT_Book.EntryOf(shelf.Classes[i]);
-            if (!e || !e.Stocked || e.Destock <= 0)
+            OZT_BookEntry e = null;
+            for (int g = 0; g < goods.Count(); g++)
+            {
+                if (goods[g].ClassName == shelf.Classes[i])
+                {
+                    e = goods[g];
+                    break;
+                }
+            }
+            if (!e || e.Destock <= 0)
                 continue;
             int n = shelf.Counts[i];
             if (n < e.MaxStock)

@@ -37,7 +37,21 @@ action manager, and the engine gets no callbacks to aim the infected's senses at
 | N.17 | `set:adm1` with a name, radius 4, one category, factors 1.1 and 0.9, `NoExchange` 1 | the file holds them | yes |
 | N.18 | `place` with the taken Id adm1; `set:adm1` as an npc of a building's class; `move:nope` | `STR_OZT_ADMIN_BAD_ID`, `STR_OZT_ADMIN_BAD_CLASS`, `STR_OZT_ADMIN_NO_POINT`, nothing written | yes |
 | N.19 | `remove:adm1`, then `respawn` | the point gone from the file; no SurvivorF_Linda within 3 m of where she stood | yes |
-| N.20 | the pane TRADERS itself | not seen: VPP Admin Tools is not on this machine (the Workshop folder holds the series' own items only), and the glue pbo hard-requires it, so the stand cannot load it | open |
+| N.20 | the pane TRADERS itself, with VPP Admin Tools (Workshop 1828439124, its build of 2026-10-29) subscribed later the same day, real mouse and keyboard | the glue compiles on the server and the client (no `SCRIPT (E)`); TRADERS stands after PLAYERS in the OpenZone window; the list shows both points from the section; a row fills the form (`npc`, Остап, KIND npc, SurvivorM_Boris, radius 3, factors 1 and 1, `gear,ammo`, CHANGES NOTES no, "at 4687 339 10195.5, facing 180, wears 4") | yes |
+| N.21 | in the pane: PLACE HERE with id `probe1`, class Land_City_Stand_Grocery, KIND object; then MOVE HERE from 8 m away; then TURN AS I | a stall at the feet (4700 339 10186), three rows, "traders: place done"; the stall at the new feet (4706 339.02 10180), none left at the old place; "turn:probe1 done" (the character had not turned, so the yaw stayed -165.095) | yes |
+| N.22 | KIND npc, class SurvivorF_Linda, categories `food,weapons`, CHANGES NOTES no, SAVE POINT; then OUTFIT FROM ME; then REMOVE twice | SurvivorF_Linda where the stall stood, the file: Kind npc, NoExchange 1, Categories [food, weapons]; "wears 7", the file holds the character's AKM with five parts, the bag and the jacket; the first REMOVE asks again ("press REMOVE again to remove probe1"), the second removes it: two rows, no one within 3 m | yes |
+
+N.20-N.22 left two things for the rework of the VPP window the owner plans (2026-11-12): the
+list draws the engine's red scroll bar and red selection, where the core's lists set the
+style NoScrollBar; and after REMOVE the line under the form still describes the removed
+point until another row is picked. RESPAWN ALL and REFRESH were not pressed in the pane
+(the window was closed by then); the ops behind them are N.19 and the answer to every op.
+
+Input on this stand died twice (2026-11-09, 2026-11-12) while a physical pad sat in the
+first XInput slot (its packet counter climbing about 1000 a second at rest): keyboard,
+mouse and the MCP's virtual pad all did nothing. Unplugging it brought input back. VPP's
+admin toggle started off this time: Home answered "[VPPAT] Can't preform that action", End
+and then Home opened the bar.
 
 No `SCRIPT (E)` line and no `ERROR` line in either log of these runs. The verdict of the
 boots read "fail" only for the stand's own count (`traders` 2 where the profile said 1),

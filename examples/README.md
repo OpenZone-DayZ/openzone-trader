@@ -1,8 +1,10 @@
 # Examples
 
 `stand/` is the set the test stand runs with: one object trader on the north-west
-airfield, eleven goods of vanilla classes in four categories (the trader deals in three
-of them, so the fourth is "not taken here"), and the stand's money: the notes and the
+airfield, twenty-nine goods of vanilla classes in four categories (the trader deals in three
+of them, so the fourth is "not taken here"; fourteen are parts of the AKM -- optics, stocks,
+handguards, a suppressor, a bayonet, a light, magazines -- for trying parts on a rifle), and
+the stand's money: the notes and the
 wallet of the phase 0 probe, worth 5, 10, 20, 50, 100 and 500. Copy the three files into
 `<profile>\OpenZone\` of a server that also loads `@OpenZone_TraderProbe`.
 

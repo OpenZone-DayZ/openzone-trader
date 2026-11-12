@@ -27,5 +27,5 @@ Publishing, in order, and only on the owner's word: `mod_build` (packs and signs
 series key goes into the ignored `keys/` first) -> `.\package.ps1` (puts the rest in place;
 `-Check` only reports) -> `workshop_publish("<Mod>")` from the `dayz` MCP.
 
-Before the glues are published: the TRADERS pane has not been compiled or seen (VPP Admin
-Tools was not on the machine), see `docs/measurements/2026-11-12/npc.md` N.20.
+The TRADERS pane was compiled and driven with VPP Admin Tools on 2026-11-12, see
+`docs/measurements/2026-11-12/npc.md` N.20-N.22.

@@ -21,6 +21,8 @@ class OZT_VerbOps
             return OpReload(detail);
         if (op == "fps")
             return OZT_VerbNpc.OpFps(args, detail);
+        if (op == "recur")
+            return OZT_VerbRecur.Op(detail);
 
         PlayerBase player = Player();
         if (!player)
@@ -66,7 +68,7 @@ class OZT_VerbOps
 
     static string KnownOps()
     {
-        return "status, reload, fps, balance, price, pay, damage, open, fit, quote, deal, show, tree, load, fits, hurt, admin, flag";
+        return "status, reload, fps, recur, balance, price, pay, damage, open, fit, quote, deal, show, tree, load, fits, hurt, admin, flag";
     }
 
     // ---- what the ops share ---------------------------------------------------

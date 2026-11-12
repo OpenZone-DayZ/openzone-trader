@@ -141,7 +141,11 @@ STR_OZT_NO_ACCESS,Цей торговець з вами не торгує,This t
 # The OpenZone admin window's trader pages (VPP rework 2026-11-12, OpenZone_Trader_VPP).
 STR_OZT_VPP_MOD,ТОРГОВЕЦЬ,TRADER
 STR_OZT_VPP_PAGE_POINTS,Точки,Points
+STR_OZT_VPP_PAGE_GOODS,Товари,Goods
+STR_OZT_VPP_PAGE_GATES,Умови й знижки,Conditions and discounts
+STR_OZT_VPP_PAGE_STOCK,Склад,Stock
 STR_OZT_VPP_PAGE_LICENCES,Ліцензії,Licences
+STR_OZT_VPP_PAGE_MONEY,Гроші,Money
 STR_OZT_VPP_PAGE_IMPORT,Iмпорт TraderPlus,TraderPlus import
 STR_OZT_VPP_REFRESH,Оновити,Refresh
 STR_OZT_VPP_UNREADABLE,Відповідь не прочитано:,The answer could not be read:
@@ -233,3 +237,195 @@ STR_OZT_VPP_LC_PICK_HELD,"Виберіть ліцензію в списку то
 STR_OZT_VPP_IM_WHEN_DRY,пробний прогін,dry run
 STR_OZT_VPP_IM_WHEN_APPLY,застосовано,applied
 STR_OZT_ADMIN_NOT_STOCKED,Цей товар у цій категорії точки не має складу,These goods have no stock in that category of the point
+STR_OZT_VPP_DRAFT,ЧЕРНЕТКА,DRAFT
+STR_OZT_VPP_APPLY,Застосувати,Apply
+STR_OZT_VPP_DISCARD,Відкинути,Discard
+STR_OZT_VPP_CLOSE,Закрити,Close
+STR_OZT_VPP_READING,Читаємо файли торговця...,Reading the trader's files...
+STR_OZT_VPP_APPLYING,Застосовуємо...,Applying...
+STR_OZT_VPP_NO_CHANGES,Без змін,No changes
+STR_OZT_VPP_CHANGED,Змінено:,Changed:
+STR_OZT_VPP_APPLIED,Застосовано,Applied
+STR_OZT_VPP_DISCARDED,Зміни відкинуто,The changes are discarded
+STR_OZT_VPP_NOTHING_CHANGED,Чернетка без змін: нема чого застосувати чи відкидати,The draft has no changes: nothing to apply or discard
+STR_OZT_VPP_APPLY_ASK,Застосувати зміни у файлах,Apply the changes to the files
+STR_OZT_VPP_DISCARD_ASK,Відкинути зміни у файлах,Discard the changes to the files
+STR_OZT_VPP_YES_DISCARD,"Так, відкинути","Yes, discard"
+STR_OZT_VPP_DRAFT_FIRST,Спершу застосуйте або відкиньте чернетку: ця дія переписує файл на сервері,Apply or discard the draft first: this action rewrites the file on the server
+STR_OZT_VPP_BAD_FILE,Файл не прочитано,The file could not be read
+STR_OZT_VPP_FILE_SETTINGS,налаштування,settings
+STR_OZT_VPP_FILE_GOODS,товари,goods
+STR_OZT_VPP_FILE_TRADERS,точки,points
+STR_OZT_VPP_PROBS_HEAD,ПРОБЛЕМИ ОСТАННЬОГО ЗАВАНТАЖЕННЯ ФАЙЛIВ,PROBLEMS OF THE FILES' LAST LOAD
+STR_OZT_VPP_PROBS_NONE,Проблем немає,No problems
+STR_OZT_VPP_PROBS_N,Проблем:,Problems:
+STR_OZT_VPP_PROBS_UNKNOWN,Проблеми: ?,Problems: ?
+STR_OZT_VPP_PROBS_MORE,Ще:,And more:
+STR_OZT_VPP_NOT,не,not
+STR_OZT_VPP_CK_FACTION,фракція,faction
+STR_OZT_VPP_CK_POST,пост,post
+STR_OZT_VPP_CK_LEADER,лідер,leader
+STR_OZT_VPP_CK_LICENCE,ліцензія,licence
+STR_OZT_VPP_CK_RESEARCH,дослідження,research
+STR_OZT_VPP_MONEY_SERVER,як на сервері,as the server's
+STR_OZT_VPP_MONEY_CASH,готівка,cash
+STR_OZT_VPP_MONEY_BOTH,"готівка, потім банк","cash, then the bank"
+STR_OZT_VPP_MONEY_BANK,банк TraderPlus,TraderPlus bank
+STR_OZT_VPP_PT_STOCK,Склад,Stock
+STR_OZT_VPP_PT_STOCK_H,порожньо: свій; однаковий у точок: спільна полиця,empty: its own; the same at points: one shelf
+STR_OZT_VPP_PT_ACCESS,Доступ,Access
+STR_OZT_VPP_PT_LIC_ADD,+ ліцензія,+ licence
+STR_OZT_VPP_PT_LIC_DEL,Прибрати,Remove
+STR_OZT_VPP_PT_NO_LICENCES,На сервері немає ліцензій: їх задають на сторінці Ліцензії,The server has no licences: they are made on the Licences page
+STR_OZT_VPP_PT_LIC_HAS,Ця ліцензія вже серед умов точки,The point asks for this licence already
+STR_OZT_VPP_PT_LIC_PICK,Виберіть умову в списку доступу,Pick a condition on the access list
+STR_OZT_VPP_PT_LIC_ELSEWHERE,Цю умову правлять на сторінці Умови й знижки,This condition is edited on the Conditions and discounts page
+STR_OZT_VPP_GD_TITLE,Товари й ціни,Goods and prices
+STR_OZT_VPP_GD_SUB,Книга цін: категорії й рядки,The price book: categories and lines
+STR_OZT_VPP_GD_CATS,КАТЕГОРIЇ,CATEGORIES
+STR_OZT_VPP_GD_CAT_ID,"Id категорії (літери, цифри, _ і -)","Category id (letters, digits, _ and -)"
+STR_OZT_VPP_GD_CAT_NAME,Назва для гравців,Name the players read
+STR_OZT_VPP_GD_CAT_ADD,+ Категорія,+ Category
+STR_OZT_VPP_GD_CAT_DEL,Прибрати,Remove
+STR_OZT_VPP_GD_FIND,Знайти товар (клас),Find goods (class)
+STR_OZT_VPP_GD_PICK,Виберіть рядок,Pick a line
+STR_OZT_VPP_GD_CLASS,Клас,Class
+STR_OZT_VPP_GD_BUY,Купівля (платить гравець),Buy (the player pays)
+STR_OZT_VPP_GD_SELL,Скупка (платить торговець),Sell (the trader pays)
+STR_OZT_VPP_GD_RULE,Правило кількості,Quantity rule
+STR_OZT_VPP_GD_RULE_EACH,за штуку,by the piece
+STR_OZT_VPP_GD_RULE_UNIT,"за одиницю (набої, цвяхи)","by the unit (rounds, nails)"
+STR_OZT_VPP_GD_RULE_FRACTION,"за повну (фляга, бинт)","by a full one (canteen, bandage)"
+STR_OZT_VPP_GD_SEC_STOCK,СКЛАД,STOCK
+STR_OZT_VPP_GD_STOCK_ON,Скінченний запас: так,Finite stock: yes
+STR_OZT_VPP_GD_STOCK_OFF,Скінченний запас: ні (безліміт),Finite stock: no (unlimited)
+STR_OZT_VPP_GD_MAX,Max (0: лише що продали),Max (0: only what players sell)
+STR_OZT_VPP_GD_COEF,Коефіцієнт ціни,Price coefficient
+STR_OZT_VPP_GD_DEST,"Списання на старті, частка","Destock at a start, share"
+STR_OZT_VPP_GD_FLOOR,"Поріг ціни, частка","Price floor, share"
+STR_OZT_VPP_GD_WITH,"У комплекті (класи через кому, кожен за своєю ціною)","Comes with (classes, comma between; each at its own price)"
+STR_OZT_VPP_GD_LN_ADD,+ Товар,+ Goods
+STR_OZT_VPP_GD_LN_DEL,Прибрати рядок,Remove line
+STR_OZT_VPP_GD_LOCKED,[замок],[locked]
+STR_OZT_VPP_GD_COUNT,Рядків і категорій:,Lines and categories:
+STR_OZT_VPP_GD_UNIT,Найменша купюра:,Smallest note:
+STR_OZT_VPP_GD_CHK_CLASS,Клас є в грі,The class is in the game
+STR_OZT_VPP_GD_CHK_NO_CLASS,Класу немає в грі (або ліцензії в налаштуваннях): сервер пропустить рядок,The game has no such class (or the settings no such licence): the server skips the line
+STR_OZT_VPP_GD_CHK_UNIT,Ціни кратні найменшій купюрі,The prices are multiples of the smallest note
+STR_OZT_VPP_GD_CHK_NO_UNIT,"Ціна не кратна найменшій купюрі, сервер округлить на свою користь:","A price is not a multiple of the smallest note, the server rounds it in its favour:"
+STR_OZT_VPP_GD_CHK_LOOP,Петля: скупка більша за найменшу ціну купівлі,A money loop: the sell price is above the least buy price
+STR_OZT_VPP_GD_CHK_NO_LOOP,Петлі немає: скупка / найменша ціна купівлі,No money loop: sell / the least buy price
+STR_OZT_VPP_GD_BAD_ID,"Id: лише літери, цифри, _ і -, до 64","Id: letters, digits, _ and - only, at most 64"
+STR_OZT_VPP_GD_TYPE_CLASS,Новий рядок: впишіть клас,A new line: type its class
+STR_OZT_VPP_GT_TITLE,Умови й знижки,Conditions and discounts
+STR_OZT_VPP_GT_SUB,"Хто бачить товар і за скільки. Замок ховає товар, знижка йде лише на купівлю.",Who sees goods and at what price. A lock hides goods; a discount is on buying only.
+STR_OZT_VPP_GT_SHOW_WITH,Показано: з умовами,Shown: with conditions
+STR_OZT_VPP_GT_SHOW_ALL,Показано: усі рядки,Shown: every line
+STR_OZT_VPP_GT_SERVER,Сервер,Server
+STR_OZT_VPP_GT_SERVER_H,"Сімейства умов, вимкнені для всіх точок",The condition families switched off for every point
+STR_OZT_VPP_GT_CAT,Категорія,Category
+STR_OZT_VPP_GT_CAT_H,Замок і знижки категорії діють на кожен її рядок,The category's lock and discounts hold for each of its lines
+STR_OZT_VPP_GT_POINT,Точка,Point
+STR_OZT_VPP_GT_POINT_H,Хто може торгувати тут і які сімейства діють на точці,"Who may trade here, and which families hold at the point"
+STR_OZT_VPP_GT_PICK,Виберіть ціль ліворуч,Pick a target on the left
+STR_OZT_VPP_GT_FAMS,СIМЕЙСТВА УМОВ,CONDITION FAMILIES
+STR_OZT_VPP_GT_FAM_ON,увімк.,on
+STR_OZT_VPP_GT_FAM_OFF,вимк.,off
+STR_OZT_VPP_GT_FAM_AS_SERVER,як сервер,as the server
+STR_OZT_VPP_GT_FAM_HERE,тут,here
+STR_OZT_VPP_GT_FAM_WHERE,Сімейства вмикають на сервері або на точці,Families are switched on the server or at a point
+STR_OZT_VPP_GT_ROWS,ЗАМОК I ЗНИЖКИ,LOCK AND DISCOUNTS
+STR_OZT_VPP_GT_LOCK,Замок,Lock
+STR_OZT_VPP_GT_LOCK_N,замок,lock
+STR_OZT_VPP_GT_DISC_N,знижок,discounts
+STR_OZT_VPP_GT_WHEN,коли,when
+STR_OZT_VPP_GT_AND,і,and
+STR_OZT_VPP_GT_ALWAYS,завжди,always
+STR_OZT_VPP_GT_BY,рахує,computed by
+STR_OZT_VPP_GT_UP_TO,до,up to
+STR_OZT_VPP_GT_KIND,Вид умови,Condition kind
+STR_OZT_VPP_GT_ARG,"Значення; кілька пишуть через вертикальну риску, тоді досить будь-якого","Value; several are written with a vertical bar between, then any of them will do"
+STR_OZT_VPP_GT_PCT,"Знижка, %","Discount, %"
+STR_OZT_VPP_GT_MAX,"Найбільше, %","At most, %"
+STR_OZT_VPP_GT_MODE_WHEN,нова: коли умови,new: when conditions hold
+STR_OZT_VPP_GT_MODE_BY,нова: рахує мод,new: the mod computes it
+STR_OZT_VPP_GT_AS_WRITTEN,як написано,as written
+STR_OZT_VPP_GT_SAVE,Записати,Save row
+STR_OZT_VPP_GT_DEL,Прибрати,Remove
+STR_OZT_VPP_GT_ADD_AND,+ і умова,+ and condition
+STR_OZT_VPP_GT_ADD_LOCK,+ До замка,+ To the lock
+STR_OZT_VPP_GT_ADD_DISC,+ Знижка,+ Discount
+STR_OZT_VPP_GT_PICKER,Вибір значення,Pick a value
+STR_OZT_VPP_GT_PICK_SET,Поставити,Set
+STR_OZT_VPP_GT_PICK_ADD,+ Або,+ Or
+STR_OZT_VPP_GT_ASKING,Питаємо сервер...,Asking the server...
+STR_OZT_VPP_GT_NOBODY,"Цей вид умови на сервері ніхто не відповідає: умова пропускає, знижка не дається","Nobody answers this kind on the server: a lock passes, a discount is not given"
+STR_OZT_VPP_GT_FREE,Значення вільне: впишіть його,A free value: type it
+STR_OZT_VPP_GT_CHOICES,значень:,values:
+STR_OZT_VPP_GT_HOLD,Мають:,Held by:
+STR_OZT_VPP_GT_HOLD_NONE,Ще ніхто не має,Nobody holds it yet
+STR_OZT_VPP_GT_PICK_VALUE,Виберіть значення в списку,Pick a value on the list
+STR_OZT_VPP_GT_NEED_KIND,Вкажіть вид умови,Name the condition's kind
+STR_OZT_VPP_GT_NEED_TARGET,"Виберіть категорію, рядок або точку","Pick a category, a line or a point"
+STR_OZT_VPP_GT_NO_DISC_HERE,Знижки бувають у категорій і рядків,Discounts belong to categories and lines
+STR_OZT_VPP_GT_PICK_DISC,"Виберіть рядок знижки, що чекає умов",Pick a row of a discount that waits for conditions
+STR_OZT_VPP_GT_PICK_ROW,Виберіть рядок умови,Pick a condition row
+STR_OZT_VPP_SK_TITLE,Склад,Stock
+STR_OZT_VPP_SK_SUB,Запас кожної точки за станами. Точки з однаковим складом продають з однієї полиці.,The stock of each point by condition. Points that name one stock sell from one shelf.
+STR_OZT_VPP_SK_POINTS,ТОЧКИ,POINTS
+STR_OZT_VPP_SK_LINES,РЯДКИ СКЛАДУ,STOCKED LINES
+STR_OZT_VPP_SK_PICK,Виберіть рядок складу,Pick a stocked line
+STR_OZT_VPP_SK_LEVEL,Стан,Condition
+STR_OZT_VPP_SK_COUNT,Кількість у цьому стані,Count in this condition
+STR_OZT_VPP_SK_SET,Встановити,Set
+STR_OZT_VPP_SK_STOCK,склад,stock
+STR_OZT_VPP_SK_LINES_N,рядків,lines
+STR_OZT_VPP_SK_NONE,Точка не має рядків зі складом,The point has no stocked lines
+STR_OZT_VPP_SK_MAX,Max,Max
+STR_OZT_VPP_SK_ONLY_SOLD,"Max 0: лише те, що продали гравці",Max 0: only what players sold
+STR_OZT_VPP_SK_START,НА СТАРТI СЕРВЕРА,AT A SERVER START
+STR_OZT_VPP_SK_START_H,Це налаштування сторінки Гроші.,These are settings of the Money page.
+STR_OZT_VPP_SK_CUT,Список скорочено сервером.,The server cut the list short.
+STR_OZT_VPP_LV_0,новий,pristine
+STR_OZT_VPP_LV_1,поношений,worn
+STR_OZT_VPP_LV_2,пошкоджений,damaged
+STR_OZT_VPP_LV_3,сильно пошкоджений,badly damaged
+STR_OZT_VPP_MN_TITLE,Гроші й правила,Money and rules
+STR_OZT_VPP_MN_SUB,Налаштування торговців на весь сервер. Гроші окремої точки: сторінка Точки.,The traders' settings for the whole server. A point's own money: the Points page.
+STR_OZT_VPP_MN_SEC_PAY,ЧИМ ПЛАТЯТЬ,HOW THEY PAY
+STR_OZT_VPP_MN_PROV,"Постачальник грошей (id): items, items+<банк>, <банк>","Money provider (id): items, items+<bank>, <bank>"
+STR_OZT_VPP_MN_PROV_H,"Банк, якого на сервері немає: торгівля йде готівкою. Мод-банк додає свій id.",A bank the server does not have: trade goes by cash. A bank mod brings its own id.
+STR_OZT_VPP_MN_SEC_NOTES,КУПЮРИ,BANKNOTES
+STR_OZT_VPP_MN_NOTE_CLS,Клас купюри,Note class
+STR_OZT_VPP_MN_NOTE_VAL,Номінал,Value
+STR_OZT_VPP_MN_NOTE_SET,Записати,Save
+STR_OZT_VPP_MN_NOTE_DEL,Прибрати,Remove
+STR_OZT_VPP_MN_NOTE_NEED,Вкажіть клас і номінал більше нуля,Name a class and a value above zero
+STR_OZT_VPP_MN_NOTE_PICK,Виберіть купюру в списку,Pick a note on the list
+STR_OZT_VPP_MN_HOLDERS,"Гаманці, що заповнюються першими (класи через кому)","Wallets filled first (classes, comma between)"
+STR_OZT_VPP_MN_NOTES_H,Номінали мають ділитися на найменший: тоді решта завжди точна. Ціни округлюються на користь торговця.,Values must divide by the smallest: then change is always exact. Prices round in the trader's favour.
+STR_OZT_VPP_MN_SEC_COND,СТАН РЕЧЕЙ: ЧАСТКА ЦIНИ СКУПКИ,CONDITION: SHARE OF THE SELL PRICE
+STR_OZT_VPP_MN_COND_H,Частка 0..1. Зіпсовані речі торговець не бере ніколи.,"A share, 0..1. A ruined thing is never taken."
+STR_OZT_VPP_MN_SEC_START,СКЛАД НА СТАРТI СЕРВЕРА,STOCK AT A SERVER START
+STR_OZT_VPP_MN_START_0,Не чіпати,Leave it
+STR_OZT_VPP_MN_START_1,Поповнити до Max,Fill to Max
+STR_OZT_VPP_MN_START_2,Випадково до Max,Random up to Max
+STR_OZT_VPP_MN_DESTOCK_YES,Списувати частку з повних рядків: так,Destock a share of full lines: yes
+STR_OZT_VPP_MN_DESTOCK_NO,Списувати частку з повних рядків: ні,Destock a share of full lines: no
+STR_OZT_VPP_MN_PRISTINE_YES,Усе продане йде в рядок нових речей: так,Everything sold goes to the pristine line: yes
+STR_OZT_VPP_MN_PRISTINE_NO,Усе продане йде в рядок нових речей: ні,Everything sold goes to the pristine line: no
+STR_OZT_VPP_MN_SEC_DEALS,ЦIНИ Й УГОДИ,PRICES AND DEALS
+STR_OZT_VPP_MN_FLOOR,Поріг ціни для всіх рядків,Price floor for every line
+STR_OZT_VPP_MN_COOLDOWN,"Пауза між угодами, мс","Pause between deals, ms"
+STR_OZT_VPP_MN_WEAR_YES,Куплене вдягати одразу на вільний слот: так,Put bought things on a free slot: yes
+STR_OZT_VPP_MN_WEAR_NO,Куплене вдягати одразу на вільний слот: ні,Put bought things on a free slot: no
+STR_OZT_VPP_MN_GROUP_YES,Кольори однієї речі за однією ціною на одній плитці: так,Colours of one thing at one price on one tile: yes
+STR_OZT_VPP_MN_GROUP_NO,Кольори однієї речі за однією ціною на одній плитці: ні,Colours of one thing at one price on one tile: no
+STR_OZT_VPP_MN_FLOOR_H,"Поріг 0: без порогу, ціна падає із запасом. Рядок товару може мати свій поріг.","Floor 0: none, the price falls with the stock. A goods line may have its own floor."
+STR_OZT_VPP_LC_SEC_DEF,ЛIЦЕНЗIЯ: ДОДАТИ АБО ЗМIНИТИ,A LICENCE: ADD OR CHANGE
+STR_OZT_VPP_LC_DEF_ID,"Id (літери, цифри, _ і -)","Id (letters, digits, _ and -)"
+STR_OZT_VPP_LC_DEF_NAME,Назва для гравців,Name the players read
+STR_OZT_VPP_LC_DEF_LOOK,"Вигляд (клас, порожньо: Paper)",Look (a class; empty: Paper)
+STR_OZT_VPP_LC_DEF_ADD,Записати,Save
+STR_OZT_VPP_LC_DEF_DEL,Прибрати,Remove
+STR_OZT_VPP_LC_NOT_APPLIED,Цієї ліцензії ще немає на сервері: застосуйте чернетку,The server does not have this licence yet: apply the draft

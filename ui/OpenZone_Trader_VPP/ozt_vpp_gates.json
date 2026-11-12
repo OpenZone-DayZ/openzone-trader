@@ -1,0 +1,917 @@
+{
+  "layout": "ozt_vpp_gates",
+  "note": "Trader > Conditions and discounts (design 5.6, 8.2; mockup TraderGates). Page trader.gates, OZT_VppPaneGates.c: who sees goods and at what price -- the locks and discounts of categories and lines, who may trade at a point, the families switched off -- edited in the draft of the three files. The picker offers what each kind's provider names (gates), research nodes included when the research glue is there.",
+  "root": {
+    "frame": {
+      "name": "PaneTrdGates",
+      "size": "$vpp.content",
+      "hidden": true,
+      "priority": 2,
+      "note": "Hidden: the shell shows the open page's pane, moves it right of the rail and sizes it to the content area.",
+      "children": [
+        {
+          "frame": {
+            "name": "PaneTrdGatesIn",
+            "size": "fill",
+            "children": [
+              {
+                "label": {
+                  "name": "TrdGtTitle",
+                  "at": [
+                    24,
+                    8
+                  ],
+                  "size": [
+                    600,
+                    28
+                  ],
+                  "text": "#STR_OZT_VPP_GT_TITLE",
+                  "font": "title",
+                  "color": "$vppText"
+                }
+              },
+              {
+                "label": {
+                  "name": "TrdGtSub",
+                  "at": [
+                    24,
+                    36
+                  ],
+                  "size": [
+                    640,
+                    18
+                  ],
+                  "text": "#STR_OZT_VPP_GT_SUB",
+                  "font": "small",
+                  "color": "$vppMuted"
+                }
+              },
+              {
+                "button": {
+                  "name": "BtnTrdGtRefresh",
+                  "at": [
+                    24,
+                    15
+                  ],
+                  "size": [
+                    110,
+                    30
+                  ],
+                  "text": "#STR_OZT_VPP_REFRESH",
+                  "font": "small",
+                  "bg": "$vppRaised",
+                  "edge": "$vppEdge",
+                  "color": "$vppText",
+                  "anchor": "right"
+                }
+              },
+              {
+                "panel": {
+                  "name": "TrdGtHeadRule",
+                  "at": [
+                    0,
+                    63
+                  ],
+                  "size": [
+                    1060,
+                    1
+                  ],
+                  "color": "$vppEdge",
+                  "note": "The script sets its width with the window's (TrdLayout)."
+                }
+              },
+              {
+                "button": {
+                  "name": "BtnTrdGtAll",
+                  "at": [
+                    24,
+                    76
+                  ],
+                  "size": [
+                    280,
+                    28
+                  ],
+                  "text": "-",
+                  "font": "small",
+                  "bg": "$vppCell",
+                  "edge": "$vppEdge",
+                  "color": "$vppText",
+                  "note": "The targets with conditions only, or every line of the book."
+                }
+              },
+              {
+                "listbox": {
+                  "name": "TrdGtTargets",
+                  "at": [
+                    24,
+                    110
+                  ],
+                  "size": [
+                    280,
+                    498
+                  ],
+                  "font": "field",
+                  "color": "$vppText",
+                  "props": {
+                    "style": "NoScrollBar",
+                    "title visible": false,
+                    "highlight row": true,
+                    "lines": 19
+                  },
+                  "note": "The server, the categories and their lines, and the points."
+                }
+              },
+              {
+                "frame": {
+                  "name": "TrdGtMid",
+                  "size": [
+                    400,
+                    532
+                  ],
+                  "children": [
+                    {
+                      "label": {
+                        "name": "TrdGtHead",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          400,
+                          24
+                        ],
+                        "text": "#STR_OZT_VPP_GT_PICK",
+                        "font": "header",
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdGtTargetSub",
+                        "at": [
+                          0,
+                          24
+                        ],
+                        "size": [
+                          400,
+                          18
+                        ],
+                        "text": "",
+                        "font": "small",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdGtFamsLbl",
+                        "at": [
+                          0,
+                          48
+                        ],
+                        "size": [
+                          400,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_GT_FAMS",
+                        "font": "tiny",
+                        "color": "$vppAccent"
+                      }
+                    },
+                    {
+                      "listbox": {
+                        "name": "TrdGtFams",
+                        "at": [
+                          0,
+                          66
+                        ],
+                        "size": [
+                          400,
+                          64
+                        ],
+                        "font": "field",
+                        "color": "$vppText",
+                        "props": {
+                          "style": "NoScrollBar",
+                          "title visible": false,
+                          "highlight row": true,
+                          "lines": 3
+                        },
+                        "note": "The gate families here: on the server row the settings' GatesOff, on a point its GatesOn and GatesOff; a click steps the state."
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdGtRowsLbl",
+                        "at": [
+                          0,
+                          138
+                        ],
+                        "size": [
+                          400,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_GT_ROWS",
+                        "font": "tiny",
+                        "color": "$vppAccent"
+                      }
+                    },
+                    {
+                      "listbox": {
+                        "name": "TrdGtRows",
+                        "at": [
+                          0,
+                          156
+                        ],
+                        "size": [
+                          400,
+                          150
+                        ],
+                        "font": "field",
+                        "color": "$vppText",
+                        "props": {
+                          "style": "NoScrollBar",
+                          "title visible": false,
+                          "highlight row": true,
+                          "lines": 6
+                        },
+                        "note": "The lock's conditions and the discounts, a condition a row."
+                      }
+                    },
+                    {
+                      "frame": {
+                        "name": "TrdGtEd",
+                        "size": [
+                          400,
+                          218
+                        ],
+                        "children": [
+                          {
+                            "label": {
+                              "name": "TrdGtKindLbl",
+                              "at": [
+                                0,
+                                0
+                              ],
+                              "size": [
+                                400,
+                                16
+                              ],
+                              "text": "#STR_OZT_VPP_GT_KIND",
+                              "font": "tiny",
+                              "color": "$vppMuted"
+                            }
+                          },
+                          {
+                            "button": {
+                              "name": "BtnTrdGtKindPrev",
+                              "at": [
+                                0,
+                                17
+                              ],
+                              "size": [
+                                30,
+                                30
+                              ],
+                              "text": "<",
+                              "font": "small",
+                              "bg": "$vppRaised",
+                              "edge": "$vppEdge",
+                              "color": "$vppText"
+                            }
+                          },
+                          {
+                            "field": {
+                              "name": "TrdGtKind",
+                              "at": [
+                                36,
+                                18
+                              ],
+                              "size": [
+                                200,
+                                28
+                              ],
+                              "color": "$vppText"
+                            }
+                          },
+                          {
+                            "button": {
+                              "name": "BtnTrdGtKindNext",
+                              "at": [
+                                242,
+                                17
+                              ],
+                              "size": [
+                                30,
+                                30
+                              ],
+                              "text": ">",
+                              "font": "small",
+                              "bg": "$vppRaised",
+                              "edge": "$vppEdge",
+                              "color": "$vppText"
+                            }
+                          },
+                          {
+                            "button": {
+                              "name": "BtnTrdGtNot",
+                              "at": [
+                                280,
+                                17
+                              ],
+                              "size": [
+                                120,
+                                30
+                              ],
+                              "text": "-",
+                              "font": "small",
+                              "bg": "$vppCell",
+                              "edge": "$vppEdge",
+                              "color": "$vppText",
+                              "note": "As written, or turned round (Not)."
+                            }
+                          },
+                          {
+                            "label": {
+                              "name": "TrdGtArgLbl",
+                              "at": [
+                                0,
+                                52
+                              ],
+                              "size": [
+                                400,
+                                16
+                              ],
+                              "text": "#STR_OZT_VPP_GT_ARG",
+                              "font": "tiny",
+                              "color": "$vppMuted"
+                            }
+                          },
+                          {
+                            "field": {
+                              "name": "TrdGtArg",
+                              "at": [
+                                0,
+                                70
+                              ],
+                              "size": [
+                                400,
+                                28
+                              ],
+                              "color": "$vppText"
+                            }
+                          },
+                          {
+                            "label": {
+                              "name": "TrdGtPctLbl",
+                              "at": [
+                                0,
+                                104
+                              ],
+                              "size": [
+                                120,
+                                16
+                              ],
+                              "text": "#STR_OZT_VPP_GT_PCT",
+                              "font": "tiny",
+                              "color": "$vppMuted"
+                            }
+                          },
+                          {
+                            "field": {
+                              "name": "TrdGtPct",
+                              "at": [
+                                0,
+                                122
+                              ],
+                              "size": [
+                                120,
+                                28
+                              ],
+                              "color": "$vppText"
+                            }
+                          },
+                          {
+                            "label": {
+                              "name": "TrdGtMaxLbl",
+                              "at": [
+                                130,
+                                104
+                              ],
+                              "size": [
+                                120,
+                                16
+                              ],
+                              "text": "#STR_OZT_VPP_GT_MAX",
+                              "font": "tiny",
+                              "color": "$vppMuted"
+                            }
+                          },
+                          {
+                            "field": {
+                              "name": "TrdGtMax",
+                              "at": [
+                                130,
+                                122
+                              ],
+                              "size": [
+                                120,
+                                28
+                              ],
+                              "color": "$vppText"
+                            }
+                          },
+                          {
+                            "button": {
+                              "name": "BtnTrdGtMode",
+                              "at": [
+                                260,
+                                121
+                              ],
+                              "size": [
+                                140,
+                                30
+                              ],
+                              "text": "-",
+                              "font": "small",
+                              "bg": "$vppCell",
+                              "edge": "$vppEdge",
+                              "color": "$vppText",
+                              "note": "A new discount: given while its conditions hold, or computed by its provider."
+                            }
+                          },
+                          {
+                            "button": {
+                              "name": "BtnTrdGtSave",
+                              "at": [
+                                0,
+                                158
+                              ],
+                              "size": [
+                                130,
+                                28
+                              ],
+                              "text": "#STR_OZT_VPP_GT_SAVE",
+                              "font": "small",
+                              "bg": "$vppRaised",
+                              "edge": "$vppEdge",
+                              "color": "$vppText"
+                            }
+                          },
+                          {
+                            "button": {
+                              "name": "BtnTrdGtDel",
+                              "at": [
+                                136,
+                                158
+                              ],
+                              "size": [
+                                130,
+                                28
+                              ],
+                              "text": "#STR_OZT_VPP_GT_DEL",
+                              "font": "small",
+                              "bg": "$vppRaised",
+                              "edge": "$vppBad",
+                              "color": "$vppBad"
+                            }
+                          },
+                          {
+                            "button": {
+                              "name": "BtnTrdGtAddAnd",
+                              "at": [
+                                272,
+                                158
+                              ],
+                              "size": [
+                                128,
+                                28
+                              ],
+                              "text": "#STR_OZT_VPP_GT_ADD_AND",
+                              "font": "small",
+                              "bg": "$vppRaised",
+                              "edge": "$vppEdge",
+                              "color": "$vppText"
+                            }
+                          },
+                          {
+                            "button": {
+                              "name": "BtnTrdGtAddLock",
+                              "at": [
+                                0,
+                                190
+                              ],
+                              "size": [
+                                197,
+                                28
+                              ],
+                              "text": "#STR_OZT_VPP_GT_ADD_LOCK",
+                              "font": "small",
+                              "bg": "$vppRaised",
+                              "edge": "$vppOk",
+                              "color": "$vppOk"
+                            }
+                          },
+                          {
+                            "button": {
+                              "name": "BtnTrdGtAddDisc",
+                              "at": [
+                                203,
+                                190
+                              ],
+                              "size": [
+                                197,
+                                28
+                              ],
+                              "text": "#STR_OZT_VPP_GT_ADD_DISC",
+                              "font": "small",
+                              "bg": "$vppRaised",
+                              "edge": "$vppOk",
+                              "color": "$vppOk"
+                            }
+                          }
+                        ],
+                        "at": [
+                          0,
+                          314
+                        ],
+                        "note": "The picked row's condition, or a new one."
+                      }
+                    }
+                  ],
+                  "at": [
+                    320,
+                    76
+                  ]
+                }
+              },
+              {
+                "frame": {
+                  "name": "TrdGtRight",
+                  "size": [
+                    300,
+                    532
+                  ],
+                  "children": [
+                    {
+                      "label": {
+                        "name": "TrdGtPickHead",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          300,
+                          24
+                        ],
+                        "text": "#STR_OZT_VPP_GT_PICKER",
+                        "font": "header",
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdGtPickSub",
+                        "at": [
+                          0,
+                          24
+                        ],
+                        "size": [
+                          300,
+                          18
+                        ],
+                        "text": "",
+                        "font": "small",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdGtPickFind",
+                        "at": [
+                          0,
+                          46
+                        ],
+                        "size": [
+                          300,
+                          28
+                        ],
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "listbox": {
+                        "name": "TrdGtPick",
+                        "at": [
+                          0,
+                          80
+                        ],
+                        "size": [
+                          300,
+                          300
+                        ],
+                        "font": "field",
+                        "color": "$vppText",
+                        "props": {
+                          "style": "NoScrollBar",
+                          "title visible": false,
+                          "highlight row": true,
+                          "lines": 12
+                        },
+                        "note": "The values the kind's provider offers (gates), filtered by the field above."
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdGtPickSet",
+                        "at": [
+                          0,
+                          386
+                        ],
+                        "size": [
+                          146,
+                          28
+                        ],
+                        "text": "#STR_OZT_VPP_GT_PICK_SET",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppEdge",
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdGtPickAdd",
+                        "at": [
+                          154,
+                          386
+                        ],
+                        "size": [
+                          146,
+                          28
+                        ],
+                        "text": "#STR_OZT_VPP_GT_PICK_ADD",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppOk",
+                        "color": "$vppOk"
+                      }
+                    },
+                    {
+                      "text": {
+                        "name": "TrdGtHolders",
+                        "at": [
+                          0,
+                          422
+                        ],
+                        "size": [
+                          300,
+                          110
+                        ],
+                        "plain": true,
+                        "grow": false,
+                        "font": "small",
+                        "color": "$vppMuted",
+                        "text": ""
+                      }
+                    }
+                  ],
+                  "at": [
+                    736,
+                    76
+                  ],
+                  "note": "The value picker of the condition's kind; the script keeps it at the right edge."
+                }
+              },
+              {
+                "panel": {
+                  "name": "TrdGtProbs",
+                  "at": [
+                    0,
+                    56
+                  ],
+                  "size": [
+                    1060,
+                    150
+                  ],
+                  "color": "$vppPanel",
+                  "children": [
+                    {
+                      "panel": {
+                        "name": "TrdGtProbsLine",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          1060,
+                          1
+                        ],
+                        "color": "$vppEdge"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdGtProbsHead",
+                        "at": [
+                          24,
+                          6
+                        ],
+                        "size": [
+                          700,
+                          20
+                        ],
+                        "text": "#STR_OZT_VPP_PROBS_HEAD",
+                        "font": "small",
+                        "color": "$vppAlert"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdGtProbsClose",
+                        "at": [
+                          24,
+                          4
+                        ],
+                        "size": [
+                          100,
+                          24
+                        ],
+                        "text": "#STR_OZT_VPP_CLOSE",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppEdge",
+                        "color": "$vppText",
+                        "anchor": "right"
+                      }
+                    },
+                    {
+                      "listbox": {
+                        "name": "TrdGtProbsList",
+                        "at": [
+                          24,
+                          32
+                        ],
+                        "size": [
+                          1012,
+                          110
+                        ],
+                        "font": "field",
+                        "color": "$vppText",
+                        "props": {
+                          "style": "NoScrollBar",
+                          "title visible": false,
+                          "highlight row": true,
+                          "lines": 5
+                        }
+                      }
+                    }
+                  ],
+                  "anchor": "bottom",
+                  "hidden": true,
+                  "note": "The problems the server's last load reported, shown after an apply and on the bar's button."
+                }
+              },
+              {
+                "panel": {
+                  "name": "TrdGtBar",
+                  "at": [
+                    0,
+                    0
+                  ],
+                  "size": [
+                    1060,
+                    56
+                  ],
+                  "color": "$vppHead",
+                  "children": [
+                    {
+                      "panel": {
+                        "name": "TrdGtBarLine",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          1060,
+                          1
+                        ],
+                        "color": "$vppEdge"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdGtBarTag",
+                        "at": [
+                          24,
+                          8
+                        ],
+                        "size": [
+                          180,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_DRAFT",
+                        "font": "tiny",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdGtBarState",
+                        "at": [
+                          24,
+                          26
+                        ],
+                        "size": [
+                          200,
+                          20
+                        ],
+                        "text": "-",
+                        "font": "small",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdGtProbs",
+                        "at": [
+                          232,
+                          12
+                        ],
+                        "size": [
+                          190,
+                          32
+                        ],
+                        "text": "#STR_OZT_VPP_PROBS_NONE",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppEdge",
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdGtBarNote",
+                        "at": [
+                          430,
+                          12
+                        ],
+                        "size": [
+                          250,
+                          32
+                        ],
+                        "text": "",
+                        "font": "small",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdGtDiscard",
+                        "at": [
+                          172,
+                          12
+                        ],
+                        "size": [
+                          140,
+                          32
+                        ],
+                        "text": "#STR_OZT_VPP_DISCARD",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppBad",
+                        "color": "$vppBad",
+                        "anchor": "right"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdGtApply",
+                        "at": [
+                          24,
+                          12
+                        ],
+                        "size": [
+                          140,
+                          32
+                        ],
+                        "text": "#STR_OZT_VPP_APPLY",
+                        "font": "small",
+                        "bg": "$vppAccent",
+                        "edge": "$vppAccent",
+                        "color": "$vppScreen",
+                        "anchor": "right"
+                      }
+                    }
+                  ],
+                  "anchor": "bottom",
+                  "note": "The draft of the trader's three files, shared by every page that edits them; the script writes the state."
+                }
+              }
+            ],
+            "note": "Proportional: follows the pane when the shell resizes it; the script places the rest (TrdLayout)."
+          }
+        }
+      ]
+    }
+  }
+}

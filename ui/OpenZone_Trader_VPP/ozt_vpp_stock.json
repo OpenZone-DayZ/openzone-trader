@@ -1,0 +1,367 @@
+{
+  "layout": "ozt_vpp_stock",
+  "note": "Trader > Stock (design 5.6, 11.1; mockup TraderStock). Page trader.stock, OZT_VppPaneStock.c: the stock of each point by condition (stock_list) and the count of a line set by hand (stock_set).",
+  "root": {
+    "frame": {
+      "name": "PaneTrdStock",
+      "size": "$vpp.content",
+      "hidden": true,
+      "priority": 2,
+      "note": "Hidden: the shell shows the open page's pane, moves it right of the rail and sizes it to the content area.",
+      "children": [
+        {
+          "frame": {
+            "name": "PaneTrdStockIn",
+            "size": "fill",
+            "children": [
+              {
+                "label": {
+                  "name": "TrdSkTitle",
+                  "at": [
+                    24,
+                    8
+                  ],
+                  "size": [
+                    600,
+                    28
+                  ],
+                  "text": "#STR_OZT_VPP_SK_TITLE",
+                  "font": "title",
+                  "color": "$vppText"
+                }
+              },
+              {
+                "label": {
+                  "name": "TrdSkSub",
+                  "at": [
+                    24,
+                    36
+                  ],
+                  "size": [
+                    640,
+                    18
+                  ],
+                  "text": "#STR_OZT_VPP_SK_SUB",
+                  "font": "small",
+                  "color": "$vppMuted"
+                }
+              },
+              {
+                "button": {
+                  "name": "BtnTrdSkRefresh",
+                  "at": [
+                    24,
+                    15
+                  ],
+                  "size": [
+                    110,
+                    30
+                  ],
+                  "text": "#STR_OZT_VPP_REFRESH",
+                  "font": "small",
+                  "bg": "$vppRaised",
+                  "edge": "$vppEdge",
+                  "color": "$vppText",
+                  "anchor": "right"
+                }
+              },
+              {
+                "panel": {
+                  "name": "TrdSkHeadRule",
+                  "at": [
+                    0,
+                    63
+                  ],
+                  "size": [
+                    1060,
+                    1
+                  ],
+                  "color": "$vppEdge",
+                  "note": "The script sets its width with the window's (TrdLayout)."
+                }
+              },
+              {
+                "label": {
+                  "name": "TrdSkPointsLbl",
+                  "at": [
+                    24,
+                    76
+                  ],
+                  "size": [
+                    260,
+                    16
+                  ],
+                  "text": "#STR_OZT_VPP_SK_POINTS",
+                  "font": "tiny",
+                  "color": "$vppAccent"
+                }
+              },
+              {
+                "listbox": {
+                  "name": "TrdSkPoints",
+                  "at": [
+                    24,
+                    96
+                  ],
+                  "size": [
+                    260,
+                    560
+                  ],
+                  "font": "field",
+                  "color": "$vppText",
+                  "props": {
+                    "style": "NoScrollBar",
+                    "title visible": false,
+                    "highlight row": true,
+                    "lines": 21
+                  },
+                  "note": "The points and the stock each sells from (points that name one stock share one shelf)."
+                }
+              },
+              {
+                "label": {
+                  "name": "TrdSkLinesLbl",
+                  "at": [
+                    300,
+                    76
+                  ],
+                  "size": [
+                    420,
+                    16
+                  ],
+                  "text": "#STR_OZT_VPP_SK_LINES",
+                  "font": "tiny",
+                  "color": "$vppAccent"
+                }
+              },
+              {
+                "listbox": {
+                  "name": "TrdSkLines",
+                  "at": [
+                    300,
+                    96
+                  ],
+                  "size": [
+                    420,
+                    560
+                  ],
+                  "font": "field",
+                  "color": "$vppText",
+                  "props": {
+                    "style": "NoScrollBar",
+                    "title visible": false,
+                    "highlight row": true,
+                    "lines": 21
+                  },
+                  "note": "The picked point's stocked lines by category: the count in each condition and the Max."
+                }
+              },
+              {
+                "frame": {
+                  "name": "TrdSkRight",
+                  "size": [
+                    300,
+                    580
+                  ],
+                  "children": [
+                    {
+                      "label": {
+                        "name": "TrdSkHead",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          300,
+                          24
+                        ],
+                        "text": "#STR_OZT_VPP_SK_PICK",
+                        "font": "header",
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdSkLnSub",
+                        "at": [
+                          0,
+                          24
+                        ],
+                        "size": [
+                          300,
+                          18
+                        ],
+                        "text": "",
+                        "font": "small",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdSkLevelLbl",
+                        "at": [
+                          0,
+                          50
+                        ],
+                        "size": [
+                          300,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_SK_LEVEL",
+                        "font": "tiny",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdSkLevel",
+                        "at": [
+                          0,
+                          68
+                        ],
+                        "size": [
+                          300,
+                          30
+                        ],
+                        "text": "-",
+                        "font": "small",
+                        "bg": "$vppCell",
+                        "edge": "$vppEdge",
+                        "color": "$vppText",
+                        "note": "Steps through the conditions: pristine, worn, damaged, badly damaged."
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdSkCountLbl",
+                        "at": [
+                          0,
+                          106
+                        ],
+                        "size": [
+                          300,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_SK_COUNT",
+                        "font": "tiny",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdSkMinus",
+                        "at": [
+                          0,
+                          123
+                        ],
+                        "size": [
+                          40,
+                          30
+                        ],
+                        "text": "-",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppEdge",
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdSkCount",
+                        "at": [
+                          46,
+                          124
+                        ],
+                        "size": [
+                          208,
+                          28
+                        ],
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdSkPlus",
+                        "at": [
+                          260,
+                          123
+                        ],
+                        "size": [
+                          40,
+                          30
+                        ],
+                        "text": "+",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppEdge",
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdSkSet",
+                        "at": [
+                          0,
+                          160
+                        ],
+                        "size": [
+                          300,
+                          32
+                        ],
+                        "text": "#STR_OZT_VPP_SK_SET",
+                        "font": "small",
+                        "bg": "$vppAccent",
+                        "edge": "$vppAccent",
+                        "color": "$vppScreen"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdSkMaxInfo",
+                        "at": [
+                          0,
+                          198
+                        ],
+                        "size": [
+                          300,
+                          20
+                        ],
+                        "text": "",
+                        "font": "small",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "text": {
+                        "name": "TrdSkStart",
+                        "at": [
+                          0,
+                          228
+                        ],
+                        "size": [
+                          300,
+                          160
+                        ],
+                        "plain": true,
+                        "grow": false,
+                        "font": "small",
+                        "color": "$vppMuted",
+                        "text": ""
+                      }
+                    }
+                  ],
+                  "at": [
+                    736,
+                    76
+                  ],
+                  "note": "The picked line's count in one condition (stock_set)."
+                }
+              }
+            ],
+            "note": "Proportional: follows the pane when the shell resizes it; the script places the rest (TrdLayout)."
+          }
+        }
+      ]
+    }
+  }
+}

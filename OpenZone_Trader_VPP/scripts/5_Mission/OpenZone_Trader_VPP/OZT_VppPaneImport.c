@@ -104,6 +104,9 @@ modded class OZ_VppAdminMenu
             when = TrdTr("#STR_OZT_VPP_IM_WHEN_APPLY");
             // The three files and the points are new on the server.
             Ask(OZT_Const.SECTION_ADMIN, "list", "{}");
+            TrdReread(OZT_Const.CFG_SETTINGS);
+            TrdReread(OZT_Const.CFG_GOODS);
+            TrdReread(OZT_Const.CFG_TRADERS);
         }
         SayTrd("TrdImWhen", when + "  " + OZ_VppJournal.Clock());
         TrdImPaintSteps();
@@ -144,6 +147,13 @@ modded class OZ_VppAdminMenu
             }
             if (nm == "BtnTrdImApply")
             {
+                // The import writes the three files: a draft that changed one
+                // would write its older copy over the import on its apply.
+                if (m_TrdDraft && m_TrdDraft.Changed() > 0)
+                {
+                    Hint(TrdTr("#STR_OZT_VPP_DRAFT_FIRST"));
+                    return true;
+                }
                 Confirm(TrdTr("#STR_OZT_VPP_IM_APPLY_ASK"), "#STR_OZT_VPP_YES_APPLY", "trd:import");
                 return true;
             }

@@ -145,11 +145,167 @@
                       }
                     },
                     {
+                      "label": {
+                        "name": "TrdLcSecDef",
+                        "at": [
+                          0,
+                          284
+                        ],
+                        "size": [
+                          556,
+                          18
+                        ],
+                        "text": "#STR_OZT_VPP_LC_SEC_DEF",
+                        "font": "tiny",
+                        "color": "$vppAccent"
+                      }
+                    },
+                    {
+                      "panel": {
+                        "name": "TrdLcSecDefRule",
+                        "at": [
+                          0,
+                          303
+                        ],
+                        "size": [
+                          556,
+                          1
+                        ],
+                        "color": "$vppEdge"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdLcDefIdLbl",
+                        "at": [
+                          0,
+                          310
+                        ],
+                        "size": [
+                          180,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_LC_DEF_ID",
+                        "font": "tiny",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdLcDefId",
+                        "at": [
+                          0,
+                          328
+                        ],
+                        "size": [
+                          180,
+                          28
+                        ],
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdLcDefNameLbl",
+                        "at": [
+                          188,
+                          310
+                        ],
+                        "size": [
+                          180,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_LC_DEF_NAME",
+                        "font": "tiny",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdLcDefName",
+                        "at": [
+                          188,
+                          328
+                        ],
+                        "size": [
+                          180,
+                          28
+                        ],
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdLcDefLookLbl",
+                        "at": [
+                          376,
+                          310
+                        ],
+                        "size": [
+                          180,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_LC_DEF_LOOK",
+                        "font": "tiny",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdLcDefLook",
+                        "at": [
+                          376,
+                          328
+                        ],
+                        "size": [
+                          180,
+                          28
+                        ],
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdLcDefAdd",
+                        "at": [
+                          0,
+                          364
+                        ],
+                        "size": [
+                          180,
+                          30
+                        ],
+                        "text": "#STR_OZT_VPP_LC_DEF_ADD",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppOk",
+                        "color": "$vppOk"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdLcDefDel",
+                        "at": [
+                          188,
+                          364
+                        ],
+                        "size": [
+                          180,
+                          30
+                        ],
+                        "text": "#STR_OZT_VPP_LC_DEF_DEL",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppBad",
+                        "color": "$vppBad"
+                      }
+                    },
+                    {
                       "text": {
                         "name": "TrdLcNote",
                         "at": [
                           0,
-                          284
+                          402
                         ],
                         "size": [
                           556,
@@ -404,6 +560,231 @@
                     76
                   ],
                   "note": "Grant or take back; the script keeps it at the right edge."
+                }
+              },
+              {
+                "panel": {
+                  "name": "TrdLcProbs",
+                  "at": [
+                    0,
+                    56
+                  ],
+                  "size": [
+                    1060,
+                    150
+                  ],
+                  "color": "$vppPanel",
+                  "children": [
+                    {
+                      "panel": {
+                        "name": "TrdLcProbsLine",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          1060,
+                          1
+                        ],
+                        "color": "$vppEdge"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdLcProbsHead",
+                        "at": [
+                          24,
+                          6
+                        ],
+                        "size": [
+                          700,
+                          20
+                        ],
+                        "text": "#STR_OZT_VPP_PROBS_HEAD",
+                        "font": "small",
+                        "color": "$vppAlert"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdLcProbsClose",
+                        "at": [
+                          24,
+                          4
+                        ],
+                        "size": [
+                          100,
+                          24
+                        ],
+                        "text": "#STR_OZT_VPP_CLOSE",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppEdge",
+                        "color": "$vppText",
+                        "anchor": "right"
+                      }
+                    },
+                    {
+                      "listbox": {
+                        "name": "TrdLcProbsList",
+                        "at": [
+                          24,
+                          32
+                        ],
+                        "size": [
+                          1012,
+                          110
+                        ],
+                        "font": "field",
+                        "color": "$vppText",
+                        "props": {
+                          "style": "NoScrollBar",
+                          "title visible": false,
+                          "highlight row": true,
+                          "lines": 5
+                        }
+                      }
+                    }
+                  ],
+                  "anchor": "bottom",
+                  "hidden": true,
+                  "note": "The problems the server's last load reported, shown after an apply and on the bar's button."
+                }
+              },
+              {
+                "panel": {
+                  "name": "TrdLcBar",
+                  "at": [
+                    0,
+                    0
+                  ],
+                  "size": [
+                    1060,
+                    56
+                  ],
+                  "color": "$vppHead",
+                  "children": [
+                    {
+                      "panel": {
+                        "name": "TrdLcBarLine",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          1060,
+                          1
+                        ],
+                        "color": "$vppEdge"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdLcBarTag",
+                        "at": [
+                          24,
+                          8
+                        ],
+                        "size": [
+                          180,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_DRAFT",
+                        "font": "tiny",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdLcBarState",
+                        "at": [
+                          24,
+                          26
+                        ],
+                        "size": [
+                          200,
+                          20
+                        ],
+                        "text": "-",
+                        "font": "small",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdLcProbs",
+                        "at": [
+                          232,
+                          12
+                        ],
+                        "size": [
+                          190,
+                          32
+                        ],
+                        "text": "#STR_OZT_VPP_PROBS_NONE",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppEdge",
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdLcBarNote",
+                        "at": [
+                          430,
+                          12
+                        ],
+                        "size": [
+                          250,
+                          32
+                        ],
+                        "text": "",
+                        "font": "small",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdLcDiscard",
+                        "at": [
+                          172,
+                          12
+                        ],
+                        "size": [
+                          140,
+                          32
+                        ],
+                        "text": "#STR_OZT_VPP_DISCARD",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppBad",
+                        "color": "$vppBad",
+                        "anchor": "right"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdLcApply",
+                        "at": [
+                          24,
+                          12
+                        ],
+                        "size": [
+                          140,
+                          32
+                        ],
+                        "text": "#STR_OZT_VPP_APPLY",
+                        "font": "small",
+                        "bg": "$vppAccent",
+                        "edge": "$vppAccent",
+                        "color": "$vppScreen",
+                        "anchor": "right"
+                      }
+                    }
+                  ],
+                  "anchor": "bottom",
+                  "note": "The draft of the trader's three files, shared by every page that edits them; the script writes the state."
                 }
               }
             ],

@@ -1,0 +1,924 @@
+{
+  "layout": "ozt_vpp_goods",
+  "note": "Trader > Goods (design 5.6, 8; mockup TraderGoods). Page trader.goods, OZT_VppPaneGoods.c: the price book's categories and lines, edited in the draft of the goods file and applied by the bar (cfg_set trader_goods).",
+  "root": {
+    "frame": {
+      "name": "PaneTrdGoods",
+      "size": "$vpp.content",
+      "hidden": true,
+      "priority": 2,
+      "note": "Hidden: the shell shows the open page's pane, moves it right of the rail and sizes it to the content area.",
+      "children": [
+        {
+          "frame": {
+            "name": "PaneTrdGoodsIn",
+            "size": "fill",
+            "children": [
+              {
+                "label": {
+                  "name": "TrdGdTitle",
+                  "at": [
+                    24,
+                    8
+                  ],
+                  "size": [
+                    600,
+                    28
+                  ],
+                  "text": "#STR_OZT_VPP_GD_TITLE",
+                  "font": "title",
+                  "color": "$vppText"
+                }
+              },
+              {
+                "label": {
+                  "name": "TrdGdSub",
+                  "at": [
+                    24,
+                    36
+                  ],
+                  "size": [
+                    640,
+                    18
+                  ],
+                  "text": "#STR_OZT_VPP_GD_SUB",
+                  "font": "small",
+                  "color": "$vppMuted"
+                }
+              },
+              {
+                "panel": {
+                  "name": "TrdGdHeadRule",
+                  "at": [
+                    0,
+                    63
+                  ],
+                  "size": [
+                    1060,
+                    1
+                  ],
+                  "color": "$vppEdge",
+                  "note": "The script sets its width with the window's (TrdLayout)."
+                }
+              },
+              {
+                "label": {
+                  "name": "TrdGdCatsHead",
+                  "at": [
+                    24,
+                    76
+                  ],
+                  "size": [
+                    230,
+                    18
+                  ],
+                  "text": "#STR_OZT_VPP_GD_CATS",
+                  "font": "tiny",
+                  "color": "$vppAccent"
+                }
+              },
+              {
+                "listbox": {
+                  "name": "TrdGdCats",
+                  "at": [
+                    24,
+                    96
+                  ],
+                  "size": [
+                    230,
+                    380
+                  ],
+                  "font": "field",
+                  "color": "$vppText",
+                  "props": {
+                    "style": "NoScrollBar",
+                    "title visible": false,
+                    "highlight row": true,
+                    "lines": 14
+                  },
+                  "note": "The price book's categories: name, id, lines; a lock or a discount marked."
+                }
+              },
+              {
+                "frame": {
+                  "name": "TrdGdCatForm",
+                  "size": [
+                    230,
+                    126
+                  ],
+                  "children": [
+                    {
+                      "label": {
+                        "name": "TrdGdCatIdLbl",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          230,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_GD_CAT_ID",
+                        "font": "tiny",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdGdCatId",
+                        "at": [
+                          0,
+                          18
+                        ],
+                        "size": [
+                          230,
+                          28
+                        ],
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdGdCatNameLbl",
+                        "at": [
+                          0,
+                          50
+                        ],
+                        "size": [
+                          230,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_GD_CAT_NAME",
+                        "font": "tiny",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdGdCatName",
+                        "at": [
+                          0,
+                          68
+                        ],
+                        "size": [
+                          230,
+                          28
+                        ],
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdGdCatAdd",
+                        "at": [
+                          0,
+                          100
+                        ],
+                        "size": [
+                          111,
+                          26
+                        ],
+                        "text": "#STR_OZT_VPP_GD_CAT_ADD",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppOk",
+                        "color": "$vppOk"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdGdCatDel",
+                        "at": [
+                          119,
+                          100
+                        ],
+                        "size": [
+                          111,
+                          26
+                        ],
+                        "text": "#STR_OZT_VPP_GD_CAT_DEL",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppBad",
+                        "color": "$vppBad"
+                      }
+                    }
+                  ],
+                  "at": [
+                    24,
+                    482
+                  ],
+                  "note": "The picked category's id and name; the script keeps it under the list."
+                }
+              },
+              {
+                "label": {
+                  "name": "TrdGdFindLbl",
+                  "at": [
+                    270,
+                    76
+                  ],
+                  "size": [
+                    420,
+                    18
+                  ],
+                  "text": "#STR_OZT_VPP_GD_FIND",
+                  "font": "tiny",
+                  "color": "$vppMuted"
+                }
+              },
+              {
+                "field": {
+                  "name": "TrdGdFind",
+                  "at": [
+                    270,
+                    96
+                  ],
+                  "size": [
+                    420,
+                    28
+                  ],
+                  "color": "$vppText"
+                }
+              },
+              {
+                "listbox": {
+                  "name": "TrdGdLines",
+                  "at": [
+                    270,
+                    130
+                  ],
+                  "size": [
+                    420,
+                    478
+                  ],
+                  "font": "field",
+                  "color": "$vppText",
+                  "props": {
+                    "style": "NoScrollBar",
+                    "title visible": false,
+                    "highlight row": true,
+                    "lines": 18
+                  },
+                  "note": "The picked category's lines: class, buy / sell, the quantity rule, the stock, a lock or a discount."
+                }
+              },
+              {
+                "frame": {
+                  "name": "TrdGdForm",
+                  "size": [
+                    330,
+                    532
+                  ],
+                  "children": [
+                    {
+                      "label": {
+                        "name": "TrdGdLnHead",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          330,
+                          24
+                        ],
+                        "text": "#STR_OZT_VPP_GD_PICK",
+                        "font": "header",
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdGdLnSub",
+                        "at": [
+                          0,
+                          24
+                        ],
+                        "size": [
+                          330,
+                          18
+                        ],
+                        "text": "",
+                        "font": "small",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdGdClsLbl",
+                        "at": [
+                          0,
+                          48
+                        ],
+                        "size": [
+                          330,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_GD_CLASS",
+                        "font": "tiny",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdGdCls",
+                        "at": [
+                          0,
+                          66
+                        ],
+                        "size": [
+                          330,
+                          28
+                        ],
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdGdBuyLbl",
+                        "at": [
+                          0,
+                          100
+                        ],
+                        "size": [
+                          160,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_GD_BUY",
+                        "font": "tiny",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdGdBuy",
+                        "at": [
+                          0,
+                          118
+                        ],
+                        "size": [
+                          160,
+                          28
+                        ],
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdGdSellLbl",
+                        "at": [
+                          170,
+                          100
+                        ],
+                        "size": [
+                          160,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_GD_SELL",
+                        "font": "tiny",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdGdSell",
+                        "at": [
+                          170,
+                          118
+                        ],
+                        "size": [
+                          160,
+                          28
+                        ],
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdGdRuleLbl",
+                        "at": [
+                          0,
+                          152
+                        ],
+                        "size": [
+                          330,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_GD_RULE",
+                        "font": "tiny",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdGdRule",
+                        "at": [
+                          0,
+                          170
+                        ],
+                        "size": [
+                          330,
+                          30
+                        ],
+                        "text": "-",
+                        "font": "small",
+                        "bg": "$vppCell",
+                        "edge": "$vppEdge",
+                        "color": "$vppText",
+                        "note": "Steps through the quantity rules: by the piece, by the unit, by a full one."
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdGdSecStock",
+                        "at": [
+                          0,
+                          208
+                        ],
+                        "size": [
+                          330,
+                          18
+                        ],
+                        "text": "#STR_OZT_VPP_GD_SEC_STOCK",
+                        "font": "tiny",
+                        "color": "$vppAccent"
+                      }
+                    },
+                    {
+                      "panel": {
+                        "name": "TrdGdSecStockRule",
+                        "at": [
+                          0,
+                          227
+                        ],
+                        "size": [
+                          330,
+                          1
+                        ],
+                        "color": "$vppEdge"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdGdStk",
+                        "at": [
+                          0,
+                          232
+                        ],
+                        "size": [
+                          330,
+                          30
+                        ],
+                        "text": "-",
+                        "font": "small",
+                        "bg": "$vppCell",
+                        "edge": "$vppEdge",
+                        "color": "$vppText",
+                        "note": "Finite stock on or off: off is unlimited goods."
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdGdMaxLbl",
+                        "at": [
+                          0,
+                          268
+                        ],
+                        "size": [
+                          160,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_GD_MAX",
+                        "font": "tiny",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdGdMax",
+                        "at": [
+                          0,
+                          286
+                        ],
+                        "size": [
+                          160,
+                          28
+                        ],
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdGdCoefLbl",
+                        "at": [
+                          170,
+                          268
+                        ],
+                        "size": [
+                          160,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_GD_COEF",
+                        "font": "tiny",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdGdCoef",
+                        "at": [
+                          170,
+                          286
+                        ],
+                        "size": [
+                          160,
+                          28
+                        ],
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdGdDestLbl",
+                        "at": [
+                          0,
+                          320
+                        ],
+                        "size": [
+                          160,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_GD_DEST",
+                        "font": "tiny",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdGdDest",
+                        "at": [
+                          0,
+                          338
+                        ],
+                        "size": [
+                          160,
+                          28
+                        ],
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdGdFloorLbl",
+                        "at": [
+                          170,
+                          320
+                        ],
+                        "size": [
+                          160,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_GD_FLOOR",
+                        "font": "tiny",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdGdFloor",
+                        "at": [
+                          170,
+                          338
+                        ],
+                        "size": [
+                          160,
+                          28
+                        ],
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdGdWithLbl",
+                        "at": [
+                          0,
+                          372
+                        ],
+                        "size": [
+                          330,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_GD_WITH",
+                        "font": "tiny",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdGdWith",
+                        "at": [
+                          0,
+                          390
+                        ],
+                        "size": [
+                          330,
+                          28
+                        ],
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "text": {
+                        "name": "TrdGdCheck",
+                        "at": [
+                          0,
+                          424
+                        ],
+                        "size": [
+                          330,
+                          64
+                        ],
+                        "plain": true,
+                        "grow": false,
+                        "font": "small",
+                        "color": "$vppMuted",
+                        "text": ""
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdGdLnAdd",
+                        "at": [
+                          0,
+                          494
+                        ],
+                        "size": [
+                          160,
+                          30
+                        ],
+                        "text": "#STR_OZT_VPP_GD_LN_ADD",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppOk",
+                        "color": "$vppOk"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdGdLnDel",
+                        "at": [
+                          170,
+                          494
+                        ],
+                        "size": [
+                          160,
+                          30
+                        ],
+                        "text": "#STR_OZT_VPP_GD_LN_DEL",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppBad",
+                        "color": "$vppBad"
+                      }
+                    }
+                  ],
+                  "at": [
+                    706,
+                    76
+                  ],
+                  "note": "The picked line, edited in the draft of the goods file; the script keeps it at the right edge."
+                }
+              },
+              {
+                "panel": {
+                  "name": "TrdGdProbs",
+                  "at": [
+                    0,
+                    56
+                  ],
+                  "size": [
+                    1060,
+                    150
+                  ],
+                  "color": "$vppPanel",
+                  "children": [
+                    {
+                      "panel": {
+                        "name": "TrdGdProbsLine",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          1060,
+                          1
+                        ],
+                        "color": "$vppEdge"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdGdProbsHead",
+                        "at": [
+                          24,
+                          6
+                        ],
+                        "size": [
+                          700,
+                          20
+                        ],
+                        "text": "#STR_OZT_VPP_PROBS_HEAD",
+                        "font": "small",
+                        "color": "$vppAlert"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdGdProbsClose",
+                        "at": [
+                          24,
+                          4
+                        ],
+                        "size": [
+                          100,
+                          24
+                        ],
+                        "text": "#STR_OZT_VPP_CLOSE",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppEdge",
+                        "color": "$vppText",
+                        "anchor": "right"
+                      }
+                    },
+                    {
+                      "listbox": {
+                        "name": "TrdGdProbsList",
+                        "at": [
+                          24,
+                          32
+                        ],
+                        "size": [
+                          1012,
+                          110
+                        ],
+                        "font": "field",
+                        "color": "$vppText",
+                        "props": {
+                          "style": "NoScrollBar",
+                          "title visible": false,
+                          "highlight row": true,
+                          "lines": 5
+                        }
+                      }
+                    }
+                  ],
+                  "anchor": "bottom",
+                  "hidden": true,
+                  "note": "The problems the server's last load reported, shown after an apply and on the bar's button."
+                }
+              },
+              {
+                "panel": {
+                  "name": "TrdGdBar",
+                  "at": [
+                    0,
+                    0
+                  ],
+                  "size": [
+                    1060,
+                    56
+                  ],
+                  "color": "$vppHead",
+                  "children": [
+                    {
+                      "panel": {
+                        "name": "TrdGdBarLine",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          1060,
+                          1
+                        ],
+                        "color": "$vppEdge"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdGdBarTag",
+                        "at": [
+                          24,
+                          8
+                        ],
+                        "size": [
+                          180,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_DRAFT",
+                        "font": "tiny",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdGdBarState",
+                        "at": [
+                          24,
+                          26
+                        ],
+                        "size": [
+                          200,
+                          20
+                        ],
+                        "text": "-",
+                        "font": "small",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdGdProbs",
+                        "at": [
+                          232,
+                          12
+                        ],
+                        "size": [
+                          190,
+                          32
+                        ],
+                        "text": "#STR_OZT_VPP_PROBS_NONE",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppEdge",
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdGdBarNote",
+                        "at": [
+                          430,
+                          12
+                        ],
+                        "size": [
+                          250,
+                          32
+                        ],
+                        "text": "",
+                        "font": "small",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdGdDiscard",
+                        "at": [
+                          172,
+                          12
+                        ],
+                        "size": [
+                          140,
+                          32
+                        ],
+                        "text": "#STR_OZT_VPP_DISCARD",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppBad",
+                        "color": "$vppBad",
+                        "anchor": "right"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdGdApply",
+                        "at": [
+                          24,
+                          12
+                        ],
+                        "size": [
+                          140,
+                          32
+                        ],
+                        "text": "#STR_OZT_VPP_APPLY",
+                        "font": "small",
+                        "bg": "$vppAccent",
+                        "edge": "$vppAccent",
+                        "color": "$vppScreen",
+                        "anchor": "right"
+                      }
+                    }
+                  ],
+                  "anchor": "bottom",
+                  "note": "The draft of the trader's three files, shared by every page that edits them; the script writes the state."
+                }
+              }
+            ],
+            "note": "Proportional: follows the pane when the shell resizes it; the script places the rest (TrdLayout)."
+          }
+        }
+      ]
+    }
+  }
+}

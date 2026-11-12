@@ -1,6 +1,6 @@
 {
   "layout": "ozt_vpp_points",
-  "note": "Trader > Points of the OpenZone admin window (VPP rework 2026-11-12, design 5.6; mockup TraderPoints). OZT_VppPane.c creates it under M_SUB_WIDGET and registers it as page trader.points. The list is the section's `list`; the card edits the picked point. Names the script resolves by string: every Trd* and BtnTrd* widget. Captions are stringtable keys of OpenZone_Trader (UA original, EN).",
+  "note": "Trader > Points of the OpenZone admin window (VPP rework 2026-11-12, design 5.6; mockup TraderPoints). OZT_VppPanePoints.c registers it as page trader.points. The list is the section's `list`; the card edits the picked point in the draft of the traders file, which the bar at the bottom applies. Names the script resolves by string: every Trd* and BtnTrd* widget. Captions are stringtable keys of OpenZone_Trader (UA original, EN).",
   "root": {
     "frame": {
       "name": "PaneTrdPoints",
@@ -207,7 +207,7 @@
                   ],
                   "size": [
                     380,
-                    490
+                    442
                   ],
                   "font": "field",
                   "color": "$vppText",
@@ -215,7 +215,7 @@
                     "style": "NoScrollBar",
                     "title visible": false,
                     "highlight row": true,
-                    "lines": 18
+                    "lines": 16
                   },
                   "note": "The points as the section's `list` answers them."
                 }
@@ -225,7 +225,7 @@
                   "name": "TrdPtCard",
                   "size": [
                     520,
-                    580
+                    532
                   ],
                   "children": [
                     {
@@ -236,7 +236,7 @@
                           0
                         ],
                         "size": [
-                          520,
+                          360,
                           26
                         ],
                         "text": "#STR_OZT_VPP_PT_PICK",
@@ -245,11 +245,31 @@
                       }
                     },
                     {
+                      "button": {
+                        "name": "BtnTrdRemove",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          150,
+                          28
+                        ],
+                        "text": "#STR_OZT_VPP_PT_REMOVE",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppBad",
+                        "color": "$vppBad",
+                        "anchor": "right",
+                        "note": "Asks on the window's confirm strip, then the section's remove op."
+                      }
+                    },
+                    {
                       "label": {
                         "name": "TrdPtHeadSub",
                         "at": [
                           0,
-                          26
+                          30
                         ],
                         "size": [
                           520,
@@ -265,7 +285,7 @@
                         "name": "TrdPtSecMain",
                         "at": [
                           0,
-                          50
+                          54
                         ],
                         "size": [
                           520,
@@ -281,7 +301,7 @@
                         "name": "TrdPtSecMainRule",
                         "at": [
                           0,
-                          69
+                          73
                         ],
                         "size": [
                           520,
@@ -295,7 +315,7 @@
                         "name": "TrdNameLbl",
                         "at": [
                           0,
-                          76
+                          80
                         ],
                         "size": [
                           86,
@@ -311,7 +331,7 @@
                         "name": "TrdName",
                         "at": [
                           90,
-                          76
+                          80
                         ],
                         "size": [
                           160,
@@ -325,7 +345,7 @@
                         "name": "TrdRadiusLbl",
                         "at": [
                           264,
-                          76
+                          80
                         ],
                         "size": [
                           86,
@@ -341,7 +361,7 @@
                         "name": "TrdRadius",
                         "at": [
                           354,
-                          76
+                          80
                         ],
                         "size": [
                           166,
@@ -355,7 +375,7 @@
                         "name": "BtnTrdKindLbl",
                         "at": [
                           0,
-                          110
+                          114
                         ],
                         "size": [
                           86,
@@ -371,7 +391,7 @@
                         "name": "BtnTrdKind",
                         "at": [
                           90,
-                          109
+                          113
                         ],
                         "size": [
                           160,
@@ -389,7 +409,7 @@
                         "name": "TrdClassLbl",
                         "at": [
                           264,
-                          110
+                          114
                         ],
                         "size": [
                           86,
@@ -405,7 +425,7 @@
                         "name": "TrdClass",
                         "at": [
                           354,
-                          110
+                          114
                         ],
                         "size": [
                           166,
@@ -419,7 +439,7 @@
                         "name": "TrdBuyLbl",
                         "at": [
                           0,
-                          144
+                          148
                         ],
                         "size": [
                           86,
@@ -435,7 +455,7 @@
                         "name": "TrdBuy",
                         "at": [
                           90,
-                          144
+                          148
                         ],
                         "size": [
                           160,
@@ -449,7 +469,7 @@
                         "name": "TrdSellLbl",
                         "at": [
                           264,
-                          144
+                          148
                         ],
                         "size": [
                           86,
@@ -465,7 +485,7 @@
                         "name": "TrdSell",
                         "at": [
                           354,
-                          144
+                          148
                         ],
                         "size": [
                           166,
@@ -479,7 +499,7 @@
                         "name": "TrdCatsLbl",
                         "at": [
                           0,
-                          178
+                          182
                         ],
                         "size": [
                           86,
@@ -495,7 +515,7 @@
                         "name": "TrdCats",
                         "at": [
                           90,
-                          178
+                          182
                         ],
                         "size": [
                           430,
@@ -509,7 +529,7 @@
                         "name": "TrdCatsKnown",
                         "at": [
                           0,
-                          210
+                          214
                         ],
                         "size": [
                           520,
@@ -527,7 +547,7 @@
                         "name": "TrdPtSecPlace",
                         "at": [
                           0,
-                          244
+                          246
                         ],
                         "size": [
                           520,
@@ -543,7 +563,7 @@
                         "name": "TrdPtSecPlaceRule",
                         "at": [
                           0,
-                          263
+                          265
                         ],
                         "size": [
                           520,
@@ -557,7 +577,7 @@
                         "name": "TrdInfo",
                         "at": [
                           0,
-                          268
+                          270
                         ],
                         "size": [
                           520,
@@ -573,7 +593,7 @@
                         "name": "BtnTrdMove",
                         "at": [
                           0,
-                          292
+                          294
                         ],
                         "size": [
                           168,
@@ -591,7 +611,7 @@
                         "name": "BtnTrdTurn",
                         "at": [
                           176,
-                          292
+                          294
                         ],
                         "size": [
                           168,
@@ -609,7 +629,7 @@
                         "name": "BtnTrdOutfit",
                         "at": [
                           352,
-                          292
+                          294
                         ],
                         "size": [
                           168,
@@ -627,7 +647,7 @@
                         "name": "TrdPtSecMoney",
                         "at": [
                           0,
-                          332
+                          334
                         ],
                         "size": [
                           520,
@@ -643,7 +663,7 @@
                         "name": "TrdPtSecMoneyRule",
                         "at": [
                           0,
-                          351
+                          353
                         ],
                         "size": [
                           520,
@@ -657,7 +677,7 @@
                         "name": "TrdProviderLbl",
                         "at": [
                           0,
-                          358
+                          360
                         ],
                         "size": [
                           86,
@@ -669,14 +689,33 @@
                       }
                     },
                     {
-                      "field": {
-                        "name": "TrdProvider",
+                      "button": {
+                        "name": "BtnTrdPtMoney",
                         "at": [
                           90,
-                          358
+                          359
                         ],
                         "size": [
                           160,
+                          30
+                        ],
+                        "text": "-",
+                        "font": "small",
+                        "bg": "$vppCell",
+                        "edge": "$vppEdge",
+                        "color": "$vppText",
+                        "note": "Steps through the money a point may name: the server's, cash, cash then the bank, the bank."
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdProvider",
+                        "at": [
+                          258,
+                          360
+                        ],
+                        "size": [
+                          96,
                           28
                         ],
                         "color": "$vppText"
@@ -686,11 +725,11 @@
                       "label": {
                         "name": "BtnTrdChangeLbl",
                         "at": [
-                          264,
-                          358
+                          362,
+                          360
                         ],
                         "size": [
-                          86,
+                          62,
                           28
                         ],
                         "text": "#STR_OZT_VPP_PT_CHANGE",
@@ -702,11 +741,11 @@
                       "button": {
                         "name": "BtnTrdChange",
                         "at": [
-                          354,
-                          357
+                          424,
+                          359
                         ],
                         "size": [
-                          166,
+                          96,
                           30
                         ],
                         "text": "-",
@@ -717,41 +756,142 @@
                       }
                     },
                     {
-                      "button": {
-                        "name": "BtnTrdRemove",
+                      "label": {
+                        "name": "TrdPtStockLbl",
                         "at": [
                           0,
-                          0
+                          394
+                        ],
+                        "size": [
+                          86,
+                          28
+                        ],
+                        "text": "#STR_OZT_VPP_PT_STOCK",
+                        "font": "small",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdPtStock",
+                        "at": [
+                          90,
+                          394
                         ],
                         "size": [
                           160,
-                          32
+                          28
                         ],
-                        "text": "#STR_OZT_VPP_PT_REMOVE",
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdPtStockNote",
+                        "at": [
+                          264,
+                          394
+                        ],
+                        "size": [
+                          256,
+                          28
+                        ],
+                        "text": "#STR_OZT_VPP_PT_STOCK_H",
+                        "font": "tiny",
+                        "color": "$vppFaint"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdPtLicLbl",
+                        "at": [
+                          0,
+                          428
+                        ],
+                        "size": [
+                          86,
+                          28
+                        ],
+                        "text": "#STR_OZT_VPP_PT_ACCESS",
                         "font": "small",
-                        "bg": "$vppRaised",
-                        "edge": "$vppBad",
-                        "color": "$vppBad",
-                        "anchor": "bottom"
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "listbox": {
+                        "name": "TrdPtLic",
+                        "at": [
+                          90,
+                          428
+                        ],
+                        "size": [
+                          430,
+                          62
+                        ],
+                        "font": "field",
+                        "color": "$vppText",
+                        "props": {
+                          "style": "NoScrollBar",
+                          "title visible": false,
+                          "highlight row": true,
+                          "lines": 3
+                        },
+                        "note": "The point's Access: who may trade here. Licences are added here; every other kind on the conditions page."
                       }
                     },
                     {
                       "button": {
-                        "name": "BtnTrdSave",
+                        "name": "BtnTrdPtLicPick",
                         "at": [
-                          0,
-                          0
+                          90,
+                          496
                         ],
                         "size": [
-                          200,
-                          32
+                          214,
+                          30
                         ],
-                        "text": "#STR_OZT_VPP_PT_SAVE",
+                        "text": "-",
                         "font": "small",
-                        "bg": "$vppAccent",
-                        "edge": "$vppAccent",
-                        "color": "$vppScreen",
-                        "anchor": "bottom-right"
+                        "bg": "$vppCell",
+                        "edge": "$vppEdge",
+                        "color": "$vppText",
+                        "note": "Steps through the server's licences (the settings' Licences)."
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdPtLicAdd",
+                        "at": [
+                          312,
+                          496
+                        ],
+                        "size": [
+                          100,
+                          30
+                        ],
+                        "text": "#STR_OZT_VPP_PT_LIC_ADD",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppOk",
+                        "color": "$vppOk"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdPtLicDel",
+                        "at": [
+                          420,
+                          496
+                        ],
+                        "size": [
+                          100,
+                          30
+                        ],
+                        "text": "#STR_OZT_VPP_PT_LIC_DEL",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppBad",
+                        "color": "$vppBad"
                       }
                     }
                   ],
@@ -759,7 +899,232 @@
                     420,
                     76
                   ],
-                  "note": "The picked point. The script moves it right of the list and sizes its height with the window."
+                  "note": "The picked point, edited in the draft of the traders file. The script moves it right of the list and sizes its height with the window."
+                }
+              },
+              {
+                "panel": {
+                  "name": "TrdPtProbs",
+                  "at": [
+                    0,
+                    56
+                  ],
+                  "size": [
+                    1060,
+                    150
+                  ],
+                  "color": "$vppPanel",
+                  "children": [
+                    {
+                      "panel": {
+                        "name": "TrdPtProbsLine",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          1060,
+                          1
+                        ],
+                        "color": "$vppEdge"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdPtProbsHead",
+                        "at": [
+                          24,
+                          6
+                        ],
+                        "size": [
+                          700,
+                          20
+                        ],
+                        "text": "#STR_OZT_VPP_PROBS_HEAD",
+                        "font": "small",
+                        "color": "$vppAlert"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdPtProbsClose",
+                        "at": [
+                          24,
+                          4
+                        ],
+                        "size": [
+                          100,
+                          24
+                        ],
+                        "text": "#STR_OZT_VPP_CLOSE",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppEdge",
+                        "color": "$vppText",
+                        "anchor": "right"
+                      }
+                    },
+                    {
+                      "listbox": {
+                        "name": "TrdPtProbsList",
+                        "at": [
+                          24,
+                          32
+                        ],
+                        "size": [
+                          1012,
+                          110
+                        ],
+                        "font": "field",
+                        "color": "$vppText",
+                        "props": {
+                          "style": "NoScrollBar",
+                          "title visible": false,
+                          "highlight row": true,
+                          "lines": 5
+                        }
+                      }
+                    }
+                  ],
+                  "anchor": "bottom",
+                  "hidden": true,
+                  "note": "The problems the server's last load reported, shown after an apply and on the bar's button."
+                }
+              },
+              {
+                "panel": {
+                  "name": "TrdPtBar",
+                  "at": [
+                    0,
+                    0
+                  ],
+                  "size": [
+                    1060,
+                    56
+                  ],
+                  "color": "$vppHead",
+                  "children": [
+                    {
+                      "panel": {
+                        "name": "TrdPtBarLine",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          1060,
+                          1
+                        ],
+                        "color": "$vppEdge"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdPtBarTag",
+                        "at": [
+                          24,
+                          8
+                        ],
+                        "size": [
+                          180,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_DRAFT",
+                        "font": "tiny",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdPtBarState",
+                        "at": [
+                          24,
+                          26
+                        ],
+                        "size": [
+                          200,
+                          20
+                        ],
+                        "text": "-",
+                        "font": "small",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdPtProbs",
+                        "at": [
+                          232,
+                          12
+                        ],
+                        "size": [
+                          190,
+                          32
+                        ],
+                        "text": "#STR_OZT_VPP_PROBS_NONE",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppEdge",
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdPtBarNote",
+                        "at": [
+                          430,
+                          12
+                        ],
+                        "size": [
+                          250,
+                          32
+                        ],
+                        "text": "",
+                        "font": "small",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdPtDiscard",
+                        "at": [
+                          172,
+                          12
+                        ],
+                        "size": [
+                          140,
+                          32
+                        ],
+                        "text": "#STR_OZT_VPP_DISCARD",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppBad",
+                        "color": "$vppBad",
+                        "anchor": "right"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdPtApply",
+                        "at": [
+                          24,
+                          12
+                        ],
+                        "size": [
+                          140,
+                          32
+                        ],
+                        "text": "#STR_OZT_VPP_APPLY",
+                        "font": "small",
+                        "bg": "$vppAccent",
+                        "edge": "$vppAccent",
+                        "color": "$vppScreen",
+                        "anchor": "right"
+                      }
+                    }
+                  ],
+                  "anchor": "bottom",
+                  "note": "The draft of the trader's three files, shared by every page that edits them; the script writes the state."
                 }
               }
             ],

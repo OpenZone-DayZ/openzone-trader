@@ -198,17 +198,342 @@ FrameWidgetClass PaneTrdLicences {
        "size to text h" 0
        "size to text v" 0
       }
-      MultilineTextWidgetClass TrdLcNote {
+      TextWidgetClass TrdLcSecDef {
        visible 1
        ignorepointer 1
        position 0 284
+       size 556 18
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       color 0.91 0.47 0.17 1
+       priority 3
+       text "#STR_OZT_VPP_LC_SEC_DEF"
+       font "gui/fonts/sdf_MetronBook24"
+       "exact text" 1
+       "exact text size" 10
+       "text halign" left
+       "text valign" center
+      }
+      PanelWidgetClass TrdLcSecDefRule {
+       visible 1
+       ignorepointer 1
+       position 0 303
+       size 556 1
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       color 0.235 0.235 0.227 1
+       priority 4
+       style rover_sim_colorable
+      }
+      TextWidgetClass TrdLcDefIdLbl {
+       visible 1
+       ignorepointer 1
+       position 0 310
+       size 180 16
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       color 0.627 0.624 0.6 1
+       priority 5
+       text "#STR_OZT_VPP_LC_DEF_ID"
+       font "gui/fonts/sdf_MetronBook24"
+       "exact text" 1
+       "exact text size" 10
+       "text halign" left
+       "text valign" center
+      }
+      PanelWidgetClass TrdLcDefIdFrame {
+       visible 1
+       position 0 328
+       size 180 28
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       color 0.235 0.235 0.227 1
+       priority 6
+       style rover_sim_colorable
+       {
+        PanelWidgetClass TrdLcDefIdFill {
+         visible 1
+         ignorepointer 1
+         position 1 1
+         size 178 26
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.047 0.047 0.047 0.95
+         priority 0
+         style rover_sim_colorable
+        }
+        EditBoxWidgetClass TrdLcDefId {
+         visible 1
+         position 6 0
+         size 168 28
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.88 0.875 0.855 1
+         priority 1
+         style Default
+         text ""
+         font "gui/fonts/MetronBook14"
+         "exact text" 1
+        }
+       }
+      }
+      TextWidgetClass TrdLcDefNameLbl {
+       visible 1
+       ignorepointer 1
+       position 188 310
+       size 180 16
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       color 0.627 0.624 0.6 1
+       priority 7
+       text "#STR_OZT_VPP_LC_DEF_NAME"
+       font "gui/fonts/sdf_MetronBook24"
+       "exact text" 1
+       "exact text size" 10
+       "text halign" left
+       "text valign" center
+      }
+      PanelWidgetClass TrdLcDefNameFrame {
+       visible 1
+       position 188 328
+       size 180 28
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       color 0.235 0.235 0.227 1
+       priority 8
+       style rover_sim_colorable
+       {
+        PanelWidgetClass TrdLcDefNameFill {
+         visible 1
+         ignorepointer 1
+         position 1 1
+         size 178 26
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.047 0.047 0.047 0.95
+         priority 0
+         style rover_sim_colorable
+        }
+        EditBoxWidgetClass TrdLcDefName {
+         visible 1
+         position 6 0
+         size 168 28
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.88 0.875 0.855 1
+         priority 1
+         style Default
+         text ""
+         font "gui/fonts/MetronBook14"
+         "exact text" 1
+        }
+       }
+      }
+      TextWidgetClass TrdLcDefLookLbl {
+       visible 1
+       ignorepointer 1
+       position 376 310
+       size 180 16
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       color 0.627 0.624 0.6 1
+       priority 9
+       text "#STR_OZT_VPP_LC_DEF_LOOK"
+       font "gui/fonts/sdf_MetronBook24"
+       "exact text" 1
+       "exact text size" 10
+       "text halign" left
+       "text valign" center
+      }
+      PanelWidgetClass TrdLcDefLookFrame {
+       visible 1
+       position 376 328
+       size 180 28
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       color 0.235 0.235 0.227 1
+       priority 10
+       style rover_sim_colorable
+       {
+        PanelWidgetClass TrdLcDefLookFill {
+         visible 1
+         ignorepointer 1
+         position 1 1
+         size 178 26
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.047 0.047 0.047 0.95
+         priority 0
+         style rover_sim_colorable
+        }
+        EditBoxWidgetClass TrdLcDefLook {
+         visible 1
+         position 6 0
+         size 168 28
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.88 0.875 0.855 1
+         priority 1
+         style Default
+         text ""
+         font "gui/fonts/MetronBook14"
+         "exact text" 1
+        }
+       }
+      }
+      ButtonWidgetClass BtnTrdLcDefAdd {
+       visible 1
+       position 0 364
+       size 180 30
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text ""
+       priority 11
+       {
+        PanelWidgetClass BtnTrdLcDefAddEdge {
+         visible 1
+         ignorepointer 1
+         position -1 -1
+         size 182 32
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.4 0.78 0.36 1
+         priority 0
+         style rover_sim_colorable
+        }
+        PanelWidgetClass BtnTrdLcDefAddBg {
+         visible 1
+         ignorepointer 1
+         position 0 0
+         size 180 30
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.118 0.118 0.114 1
+         priority 1
+         style rover_sim_colorable
+        }
+        TextWidgetClass BtnTrdLcDefAddText {
+         visible 1
+         ignorepointer 1
+         position 0 0
+         size 180 30
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.4 0.78 0.36 1
+         priority 2
+         text "#STR_OZT_VPP_LC_DEF_ADD"
+         font "gui/fonts/sdf_MetronBook24"
+         "exact text" 1
+         "exact text size" 13
+         "text halign" center
+         "text valign" center
+        }
+       }
+      }
+      ButtonWidgetClass BtnTrdLcDefDel {
+       visible 1
+       position 188 364
+       size 180 30
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text ""
+       priority 12
+       {
+        PanelWidgetClass BtnTrdLcDefDelEdge {
+         visible 1
+         ignorepointer 1
+         position -1 -1
+         size 182 32
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.88 0.32 0.29 1
+         priority 0
+         style rover_sim_colorable
+        }
+        PanelWidgetClass BtnTrdLcDefDelBg {
+         visible 1
+         ignorepointer 1
+         position 0 0
+         size 180 30
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.118 0.118 0.114 1
+         priority 1
+         style rover_sim_colorable
+        }
+        TextWidgetClass BtnTrdLcDefDelText {
+         visible 1
+         ignorepointer 1
+         position 0 0
+         size 180 30
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.88 0.32 0.29 1
+         priority 2
+         text "#STR_OZT_VPP_LC_DEF_DEL"
+         font "gui/fonts/sdf_MetronBook24"
+         "exact text" 1
+         "exact text size" 13
+         "text halign" center
+         "text valign" center
+        }
+       }
+      }
+      MultilineTextWidgetClass TrdLcNote {
+       visible 1
+       ignorepointer 1
+       position 0 402
        size 556 48
        hexactpos 1
        vexactpos 1
        hexactsize 1
        vexactsize 1
        color 0.627 0.624 0.6 1
-       priority 3
+       priority 13
        text "#STR_OZT_VPP_LC_NOTE"
        font "gui/fonts/sdf_MetronBook24"
        "exact text" 1
@@ -618,6 +943,386 @@ FrameWidgetClass PaneTrdLicences {
          color 0.88 0.32 0.29 1
          priority 2
          text "#STR_OZT_VPP_LC_TAKE"
+         font "gui/fonts/sdf_MetronBook24"
+         "exact text" 1
+         "exact text size" 13
+         "text halign" center
+         "text valign" center
+        }
+       }
+      }
+     }
+    }
+    // The problems the server's last load reported, shown after an apply and on the bar's button.
+    PanelWidgetClass TrdLcProbs {
+     visible 0
+     ignorepointer 1
+     valign bottom_ref
+     position 0 56
+     size 1060 150
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     color 0.047 0.047 0.047 1
+     priority 6
+     style rover_sim_colorable
+     {
+      PanelWidgetClass TrdLcProbsLine {
+       visible 1
+       ignorepointer 1
+       position 0 0
+       size 1060 1
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       color 0.235 0.235 0.227 1
+       priority 0
+       style rover_sim_colorable
+      }
+      TextWidgetClass TrdLcProbsHead {
+       visible 1
+       ignorepointer 1
+       position 24 6
+       size 700 20
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       color 0.96 0.78 0.25 1
+       priority 1
+       text "#STR_OZT_VPP_PROBS_HEAD"
+       font "gui/fonts/sdf_MetronBook24"
+       "exact text" 1
+       "exact text size" 13
+       "text halign" left
+       "text valign" center
+      }
+      ButtonWidgetClass BtnTrdLcProbsClose {
+       visible 1
+       halign right_ref
+       position 24 4
+       size 100 24
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text ""
+       priority 2
+       {
+        PanelWidgetClass BtnTrdLcProbsCloseEdge {
+         visible 1
+         ignorepointer 1
+         position -1 -1
+         size 102 26
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.235 0.235 0.227 1
+         priority 0
+         style rover_sim_colorable
+        }
+        PanelWidgetClass BtnTrdLcProbsCloseBg {
+         visible 1
+         ignorepointer 1
+         position 0 0
+         size 100 24
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.118 0.118 0.114 1
+         priority 1
+         style rover_sim_colorable
+        }
+        TextWidgetClass BtnTrdLcProbsCloseText {
+         visible 1
+         ignorepointer 1
+         position 0 0
+         size 100 24
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.88 0.875 0.855 1
+         priority 2
+         text "#STR_OZT_VPP_CLOSE"
+         font "gui/fonts/sdf_MetronBook24"
+         "exact text" 1
+         "exact text size" 13
+         "text halign" center
+         "text valign" center
+        }
+       }
+      }
+      TextListboxWidgetClass TrdLcProbsList {
+       visible 1
+       position 24 32
+       size 1012 110
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       color 0.88 0.875 0.855 1
+       priority 3
+       font "gui/fonts/MetronBook14"
+       "exact text" 1
+       style NoScrollBar
+       "title visible" 0
+       "highlight row" 1
+       lines 5
+      }
+     }
+    }
+    // The draft of the trader's three files, shared by every page that edits them; the script writes the state.
+    PanelWidgetClass TrdLcBar {
+     visible 1
+     ignorepointer 1
+     valign bottom_ref
+     position 0 0
+     size 1060 56
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     color 0.075 0.075 0.071 1
+     priority 7
+     style rover_sim_colorable
+     {
+      PanelWidgetClass TrdLcBarLine {
+       visible 1
+       ignorepointer 1
+       position 0 0
+       size 1060 1
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       color 0.235 0.235 0.227 1
+       priority 0
+       style rover_sim_colorable
+      }
+      TextWidgetClass TrdLcBarTag {
+       visible 1
+       ignorepointer 1
+       position 24 8
+       size 180 16
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       color 0.627 0.624 0.6 1
+       priority 1
+       text "#STR_OZT_VPP_DRAFT"
+       font "gui/fonts/sdf_MetronBook24"
+       "exact text" 1
+       "exact text size" 10
+       "text halign" left
+       "text valign" center
+      }
+      TextWidgetClass TrdLcBarState {
+       visible 1
+       ignorepointer 1
+       position 24 26
+       size 200 20
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       color 0.627 0.624 0.6 1
+       priority 2
+       text "-"
+       font "gui/fonts/sdf_MetronBook24"
+       "exact text" 1
+       "exact text size" 13
+       "text halign" left
+       "text valign" center
+      }
+      ButtonWidgetClass BtnTrdLcProbs {
+       visible 1
+       position 232 12
+       size 190 32
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text ""
+       priority 3
+       {
+        PanelWidgetClass BtnTrdLcProbsEdge {
+         visible 1
+         ignorepointer 1
+         position -1 -1
+         size 192 34
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.235 0.235 0.227 1
+         priority 0
+         style rover_sim_colorable
+        }
+        PanelWidgetClass BtnTrdLcProbsBg {
+         visible 1
+         ignorepointer 1
+         position 0 0
+         size 190 32
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.118 0.118 0.114 1
+         priority 1
+         style rover_sim_colorable
+        }
+        TextWidgetClass BtnTrdLcProbsText {
+         visible 1
+         ignorepointer 1
+         position 0 0
+         size 190 32
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.88 0.875 0.855 1
+         priority 2
+         text "#STR_OZT_VPP_PROBS_NONE"
+         font "gui/fonts/sdf_MetronBook24"
+         "exact text" 1
+         "exact text size" 13
+         "text halign" center
+         "text valign" center
+        }
+       }
+      }
+      TextWidgetClass TrdLcBarNote {
+       visible 1
+       ignorepointer 1
+       position 430 12
+       size 250 32
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       color 0.627 0.624 0.6 1
+       priority 4
+       text ""
+       font "gui/fonts/sdf_MetronBook24"
+       "exact text" 1
+       "exact text size" 13
+       "text halign" left
+       "text valign" center
+      }
+      ButtonWidgetClass BtnTrdLcDiscard {
+       visible 1
+       halign right_ref
+       position 172 12
+       size 140 32
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text ""
+       priority 5
+       {
+        PanelWidgetClass BtnTrdLcDiscardEdge {
+         visible 1
+         ignorepointer 1
+         position -1 -1
+         size 142 34
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.88 0.32 0.29 1
+         priority 0
+         style rover_sim_colorable
+        }
+        PanelWidgetClass BtnTrdLcDiscardBg {
+         visible 1
+         ignorepointer 1
+         position 0 0
+         size 140 32
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.118 0.118 0.114 1
+         priority 1
+         style rover_sim_colorable
+        }
+        TextWidgetClass BtnTrdLcDiscardText {
+         visible 1
+         ignorepointer 1
+         position 0 0
+         size 140 32
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.88 0.32 0.29 1
+         priority 2
+         text "#STR_OZT_VPP_DISCARD"
+         font "gui/fonts/sdf_MetronBook24"
+         "exact text" 1
+         "exact text size" 13
+         "text halign" center
+         "text valign" center
+        }
+       }
+      }
+      ButtonWidgetClass BtnTrdLcApply {
+       visible 1
+       halign right_ref
+       position 24 12
+       size 140 32
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text ""
+       priority 6
+       {
+        PanelWidgetClass BtnTrdLcApplyEdge {
+         visible 1
+         ignorepointer 1
+         position -1 -1
+         size 142 34
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.91 0.47 0.17 1
+         priority 0
+         style rover_sim_colorable
+        }
+        PanelWidgetClass BtnTrdLcApplyBg {
+         visible 1
+         ignorepointer 1
+         position 0 0
+         size 140 32
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.91 0.47 0.17 1
+         priority 1
+         style rover_sim_colorable
+        }
+        TextWidgetClass BtnTrdLcApplyText {
+         visible 1
+         ignorepointer 1
+         position 0 0
+         size 140 32
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.035 0.035 0.035 0.97
+         priority 2
+         text "#STR_OZT_VPP_APPLY"
          font "gui/fonts/sdf_MetronBook24"
          "exact text" 1
          "exact text size" 13

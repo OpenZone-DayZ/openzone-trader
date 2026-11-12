@@ -13,6 +13,8 @@ client, sent to the owner. Prices are in the stand's notes, the smallest of whic
 | S.3 | `UniversalLight` with `Stock {0, Coefficient 1}` ("only what players sell") | no line on the shelf until one was sold; sold at 85 (worn), it came onto the shelf as its own worn line at 170 and was bought back worn (the card: WORN) |
 | S.4 | `Ammo_762x39` with `Stock {300}`, priced by the unit | the line counts rounds; 280 left after a deal of 20 |
 | S.5 | a stocked line with nothing in it | one record with `Stock` 0: a red 0, a red corner and a muted price on the tile; it does not go into the cart; the card reads "In stock" with the count otherwise |
+| S.6 | no ceiling (the owner, 2026-11-12): the AKM line pushed to 122 (`op=stock delta=120`) | `quote sell=AKM` refused `STR_OZT_NO_NOT_TAKEN` (1250 x 0.95^121 is below the note of 5); the shelf sells an AKM for 10 (2500 x 0.95^121 = 5.05, up to the note). The tiles of the player's two AKMs showed 1 250 (the price without the stock: `open` priced the player's things by `SellPrice`); since the fix (`SellPriceAt` at the stock the line holds) they are red, not taken, as the deal says |
+| S.7 | a restart with `StartStock` 1 and `DestockAtStart` 1, the AKM line at 122 | 2 after the start: filled to `Max` 3, then the destock share 0.25 of 3 rounded to 1 taken off (`stock 'stand': 3 line(s) at the start`) |
 
 ## Licences (7b)
 

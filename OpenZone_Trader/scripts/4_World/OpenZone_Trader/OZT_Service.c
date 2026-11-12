@@ -180,7 +180,10 @@ class OZT_Open
                 continue;
             OZT_BookEntry entry = OZT_Book.EntryOf(own.GetType());
             int units = OZT_Stack.Units(own);
-            int price = OZT_Book.SellPrice(trader, entry, own, units);
+            // A stocked line pays at the stock it holds now, as the deal will
+            // (design §11.1): no ceiling, so where the curve brings less than
+            // the smallest note the trader takes nothing and the screen says so.
+            int price = OZT_Book.SellPriceAt(trader, entry, own, units, null);
             if (price <= 0)
                 continue;
             OZT_WireOwn wo = new OZT_WireOwn();

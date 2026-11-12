@@ -133,6 +133,8 @@ class OZT_TradeMenu : UIScriptedMenu
     protected int m_ActLow;
     protected int m_ActHigh;
     protected int m_ActIndex;
+    // The condition of the stock line the quantity dialog buys from.
+    protected int m_QtyLevel;
     protected int m_ActZone;
 
     // The tile under a held button, where the press was, and the drag in the
@@ -991,16 +993,49 @@ class OZT_TradeMenu : UIScriptedMenu
         return -1;
     }
 
+    // The goods record of a class: its pristine line when the class is
+    // stocked in more than one condition (design §11.1).
     protected OZT_WireGoods GoodsOf(string type)
+    {
+        if (!m_Data)
+            return null;
+        OZT_WireGoods first = null;
+        for (int i = 0; i < m_Data.Goods.Count(); i++)
+        {
+            OZT_WireGoods g = m_Data.Goods[i];
+            if (g.ClassName != type)
+                continue;
+            if (g.Level == 0)
+                return g;
+            if (!first)
+                first = g;
+        }
+        return first;
+    }
+
+    protected OZT_WireGoods GoodsAt(string type, int level)
     {
         if (!m_Data)
             return null;
         for (int i = 0; i < m_Data.Goods.Count(); i++)
         {
-            if (m_Data.Goods[i].ClassName == type)
-                return m_Data.Goods[i];
+            OZT_WireGoods g = m_Data.Goods[i];
+            if (g.ClassName == type && g.Level == level)
+                return g;
         }
         return null;
+    }
+
+    // What the stock line has left beside what the cart already buys of it;
+    // -1: unlimited.
+    protected int StockLeft(OZT_WireGoods g)
+    {
+        if (!g || g.Stock < 0)
+            return -1;
+        int left = g.Stock - m_Cart.Buying(g.ClassName, g.Level);
+        if (left < 0)
+            left = 0;
+        return left;
     }
 
     protected OZT_WireOwn OwnOf(int low, int high)
@@ -1048,13 +1083,24 @@ class OZT_TradeMenu : UIScriptedMenu
                 // Money is not goods: the notes stand only in their own tab.
                 continue;
             }
-            // Drawn as it comes: with what the price book gives it.
-            EntityAI e = m_Shelf.LookOf(g.ClassName, g.With, null);
+            // Drawn as it comes: with what the price book gives it, a worn
+            // stock line in its condition.
+            EntityAI e;
+            if (g.Level > 0)
+                e = m_Shelf.LookWorn(g.ClassName, g.Level);
+            else
+                e = m_Shelf.LookOf(g.ClassName, g.With, null);
             if (!e)
                 continue;
             OZT_Tile t = new OZT_Tile(OZT_Tile.SHELF, g.ClassName, e);
             t.Price = g.Buy;
             t.Index = i;
+            t.Level = g.Level;
+            // A stocked line shows what it holds; a sold-out one lies dark.
+            if (g.Stock > 0)
+                t.Count = g.Stock;
+            else if (g.Stock == 0)
+                t.SoldOut = true;
             if (m_ShelfGrid.Add(t))
                 Relight(t, true);
         }
@@ -1319,11 +1365,16 @@ class OZT_TradeMenu : UIScriptedMenu
             OZT_WireGoods bought = GoodsOf(buy.Type);
             if (bought && !buy.IsOnto())
                 comes = bought.With;
-            EntityAI stand = m_Shelf.LookOf(buy.Type, comes, buy.Fits);
+            EntityAI stand;
+            if (buy.Level > 0)
+                stand = m_Shelf.LookWorn(buy.Type, buy.Level);
+            else
+                stand = m_Shelf.LookOf(buy.Type, comes, buy.Fits);
             if (!stand)
                 continue;
             OZT_Tile bt = new OZT_Tile(OZT_Tile.BUY, buy.Type, stand);
             bt.Index = b;
+            bt.Level = buy.Level;
             if (m_BuyGrid.Add(bt))
                 Relight(bt, true);
         }
@@ -1547,6 +1598,8 @@ class OZT_TradeMenu : UIScriptedMenu
     {
         if (t.Kind == OZT_Tile.OWN || t.Kind == OZT_Tile.SELL)
             return t.Low.ToString() + ":" + t.High.ToString();
+        if (t.Kind == OZT_Tile.SHELF && t.Level > 0)
+            return t.Type + "|L" + t.Level.ToString();
         return t.Type;
     }
 
@@ -2549,7 +2602,19 @@ class OZT_TradeMenu : UIScriptedMenu
     // the game's names.
     protected void OpenCard(OZT_Tile t)
     {
-        OZT_WireGoods entry = GoodsOf(t.Type);
+        // The tile's own record: a stock line has one per condition.
+        OZT_WireGoods entry = null;
+        if (t.Kind == OZT_Tile.SHELF && m_Data && t.Index >= 0 && t.Index < m_Data.Goods.Count())
+        {
+            if (m_Data.Goods[t.Index].ClassName == t.Type)
+                entry = m_Data.Goods[t.Index];
+        }
+        else if (t.Kind == OZT_Tile.BUY)
+        {
+            entry = GoodsAt(t.Type, t.Level);
+        }
+        if (!entry)
+            entry = GoodsOf(t.Type);
         string comes = "";
         if (entry && entry.With)
         {
@@ -2748,7 +2813,7 @@ class OZT_TradeMenu : UIScriptedMenu
         }
 
         if (kind == OZT_Tile.SHELF)
-            AddBuy(m_ActType);
+            AddBuy(m_ActType, m_ActIndex);
         else if (kind == OZT_Tile.OWN && OwnSlotUnder())
             PutPartOn(m_ActLow, m_ActHigh, m_ActDropEntry);
         else if (kind == OZT_Tile.OWN && (m_ActZone == ZONE_OWN || m_ActZone == ZONE_CHAR))
@@ -2795,11 +2860,23 @@ class OZT_TradeMenu : UIScriptedMenu
         return left;
     }
 
-    protected void AddBuy(string type)
+    protected void AddBuy(string type, int index = -1)
     {
-        OZT_WireGoods g = GoodsOf(type);
+        OZT_WireGoods g = null;
+        if (m_Data && index >= 0 && index < m_Data.Goods.Count() && m_Data.Goods[index].ClassName == type)
+            g = m_Data.Goods[index];
+        if (!g)
+            g = GoodsOf(type);
         if (!g || g.Buy <= 0)
             return;
+        // A stock line (design §11.1): no more than it holds.
+        int left = StockLeft(g);
+        if (left == 0)
+        {
+            SayInfo(OZT_Ui.Words("STR_OZT_UI_SOLD_OUT"), OZT_Look.Alert());
+            return;
+        }
+        m_QtyLevel = g.Level;
         // Under the unit rule the count is units, and the player says how
         // many: a full stack to begin with, five stacks at most at a time.
         if (g.Rule == OZT_Const.RULE_UNIT)
@@ -2813,6 +2890,10 @@ class OZT_TradeMenu : UIScriptedMenu
             int most = full * 5;
             if (most > OZT_Deal.MAX_UNITS)
                 most = OZT_Deal.MAX_UNITS;
+            if (left > 0 && most > left)
+                most = left;
+            if (full > most)
+                full = most;
             if (g.Category == OZT_Const.CATEGORY_CHANGE)
             {
                 // A note: as many as the notes given leave room for, one when
@@ -2828,7 +2909,7 @@ class OZT_TradeMenu : UIScriptedMenu
             m_Qty.ToBuy(type, stand, g.Buy, most, full, false);
             return;
         }
-        m_Cart.Buy(type, 1, g.Buy, OZT_Deal.MAX_PIECES);
+        m_Cart.Buy(type, 1, g.Buy, OZT_Deal.MAX_PIECES, g.Level);
         CartChanged();
     }
 
@@ -2839,10 +2920,12 @@ class OZT_TradeMenu : UIScriptedMenu
             return;
         if (!selling)
         {
-            OZT_WireGoods g = GoodsOf(type);
+            OZT_WireGoods g = GoodsAt(type, m_QtyLevel);
+            if (!g)
+                g = GoodsOf(type);
             if (!g || g.Buy <= 0)
                 return;
-            m_Cart.Buy(type, count, g.Buy, OZT_Deal.MAX_UNITS);
+            m_Cart.Buy(type, count, g.Buy, OZT_Deal.MAX_UNITS, g.Level);
             CartChanged();
             return;
         }

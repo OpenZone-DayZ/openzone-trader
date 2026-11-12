@@ -38,6 +38,10 @@ class OZT_CartLine
     // What the last quote said for the line; below zero until it answers.
     int Price;
 
+    // Bought: the condition of the stock line it comes from (design §11.1),
+    // 0 for everything that is not stocked.
+    int Level;
+
     // Bought: the parts fitted to the thing, and, for a part bought onto a
     // thing the player carries, that thing and the slot.
     ref array<ref OZT_CartFit> Fits;
@@ -128,13 +132,13 @@ class OZT_Cart
 
     // More of a class into the BUY cart; one line per class, besides the
     // lines that carry parts or go onto a thing (those buy one each).
-    void Buy(string type, int count, int each, int most)
+    void Buy(string type, int count, int each, int most, int level = 0)
     {
         OZT_CartLine line;
         for (int i = 0; i < Buys.Count(); i++)
         {
             OZT_CartLine have = Buys[i];
-            if (have.Type == type && have.Fits.Count() == 0 && !have.IsOnto())
+            if (have.Type == type && have.Level == level && have.Fits.Count() == 0 && !have.IsOnto())
                 line = have;
         }
         if (!line)
@@ -142,6 +146,7 @@ class OZT_Cart
             line = new OZT_CartLine();
             line.Type = type;
             line.Each = each;
+            line.Level = level;
             Buys.Insert(line);
         }
         line.Count = line.Count + count;
@@ -173,7 +178,22 @@ class OZT_Cart
         if (line.Count <= 1)
             return index;
         line.Count = line.Count - 1;
-        return BuyOne(line.Type, line.Each);
+        int one = BuyOne(line.Type, line.Each);
+        Buys[one].Level = line.Level;
+        return one;
+    }
+
+    // How many of a class in a condition the cart buys, on every line.
+    int Buying(string type, int level)
+    {
+        int n = 0;
+        for (int i = 0; i < Buys.Count(); i++)
+        {
+            OZT_CartLine line = Buys[i];
+            if (line.Type == type && line.Level == level)
+                n = n + line.Count;
+        }
+        return n;
     }
 
     void AddFit(int index, string type, string slot, int on, int each)
@@ -422,6 +442,7 @@ class OZT_Cart
             wb.OnLow = line.OnLow;
             wb.OnHigh = line.OnHigh;
             wb.SlotName = line.OnSlot;
+            wb.Level = line.Level;
             for (int f = 0; f < line.Fits.Count(); f++)
             {
                 OZT_WireFit wf = new OZT_WireFit();

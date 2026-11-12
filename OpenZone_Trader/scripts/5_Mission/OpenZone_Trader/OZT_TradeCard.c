@@ -170,6 +170,9 @@ class OZT_Card
         // What the price of the goods holds besides the goods.
         if (goods && comes != "")
             Line(OZT_Ui.Words("STR_OZT_UI_COMES_WITH"), comes);
+        // What a stock line holds (design §11.1).
+        if (t.Kind == OZT_Tile.SHELF && g && g.Stock >= 0)
+            Line(OZT_Ui.Words("STR_OZT_UI_IN_STOCK"), g.Stock.ToString());
         // The other side of the same trader's book.
         if (goods && g && g.Sell > 0)
             Line(OZT_Ui.Words("STR_OZT_UI_PAYS_NEW"), OZT_Ui.Sum(g.Sell));

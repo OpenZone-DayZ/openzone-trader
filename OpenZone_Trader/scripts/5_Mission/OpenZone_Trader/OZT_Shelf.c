@@ -187,6 +187,26 @@ class OZT_Shelf
         return m_ByClass.Count();
     }
 
+    // A look of goods from a worn stock line (design §11.1): its own local
+    // entity in that condition, so the tile and the card show the condition
+    // the goods come in. Level 0: the class's own stand-in.
+    EntityAI LookWorn(string type, int level)
+    {
+        if (level <= 0)
+            return Of(type);
+        string key = type + "|L" + level.ToString();
+        EntityAI look;
+        if (m_Looks.Find(key, look) && look)
+            return look;
+        look = EntityAI.Cast(GetGame().CreateObjectEx(type, "0 0 0", ECE_LOCAL));
+        if (!look)
+            return Of(type);
+        look.DisableSimulation(true);
+        look.SetHealth01("", "", OZT_Book.LevelHealth(level));
+        m_Looks.Set(key, look);
+        return look;
+    }
+
     void Clear()
     {
         for (int i = 0; i < m_ByClass.Count(); i++)

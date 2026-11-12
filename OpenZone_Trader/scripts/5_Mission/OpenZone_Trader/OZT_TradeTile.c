@@ -34,8 +34,17 @@ class OZT_Tile
     int Count;
 
     // 0: can be sold. 1: the trader does not take it. 2: not empty (in the
-    // strip: kept). 3: bought in this deal. 4: rides on a part that stays.
+    // strip: kept). 3: bought in this deal. 4: rides on a part that stays; on
+    // the shelf: sold out.
     int Why;
+
+    // The goods' condition on the shelf and in the BUY cart: a stock line's
+    // level (design §11.1), 0 pristine.
+    int Level;
+
+    // A stocked line that holds nothing now: its picture pales and its count
+    // reads a red zero.
+    bool SoldOut;
 
     // A part's price the player pays (rounded up on the tile), and the
     // number of parts a BUY line fits to its thing.
@@ -170,30 +179,58 @@ class OZT_Tile
                 m_PriceText.SetText("...");
             else
                 m_PriceText.SetText("");
+            int priceTint = OZT_Look.Gold();
+            if (SoldOut)
+                priceTint = OZT_Look.Muted();
+            m_PriceText.SetColor(priceTint);
         }
         // The count: beside the price where the tile is wide enough for both,
         // above it where it is not.
         bool wide = W > 1;
+        bool counted = Count > 0 || SoldOut;
+        string many = Count.ToString();
+        int tint = OZT_Look.Text();
+        if (SoldOut)
+        {
+            many = "0";
+            tint = OZT_Look.Bad();
+        }
         if (m_QtyText)
         {
-            m_QtyText.Show(Count > 0 && wide);
-            if (Count > 0)
-                m_QtyText.SetText(Count.ToString());
+            m_QtyText.Show(counted && wide);
+            if (counted)
+            {
+                m_QtyText.SetText(many);
+                m_QtyText.SetColor(tint);
+            }
+        }
+        if (m_Pic)
+        {
+            float alpha = 1;
+            if (SoldOut)
+                alpha = 0.35;
+            m_Pic.SetAlpha(alpha);
         }
         if (m_QtyTop)
         {
-            bool top = Count > 0 && !wide;
+            bool top = counted && !wide;
             string word = "";
             if (top)
-                word = Count.ToString();
+                word = many;
             else if (Parts > 0)
                 word = "+" + Parts.ToString();
             m_QtyTop.Show(word != "");
             m_QtyTop.SetText(word);
+            int topTint = OZT_Look.Text();
+            if (top)
+                topTint = tint;
+            m_QtyTop.SetColor(topTint);
         }
         if (m_No)
         {
-            m_No.Show(Why == 1 || Why == 2);
+            // A sold-out line wears the red corner too: on the shelf it can
+            // only mean "not to be had now".
+            m_No.Show(Why == 1 || Why == 2 || SoldOut);
             if (Why == 2)
                 m_No.SetColor(OZT_Look.Alert());
             else
@@ -201,7 +238,7 @@ class OZT_Tile
         }
         if (m_Pip)
         {
-            int level = 0;
+            int level = Level;
             if (Item && Kind != SHELF && Kind != BUY)
                 level = Item.GetHealthLevel();
             m_Pip.Show(level > 0);

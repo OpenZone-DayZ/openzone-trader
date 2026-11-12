@@ -1197,7 +1197,7 @@ class OZT_Deal
             if (fresh)
                 GetGame().ObjectDelete(fresh);
             if (!takes)
-                return OZT_Const.NO_CHANGED;
+                return OZT_Const.NO_PARTS;
         }
 
         // Parts bought onto one thing of the player's, whatever lines they came
@@ -1235,7 +1235,7 @@ class OZT_Deal
             if (twin)
                 GetGame().ObjectDelete(twin);
             if (!fine)
-                return OZT_Const.NO_CHANGED;
+                return OZT_Const.NO_PARTS;
         }
         return "";
     }

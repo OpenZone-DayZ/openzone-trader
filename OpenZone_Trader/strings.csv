@@ -9,6 +9,7 @@ STR_OZT_NO_NOT_YOURS,Ця річ не ваша,This item is not yours
 STR_OZT_NO_NOT_TAKEN,Торговець це не бере,The trader does not take this
 STR_OZT_NO_NOT_EMPTY,"Усередині лежать речі, яких немає в угоді: %1","%1 thing(s) lie inside and are not in the deal"
 STR_OZT_NO_LOCKED,Цей товар вам недоступний,These goods are not available to you
+STR_OZT_NO_PARTS,"Частини не стають разом: перевірте смугу частин","Some parts do not go on together: check the strip of parts"
 STR_OZT_NO_STOCK,Товар закінчився,Out of stock
 STR_OZT_NO_INTERNAL,Торговець не зміг виконати угоду,The trader could not complete the deal
 # The trade screen. Titles are capitals in both languages; the capital of the
@@ -87,6 +88,7 @@ STR_OZT_UI_TAKE_ALL_OFF,ЗНЯТИ ВСЕ,TAKE ALL OFF
 STR_OZT_UI_IN_DEAL,"Ця річ в угоді: спершу приберіть її з продажу","This thing is in the deal: take it out of the sale first"
 STR_OZT_UI_NO_ROOM,"У сумках немає місця для цієї речі","There is no room for this thing in your bags"
 STR_OZT_UI_NO_SLOT,"Немає вільного слота для цієї речі","There is no free slot for this thing"
+STR_OZT_UI_PARTS_DROPPED,"Більше не стає, прибрано з угоди: %1","No longer fits, taken out of the deal: %1"
 STR_OZT_UI_TRYING,примірка: ще не куплено,trying on: not bought yet
 # The parts strip.
 STR_OZT_UI_PARTS_ROUNDS,Набої,Rounds

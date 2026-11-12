@@ -2846,6 +2846,7 @@ class OZT_TradeMenu : UIScriptedMenu
 
     protected void CartChanged()
     {
+        string pruned = PruneParts();
         m_Quote = null;
         m_QuoteTries = 0;
         m_DirtyOwn = true;
@@ -2856,8 +2857,219 @@ class OZT_TradeMenu : UIScriptedMenu
             m_QuoteIn = -1;
         else
             QuoteSoon(QUOTE_AFTER);
-        SayInfo(OZT_Ui.Words("STR_OZT_UI_HELLO"), OZT_Look.Text());
+        if (pruned != "")
+            SayInfo(OZT_Ui.Words1("STR_OZT_UI_PARTS_DROPPED", pruned), OZT_Look.Alert());
+        else
+            SayInfo(OZT_Ui.Words("STR_OZT_UI_HELLO"), OZT_Look.Text());
         PaintDeal();
+    }
+
+    // After every change of the cart: a part chosen for a slot the deal has
+    // made unavailable -- a light bought for a rifle whose rail handguard the
+    // deal replaces with a wooden one -- leaves the deal, and the screen names
+    // it (the owner, 2026-11-12). The server's own question (OZT_Deal
+    // .CheckFits), asked in passes: what does not go on yet is tried again
+    // after the rest (a light waits for the rail bought with it), and what
+    // never goes on is out. Returns the names of what left, or "".
+    protected string PruneParts()
+    {
+        array<string> lost = new array<string>();
+        PruneOntos(lost);
+        PruneFits(lost);
+        string names = "";
+        for (int i = 0; i < lost.Count(); i++)
+        {
+            if (i > 0)
+                names = names + ", ";
+            names = names + lost[i];
+        }
+        return names;
+    }
+
+    // Would `host` take a thing of `type` in that slot now, as the engine sees it?
+    protected bool Takes(EntityAI host, string type, int slotId)
+    {
+        EntityAI part = m_Shelf.Of(type);
+        if (!host || !part || slotId == InventorySlots.INVALID)
+            return false;
+        InventoryLocation loc = new InventoryLocation();
+        loc.SetAttachment(host, part, slotId);
+        return GameInventory.LocationTestAddEntity(loc, false, true, false, false, true, false);
+    }
+
+    // A local twin of a carried thing as the deal leaves it: its parts but the
+    // ones the cart sells and the ones in `freed` (the slots parts are bought
+    // onto, whose old parts the deal sells or puts in the bags). The caller
+    // deletes it.
+    protected EntityAI BareTwin(EntityAI real, array<int> freed)
+    {
+        EntityAI twin = EntityAI.Cast(GetGame().CreateObjectEx(real.GetType(), "0 0 0", ECE_LOCAL));
+        if (!twin)
+            return null;
+        twin.DisableSimulation(true);
+        int n = real.GetInventory().AttachmentCount();
+        InventoryLocation il = new InventoryLocation();
+        for (int i = 0; i < n; i++)
+        {
+            EntityAI part = real.GetInventory().GetAttachmentFromIndex(i);
+            if (!part || !part.GetInventory().GetCurrentInventoryLocation(il))
+                continue;
+            if (freed.Find(il.GetSlot()) > -1)
+                continue;
+            int pl;
+            int ph;
+            part.GetNetworkID(pl, ph);
+            if (SellLineOf(pl, ph) > -1)
+                continue;
+            EntityAI copy = twin.GetInventory().CreateAttachmentEx(part.GetType(), il.GetSlot());
+            if (copy)
+                OZT_Shelf.CopyParts(part, copy, 1);
+        }
+        return twin;
+    }
+
+    // Parts bought onto the player's own things, thing by thing.
+    protected void PruneOntos(array<string> lost)
+    {
+        array<int> drop = new array<int>();
+        array<int> doneLow = new array<int>();
+        array<int> doneHigh = new array<int>();
+        for (int b = 0; b < m_Cart.Buys.Count(); b++)
+        {
+            OZT_CartLine first = m_Cart.Buys[b];
+            if (!first.IsOnto())
+                continue;
+            bool seen = false;
+            for (int d = 0; d < doneLow.Count(); d++)
+            {
+                if (doneLow[d] == first.OnLow && doneHigh[d] == first.OnHigh)
+                    seen = true;
+            }
+            if (seen)
+                continue;
+            doneLow.Insert(first.OnLow);
+            doneHigh.Insert(first.OnHigh);
+            EntityAI host = EntityAI.Cast(GetGame().GetObjectByNetworkId(first.OnLow, first.OnHigh));
+            if (!host)
+                continue;
+
+            array<int> lines = new array<int>();
+            array<int> slots = new array<int>();
+            for (int k = 0; k < m_Cart.Buys.Count(); k++)
+            {
+                OZT_CartLine l = m_Cart.Buys[k];
+                if (l.OnLow != first.OnLow || l.OnHigh != first.OnHigh)
+                    continue;
+                lines.Insert(k);
+                slots.Insert(InventorySlots.GetSlotIdFromString(l.OnSlot));
+            }
+            EntityAI twin = BareTwin(host, slots);
+            if (!twin)
+                continue;
+            array<bool> placed = new array<bool>();
+            for (int p = 0; p < lines.Count(); p++)
+                placed.Insert(false);
+            bool progress = true;
+            while (progress)
+            {
+                progress = false;
+                for (int q = 0; q < lines.Count(); q++)
+                {
+                    if (placed[q])
+                        continue;
+                    string qType = m_Cart.Buys[lines[q]].Type;
+                    if (!Takes(twin, qType, slots[q]))
+                        continue;
+                    twin.GetInventory().CreateAttachmentEx(qType, slots[q]);
+                    placed[q] = true;
+                    progress = true;
+                }
+            }
+            GetGame().ObjectDelete(twin);
+            for (int r = 0; r < lines.Count(); r++)
+            {
+                if (!placed[r])
+                    drop.Insert(lines[r]);
+            }
+        }
+        // The last first, so the indices before them hold.
+        drop.Sort();
+        for (int x = drop.Count() - 1; x >= 0; x--)
+        {
+            lost.Insert(OZT_Ui.NameOf(m_Shelf.Of(m_Cart.Buys[drop[x]].Type)));
+            m_Cart.BuyCount(drop[x], 0);
+        }
+    }
+
+    // Parts fitted to goods bought in this deal, line by line.
+    protected void PruneFits(array<string> lost)
+    {
+        for (int b = 0; b < m_Cart.Buys.Count(); b++)
+        {
+            OZT_CartLine line = m_Cart.Buys[b];
+            if (line.IsOnto() || line.Fits.Count() == 0)
+                continue;
+            EntityAI fresh = EntityAI.Cast(GetGame().CreateObjectEx(line.Type, "0 0 0", ECE_LOCAL));
+            if (!fresh)
+                continue;
+            fresh.DisableSimulation(true);
+            OZT_WireGoods g = GoodsOf(line.Type);
+            if (g && g.With)
+            {
+                array<string> taken = new array<string>();
+                for (int w = 0; w < g.With.Count(); w++)
+                {
+                    string ws = OZT_Fit.SlotFor(line.Type, g.With[w], taken);
+                    if (ws == "")
+                        continue;
+                    taken.Insert(ws);
+                    fresh.GetInventory().CreateAttachmentEx(g.With[w], InventorySlots.GetSlotIdFromString(ws));
+                }
+            }
+            int count = line.Fits.Count();
+            array<EntityAI> made = new array<EntityAI>();
+            array<bool> placed = new array<bool>();
+            for (int i = 0; i < count; i++)
+            {
+                made.Insert(null);
+                placed.Insert(false);
+            }
+            bool progress = true;
+            while (progress)
+            {
+                progress = false;
+                for (int f = 0; f < count; f++)
+                {
+                    if (placed[f])
+                        continue;
+                    OZT_CartFit fit = line.Fits[f];
+                    EntityAI on = fresh;
+                    if (fit.On >= 0)
+                    {
+                        on = null;
+                        if (fit.On < count && placed[fit.On])
+                            on = made[fit.On];
+                    }
+                    int sid = InventorySlots.GetSlotIdFromString(fit.SlotName);
+                    if (!on || !Takes(on, fit.Type, sid))
+                        continue;
+                    made[f] = on.GetInventory().CreateAttachmentEx(fit.Type, sid);
+                    if (!made[f])
+                        continue;
+                    placed[f] = true;
+                    progress = true;
+                }
+            }
+            GetGame().ObjectDelete(fresh);
+            // The last first: a fit dropped takes what hangs on it along.
+            for (int x = count - 1; x >= 0; x--)
+            {
+                if (placed[x] || x >= line.Fits.Count())
+                    continue;
+                lost.Insert(OZT_Ui.NameOf(m_Shelf.Of(line.Fits[x].Type)));
+                m_Cart.DropFit(b, x);
+            }
+        }
     }
 
     void ClearDeal()

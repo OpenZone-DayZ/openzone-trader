@@ -80,7 +80,7 @@
         { "Id": "weapons", "Name": "Зброя",
           "Discounts": [ { "Percent": 10, "When": [ { "Kind": "post", "Arg": "quartermaster" } ] } ],
           "Goods": [
-            { "ClassName": "AKM", "Buy": 2500, "Sell": 1250, "Stock": { "Max": 3, "Coefficient": 0.95, "Destock": 0.25 } },
+            { "ClassName": "AKM", "Buy": 2500, "Sell": 1250, "Stock": { "Max": 3, "Coefficient": 0.95, "Destock": 0.25, "Floor": 0.4 } },
             { "ClassName": "Mag_AKM_30Rnd", "Buy": 180, "Sell": 90 },
             { "ClassName": "PSO1Optic", "Buy": 600, "Sell": 300 },
             { "ClassName": "PSO11Optic", "Buy": 900, "Sell": 450 },

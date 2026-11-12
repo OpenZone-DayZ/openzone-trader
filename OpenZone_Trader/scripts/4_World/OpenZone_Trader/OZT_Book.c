@@ -111,10 +111,12 @@ class OZT_BookEntry
     ref array<ref OZT_Discount> Discounts;
 
     // Finite goods (design §11.1): the line's Stock block; unlimited without.
+    // Floor: the line's own, else the settings' StockFloor.
     bool Stocked;
     int MaxStock;
     float Coefficient = 1;
     float Destock;
+    float Floor;
 }
 
 class OZT_Book
@@ -157,6 +159,9 @@ class OZT_Book
                     e.MaxStock = line.Stock.Max;
                     e.Coefficient = line.Stock.Coefficient;
                     e.Destock = line.Stock.Destock;
+                    e.Floor = line.Stock.Floor;
+                    if (e.Floor <= 0)
+                        e.Floor = OZT_Config.Get().Settings().StockFloor;
                 }
                 s_ByClass.Set(e.ClassName, e);
             }
@@ -313,11 +318,18 @@ class OZT_Book
         return level;
     }
 
-    static float Curve(float coef, int n)
+    // The share of a line's price at a stock: Coefficient^n, never below the
+    // line's floor (design §11.1). The same floor on both sides keeps "a unit
+    // sold and bought straight back brings no money": the loop check's
+    // Sell <= Buy x min(Coefficient, 1) holds at the floor as above it.
+    static float Curve(float coef, int n, float floor = 0)
     {
-        if (coef == 1 || n <= 0)
-            return 1;
-        return Math.Pow(coef, n);
+        float share = 1;
+        if (coef != 1 && n > 0)
+            share = Math.Pow(coef, n);
+        if (share < floor)
+            share = floor;
+        return share;
     }
 
     // The line as it stands, or as the deal behind `cursor` has left it.
@@ -358,7 +370,7 @@ class OZT_Book
         int sum = 0;
         for (int j = 0; j < count; j++)
         {
-            int piece = OZT_Config.RoundUpTo(base * Curve(e.Coefficient, stock - 1 - j), unit);
+            int piece = OZT_Config.RoundUpTo(base * Curve(e.Coefficient, stock - 1 - j, e.Floor), unit);
             if (pct > 0)
                 piece = OZT_Config.RoundUpTo(piece * (100 - pct) / 100, unit);
             sum = sum + piece;
@@ -499,7 +511,7 @@ class OZT_Book
             int n = stock + j;
             if (n < 1)
                 n = 1;
-            sum = sum + each * Curve(e.Coefficient, n - 1);
+            sum = sum + each * Curve(e.Coefficient, n - 1, e.Floor);
         }
         int paid = OZT_Config.RoundDownTo(sum, OZT_Config.Get().Unit());
         if (paid > 0 && cursor)

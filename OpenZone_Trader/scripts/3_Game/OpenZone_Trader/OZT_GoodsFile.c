@@ -13,8 +13,9 @@
 // threshold (0: the trader holds only what players sell him; write it with its
 // Coefficient, a block of zeros reads as no block), `Coefficient` the price's
 // change per unit of stock (price x Coefficient^(stock-1)), `Destock` the share
-// a full line loses at a server start. TraderPlus's product line maps onto it
-// one to one.
+// a full line loses at a server start, `Floor` the least share of its prices
+// the curve brings it to (0..1; 0 or left out: the settings' StockFloor).
+// TraderPlus's product line maps onto it (OZT_TPImport); it has no floor.
 //
 // `With` names classes that come attached to the goods: a pistol with its
 // magazine. Each is goods of the book itself and is charged at its own price:
@@ -31,11 +32,19 @@ class OZT_GoodsStock
     float Coefficient = 1;
     float Destock = 0;
 
+    // The price never falls below this share of the line's own prices, on
+    // either side (the owner, 2026-11-12: "min price"): Buy x Floor for the
+    // player, Sell x Floor for the trader. 0: the settings' StockFloor.
+    float Floor = 0;
+
     // Does the block say anything? A block of zeros is one the file did not
     // carry: "only what players sell" is written with its Coefficient.
     bool Said()
     {
-        return Max != 0 || Coefficient != 0 || Destock != 0;
+        bool shape = Max != 0 || Coefficient != 0;
+        if (shape)
+            return true;
+        return Destock != 0 || Floor != 0;
     }
 
     OZT_GoodsStock Copy()
@@ -44,6 +53,7 @@ class OZT_GoodsStock
         c.Max = Max;
         c.Coefficient = Coefficient;
         c.Destock = Destock;
+        c.Floor = Floor;
         return c;
     }
 }
@@ -230,6 +240,12 @@ class OZT_GoodsFile : OZ_ConfigBase
         {
             OZT_Log.Warn("Goods: '" + e.ClassName + "' has Stock.Destock " + st.Destock.ToString() + "; it is a share, 0..1. Using 0");
             st.Destock = 0;
+            fixes++;
+        }
+        if (st.Floor < 0 || st.Floor > 1)
+        {
+            OZT_Log.Warn("Goods: '" + e.ClassName + "' has Stock.Floor " + st.Floor.ToString() + "; it is a share, 0..1. Using the settings' StockFloor");
+            st.Floor = 0;
             fixes++;
         }
         return fixes;

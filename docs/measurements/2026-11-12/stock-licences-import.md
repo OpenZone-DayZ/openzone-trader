@@ -15,6 +15,7 @@ client, sent to the owner. Prices are in the stand's notes, the smallest of whic
 | S.5 | a stocked line with nothing in it | one record with `Stock` 0: a red 0, a red corner and a muted price on the tile; it does not go into the cart; the card reads "In stock" with the count otherwise |
 | S.6 | no ceiling (the owner, 2026-11-12): the AKM line pushed to 122 (`op=stock delta=120`) | `quote sell=AKM` refused `STR_OZT_NO_NOT_TAKEN` (1250 x 0.95^121 is below the note of 5); the shelf sells an AKM for 10 (2500 x 0.95^121 = 5.05, up to the note). The tiles of the player's two AKMs showed 1 250 (the price without the stock: `open` priced the player's things by `SellPrice`); since the fix (`SellPriceAt` at the stock the line holds) they are red, not taken, as the deal says |
 | S.7 | a restart with `StartStock` 1 and `DestockAtStart` 1, the AKM line at 122 | 2 after the start: filled to `Max` 3, then the destock share 0.25 of 3 rounded to 1 taken off (`stock 'stand': 3 line(s) at the start`) |
+| S.8 | a floor (the owner, 2026-11-12: "min price"): the AKM line with `Floor` 0.4, pushed to 122 | `quote sell=AKM` ok, 1 575 for the player's AKM with its parts (the rifle 1250 x 0.4 = 500); the tiles 1 575 on the shoulder and 1 830 in the hands; the shelf sells an AKM for 1 000 (2500 x 0.4) where it sold for 10 without the floor (S.6); `goods=105 problems=0` |
 
 ## Licences (7b)
 

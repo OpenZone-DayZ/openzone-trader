@@ -99,6 +99,10 @@ class OZT_Settings : OZ_ConfigBase
     int DestockAtStart = 0;
     // 1: what players sell goes into the pristine line whatever its condition.
     int StockOnlyPristine = 0;
+    // The least share of a stocked line's prices the curve brings it to, for
+    // every line whose Stock does not name its own Floor (0..1; 0: none, the
+    // price falls until a unit brings less than the smallest note).
+    float StockFloor = 0;
 
     // The licences of the server (design §11.2).
     ref array<ref OZT_LicenceDef> Licences;
@@ -211,6 +215,12 @@ class OZT_Settings : OZ_ConfigBase
             }
         }
         Licences = defs;
+        if (StockFloor < 0 || StockFloor > 1)
+        {
+            OZT_Log.Warn("Settings: StockFloor " + StockFloor.ToString() + " is a share, 0..1; using 0");
+            StockFloor = 0;
+            warnings++;
+        }
         if (StartStock < 0 || StartStock > 2)
         {
             OZT_Log.Warn("Settings: StartStock " + StartStock.ToString() + " is 0, 1 or 2; using 0");

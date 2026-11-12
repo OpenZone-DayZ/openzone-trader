@@ -61,6 +61,18 @@ class OZT_Admin : OZ_AdminSection
             error = "";
             return ListJson();
         }
+        if (verb == "import_traderplus")
+        {
+            string told = ImportTraderPlus(json);
+            if (told != "")
+            {
+                error = told;
+                return "";
+            }
+            ok = true;
+            error = "";
+            return ListJson();
+        }
 
         OZT_TradersFile file = new OZT_TradersFile();
         if (!OZ_ConfigLoader<OZT_TradersFile>.Load(OZT_Const.TRADERS, TAG, file, true, false))
@@ -120,6 +132,28 @@ class OZT_Admin : OZ_AdminSection
         else
             OZT_Licences.Revoke(uid, req.Id);
         OZT_Log.Info("admin: licence '" + req.Id + "' grant=" + req.Grant.ToString() + " for a player");
+        return "";
+    }
+
+    // TraderPlus's files to ours (design §11.3): a dry run unless Apply is 1.
+    // The report goes to OpenZone\TraderPlusImport\report.txt and the log.
+    protected string ImportTraderPlus(string json)
+    {
+        OZT_AdminImport req = new OZT_AdminImport();
+        string err;
+        if (json != "" && !JsonFileLoader<OZT_AdminImport>.LoadData(json, req, err))
+            return "STR_OZT_ADMIN_BAD_REQUEST";
+        // A folder under the server's profile, and nowhere else.
+        if (req.Root != "")
+        {
+            if (req.Root.IndexOf("$profile:") != 0 || req.Root.Contains(".."))
+                return "STR_OZT_ADMIN_BAD_REQUEST";
+        }
+        bool done;
+        string report = OZT_TPImport.Run(req.Root, req.Apply == 1, done);
+        OZT_Log.Info("admin: TraderPlus import, apply=" + req.Apply.ToString() + "\n" + report);
+        if (!done)
+            return "STR_OZT_ADMIN_NO_TRADERPLUS";
         return "";
     }
 

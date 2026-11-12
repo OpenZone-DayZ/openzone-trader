@@ -23,6 +23,8 @@ class OZT_VerbOps
             return OZT_VerbNpc.OpFps(args, detail);
         if (op == "recur")
             return OZT_VerbRecur.Op(detail);
+        if (op == "import")
+            return OpImport(args, detail);
 
         PlayerBase player = Player();
         if (!player)
@@ -70,7 +72,7 @@ class OZT_VerbOps
 
     static string KnownOps()
     {
-        return "status, reload, fps, recur, balance, price, pay, damage, open, fit, quote, deal, show, tree, load, fits, hurt, admin, flag";
+        return "status, reload, fps, recur, import, balance, price, pay, damage, open, fit, quote, deal, licence, show, tree, load, fits, hurt, admin, flag";
     }
 
     // ---- what the ops share ---------------------------------------------------
@@ -788,6 +790,20 @@ class OZT_VerbOps
         OZ_Rpc.Show(to, OZT_Const.SHOW_PREFIX + id);
         detail = "show: sent '" + OZT_Const.SHOW_PREFIX + id + "'";
         return true;
+    }
+
+    // import [apply=1] [root=<folder>]: TraderPlus's files to ours (design
+    // §11.3), a dry run unless apply=1; root "" is TraderPlus's own folder.
+    // The whole report is in OpenZone\TraderPlusImport\report.txt.
+    static bool OpImport(map<string, string> args, out string detail)
+    {
+        string root = Arg(args, "root", "");
+        bool apply = Arg(args, "apply", "0") == "1";
+        bool done;
+        string report = OZT_TPImport.Run(root, apply, done);
+        report.Replace("\n", " | ");
+        detail = "import: " + report;
+        return done;
     }
 
     // ---- the ops of this task -------------------------------------------------

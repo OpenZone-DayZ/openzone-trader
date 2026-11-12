@@ -86,6 +86,14 @@ class OZT_AdminLicence
     int Grant = 1;
 }
 
+// The TraderPlus import (design §11.3): a dry run unless Apply is 1; Root is
+// the folder of TraderPlus's files under the profile, "" for its own.
+class OZT_AdminImport
+{
+    int Apply = 0;
+    string Root = "";
+}
+
 class OZT_AdminSet
 {
     string Name = "";

@@ -17,6 +17,14 @@ class OZT_Admin : OZ_AdminSection
 {
     static const string TAG = "trader points";
 
+    // Reads change nothing: other admins are not told about them (the core's
+    // OZ_AdminTell, VPP rework 2026-11-12). The window's own list is the same.
+    override bool IsRead(string op)
+    {
+        array<string> reads = {"list", "stock_list", "licence_list", "problems", "gates", "gate_holders"};
+        return reads.Find(op) != -1;
+    }
+
     override string Handle(string op, string json, PlayerIdentity sender, out bool ok, out string error)
     {
         ok = false;

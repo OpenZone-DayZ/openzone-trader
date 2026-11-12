@@ -155,6 +155,20 @@ class OZT_ItemMoney : OZT_MoneyProvider
         return sum - amount;
     }
 
+    // Cash first, then the bank: every note the player has left pays.
+    // Returns their sum.
+    static int SpendAll(array<ref OZT_NoteStack> stacks)
+    {
+        int sum = 0;
+        for (int i = 0; i < stacks.Count(); i++)
+        {
+            OZT_NoteStack s = stacks[i];
+            s.Spend = s.Units;
+            sum = sum + s.Units * s.Value;
+        }
+        return sum;
+    }
+
     // A sum in the largest notes: counts[i] units of Settings.Notes[i]. False
     // when the notes cannot make it (it is not a multiple of the smallest).
     static bool Change(int amount, out array<int> counts)

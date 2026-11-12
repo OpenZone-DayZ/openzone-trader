@@ -159,6 +159,9 @@ class OZT_Deal
 
     protected int m_Net;
     protected int m_Give;
+    // Cash first, then the bank: what the bank pays (above zero) or takes
+    // (below zero) in this deal; 0 for every plain provider.
+    protected int m_Bank;
     protected string m_Lines;
 
     // The notes the player gives and takes at the change tab, by face value.
@@ -302,6 +305,7 @@ class OZT_Deal
             m_Res.Paid = m_Net;
         else
             m_Res.Received = -m_Net;
+        m_Res.Bank = m_Bank;
 
         if (!commit)
         {
@@ -868,6 +872,7 @@ class OZT_Deal
     protected string PlanMoney()
     {
         m_Give = 0;
+        m_Bank = 0;
         if (!m_Money.Physical())
         {
             if (m_Net > 0 && m_Money.Balance(m_Player) < m_Net)
@@ -892,7 +897,19 @@ class OZT_Deal
         }
         int change = OZT_ItemMoney.Pay(stacks, m_Net);
         if (change < 0)
-            return OZT_Const.NO_MONEY;
+        {
+            // Cash first, then the bank (the owner, 2026-11-12): every note
+            // pays, the bank the rest.
+            OZT_MoneyProvider bank = m_Money.Then();
+            if (!bank)
+                return OZT_Const.NO_MONEY;
+            int cash = OZT_ItemMoney.SpendAll(stacks);
+            int rest = m_Net - cash;
+            if (bank.Balance(m_Player) < rest)
+                return OZT_Const.NO_MONEY;
+            m_Bank = rest;
+            change = 0;
+        }
         for (int i = 0; i < stacks.Count(); i++)
         {
             OZT_NoteStack s = stacks[i];
@@ -942,10 +959,41 @@ class OZT_Deal
     {
         int adrift = PlanMoves();
         int kept = m_Grows.Count();
+        int left;
+        string why = LayAll(kept, adrift, left);
+        if (why != OZT_Const.NO_SPACE)
+            return why;
+
+        // Cash first, then the bank: the notes the trader hands over that find
+        // no room go to the bank instead, and what the deal makes keeps the
+        // bags.
+        OZT_MoneyProvider bank = m_Money.Then();
+        if (bank && m_Give > 0)
+        {
+            UnlayThings(kept);
+            m_Bank = m_Bank - m_Give;
+            m_Give = 0;
+            int again;
+            why = LayAll(kept, adrift, again);
+            if (why != OZT_Const.NO_SPACE)
+                return why;
+        }
+
+        // The count a refusal carries is the first laying's: how many things had
+        // no place when the bags were used best.
+        m_Res.Left = left;
+        return OZT_Const.NO_SPACE;
+    }
+
+    // One laying of everything, with the hands for the one thing that has no
+    // place and once more with the largest set aside: "" when all has a place,
+    // NO_SPACE with `left` the things without one, or another refusal.
+    protected string LayAll(int kept, int adrift, out int left)
+    {
         string why = LayThings(false);
         if (why != "")
             return why;
-        int left = m_Homeless.Count() + adrift;
+        left = m_Homeless.Count() + adrift;
         if (left == 0)
             return "";
 
@@ -978,10 +1026,6 @@ class OZT_Deal
                 return "";
             m_Res.InHands = "";
         }
-
-        // The count a refusal carries is the first laying's: how many things had
-        // no place when the bags were used best.
-        m_Res.Left = left;
         return OZT_Const.NO_SPACE;
     }
 
@@ -1448,10 +1492,16 @@ class OZT_Deal
             return why;
 
         // Money that is not items leaves before anything is deleted: if it
-        // cannot, nothing is sold (parts that came off stay off).
+        // cannot, nothing is sold (parts that came off stay off). So does the
+        // bank's share behind cash.
         if (!m_Money.Physical() && m_Net > 0)
         {
             if (!m_Money.Take(m_Player, m_Net, "deal"))
+                return OZT_Const.NO_MONEY;
+        }
+        if (m_Bank > 0)
+        {
+            if (!m_Money.Then().Take(m_Player, m_Bank, "deal"))
                 return OZT_Const.NO_MONEY;
         }
 
@@ -1487,6 +1537,8 @@ class OZT_Deal
 
         if (!m_Money.Physical() && m_Net < 0)
             m_Money.Give(m_Player, -m_Net, "deal");
+        if (m_Bank < 0)
+            m_Money.Then().Give(m_Player, -m_Bank, "deal");
 
         // The stock moves of the deal onto the shelf and into its file; the
         // others at a point of that stock hear of it.
@@ -1503,6 +1555,8 @@ class OZT_Deal
 
         string line = "deal: " + uid + " at '" + m_Trader.Id + "' net " + m_Net.ToString();
         line = line + " (" + m_Money.Id() + "):" + m_Lines;
+        if (m_Bank != 0)
+            line = line + " bank=" + m_Bank.ToString();
         OZT_Log.Info(line);
         return "";
     }

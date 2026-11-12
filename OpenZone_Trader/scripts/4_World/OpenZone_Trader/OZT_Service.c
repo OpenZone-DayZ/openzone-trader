@@ -92,6 +92,8 @@ class OZT_Open
         res.Unit = money.Unit();
         res.Label = money.Label();
         res.Balance = money.Balance(player);
+        if (money.Then())
+            res.Bank = money.Then().Balance(player);
         res.WearBought = OZT_Config.Get().Settings().WearBought;
         if (money.Physical())
         {

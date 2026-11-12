@@ -1,7 +1,10 @@
 // OZ_Trader_Settings.json: what holds for every trader of the server.
 //
 // Money first. `Provider` names the money provider of the server ("items", or
-// the id a bank glue registers); a trader may name another. With item money
+// the id a bank glue registers); a trader may name another. "items+<bank>" is
+// cash first, then that bank (the owner, 2026-11-12): the notes pay first and
+// the bank the rest, and what the trader pays out that finds no room in the
+// bags goes to the bank; a bank that is not loaded leaves cash alone. With item money
 // `Notes` lists the banknote classes and what one unit of each is worth, and
 // `Holders` the wallet-like classes that are filled before the bags.
 

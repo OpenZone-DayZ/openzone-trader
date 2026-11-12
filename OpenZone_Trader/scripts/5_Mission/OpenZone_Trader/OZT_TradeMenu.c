@@ -451,6 +451,16 @@ class OZT_TradeMenu : UIScriptedMenu
 
     // ---- the service ----------------------------------------------------------------------
 
+    // The player's money: the sum, or with a bank behind the notes the notes
+    // and the account apart.
+    protected string MoneyWords(OZT_OpenRes res)
+    {
+        if (res.Bank < 0)
+            return OZT_Ui.Sum(res.Balance);
+        string cash = OZT_Ui.Sum(res.Balance - res.Bank);
+        return cash + " + " + OZT_Ui.Words1("STR_OZT_UI_IN_BANK", OZT_Ui.Sum(res.Bank));
+    }
+
     // Somebody else's deal changed the stock this trader sells from (the
     // server's NOTICE_STOCK): the shelf, its counts and its prices are asked
     // again, and the cart is quoted again once they are in.
@@ -554,7 +564,7 @@ class OZT_TradeMenu : UIScriptedMenu
             SayInfo(OZT_Ui.Words("STR_OZT_UI_HELLO"), OZT_Look.Text());
         }
         SayShelfMeta();
-        OZT_Ui.Say(layoutRoot, "OwnMoney", OZT_Ui.Sum(res.Balance));
+        OZT_Ui.Say(layoutRoot, "OwnMoney", MoneyWords(res));
         m_DirtyParts = true;
 
         if (m_Cart.Prune(res) > 0)
@@ -1703,6 +1713,11 @@ class OZT_TradeMenu : UIScriptedMenu
                     space = OZT_Ui.Words1("STR_OZT_UI_TO_HANDS", what);
                     spaceColor = OZT_Look.Alert();
                 }
+                // Cash first, then the bank: the bank's share is said first.
+                if (m_Quote.Bank > 0)
+                    space = OZT_Ui.Words1("STR_OZT_UI_FROM_BANK", OZT_Ui.Sum(m_Quote.Bank)) + " " + space;
+                else if (m_Quote.Bank < 0)
+                    space = OZT_Ui.Words1("STR_OZT_UI_TO_BANK", OZT_Ui.Sum(-m_Quote.Bank));
             }
             else
             {

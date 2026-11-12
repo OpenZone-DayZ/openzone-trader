@@ -82,6 +82,9 @@ class OZT_OpenRes
     int Unit = 1;
     string Label = "";
     int Balance = 0;
+    // Cash first, then the bank: the bank's share of Balance; -1 when no bank
+    // stands behind the notes.
+    int Bank = -1;
     int WearBought = 1;
     ref OZT_ConditionFactors Condition;
     ref array<ref OZT_WireCategory> Categories;
@@ -249,6 +252,9 @@ class OZT_DealRes
     int Paid = 0;
     int Received = 0;
     int Balance = 0;
+    // Cash first, then the bank: what the bank pays (above zero) or takes
+    // (below zero) in this deal.
+    int Bank = 0;
 
     // The class of the one thing that went to the hands; "" when none did.
     string InHands = "";

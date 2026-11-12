@@ -55,5 +55,5 @@ noise        = ["Bridge.Url is not https", "bridge: "]
 [expect.counters]
 # The stall and Ostap, a trader's character (phase 4).
 traders  = 2
-goods    = 29
+goods    = 90
 problems = 0

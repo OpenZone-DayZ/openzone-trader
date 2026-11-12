@@ -668,6 +668,9 @@ class OZT_TradeMenu : UIScriptedMenu
         array<EntityAI> all = new array<EntityAI>();
         player.GetInventory().EnumerateInventory(InventoryTraversalType.PREORDER, all);
         int sig = all.Count();
+        // Where each thing is counts too: a thing taken off into a bag keeps
+        // its id, and only its place says it moved.
+        InventoryLocation il = new InventoryLocation();
         for (int i = 0; i < all.Count(); i++)
         {
             EntityAI e = all[i];
@@ -678,6 +681,11 @@ class OZT_TradeMenu : UIScriptedMenu
             e.GetNetworkID(low, high);
             sig = sig * 31 + low;
             sig = sig + OZT_Stack.Units(e) * 7 + e.GetHealthLevel();
+            if (e.GetInventory().GetCurrentInventoryLocation(il))
+            {
+                sig = sig * 13 + il.GetType() * 5 + il.GetSlot();
+                sig = sig + il.GetRow() * 3 + il.GetCol();
+            }
         }
         return sig;
     }
@@ -2060,6 +2068,54 @@ class OZT_TradeMenu : UIScriptedMenu
         }
     }
 
+    // The player's own thing, as the game's inventory moves it: dropped on the
+    // player's things it comes off the character (or out of the hands) into
+    // the bags; dropped on the character it is put on, in a free slot. The
+    // engine's predictive moves, as the vanilla inventory makes them; the
+    // screen follows when the things change (WatchThings).
+    protected void MoveOwn(int low, int high, bool wear)
+    {
+        PlayerBase me = PlayerBase.Cast(GetGame().GetPlayer());
+        EntityAI item = EntityAI.Cast(GetGame().GetObjectByNetworkId(low, high));
+        if (!me || !item || item.GetHierarchyRootPlayer() != me)
+            return;
+        if (SellLineOf(low, high) > -1)
+        {
+            SayInfo(OZT_Ui.Words("STR_OZT_UI_IN_DEAL"), OZT_Look.Alert());
+            return;
+        }
+        InventoryLocation at = new InventoryLocation();
+        if (!item.GetInventory().GetCurrentInventoryLocation(at))
+            return;
+        bool onBody = false;
+        if (at.GetType() == InventoryLocationType.HANDS)
+            onBody = true;
+        else if (at.GetType() == InventoryLocationType.ATTACHMENT && at.GetParent() == me)
+            onBody = true;
+
+        if (wear)
+        {
+            if (onBody)
+                return;
+            if (!me.GetInventory().CanAddAttachment(item))
+            {
+                SayInfo(OZT_Ui.Words("STR_OZT_UI_NO_SLOT"), OZT_Look.Alert());
+                return;
+            }
+            me.PredictiveTakeEntityToTargetAttachment(me, item);
+            return;
+        }
+        if (!onBody)
+            return;
+        InventoryLocation to = new InventoryLocation();
+        if (!me.GetInventory().FindFreeLocationFor(item, FindInventoryLocationType.CARGO, to))
+        {
+            SayInfo(OZT_Ui.Words("STR_OZT_UI_NO_ROOM"), OZT_Look.Alert());
+            return;
+        }
+        me.PredictiveTakeEntityToInventory(FindInventoryLocationType.CARGO, item);
+    }
+
     protected int SellLineOf(int low, int high)
     {
         for (int i = 0; i < m_Cart.Sells.Count(); i++)
@@ -2470,7 +2526,7 @@ class OZT_TradeMenu : UIScriptedMenu
         if (kind == OZT_Tile.SHELF)
             return zone == ZONE_BUY || zone == ZONE_OWN || zone == ZONE_CHAR;
         if (kind == OZT_Tile.OWN)
-            return zone == ZONE_SELL || zone == ZONE_SHELF;
+            return zone == ZONE_SELL || zone == ZONE_SHELF || zone == ZONE_OWN || zone == ZONE_CHAR;
         if (kind == OZT_Tile.BUY)
             return zone != ZONE_BUY && zone != ZONE_NONE;
         if (kind == OZT_Tile.SELL)
@@ -2535,6 +2591,8 @@ class OZT_TradeMenu : UIScriptedMenu
 
         if (kind == OZT_Tile.SHELF)
             AddBuy(m_ActType);
+        else if (kind == OZT_Tile.OWN && (m_ActZone == ZONE_OWN || m_ActZone == ZONE_CHAR))
+            MoveOwn(m_ActLow, m_ActHigh, m_ActZone == ZONE_CHAR);
         else if (kind == OZT_Tile.OWN)
             AddSell(m_ActLow, m_ActHigh);
         else if (kind == OZT_Tile.BUY)

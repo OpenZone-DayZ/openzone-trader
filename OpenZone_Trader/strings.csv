@@ -43,7 +43,7 @@ STR_OZT_UI_TO_HANDS,Місця немає: %1 піде в руки,No room in yo
 STR_OZT_UI_ASKING,Торговець рахує...,The trader is counting...
 STR_OZT_UI_EMPTY_DEAL,Куплене й решта лягають у перше вільне місце,Bought items and change go to the first free space in your bags
 STR_OZT_UI_LOADING,Чекаємо на торговця...,Waiting for the trader...
-STR_OZT_UI_HELLO,"Клацніть річ, щоб вибрати її. Двічі клацніть або перетягніть, щоб додати до угоди.","Click an item to select it. Double-click or drag it to move it into the deal."
+STR_OZT_UI_HELLO,"Клацніть, щоб вибрати. Двічі клацніть або перетягніть в угоду. Надіте тягніть у свої речі, щоб зняти, а на персонажа, щоб надіти.","Click to select. Double-click or drag into the deal. Drag worn things into your items to take them off, onto the character to put them on."
 STR_OZT_UI_DONE,Угоду укладено,The deal is done
 STR_OZT_UI_KEYS,ЛКМ - вибрати     2xЛКМ або перетягнути - в угоду     F - підтвердити     R - очистити     P - прайс     Esc - закрити,LMB - select     2xLMB or drag - into the deal     F - confirm     R - clear     P - price list     Esc - close
 STR_OZT_UI_WHY_NOT_TAKEN,Торговець це не бере,The trader does not take this
@@ -84,6 +84,9 @@ STR_OZT_UI_LIST_NOTE,"Торговець платить вказану суму 
 STR_OZT_UI_TRY_ON,ПРИМIРЯТИ,TRY ON
 STR_OZT_UI_TAKE_OFF,ЗНЯТИ,TAKE OFF
 STR_OZT_UI_TAKE_ALL_OFF,ЗНЯТИ ВСЕ,TAKE ALL OFF
+STR_OZT_UI_IN_DEAL,"Ця річ в угоді: спершу приберіть її з продажу","This thing is in the deal: take it out of the sale first"
+STR_OZT_UI_NO_ROOM,"У сумках немає місця для цієї речі","There is no room for this thing in your bags"
+STR_OZT_UI_NO_SLOT,"Немає вільного слота для цієї речі","There is no free slot for this thing"
 STR_OZT_UI_TRYING,примірка: ще не куплено,trying on: not bought yet
 # The parts strip.
 STR_OZT_UI_PARTS_ROUNDS,Набої,Rounds

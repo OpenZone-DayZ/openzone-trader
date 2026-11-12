@@ -1456,23 +1456,63 @@ FrameWidgetClass OZT_Trade {
          "text halign" center
          "text valign" center
         }
-        TextWidgetClass OwnMeta {
+        // The filter of the player's things: everything in the bags, or only what the trader takes as it is or emptied; the menu turns its caption.
+        ButtonWidgetClass OwnFilterBtn {
          visible 1
-         ignorepointer 1
-         position 250 0
-         size 294 40
+         position 352 4
+         size 194 32
          hexactpos 1
          vexactpos 1
          hexactsize 1
          vexactsize 1
-         color 0.55 0.545 0.525 1
+         text ""
          priority 2
-         text "#STR_OZT_UI_YOURS_META"
-         font "gui/fonts/sdf_MetronBook24"
-         "exact text" 1
-         "exact text size" 14
-         "text halign" right
-         "text valign" center
+         {
+          PanelWidgetClass OwnFilterBtnEdge {
+           visible 1
+           ignorepointer 1
+           position -1 -1
+           size 196 34
+           hexactpos 1
+           vexactpos 1
+           hexactsize 1
+           vexactsize 1
+           color 0.235 0.235 0.227 1
+           priority 0
+           style rover_sim_colorable
+          }
+          PanelWidgetClass OwnFilterBtnBg {
+           visible 1
+           ignorepointer 1
+           position 0 0
+           size 194 32
+           hexactpos 1
+           vexactpos 1
+           hexactsize 1
+           vexactsize 1
+           color 0.118 0.118 0.114 1
+           priority 1
+           style rover_sim_colorable
+          }
+          TextWidgetClass OwnFilterBtnText {
+           visible 1
+           ignorepointer 1
+           position 0 0
+           size 194 32
+           hexactpos 1
+           vexactpos 1
+           hexactsize 1
+           vexactsize 1
+           color 0.55 0.545 0.525 1
+           priority 2
+           text "#STR_OZT_UI_YOURS_META"
+           font "gui/fonts/sdf_MetronBook24"
+           "exact text" 1
+           "exact text size" 14
+           "text halign" center
+           "text valign" center
+          }
+         }
         }
        }
       }

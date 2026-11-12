@@ -74,11 +74,19 @@ class OZT_TradeMenu : UIScriptedMenu
     protected ref OZT_TileGrid m_SellGrid;
 
     // Tabs: "" for ALL, then the trader's categories.
+    // The categories of the two strips: the shelf has a tab for what the
+    // player may buy, the player's things one for what the trader takes.
     protected ref array<string> m_TabIds;
+    protected ref array<string> m_OwnIds;
     protected ref array<Widget> m_ShelfTabs;
     protected ref array<Widget> m_OwnTabs;
     protected int m_ShelfTab;
     protected int m_OwnTab;
+    protected string m_TabSig;
+
+    // The player's things: everything in the bags, or only what sells (the
+    // owner, 2026-11-12). The player's choice for the whole session.
+    protected static bool s_OwnSellable;
 
     protected Widget m_BuyPanel;
     protected Widget m_SellPanel;
@@ -133,6 +141,11 @@ class OZT_TradeMenu : UIScriptedMenu
     protected int m_ActLow;
     protected int m_ActHigh;
     protected int m_ActIndex;
+    // A stock changed under the screen (StockMoved): the open it asks for
+    // says so if the cart had to change; one more open once the one on its
+    // way is in.
+    protected bool m_ByNews;
+    protected bool m_NewsWaits;
     // The condition of the stock line the quantity dialog buys from.
     protected int m_QtyLevel;
     protected int m_ActZone;
@@ -205,6 +218,7 @@ class OZT_TradeMenu : UIScriptedMenu
         m_Shelf = new OZT_Shelf();
         m_Cart = new OZT_Cart();
         m_TabIds = new array<string>();
+        m_OwnIds = new array<string>();
         m_ShelfTabs = new array<Widget>();
         m_OwnTabs = new array<Widget>();
         m_SlotWidgets = new array<Widget>();
@@ -437,6 +451,25 @@ class OZT_TradeMenu : UIScriptedMenu
 
     // ---- the service ----------------------------------------------------------------------
 
+    // Somebody else's deal changed the stock this trader sells from (the
+    // server's NOTICE_STOCK): the shelf, its counts and its prices are asked
+    // again, and the cart is quoted again once they are in.
+    void StockMoved()
+    {
+        if (!m_Data)
+            return;
+        m_ByNews = true;
+        if (m_OpenFlying || m_DealFlying)
+        {
+            // The answer on its way may predate the news: ask once it is in.
+            m_NewsWaits = true;
+            return;
+        }
+        m_Quote = null;
+        PaintDeal();
+        AskOpen();
+    }
+
     protected void AskOpen()
     {
         OZT_OpenReq req = new OZT_OpenReq();
@@ -478,6 +511,13 @@ class OZT_TradeMenu : UIScriptedMenu
                 return;
             }
             TakeOpen(json);
+            // A stock changed while this answer flew: it may predate that.
+            if (m_NewsWaits)
+            {
+                m_NewsWaits = false;
+                m_Quote = null;
+                AskOpen();
+            }
             return;
         }
         if (op == OZT_Const.OP_QUOTE)
@@ -505,9 +545,12 @@ class OZT_TradeMenu : UIScriptedMenu
         }
         bool first = m_Data == null;
         m_Data = res;
+        // A licence bought opens a category, a stock sold out may close one.
+        if (first || TabsSig() != m_TabSig)
+            MakeTabs();
         if (first)
         {
-            MakeTabs();
+            PaintOwnFilter();
             SayInfo(OZT_Ui.Words("STR_OZT_UI_HELLO"), OZT_Look.Text());
         }
         SayShelfMeta();
@@ -515,7 +558,13 @@ class OZT_TradeMenu : UIScriptedMenu
         m_DirtyParts = true;
 
         if (m_Cart.Prune(res) > 0)
+        {
             m_Quote = null;
+            if (m_ByNews)
+                SayInfo(OZT_Ui.Words("STR_OZT_UI_CART_CUT"), OZT_Look.Alert());
+        }
+        if (!m_NewsWaits)
+            m_ByNews = false;
         m_DirtyShelf = true;
         m_DirtyOwn = true;
         m_DirtySlots = true;
@@ -815,24 +864,86 @@ class OZT_TradeMenu : UIScriptedMenu
         m_Turning = false;
     }
 
-    protected void MakeTabs()
+    // Has the category anything for this player on one side: to buy on the
+    // shelf, to sell among the player's things? A category all of whose goods
+    // are locked for the player has no tab on the shelf, as TraderPlus hides
+    // it; what the trader takes of it keeps its tab beside the player's things.
+    protected bool Shelved(string category, bool buying)
     {
-        m_TabIds.Clear();
-        array<string> names = new array<string>();
-        m_TabIds.Insert("");
+        for (int i = 0; i < m_Data.Goods.Count(); i++)
+        {
+            OZT_WireGoods g = m_Data.Goods[i];
+            if (g.Category != category)
+                continue;
+            if (buying && g.Buy > 0)
+                return true;
+            if (!buying && g.Sell > 0)
+                return true;
+        }
+        return false;
+    }
+
+    // The categories of one strip: the change tab, and those with anything
+    // on that side.
+    protected void TabsOf(bool buying, array<string> ids, array<string> names)
+    {
+        ids.Insert("");
         names.Insert(OZT_Ui.Words("STR_OZT_UI_ALL"));
         for (int c = 0; c < m_Data.Categories.Count(); c++)
         {
-            m_TabIds.Insert(m_Data.Categories[c].Id);
+            string cid = m_Data.Categories[c].Id;
             // The change tab is the server's, not an admin's category: the
             // screen names it in the player's language.
-            if (m_Data.Categories[c].Id == OZT_Const.CATEGORY_CHANGE)
+            if (cid == OZT_Const.CATEGORY_CHANGE)
+            {
+                ids.Insert(cid);
                 names.Insert(OZT_Ui.Words("STR_OZT_UI_CHANGE"));
-            else
-                names.Insert(m_Data.Categories[c].Name);
+                continue;
+            }
+            if (!Shelved(cid, buying))
+                continue;
+            ids.Insert(cid);
+            names.Insert(m_Data.Categories[c].Name);
         }
-        float shelfStrip = MakeStrip("ShelfTabs", names, m_ShelfTabs);
-        float ownStrip = MakeStrip("OwnTabs", names, m_OwnTabs);
+    }
+
+    // The tabs both strips have now, as one string: they are made again
+    // when it changes.
+    protected string TabsSig()
+    {
+        array<string> shelf = new array<string>();
+        array<string> own = new array<string>();
+        array<string> words = new array<string>();
+        TabsOf(true, shelf, words);
+        TabsOf(false, own, words);
+        string sig = "";
+        for (int s = 0; s < shelf.Count(); s++)
+            sig = sig + shelf[s] + "|";
+        sig = sig + "/";
+        for (int o = 0; o < own.Count(); o++)
+            sig = sig + own[o] + "|";
+        return sig;
+    }
+
+    protected void MakeTabs()
+    {
+        // The open tabs stay open by their category when the strip is made
+        // again.
+        string shelfWas = "";
+        string ownWas = "";
+        if (m_ShelfTab < m_TabIds.Count())
+            shelfWas = m_TabIds[m_ShelfTab];
+        if (m_OwnTab < m_OwnIds.Count())
+            ownWas = m_OwnIds[m_OwnTab];
+        m_TabSig = TabsSig();
+        m_TabIds.Clear();
+        m_OwnIds.Clear();
+        array<string> shelfNames = new array<string>();
+        array<string> ownNames = new array<string>();
+        TabsOf(true, m_TabIds, shelfNames);
+        TabsOf(false, m_OwnIds, ownNames);
+        float shelfStrip = MakeStrip("ShelfTabs", shelfNames, m_ShelfTabs);
+        float ownStrip = MakeStrip("OwnTabs", ownNames, m_OwnTabs);
         // The grid starts below its strip and ends where the layout ends it.
         float px = OZT_Ui.Px();
         float top = Math.Round(STRIP_TOP * px);
@@ -840,6 +951,12 @@ class OZT_TradeMenu : UIScriptedMenu
         float bottom = Math.Round(GRID_BOTTOM * px);
         m_ShelfGrid.Reframe(top + shelfStrip + gap, bottom);
         m_OwnGrid.Reframe(top + ownStrip + gap, bottom);
+        m_ShelfTab = m_TabIds.Find(shelfWas);
+        if (m_ShelfTab < 0)
+            m_ShelfTab = 0;
+        m_OwnTab = m_OwnIds.Find(ownWas);
+        if (m_OwnTab < 0)
+            m_OwnTab = 0;
         PaintTabs();
     }
 
@@ -917,11 +1034,14 @@ class OZT_TradeMenu : UIScriptedMenu
         PaintStrip(m_OwnTabs, m_OwnTab);
     }
 
-    protected bool IsChangeTab(int tab)
+    protected bool IsChangeTab(int tab, bool shelf)
     {
-        if (tab < 0 || tab >= m_TabIds.Count())
+        array<string> ids = m_OwnIds;
+        if (shelf)
+            ids = m_TabIds;
+        if (tab < 0 || tab >= ids.Count())
             return false;
-        return m_TabIds[tab] == OZT_Const.CATEGORY_CHANGE;
+        return ids[tab] == OZT_Const.CATEGORY_CHANGE;
     }
 
     // The change tab is one for both sides: the trader's notes on the shelf
@@ -929,16 +1049,17 @@ class OZT_TradeMenu : UIScriptedMenu
     // other; left on one side, the other goes back to everything.
     protected void FollowChange(int tab, bool fromShelf)
     {
-        bool change = IsChangeTab(tab);
+        bool change = IsChangeTab(tab, fromShelf);
         if (fromShelf)
         {
-            if (change && m_OwnTab != tab)
+            int ownChange = m_OwnIds.Find(OZT_Const.CATEGORY_CHANGE);
+            if (change && ownChange > -1 && m_OwnTab != ownChange)
             {
-                m_OwnTab = tab;
+                m_OwnTab = ownChange;
                 m_DirtyOwn = true;
                 m_DirtySlots = true;
             }
-            else if (!change && IsChangeTab(m_OwnTab))
+            else if (!change && IsChangeTab(m_OwnTab, false))
             {
                 m_OwnTab = 0;
                 m_DirtyOwn = true;
@@ -946,12 +1067,13 @@ class OZT_TradeMenu : UIScriptedMenu
             }
             return;
         }
-        if (change && m_ShelfTab != tab)
+        int shelfChange = m_TabIds.Find(OZT_Const.CATEGORY_CHANGE);
+        if (change && shelfChange > -1 && m_ShelfTab != shelfChange)
         {
-            m_ShelfTab = tab;
+            m_ShelfTab = shelfChange;
             m_DirtyShelf = true;
         }
-        else if (!change && IsChangeTab(m_ShelfTab))
+        else if (!change && IsChangeTab(m_ShelfTab, true))
         {
             m_ShelfTab = 0;
             m_DirtyShelf = true;
@@ -1136,7 +1258,7 @@ class OZT_TradeMenu : UIScriptedMenu
         PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
         if (!player)
             return;
-        string cat = m_TabIds[m_OwnTab];
+        string cat = m_OwnIds[m_OwnTab];
         array<EntityAI> all = new array<EntityAI>();
         player.GetInventory().EnumerateInventory(InventoryTraversalType.PREORDER, all);
         InventoryLocation loc = new InventoryLocation();
@@ -1165,10 +1287,30 @@ class OZT_TradeMenu : UIScriptedMenu
                     continue;
             }
             OZT_Tile t = OwnTile(e);
-            if (t && m_OwnGrid.Add(t))
+            if (!t)
+                continue;
+            // Only what sells: what the trader takes as it is, and what he
+            // would take emptied.
+            if (s_OwnSellable && t.Why != 0 && t.Why != 2)
+                continue;
+            if (m_OwnGrid.Add(t))
                 Relight(t, true);
         }
         m_OwnGrid.Arrange();
+    }
+
+    // The head of the player's things says which of the two it shows.
+    protected void PaintOwnFilter()
+    {
+        string key = "STR_OZT_UI_YOURS_META";
+        int color = OZT_Look.Muted();
+        if (s_OwnSellable)
+        {
+            key = "STR_OZT_UI_YOURS_SELLABLE";
+            color = OZT_Look.Accent();
+        }
+        OZT_Ui.Say(layoutRoot, "OwnFilterBtnText", OZT_Ui.Words(key));
+        OZT_Ui.Tint(layoutRoot, "OwnFilterBtnText", color);
     }
 
     // What a thing of the player's brings sold as it is: with what hangs on it
@@ -2541,6 +2683,13 @@ class OZT_TradeMenu : UIScriptedMenu
         if (w && w.GetName() == "ListBtn")
         {
             ToggleList();
+            return true;
+        }
+        if (w && w.GetName() == "OwnFilterBtn")
+        {
+            s_OwnSellable = !s_OwnSellable;
+            PaintOwnFilter();
+            m_DirtyOwn = true;
             return true;
         }
         if (w && w.GetName() == "TryOffBtn")

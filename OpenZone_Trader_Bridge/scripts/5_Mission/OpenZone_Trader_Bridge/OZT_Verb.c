@@ -25,6 +25,8 @@ class OZT_VerbOps
             return OZT_VerbRecur.Op(detail);
         if (op == "import")
             return OpImport(args, detail);
+        if (op == "stock")
+            return OpStock(args, detail);
 
         PlayerBase player = Player();
         if (!player)
@@ -72,7 +74,7 @@ class OZT_VerbOps
 
     static string KnownOps()
     {
-        return "status, reload, fps, recur, import, balance, price, pay, damage, open, fit, quote, deal, licence, show, tree, load, fits, hurt, admin, flag";
+        return "status, reload, fps, recur, import, stock, balance, price, pay, damage, open, fit, quote, deal, licence, show, tree, load, fits, hurt, admin, flag";
     }
 
     // ---- what the ops share ---------------------------------------------------
@@ -804,6 +806,28 @@ class OZT_VerbOps
         report.Replace("\n", " | ");
         detail = "import: " + report;
         return done;
+    }
+
+    // stock stock=<id> class=<Class> [level=0] delta=<n>: a stock line moved
+    // by hand, and the news of it told the way a deal tells it: what another
+    // player's deal does to an open screen, with one client on the stand.
+    static bool OpStock(map<string, string> args, out string detail)
+    {
+        string stock = Arg(args, "stock", "");
+        string type = Arg(args, "class", "");
+        int level = Arg(args, "level", "0").ToInt();
+        int delta = Arg(args, "delta", "0").ToInt();
+        if (stock == "" || type == "")
+        {
+            detail = "stock: stock= and class= are needed";
+            return false;
+        }
+        OZT_Stock.Add(stock, type, level, delta);
+        OZT_Stock.Save(stock);
+        OZT_StockNews.Tell(stock, null);
+        int now = OZT_Stock.Count(stock, type, level);
+        detail = "stock: " + stock + " " + type + " level " + level.ToString() + " now " + now.ToString() + ", news told";
+        return true;
     }
 
     // ---- the ops of this task -------------------------------------------------

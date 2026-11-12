@@ -397,13 +397,16 @@ class OZT_Cart
                 dropped++;
                 continue;
             }
+            // The line's own record: its class in its condition, still for
+            // sale and not sold out (design §11.1).
             bool sold = false;
             for (int g = 0; g < data.Goods.Count(); g++)
             {
-                if (data.Goods[g].ClassName == Buys[b].Type && data.Goods[g].Buy > 0)
+                OZT_WireGoods rec = data.Goods[g];
+                if (rec.ClassName == onto.Type && rec.Level == onto.Level && rec.Buy > 0 && rec.Stock != 0)
                 {
                     sold = true;
-                    Buys[b].Each = data.Goods[g].Buy;
+                    onto.Each = rec.Buy;
                 }
             }
             if (!sold)
@@ -412,9 +415,42 @@ class OZT_Cart
                 dropped++;
             }
         }
+        dropped = dropped + CutToStock(data);
         if (dropped > 0)
             MarkChanged();
         return dropped;
+    }
+
+    // Lines that buy more of a stock line than the shelf now holds give the
+    // rest up, the last line first: somebody else bought it meanwhile.
+    // Returns how many lines changed.
+    protected int CutToStock(OZT_OpenRes data)
+    {
+        int cut = 0;
+        for (int g = 0; g < data.Goods.Count(); g++)
+        {
+            OZT_WireGoods rec = data.Goods[g];
+            if (rec.Stock < 0)
+                continue;
+            int over = Buying(rec.ClassName, rec.Level) - rec.Stock;
+            for (int b = Buys.Count() - 1; b >= 0; b--)
+            {
+                if (over <= 0)
+                    break;
+                OZT_CartLine line = Buys[b];
+                if (line.Type != rec.ClassName || line.Level != rec.Level)
+                    continue;
+                int off = over;
+                if (off > line.Count)
+                    off = line.Count;
+                line.Count = line.Count - off;
+                over = over - off;
+                if (line.Count <= 0)
+                    Buys.RemoveOrdered(b);
+                cut++;
+            }
+        }
+        return cut;
     }
 
     // The request of a quote or of a deal, as JSON.

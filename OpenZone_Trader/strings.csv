@@ -20,6 +20,7 @@ STR_OZT_UI_SELL,ПРОДАЖ,SELL
 STR_OZT_UI_TRADER,ТОРГОВЕЦЬ,TRADER
 STR_OZT_UI_YOURS,ВАШI РЕЧI,YOUR ITEMS
 STR_OZT_UI_YOURS_META,"усе, що у ваших сумках",everything in your bags
+STR_OZT_UI_YOURS_SELLABLE,"лише те, що можна продати",only what can be sold
 STR_OZT_UI_CHARACTER,ПЕРСОНАЖ,CHARACTER
 STR_OZT_UI_ALL,УСЕ,ALL
 STR_OZT_UI_BUY_EMPTY,"Перетягніть сюди товар або двічі клацніть його на полиці","Drag goods here, or double-click them on the shelf"
@@ -91,6 +92,7 @@ STR_OZT_UI_NO_ROOM,"У сумках немає місця для цієї реч
 STR_OZT_UI_NO_SLOT,"Немає вільного слота для цієї речі","There is no free slot for this thing"
 STR_OZT_UI_PARTS_DROPPED,"Більше не стає, прибрано з угоди: %1","No longer fits, taken out of the deal: %1"
 STR_OZT_UI_SOLD_OUT,"Цього товару зараз немає в наявності","This is out of stock right now"
+STR_OZT_UI_CART_CUT,"Частини товару вже немає: угоду змінено","Some of the goods are gone: the deal has changed"
 STR_OZT_UI_IN_STOCK,"В наявності","In stock"
 STR_OZT_UI_LICENCE,"Ліцензія","Licence"
 STR_OZT_UI_LICENCE_HELD,"у вас є","you hold it"

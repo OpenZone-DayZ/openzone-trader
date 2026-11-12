@@ -42,6 +42,15 @@ modded class MissionGameplay
     {
         if (op.IndexOf("trader.") != 0)
             return;
+        // A stock changed under the open screen: no notification, the screen
+        // asks again.
+        if (op == OZT_Const.NOTICE_STOCK)
+        {
+            OZT_TradeMenu menu = OZT_TradeMenu.Current();
+            if (menu)
+                menu.StockMoved();
+            return;
+        }
         NotificationSystem.AddNotificationExtended(4, "#STR_OZT_MODNAME", OZ_Notice.Text(), "");
     }
 

@@ -303,7 +303,8 @@ class OZT_StockCursor
     }
 
     // After a committed deal: the moves onto the shelf, the shelf to its file.
-    void Commit()
+    // True: the stock changed.
+    bool Commit()
     {
         bool changed = false;
         for (int i = 0; i < m_Delta.Classes.Count(); i++)
@@ -316,5 +317,46 @@ class OZT_StockCursor
         }
         if (changed)
             OZT_Stock.Save(m_Stock);
+        return changed;
     }
+}
+
+// After a deal that changed a stock, everybody else who stands at a point that
+// sells from it is told (the owner, 2026-11-12: two players at one trader see
+// one shelf), so an open screen asks for its shelf again. Who stands there is
+// all the server knows of an open screen; a client with no screen open lets
+// the notice go.
+class OZT_StockNews
+{
+    static void Tell(string stock, PlayerBase dealer)
+    {
+        array<OZT_Point> points = new array<OZT_Point>();
+        array<ref OZT_Point> all = OZT_Config.Get().Traders().Traders;
+        for (int i = 0; i < all.Count(); i++)
+        {
+            if (all[i].StockId() == stock)
+                points.Insert(all[i]);
+        }
+        if (points.Count() == 0)
+            return;
+        array<Man> players = new array<Man>();
+        GetGame().GetPlayers(players);
+        for (int p = 0; p < players.Count(); p++)
+        {
+            PlayerBase pb = PlayerBase.Cast(players[p]);
+            if (!pb || pb == dealer || !pb.GetIdentity())
+                continue;
+            for (int k = 0; k < points.Count(); k++)
+            {
+                float away = OZT_Points.Away(points[k].Id, pb);
+                if (away < 0 || away > points[k].Radius + NEAR_SLACK)
+                    continue;
+                OZ_Rpc.Notice(pb.GetIdentity(), OZT_Const.NOTICE_STOCK, true, stock);
+                break;
+            }
+        }
+    }
+
+    // A screen stays open a step or two past the radius.
+    static const float NEAR_SLACK = 2;
 }

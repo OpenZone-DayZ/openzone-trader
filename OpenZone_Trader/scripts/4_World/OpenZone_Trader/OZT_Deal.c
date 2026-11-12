@@ -1488,8 +1488,10 @@ class OZT_Deal
         if (!m_Money.Physical() && m_Net < 0)
             m_Money.Give(m_Player, -m_Net, "deal");
 
-        // The stock moves of the deal onto the shelf and into its file.
-        m_Cursor.Commit();
+        // The stock moves of the deal onto the shelf and into its file; the
+        // others at a point of that stock hear of it.
+        if (m_Cursor.Commit())
+            OZT_StockNews.Tell(m_Cursor.Stock(), m_Player);
         // The licences bought, onto the character.
         for (int lc = 0; lc < m_Licences.Count(); lc++)
             OZT_Licences.Grant(OZT_Licences.UidOf(m_Player), m_Licences[lc]);

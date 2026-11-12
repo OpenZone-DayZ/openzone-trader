@@ -1224,20 +1224,20 @@
                             }
                           },
                           {
-                            "label": {
-                              "name": "OwnMeta",
+                            "button": {
+                              "name": "OwnFilterBtn",
                               "at": [
-                                250,
-                                0
+                                352,
+                                4
                               ],
                               "size": [
-                                294,
-                                40
+                                194,
+                                32
                               ],
+                              "text": "#STR_OZT_UI_YOURS_META",
                               "font": "hint",
                               "color": "$muted",
-                              "align": "right",
-                              "text": "#STR_OZT_UI_YOURS_META"
+                              "note": "The filter of the player's things: everything in the bags, or only what the trader takes as it is or emptied; the menu turns its caption."
                             }
                           }
                         ]

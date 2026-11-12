@@ -40,6 +40,9 @@ class OZT_Const
     // The op of a notice the trade action sends when it refuses (OZ_Rpc.Notice);
     // the client shows every notice whose op starts with "trader.".
     static const string NOTICE_OPEN = "trader.open";
+    // The notice that a stock changed under an open screen (design §11.1):
+    // `why` carries the stock's id; the screen asks `open` again.
+    static const string NOTICE_STOCK = "trader.stock";
 
     // The trade screen's menu id, beside the series' own (131-135 are the PDA's
     // and the research tree's). A large id makes EnterScriptedMenu answer nothing.

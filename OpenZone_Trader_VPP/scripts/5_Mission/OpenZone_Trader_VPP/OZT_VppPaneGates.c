@@ -368,7 +368,9 @@ modded class OZ_VppAdminMenu
     protected bool TrdGtServerOff(string family)
     {
         array<string> off = m_TrdDraft.Settings.GatesOff;
-        return off && off.Find(family) != -1;
+        if (!off)
+            return false;
+        return off.Find(family) != -1;
     }
 
     protected void TrdGtPaintFams()
@@ -986,7 +988,7 @@ modded class OZ_VppAdminMenu
         if (w && M_SUB_WIDGET)
         {
             string nm = w.GetName();
-            if (nm.IndexOf("BtnTrdGt") == 0 && !TrdGtLoaded())
+            if (nm.IndexOf("BtnTrdGt") == 0 && nm != "BtnTrdGtRefresh" && !TrdGtLoaded())
             {
                 Hint(TrdTr("#STR_OZT_VPP_READING"));
                 return true;

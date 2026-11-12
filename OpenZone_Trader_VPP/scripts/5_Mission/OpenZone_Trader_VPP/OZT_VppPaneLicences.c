@@ -112,7 +112,9 @@ modded class OZ_VppAdminMenu
         string holdersWord = TrdTr("#STR_OZT_VPP_LC_HOLDERS");
         array<string> rows = new array<string>();
         array<int> inks = new array<int>();
-        bool fromDraft = m_TrdDraft && m_TrdDraft.Settings && m_TrdDraft.Settings.Licences;
+        bool fromDraft = false;
+        if (m_TrdDraft && m_TrdDraft.Settings && m_TrdDraft.Settings.Licences)
+            fromDraft = true;
         if (fromDraft)
         {
             array<ref OZT_LicenceDef> defs = m_TrdDraft.Settings.Licences;

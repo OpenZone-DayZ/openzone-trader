@@ -451,3 +451,7 @@ STR_OZT_VPP_RS_H_ACCESS,ДОСТУП ДО ТОЧОК,ACCESS TO POINTS
 STR_OZT_VPP_RS_H_WHO,ХТО ВЖЕ МАЄ,WHO HAS IT
 STR_OZT_VPP_RS_H_FAMILY,ДЕ ДIЄ СIМЕЙСТВО ДОСЛIДЖЕННЯ,WHERE THE RESEARCH FAMILY HOLDS
 STR_OZT_VPP_RS_TURNED,(навпаки: без вузла),(turned round: without the node)
+STR_OZT_FACT_POINTS,Точок,Points
+STR_OZT_FACT_GOODS,Товарів,Goods
+STR_OZT_FACT_MONEY,Гроші,Money
+STR_OZT_FACT_RESPAWNED,точки зроблено заново,points made again

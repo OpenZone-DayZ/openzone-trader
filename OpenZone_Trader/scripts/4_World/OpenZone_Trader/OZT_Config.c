@@ -100,6 +100,17 @@ class OZT_Config
         return null;
     }
 
+    // For the card on the core's overview page (OZT_Facts).
+    int TraderCount()
+    {
+        return m_Traders.Traders.Count();
+    }
+
+    int GoodsCount()
+    {
+        return m_GoodsCount;
+    }
+
     string Counters()
     {
         string s = "traders=" + m_Traders.Traders.Count().ToString() + " goods=" + m_GoodsCount.ToString();

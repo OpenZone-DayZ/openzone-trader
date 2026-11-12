@@ -53,6 +53,8 @@ class OZT_Module : CF_ModuleWorld
         // The admin's side: the pane's section and the three files in the
         // core's editor. The core empties its registries at mission end.
         OZ_AdminRegistry.Register(OZT_Const.SECTION_ADMIN, new OZT_Admin());
+        // The trader's card on the core's overview page (VPP rework 2026-11-12).
+        OZ_AdminFacts.Register(new OZT_Facts());
         OZ_AdminCfg.Register(OZT_Const.CFG_SETTINGS, OZT_Const.SETTINGS, new OZT_SettingsApplier(), OZT_Const.CFG_OWNER);
         OZ_AdminCfg.Register(OZT_Const.CFG_GOODS, OZT_Const.GOODS, new OZT_GoodsApplier(), OZT_Const.CFG_OWNER);
         OZ_AdminCfg.Register(OZT_Const.CFG_TRADERS, OZT_Const.TRADERS, new OZT_TradersApplier(), OZT_Const.CFG_OWNER);

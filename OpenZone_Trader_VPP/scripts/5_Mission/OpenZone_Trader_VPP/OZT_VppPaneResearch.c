@@ -8,19 +8,19 @@
 // knows the trader alone. The tree's nodes and who completed them come from the
 // research gate of OpenZone_Trader_Research, through the trader's own ops -- `gates`
 // (the gate's choices: every node of the tree) and `gate_holders` (the factions
-// that completed one). So it compiles only beside that gate: the engine defines the
-// CfgMods class name OpenZone_Trader_Research when the gate is loaded.
+// that completed one). The gate is the server's: it may load as a server mod, so a
+// client has no define of it, and the page appears when the server's `gates` name
+// the family "research" (asked once as the window opens).
 //
 // It reads what is in force on the server: the files as the server last gave them,
 // not the draft's edits. It sits under the module "research" of the rail, after the
-// research glue's own pages: it registers from a call made one frame after the
-// window's creation, when every glue's layer has registered its own.
+// research glue's own pages: it registers when the answer to `gates` arrives,
+// after every glue's layer has registered its own.
 //
 // A layer of OZ_VppAdminMenu after OZT_VppPaneGates.c (it takes TrdOnHolders from it).
 
 #ifdef AVPPAdminTools
 #ifdef OpenZone_VPP
-#ifdef OpenZone_Trader_Research
 #ifndef NO_GUI
 
 modded class OZ_VppAdminMenu
@@ -48,12 +48,38 @@ modded class OZ_VppAdminMenu
         super.OnCreate(RootW);
         if (!M_SUB_WIDGET)
             return;
-        GetGame().GetCallQueue(CALL_CATEGORY_GUI).CallLater(this.TrdRsRegister, 0, false);
+        GetGame().GetCallQueue(CALL_CATEGORY_GUI).CallLater(this.TrdRsProbe, 0, false);
     }
 
     void ~OZ_VppAdminMenu()
     {
-        GetGame().GetCallQueue(CALL_CATEGORY_GUI).Remove(this.TrdRsRegister);
+        GetGame().GetCallQueue(CALL_CATEGORY_GUI).Remove(this.TrdRsProbe);
+    }
+
+    // Does the server run the research gate? `gates` says (a read, not journaled).
+    void TrdRsProbe()
+    {
+        if (!M_SUB_WIDGET)
+            return;
+        if (m_TrdGates)
+            TrdGatesKnown();
+        else
+            TrdNeedGates();
+    }
+
+    override void TrdGatesKnown()
+    {
+        super.TrdGatesKnown();
+        if (!m_TrdGates)
+            return;
+        for (int f = 0; f < m_TrdGates.Families.Count(); f++)
+        {
+            if (m_TrdGates.Families[f].Family == "research")
+            {
+                TrdRsRegister();
+                return;
+            }
+        }
     }
 
     // The page on the rail under "research": after the research glue's eight pages,
@@ -681,7 +707,6 @@ modded class OZ_VppAdminMenu
     }
 }
 
-#endif
 #endif
 #endif
 #endif

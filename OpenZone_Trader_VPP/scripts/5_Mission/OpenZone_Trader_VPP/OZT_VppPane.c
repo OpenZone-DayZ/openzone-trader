@@ -424,6 +424,13 @@ modded class OZ_VppAdminMenu
             TrdAskGates();
     }
 
+    // The server's gates have arrived (m_TrdGates). A layer that waits for them to
+    // decide something -- Research > Trade appears only beside the research gate --
+    // hears it here.
+    protected void TrdGatesKnown()
+    {
+    }
+
     // The kind's entry of the last `gates`, or null.
     protected OZT_AdminGateKind TrdGateKind(string kind)
     {
@@ -850,6 +857,7 @@ modded class OZ_VppAdminMenu
             if (JsonFileLoader<OZT_AdminGates>.LoadData(json, gates, err))
             {
                 m_TrdGates = gates.Copy();
+                TrdGatesKnown();
                 TrdRepaint(TrdShownKey());
             }
             return;

@@ -41,6 +41,8 @@ class OZT_Module : CF_ModuleWorld
         OZT_Money.Provide(new OZT_ItemMoney());
         // The identity kinds are this mod's own: they need the core alone.
         OZT_Gates.Provide(new OZT_FactionGate());
+        // Licences are this mod's own too (design §11.2).
+        OZT_Gates.Provide(new OZT_LicenceGate());
 
         // The points ride in the core's sync packet: the handler first, then
         // the points, whose respawn sends the packet again.
@@ -91,6 +93,7 @@ class OZT_Module : CF_ModuleWorld
         OZT_Gates.Reset();
         OZT_Book.Reset();
         OZT_Stock.Reset();
+        OZT_Licences.Reset();
 
         // The core empties its own registries at mission end; the objects at
         // the points are ours to take away, and so is our handler of its packet.

@@ -17,6 +17,12 @@ class OZT_Open
         wg.ClassName = e.ClassName;
         wg.Category = e.Category;
         wg.Level = level;
+        OZT_LicenceDef licence = OZT_Licences.Def(OZT_Licences.IdOf(e.ClassName));
+        if (licence)
+        {
+            wg.Name = licence.Name;
+            wg.Look = licence.Look;
+        }
         if (e.Stocked)
             wg.Stock = OZT_Book.StockOf(trader, e, level, null);
         wg.Buy = OZT_Book.ShelfWith(player, trader, e, level);
@@ -94,6 +100,9 @@ class OZT_Open
                 res.Notes.Insert(notes[n].ClassName);
         }
         res.Condition = OZT_Config.Get().Settings().Condition.Copy();
+        array<string> granted = OZT_Licences.Of(OZT_Licences.UidOf(player));
+        for (int h = 0; h < granted.Count(); h++)
+            res.Licences.Insert(granted[h]);
 
         int unit = OZT_Config.Get().Unit();
         for (int c = 0; c < trader.Categories.Count(); c++)

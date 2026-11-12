@@ -102,7 +102,11 @@ class OZT_Card
         if (g && g.Rule == OZT_Const.RULE_UNIT)
             byUnit = true;
 
-        OZT_Ui.Say(m_Root, "CardName", OZT_Ui.NameOf(item));
+        // A licence reads its own name, not the name of what draws it.
+        string title = OZT_Ui.NameOf(item);
+        if (g && g.Name != "")
+            title = g.Name;
+        OZT_Ui.Say(m_Root, "CardName", title);
         // The game's own words and colours for weight and condition.
         InspectMenuNew.UpdateItemInfoWeight(m_Root, item);
         InspectMenuNew.UpdateItemInfoDamage(m_Root, item);
@@ -170,6 +174,9 @@ class OZT_Card
         // What the price of the goods holds besides the goods.
         if (goods && comes != "")
             Line(OZT_Ui.Words("STR_OZT_UI_COMES_WITH"), comes);
+        // A licence the player holds (design §11.2).
+        if (t.Owned)
+            Line(OZT_Ui.Words("STR_OZT_UI_LICENCE"), OZT_Ui.Words("STR_OZT_UI_LICENCE_HELD"));
         // What a stock line holds (design §11.1).
         if (t.Kind == OZT_Tile.SHELF && g && g.Stock >= 0)
             Line(OZT_Ui.Words("STR_OZT_UI_IN_STOCK"), g.Stock.ToString());

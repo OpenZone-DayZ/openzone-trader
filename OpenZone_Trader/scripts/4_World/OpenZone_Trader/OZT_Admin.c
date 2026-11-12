@@ -49,6 +49,19 @@ class OZT_Admin : OZ_AdminSection
         if (sender)
             admin = PlayerBase.Cast(sender.GetPlayer());
 
+        if (verb == "licence")
+        {
+            string said = GiveLicence(json);
+            if (said != "")
+            {
+                error = said;
+                return "";
+            }
+            ok = true;
+            error = "";
+            return ListJson();
+        }
+
         OZT_TradersFile file = new OZT_TradersFile();
         if (!OZ_ConfigLoader<OZT_TradersFile>.Load(OZT_Const.TRADERS, TAG, file, true, false))
         {
@@ -88,6 +101,54 @@ class OZT_Admin : OZ_AdminSection
     }
 
     // ---- the ops ------------------------------------------------------------
+
+    // A licence granted or taken back (design §11.2): by Steam id, or by the
+    // name of a player online.
+    protected string GiveLicence(string json)
+    {
+        OZT_AdminLicence req = new OZT_AdminLicence();
+        string err;
+        if (!JsonFileLoader<OZT_AdminLicence>.LoadData(json, req, err))
+            return "STR_OZT_ADMIN_BAD_REQUEST";
+        if (!OZT_Licences.Def(req.Id))
+            return "STR_OZT_ADMIN_NO_LICENCE";
+        string uid = UidByName(req.Player);
+        if (uid == "")
+            return "STR_OZT_ADMIN_NO_SUCH_PLAYER";
+        if (req.Grant == 1)
+            OZT_Licences.Grant(uid, req.Id);
+        else
+            OZT_Licences.Revoke(uid, req.Id);
+        OZT_Log.Info("admin: licence '" + req.Id + "' grant=" + req.Grant.ToString() + " for a player");
+        return "";
+    }
+
+    // A Steam id as it is; a name of a player online to that player's id.
+    static string UidByName(string who)
+    {
+        if (who == "")
+            return "";
+        array<Man> players = new array<Man>();
+        GetGame().GetPlayers(players);
+        for (int i = 0; i < players.Count(); i++)
+        {
+            PlayerBase p = PlayerBase.Cast(players[i]);
+            if (!p || !p.GetIdentity())
+                continue;
+            if (p.GetIdentity().GetName() == who || p.GetIdentity().GetPlainId() == who)
+                return p.GetIdentity().GetPlainId();
+        }
+        // An id of a player who is not online: digits only, 17 of them.
+        if (who.Length() != 17)
+            return "";
+        for (int c = 0; c < who.Length(); c++)
+        {
+            int code = who.Get(c).ToAscii();
+            if (code < 48 || code > 57)
+                return "";
+        }
+        return who;
+    }
 
     protected string Place(OZT_TradersFile file, string json, PlayerBase admin)
     {

@@ -77,6 +77,15 @@ class OZT_AdminAdopt
 
 // The values of a point the pane edits; the place, the facing and the outfit
 // have ops of their own.
+// Grant or take back a licence (design §11.2): `Player` is a Steam id or the
+// name of a player online.
+class OZT_AdminLicence
+{
+    string Player = "";
+    string Id = "";
+    int Grant = 1;
+}
+
 class OZT_AdminSet
 {
     string Name = "";

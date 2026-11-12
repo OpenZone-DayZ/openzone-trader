@@ -15,5 +15,8 @@
     "WearBought": 1,
     "StartStock": 1,
     "DestockAtStart": 1,
-    "StockOnlyPristine": 0
+    "StockOnlyPristine": 0,
+    "Licences": [
+        { "Id": "weapons", "Name": "Дозвіл на зброю", "Look": "Paper" }
+    ]
 }

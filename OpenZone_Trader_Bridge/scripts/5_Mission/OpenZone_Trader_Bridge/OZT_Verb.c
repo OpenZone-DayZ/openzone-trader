@@ -47,6 +47,8 @@ class OZT_VerbOps
             return OpDeal(player, args, false, detail);
         if (op == "deal")
             return OpDeal(player, args, true, detail);
+        if (op == "licence")
+            return OpLicence(player, args, detail);
         if (op == "show")
             return OpShow(player, args, detail);
         if (op == "tree")
@@ -478,13 +480,31 @@ class OZT_VerbOps
             array<string> pieces = new array<string>();
             token.Split("+", pieces);
             string head = pieces[0].Trim();
+            // The count after the LAST colon, digits only: a licence's own
+            // name has one (@licence:weapons:1).
             int count = 1;
-            int colon = head.IndexOf(":");
+            int colon = -1;
+            for (int ch = 0; ch < head.Length(); ch++)
+            {
+                if (head.Get(ch) == ":")
+                    colon = ch;
+            }
             if (colon > -1)
             {
                 int after = head.Length() - colon - 1;
-                count = head.Substring(colon + 1, after).ToInt();
-                head = head.Substring(0, colon);
+                string tail = head.Substring(colon + 1, after);
+                bool digits = after > 0;
+                for (int d = 0; d < tail.Length(); d++)
+                {
+                    int code = tail.Get(d).ToAscii();
+                    if (code < 48 || code > 57)
+                        digits = false;
+                }
+                if (digits)
+                {
+                    count = tail.ToInt();
+                    head = head.Substring(0, colon);
+                }
             }
             if (count < 1)
                 count = 1;
@@ -726,6 +746,36 @@ class OZT_VerbOps
 
     // show [trader=<id>]: tell the client to put the trade screen up for a
     // trader, the way the trade action will.
+    // licence id=<Id> [grant=1|0]: the player's licence granted or taken
+    // back; without id, the licences the player holds.
+    static bool OpLicence(PlayerBase player, map<string, string> args, out string detail)
+    {
+        string uid = OZT_Licences.UidOf(player);
+        string id = Arg(args, "id", "");
+        if (id != "")
+        {
+            if (!OZT_Licences.Def(id))
+            {
+                detail = "licence: the settings list no '" + id + "'";
+                return false;
+            }
+            if (Arg(args, "grant", "1") == "1")
+                OZT_Licences.Grant(uid, id);
+            else
+                OZT_Licences.Revoke(uid, id);
+        }
+        array<string> held = OZT_Licences.Of(uid);
+        string list = "";
+        for (int i = 0; i < held.Count(); i++)
+        {
+            if (list != "")
+                list = list + ",";
+            list = list + held[i];
+        }
+        detail = "licences: " + list;
+        return true;
+    }
+
     static bool OpShow(PlayerBase player, map<string, string> args, out string detail)
     {
         string id = Arg(args, "trader", "stand");

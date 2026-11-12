@@ -11,6 +11,7 @@
               "Requires": [ { "Kind": "stand", "Arg": "nvg" } ] },
             { "ClassName": "Battery9V", "Buy": 20, "Sell": 10 },
             { "ClassName": "TaloonBag_Blue", "Buy": 400, "Sell": 200 },
+            { "ClassName": "@licence:weapons", "Buy": 5000 },
             { "ClassName": "Paper", "Buy": 5 }
         ] },
         { "Id": "clothes", "Name": "Одяг", "Goods": [
@@ -96,7 +97,7 @@
             { "ClassName": "UniversalLight", "Buy": 200, "Sell": 100, "Stock": { "Max": 0, "Coefficient": 1 } },
             { "ClassName": "Mag_AKM_Palm30Rnd", "Buy": 220, "Sell": 110 },
             { "ClassName": "Mag_AKM_Drum75Rnd", "Buy": 600, "Sell": 300 },
-            { "ClassName": "M4A1", "Buy": 3000, "Sell": 1500, "Stock": { "Max": 2, "Coefficient": 0.9 } },
+            { "ClassName": "M4A1", "Buy": 3000, "Sell": 1500, "Stock": { "Max": 2, "Coefficient": 0.9 }, "Requires": [ { "Kind": "licence", "Arg": "weapons" } ] },
             { "ClassName": "Mag_STANAG_30Rnd", "Buy": 200, "Sell": 100 },
             { "ClassName": "M4_RISHndgrd", "Buy": 300, "Sell": 150 },
             { "ClassName": "M4_PlasticHndgrd", "Buy": 150, "Sell": 75 },

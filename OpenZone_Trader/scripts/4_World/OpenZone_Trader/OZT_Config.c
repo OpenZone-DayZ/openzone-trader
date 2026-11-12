@@ -249,6 +249,28 @@ class OZT_Config
             for (int g = 0; g < cat.Goods.Count(); g++)
             {
                 OZT_Goods e = cat.Goods[g];
+                // A licence (design §11.2): one the settings list, never
+                // bought back, never stocked.
+                if (OZT_Licences.IsLicence(e.ClassName))
+                {
+                    string lid = OZT_Licences.IdOf(e.ClassName);
+                    if (!LicenceListed(lid))
+                    {
+                        Problem("Goods: '" + e.ClassName + "' in category '" + cat.Id + "' is skipped: the settings list no licence '" + lid + "'");
+                        continue;
+                    }
+                    if (seen.Find(e.ClassName) > -1)
+                    {
+                        Problem("Goods: '" + e.ClassName + "' in category '" + cat.Id + "' is skipped: the licence is in the price book already");
+                        continue;
+                    }
+                    seen.Insert(e.ClassName);
+                    e.Sell = 0;
+                    e.Stock = null;
+                    e.Buy = Fitted(e.ClassName, "Buy", e.Buy, unit);
+                    kept.Insert(e);
+                    continue;
+                }
                 if (!ClassKnown(e.ClassName))
                 {
                     Problem("Goods: '" + e.ClassName + "' in category '" + cat.Id + "' is skipped: no such class");
@@ -278,6 +300,17 @@ class OZT_Config
 
         for (int w = 0; w < lines.Count(); w++)
             CheckWith(lines[w], seen, lines);
+    }
+
+    private bool LicenceListed(string id)
+    {
+        array<ref OZT_LicenceDef> defs = m_Settings.Licences;
+        for (int i = 0; i < defs.Count(); i++)
+        {
+            if (defs[i].Id == id)
+                return true;
+        }
+        return false;
     }
 
     // What comes attached to goods: each a class of the book with a price to

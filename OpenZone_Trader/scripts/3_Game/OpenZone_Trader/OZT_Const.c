@@ -9,6 +9,10 @@ class OZT_Const
     static const string GOODS    = "$profile:OpenZone\\OZ_Trader_Goods.json";
     static const string TRADERS  = "$profile:OpenZone\\OZ_Trader_Traders.json";
 
+    // A licence as goods, and the folder of who holds which (design §11.2).
+    static const string LICENCE_PREFIX = "@licence:";
+    static const string LICENCE_DIR = "$profile:OpenZone\\TraderLicences";
+
     // The stock of each shelf (design §11.1): one small file per stock.
     static const string STOCK_DIR = "$profile:OpenZone\\TraderStock";
 
@@ -80,6 +84,8 @@ class OZT_Const
     static const string NO_PARTS     = "STR_OZT_NO_PARTS";
     static const string NO_ACCESS    = "STR_OZT_NO_ACCESS";
     static const string NO_STOCK     = "STR_OZT_NO_STOCK";
+    // A licence the player holds already.
+    static const string NO_HAS_LICENCE = "STR_OZT_NO_HAS_LICENCE";
     static const string NO_INTERNAL  = "STR_OZT_NO_INTERNAL";
 
     // Health levels the condition factors are named after

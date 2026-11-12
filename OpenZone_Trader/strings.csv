@@ -11,6 +11,7 @@ STR_OZT_NO_NOT_EMPTY,"Усередині лежать речі, яких нем�
 STR_OZT_NO_LOCKED,Цей товар вам недоступний,These goods are not available to you
 STR_OZT_NO_PARTS,"Частини не поєднуються: перевірте смугу частин","Some parts do not go together: check the strip of parts"
 STR_OZT_NO_STOCK,Товар закінчився,Out of stock
+STR_OZT_NO_HAS_LICENCE,"Ця ліцензія у вас уже є","You hold this licence already"
 STR_OZT_NO_INTERNAL,Торговець не зміг виконати угоду,The trader could not complete the deal
 # The trade screen. Titles are capitals in both languages; the capital of the
 # Ukrainian i is typed as the Latin I, which the game's fonts have.
@@ -91,6 +92,10 @@ STR_OZT_UI_NO_SLOT,"Немає вільного слота для цієї ре�
 STR_OZT_UI_PARTS_DROPPED,"Більше не стає, прибрано з угоди: %1","No longer fits, taken out of the deal: %1"
 STR_OZT_UI_SOLD_OUT,"Цього товару зараз немає в наявності","This is out of stock right now"
 STR_OZT_UI_IN_STOCK,"В наявності","In stock"
+STR_OZT_UI_LICENCE,"Ліцензія","Licence"
+STR_OZT_UI_LICENCE_HELD,"у вас є","you hold it"
+STR_OZT_ADMIN_NO_LICENCE,"Немає такої ліцензії","No such licence"
+STR_OZT_ADMIN_NO_SUCH_PLAYER,"Немає такого гравця","No such player"
 STR_OZT_UI_OLD_HELD,"Стару частину тримає інша, прибрано з угоди: %1","The old part is held on by another, taken out of the deal: %1"
 STR_OZT_UI_SALE_HELD,"Цю частину тримає інша, прибрано з продажу: %1","Held on by another part, taken out of the sale: %1"
 STR_OZT_UI_KEEP_HELD,"Частину, яку ви лишаєте, тримає інша, прибрано з продажу: %1","A part you keep is held on by another, taken out of the sale: %1"

@@ -53,6 +53,25 @@ class OZT_ConditionFactors
     }
 }
 
+// A licence the server sells or gives (design §11.2): `Id` is what goods
+// (`@licence:<Id>`) and gates (`licence`) name, `Name` what the player reads,
+// `Look` the class the shelf draws for it.
+class OZT_LicenceDef
+{
+    string Id = "";
+    string Name = "";
+    string Look = "";
+
+    OZT_LicenceDef Copy()
+    {
+        OZT_LicenceDef c = new OZT_LicenceDef();
+        c.Id = Id;
+        c.Name = Name;
+        c.Look = Look;
+        return c;
+    }
+}
+
 class OZT_Settings : OZ_ConfigBase
 {
     string Provider = "items";
@@ -81,6 +100,9 @@ class OZT_Settings : OZ_ConfigBase
     // 1: what players sell goes into the pristine line whatever its condition.
     int StockOnlyPristine = 0;
 
+    // The licences of the server (design §11.2).
+    ref array<ref OZT_LicenceDef> Licences;
+
     override int LatestVersion()
     {
         return 1;
@@ -96,6 +118,7 @@ class OZT_Settings : OZ_ConfigBase
         Condition = new OZT_ConditionFactors();
         CooldownMs = 1000;
         WearBought = 1;
+        Licences = new array<ref OZT_LicenceDef>();
     }
 
     override void Validate(out int warnings)
@@ -163,6 +186,31 @@ class OZT_Settings : OZ_ConfigBase
             warnings++;
         }
 
+        array<ref OZT_LicenceDef> defs = new array<ref OZT_LicenceDef>();
+        array<string> ids = new array<string>();
+        if (Licences)
+        {
+            for (int l = 0; l < Licences.Count(); l++)
+            {
+                OZT_LicenceDef raw = Licences[l];
+                if (!raw)
+                    continue;
+                OZT_LicenceDef d = raw.Copy();
+                if (!OZT_Ids.IsSafe(d.Id) || ids.Find(d.Id) > -1)
+                {
+                    OZT_Log.Warn("Settings: a licence with the Id '" + d.Id + "' is dropped: letters, digits, _ and - only, once each");
+                    warnings++;
+                    continue;
+                }
+                if (d.Name == "")
+                    d.Name = d.Id;
+                if (d.Look == "")
+                    d.Look = "Paper";
+                ids.Insert(d.Id);
+                defs.Insert(d);
+            }
+        }
+        Licences = defs;
         if (StartStock < 0 || StartStock > 2)
         {
             OZT_Log.Warn("Settings: StartStock " + StartStock.ToString() + " is 0, 1 or 2; using 0");

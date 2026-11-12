@@ -46,6 +46,9 @@ class OZT_Tile
     // reads a red zero.
     bool SoldOut;
 
+    // A licence the player holds (design §11.2): the green corner.
+    bool Owned;
+
     // A part's price the player pays (rounded up on the tile), and the
     // number of parts a BUY line fits to its thing.
     bool Pays;
@@ -230,8 +233,10 @@ class OZT_Tile
         {
             // A sold-out line wears the red corner too: on the shelf it can
             // only mean "not to be had now".
-            m_No.Show(Why == 1 || Why == 2 || SoldOut);
-            if (Why == 2)
+            m_No.Show(Why == 1 || Why == 2 || SoldOut || Owned);
+            if (Owned)
+                m_No.SetColor(OZT_Look.Good());
+            else if (Why == 2)
                 m_No.SetColor(OZT_Look.Alert());
             else
                 m_No.SetColor(OZT_Look.Bad());

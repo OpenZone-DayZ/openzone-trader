@@ -34,6 +34,10 @@ class OZT_WireGoods
     // The condition the line's things are in: 0 pristine .. 3 badly damaged.
     // A stocked class is sent once per condition it holds.
     int Level = 0;
+    // A licence (design §11.2): what the player reads, and the class the
+    // shelf draws for it. Empty for goods.
+    string Name = "";
+    string Look = "";
     // What comes attached to one at this trader, each charged at its own
     // price: Buy is the sum.
     ref array<string> With;
@@ -86,6 +90,8 @@ class OZT_OpenRes
     // The classes that are this trader's money when money is items: the screen
     // counts them as money and does not show them among the player's things.
     ref array<string> Notes;
+    // The licences the player holds (design §11.2).
+    ref array<string> Licences;
 
     void OZT_OpenRes()
     {
@@ -94,6 +100,7 @@ class OZT_OpenRes
         Goods = new array<ref OZT_WireGoods>();
         Yours = new array<ref OZT_WireOwn>();
         Notes = new array<string>();
+        Licences = new array<string>();
     }
 }
 

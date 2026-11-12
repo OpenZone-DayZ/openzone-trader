@@ -1026,6 +1026,18 @@ class OZT_TradeMenu : UIScriptedMenu
         return null;
     }
 
+    // Does the player hold the licence these goods are (design §11.2)?
+    protected bool HoldsLicence(string type)
+    {
+        if (!m_Data || !m_Data.Licences)
+            return false;
+        string prefix = OZT_Const.LICENCE_PREFIX;
+        if (type.IndexOf(prefix) != 0)
+            return false;
+        string id = type.Substring(prefix.Length(), type.Length() - prefix.Length());
+        return m_Data.Licences.Find(id) > -1;
+    }
+
     // What the stock line has left beside what the cart already buys of it;
     // -1: unlimited.
     protected int StockLeft(OZT_WireGoods g)
@@ -1086,7 +1098,9 @@ class OZT_TradeMenu : UIScriptedMenu
             // Drawn as it comes: with what the price book gives it, a worn
             // stock line in its condition.
             EntityAI e;
-            if (g.Level > 0)
+            if (g.Look != "")
+                e = m_Shelf.Of(g.Look);
+            else if (g.Level > 0)
                 e = m_Shelf.LookWorn(g.ClassName, g.Level);
             else
                 e = m_Shelf.LookOf(g.ClassName, g.With, null);
@@ -1101,6 +1115,8 @@ class OZT_TradeMenu : UIScriptedMenu
                 t.Count = g.Stock;
             else if (g.Stock == 0)
                 t.SoldOut = true;
+            if (g.Look != "")
+                t.Owned = HoldsLicence(g.ClassName);
             if (m_ShelfGrid.Add(t))
                 Relight(t, true);
         }
@@ -1366,7 +1382,10 @@ class OZT_TradeMenu : UIScriptedMenu
             if (bought && !buy.IsOnto())
                 comes = bought.With;
             EntityAI stand;
-            if (buy.Level > 0)
+            OZT_WireGoods sold = GoodsOf(buy.Type);
+            if (sold && sold.Look != "")
+                stand = m_Shelf.Of(sold.Look);
+            else if (buy.Level > 0)
                 stand = m_Shelf.LookWorn(buy.Type, buy.Level);
             else
                 stand = m_Shelf.LookOf(buy.Type, comes, buy.Fits);
@@ -2869,6 +2888,18 @@ class OZT_TradeMenu : UIScriptedMenu
             g = GoodsOf(type);
         if (!g || g.Buy <= 0)
             return;
+        // A licence (design §11.2): once, and not one the player holds.
+        if (g.Look != "")
+        {
+            if (HoldsLicence(type) || m_Cart.Buying(type, 0) > 0)
+            {
+                SayInfo(OZT_Ui.Words("STR_OZT_NO_HAS_LICENCE"), OZT_Look.Alert());
+                return;
+            }
+            m_Cart.Buy(type, 1, g.Buy, 1, 0);
+            CartChanged();
+            return;
+        }
         // A stock line (design §11.1): no more than it holds.
         int left = StockLeft(g);
         if (left == 0)

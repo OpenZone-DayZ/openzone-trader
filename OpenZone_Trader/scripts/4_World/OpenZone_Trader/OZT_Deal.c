@@ -131,6 +131,8 @@ class OZT_Deal
     protected ref array<int> m_BuyLevels;
     // What the deal takes from the trader's stock and brings into it.
     protected ref OZT_StockCursor m_Cursor;
+    // The licences the deal sells (design §11.2): granted at the commit.
+    protected ref array<string> m_Licences;
 
     // The parts of each bought line (an empty list for a plain one), and the
     // parts bought onto things the player carries.
@@ -201,6 +203,7 @@ class OZT_Deal
         m_BuyCounts = new array<int>();
         m_BuyRules = new array<string>();
         m_BuyLevels = new array<int>();
+        m_Licences = new array<string>();
         m_BuyParts = new array<ref OZT_PartList>();
         m_Ontos = new array<ref OZT_Onto>();
         m_Homeless = new array<string>();
@@ -536,6 +539,26 @@ class OZT_Deal
             // catalogue the client holds is stale.
             if (OZT_Book.Locked(m_Player, m_Trader, entry))
                 return OZT_Const.NO_LOCKED;
+            // A licence (design §11.2): one, not held yet, nothing to make.
+            string lid = "";
+            if (entry)
+                lid = OZT_Licences.IdOf(entry.ClassName);
+            if (lid != "")
+            {
+                if (line.Count != 1 || line.Fit.Count() > 0 || line.OnLow != 0 || line.OnHigh != 0)
+                    return OZT_Const.NO_INTERNAL;
+                if (OZT_Licences.Has(OZT_Licences.UidOf(m_Player), lid) || m_Licences.Find(lid) > -1)
+                    return OZT_Const.NO_HAS_LICENCE;
+                int fee = OZT_Book.BuyFor(m_Player, m_Trader, entry, 1);
+                if (fee <= 0)
+                    return OZT_Const.NO_CHANGED;
+                m_Licences.Insert(lid);
+                total = total + fee;
+                m_Res.BuyPrices.Insert(fee);
+                m_Res.Bought = total;
+                m_Lines = m_Lines + " +" + entry.ClassName + "=" + fee.ToString();
+                continue;
+            }
             // A stock line (design §11.1): its condition, and enough in it.
             int level = line.Level;
             bool stocked = false;
@@ -1467,6 +1490,9 @@ class OZT_Deal
 
         // The stock moves of the deal onto the shelf and into its file.
         m_Cursor.Commit();
+        // The licences bought, onto the character.
+        for (int lc = 0; lc < m_Licences.Count(); lc++)
+            OZT_Licences.Grant(OZT_Licences.UidOf(m_Player), m_Licences[lc]);
 
         string uid = Uid();
         int now = GetGame().GetTime();

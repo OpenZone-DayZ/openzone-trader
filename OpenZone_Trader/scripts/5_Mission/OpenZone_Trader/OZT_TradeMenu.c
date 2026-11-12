@@ -102,6 +102,15 @@ class OZT_TradeMenu : UIScriptedMenu
     protected ref array<Widget> m_SlotWidgets;
     protected ref array<ref OZT_Tile> m_SlotTiles;
 
+    // Parts of the player's things that come off with a part the deal takes
+    // off, because they hold it on (PruneOffs): left off the twins the screen
+    // asks the engine with.
+    protected ref array<EntityAI> m_OffToo;
+
+    // What the last change of the cart took out of it or took off with it, in
+    // words: the quote's own line comes after it, never over it.
+    protected string m_PruneSaid;
+
     // The selected thing: a tile's kind and key. A part taken off in the
     // strip leaves with its tile; the thing it was on is selected instead and
     // painted once the grids are laid again.
@@ -198,6 +207,7 @@ class OZT_TradeMenu : UIScriptedMenu
         m_OwnTabs = new array<Widget>();
         m_SlotWidgets = new array<Widget>();
         m_SlotTiles = new array<ref OZT_Tile>();
+        m_OffToo = new array<EntityAI>();
         m_QuoteIn = -1;
     }
 
@@ -600,6 +610,13 @@ class OZT_TradeMenu : UIScriptedMenu
         string stays = "";
         if (ok)
             stays = StaysWords(res);
+        if (m_PruneSaid != "")
+        {
+            if (stays != "")
+                stays = m_PruneSaid + ". " + stays;
+            else
+                stays = m_PruneSaid;
+        }
         if (stays != "")
         {
             SayInfo(stays, OZT_Look.Alert());
@@ -617,6 +634,7 @@ class OZT_TradeMenu : UIScriptedMenu
         {
             EndTry();
             m_Cart.Clear();
+            m_PruneSaid = "";
             m_Quote = null;
             m_DirtyOwn = true;
             m_DirtySlots = true;
@@ -1038,7 +1056,7 @@ class OZT_TradeMenu : UIScriptedMenu
             t.Price = g.Buy;
             t.Index = i;
             if (m_ShelfGrid.Add(t))
-                t.SetPicked(IsPick(t));
+                Relight(t, true);
         }
         m_ShelfGrid.Arrange();
     }
@@ -1086,7 +1104,7 @@ class OZT_TradeMenu : UIScriptedMenu
             }
             OZT_Tile t = OwnTile(e);
             if (t && m_OwnGrid.Add(t))
-                t.SetPicked(IsPick(t));
+                Relight(t, true);
         }
         m_OwnGrid.Arrange();
     }
@@ -1277,7 +1295,7 @@ class OZT_TradeMenu : UIScriptedMenu
             if (!tile || !into || !tile.Build(into))
                 continue;
             tile.Fill(w, hold);
-            tile.SetPicked(IsPick(tile));
+            Relight(tile, true);
             m_SlotTiles.Insert(tile);
             if (img)
                 img.Show(false);
@@ -1307,7 +1325,7 @@ class OZT_TradeMenu : UIScriptedMenu
             OZT_Tile bt = new OZT_Tile(OZT_Tile.BUY, buy.Type, stand);
             bt.Index = b;
             if (m_BuyGrid.Add(bt))
-                bt.SetPicked(IsPick(bt));
+                Relight(bt, true);
         }
         m_BuyGrid.Arrange();
 
@@ -1322,7 +1340,7 @@ class OZT_TradeMenu : UIScriptedMenu
             st.Low = sell.Low;
             st.High = sell.High;
             if (m_SellGrid.Add(st))
-                st.SetPicked(IsPick(st));
+                Relight(st, true);
         }
         m_SellGrid.Arrange();
         PaintCarts();
@@ -1551,13 +1569,39 @@ class OZT_TradeMenu : UIScriptedMenu
         RepaintPicks(m_BuyGrid);
         RepaintPicks(m_SellGrid);
         for (int s = 0; s < m_SlotTiles.Count(); s++)
-        {
-            OZT_Tile held = m_SlotTiles[s];
-            bool lit = IsPick(held);
-            if (lit != held.IsPicked())
-                held.SetPicked(lit);
-        }
+            Relight(m_SlotTiles[s], false);
         PaintPick(t);
+    }
+
+    // Is the tile the thing the parts strip shows? It stays lit while a part
+    // of it is picked in the strip, so the player sees what is being changed.
+    protected bool IsHeld(OZT_Tile t)
+    {
+        if (!m_PartsAt || !t || t.Kind == OZT_Tile.PART)
+            return false;
+        if (m_PartsAt.Kind == OZT_Tile.OWN || m_PartsAt.Kind == OZT_Tile.SELL)
+        {
+            if (t.Kind != OZT_Tile.OWN && t.Kind != OZT_Tile.SELL)
+                return false;
+            return t.Low == m_PartsAt.Low && t.High == m_PartsAt.High;
+        }
+        if (m_PartsAt.Kind == OZT_Tile.BUY)
+            return t.Kind == OZT_Tile.BUY && t.Index == m_PartsAt.Line;
+        return t.Kind == m_PartsAt.Kind && t.Type == m_PartsAt.Type;
+    }
+
+    // Paints a tile's light anew where its pick or its hold changed (`always`:
+    // a tile just made). True: the tile is the pick.
+    protected bool Relight(OZT_Tile t, bool always)
+    {
+        bool on = IsPick(t);
+        bool kept = IsHeld(t);
+        if (always || on != t.IsPicked() || kept != t.Held)
+        {
+            t.Held = kept;
+            t.SetPicked(on);
+        }
+        return on;
     }
 
     // Is the selected thing still on the screen?
@@ -1607,6 +1651,7 @@ class OZT_TradeMenu : UIScriptedMenu
         m_PartsAt = null;
         ClearFilter();
         m_DirtyParts = true;
+        m_PaintPickSoon = true;
     }
 
     // The thing the strip shows becomes the selection again: a part taken off
@@ -1640,12 +1685,10 @@ class OZT_TradeMenu : UIScriptedMenu
             found = PickedIn(m_ShelfGrid);
         for (int s = 0; s < m_SlotTiles.Count(); s++)
         {
-            OZT_Tile held = m_SlotTiles[s];
-            bool lit = IsPick(held);
-            if (lit != held.IsPicked())
-                held.SetPicked(lit);
+            OZT_Tile worn = m_SlotTiles[s];
+            bool lit = Relight(worn, false);
             if (lit && !found)
-                found = held;
+                found = worn;
         }
         if (found)
             PaintPick(found);
@@ -1664,12 +1707,7 @@ class OZT_TradeMenu : UIScriptedMenu
     protected void RepaintPicks(OZT_TileGrid grid)
     {
         for (int i = 0; i < grid.Count(); i++)
-        {
-            OZT_Tile t = grid.Get(i);
-            bool on = IsPick(t);
-            if (on != t.IsPicked())
-                t.SetPicked(on);
-        }
+            Relight(grid.Get(i), false);
     }
 
     // The selected thing in words: its name, the sum that applies here and
@@ -1930,7 +1968,7 @@ class OZT_TradeMenu : UIScriptedMenu
             // sale again, it comes off into the bags with the deal.
             bool stood = slot.What == OZT_PartsEntry.PART && slot.State != OZT_PartsEntry.ONTO;
             if (stood && SellLineOf(slot.Low, slot.High) < 0)
-                AddSell(slot.Low, slot.High);
+                AddSell(slot.Low, slot.High, true);
         }
         ClearFilter();
         CartChanged();
@@ -2816,12 +2854,17 @@ class OZT_TradeMenu : UIScriptedMenu
         CartChanged();
     }
 
-    protected void AddSell(int low, int high)
+    // `quiet`: a sale another gesture makes on its own way (the old part a
+    // bought one replaces) -- no word if the trader does not take the thing,
+    // no question how many, and no CartChanged: the gesture calls it once, so
+    // what that call says (a line taken out of the deal) stays on the screen.
+    protected void AddSell(int low, int high, bool quiet = false)
     {
         OZT_WireOwn own = OwnOf(low, high);
         if (!own)
         {
-            SayInfo(OZT_Ui.Words("STR_OZT_UI_WHY_NOT_TAKEN"), OZT_Look.Alert());
+            if (!quiet)
+                SayInfo(OZT_Ui.Words("STR_OZT_UI_WHY_NOT_TAKEN"), OZT_Look.Alert());
             return;
         }
         EntityAI item = EntityAI.Cast(GetGame().GetObjectByNetworkId(low, high));
@@ -2830,7 +2873,7 @@ class OZT_TradeMenu : UIScriptedMenu
         // A thing with something inside goes with all of it or not at all: it
         // may be put into the deal, and the quote says how much is in the way.
         // More than one unit: the player says how many.
-        if (own.Units > 1)
+        if (own.Units > 1 && !quiet)
         {
             // Notes are given one to begin with: a note is broken more often
             // than a whole wad.
@@ -2841,12 +2884,14 @@ class OZT_TradeMenu : UIScriptedMenu
             return;
         }
         m_Cart.Sell(item, low, high, 0, own.Units, Brings(own));
-        CartChanged();
+        if (!quiet)
+            CartChanged();
     }
 
     protected void CartChanged()
     {
         string pruned = PruneParts();
+        m_PruneSaid = pruned;
         m_Quote = null;
         m_QuoteTries = 0;
         m_DirtyOwn = true;
@@ -2858,7 +2903,7 @@ class OZT_TradeMenu : UIScriptedMenu
         else
             QuoteSoon(QUOTE_AFTER);
         if (pruned != "")
-            SayInfo(OZT_Ui.Words1("STR_OZT_UI_PARTS_DROPPED", pruned), OZT_Look.Alert());
+            SayInfo(pruned, OZT_Look.Alert());
         else
             SayInfo(OZT_Ui.Words("STR_OZT_UI_HELLO"), OZT_Look.Text());
         PaintDeal();
@@ -2870,20 +2915,192 @@ class OZT_TradeMenu : UIScriptedMenu
     // it (the owner, 2026-11-12). The server's own question (OZT_Deal
     // .CheckFits), asked in passes: what does not go on yet is tried again
     // after the rest (a light waits for the rail bought with it), and what
-    // never goes on is out. Returns the names of what left, or "".
+    // never goes on is out. Before that, the other side of the same rule:
+    // what would take off a part the game holds on (PruneOffs). The rule is
+    // the engine's for every part and slot, no class is named. Returns the
+    // words for what left, or "".
     protected string PruneParts()
     {
+        array<string> held = new array<string>();
+        array<string> unsold = new array<string>();
+        array<string> unkept = new array<string>();
+        array<string> offToo = new array<string>();
+        PruneOffs(held, unsold, offToo);
+        PruneKeeps(unkept);
         array<string> lost = new array<string>();
         PruneOntos(lost);
         PruneFits(lost);
-        string names = "";
-        for (int i = 0; i < lost.Count(); i++)
+        string say = Said("", "STR_OZT_UI_PARTS_DROPPED", lost);
+        say = Said(say, "STR_OZT_UI_OLD_HELD", held);
+        say = Said(say, "STR_OZT_UI_SALE_HELD", unsold);
+        say = Said(say, "STR_OZT_UI_KEEP_HELD", unkept);
+        say = Said(say, "STR_OZT_UI_OFF_TOO", offToo);
+        return say;
+    }
+
+    // One sentence more for what left the deal: the key's words with the names.
+    protected string Said(string say, string key, array<string> names)
+    {
+        if (names.Count() == 0)
+            return say;
+        string list = "";
+        for (int i = 0; i < names.Count(); i++)
         {
             if (i > 0)
-                names = names + ", ";
-            names = names + lost[i];
+                list = list + ", ";
+            list = list + names[i];
         }
-        return names;
+        string line = OZT_Ui.Words1(key, list);
+        if (say == "")
+            return line;
+        return say + " " + line;
+    }
+
+    // Parts the deal would take off a thing the player keeps while the game
+    // holds them on (OZT_Offs; the server's CheckOffs): a part sold off it, the
+    // old part a bought one pushes out -- the light that stays on a rifle holds
+    // its rail handguard. What holds it on comes off with it, into the bags,
+    // as the server does it (OZT_Deal.CheckOffs), and is named. A part nothing
+    // frees stays where it is: what is bought into its slot leaves the cart,
+    // and so does its own sale.
+    protected void PruneOffs(array<string> held, array<string> unsold, array<string> offToo)
+    {
+        m_OffToo.Clear();
+        array<EntityAI> hosts = new array<EntityAI>();
+        array<ref array<EntityAI>> leaves = new array<ref array<EntityAI>>();
+        for (int s = 0; s < m_Cart.Sells.Count(); s++)
+        {
+            OZT_CartLine sold = m_Cart.Sells[s];
+            if (sold.Item && sold.Count == 0)
+                OZT_Offs.AddLeave(hosts, leaves, sold.Item);
+        }
+        for (int b = 0; b < m_Cart.Buys.Count(); b++)
+        {
+            OZT_CartLine onto = m_Cart.Buys[b];
+            if (!onto.IsOnto())
+                continue;
+            EntityAI host = EntityAI.Cast(GetGame().GetObjectByNetworkId(onto.OnLow, onto.OnHigh));
+            int sid = InventorySlots.GetSlotIdFromString(onto.OnSlot);
+            if (!host || sid == InventorySlots.INVALID)
+                continue;
+            EntityAI there = host.GetInventory().FindAttachment(sid);
+            if (there)
+                OZT_Offs.AddLeave(hosts, leaves, there);
+        }
+        for (int h = 0; h < hosts.Count(); h++)
+        {
+            array<EntityAI> stuck = new array<EntityAI>();
+            OZT_Offs.Stuck(hosts[h], leaves[h], null, stuck);
+            if (stuck.Count() == 0)
+                continue;
+            array<EntityAI> holders = new array<EntityAI>();
+            if (OZT_Offs.Holders(hosts[h], leaves[h], holders))
+            {
+                for (int o = 0; o < holders.Count(); o++)
+                {
+                    m_OffToo.Insert(holders[o]);
+                    offToo.Insert(OZT_Ui.NameOf(holders[o]));
+                }
+                continue;
+            }
+            for (int k = 0; k < stuck.Count(); k++)
+                LetStay(hosts[h], stuck[k], held, unsold);
+        }
+    }
+
+    protected void LetStay(EntityAI host, EntityAI part, array<string> held, array<string> unsold)
+    {
+        InventoryLocation il = new InventoryLocation();
+        if (!part.GetInventory().GetCurrentInventoryLocation(il))
+            return;
+        int hl;
+        int hh;
+        host.GetNetworkID(hl, hh);
+        string slot = InventorySlots.GetSlotName(il.GetSlot());
+        bool replaced = false;
+        int onto = OZT_PartsReader.OntoLine(m_Cart, hl, hh, slot);
+        while (onto > -1)
+        {
+            held.Insert(OZT_Ui.NameOf(m_Shelf.Of(m_Cart.Buys[onto].Type)));
+            m_Cart.BuyCount(onto, 0);
+            replaced = true;
+            onto = OZT_PartsReader.OntoLine(m_Cart, hl, hh, slot);
+        }
+        int pl;
+        int ph;
+        part.GetNetworkID(pl, ph);
+        int line = SellLineOf(pl, ph);
+        if (line < 0)
+            return;
+        // The sale the replacement put there goes without a word of its own.
+        if (!replaced)
+            unsold.Insert(OZT_Ui.NameOf(part));
+        m_Cart.Unsell(line);
+    }
+
+    // A part kept off a sold thing while the game holds it on (an Atlas bipod
+    // never comes off): the thing's sale leaves the cart, so nothing the
+    // player meant to keep goes to the trader. The thing's other parts are the
+    // trader's to take off first, in any order. A part the trader does not
+    // take comes off the same way; the server answers for that one.
+    protected void PruneKeeps(array<string> unkept)
+    {
+        for (int s = m_Cart.Sells.Count() - 1; s >= 0; s--)
+        {
+            OZT_CartLine line = m_Cart.Sells[s];
+            if (!line.Item || line.Keep.Count() == 0)
+                continue;
+            array<EntityAI> hosts = new array<EntityAI>();
+            array<ref array<EntityAI>> leaves = new array<ref array<EntityAI>>();
+            for (int k = 0; k < line.Keep.Count(); k++)
+            {
+                OZT_WireKeep keep = line.Keep[k];
+                if (keep.Rounds != 0)
+                    continue;
+                EntityAI kept = EntityAI.Cast(GetGame().GetObjectByNetworkId(keep.Low, keep.High));
+                if (kept && !RidesKept(line, kept))
+                    OZT_Offs.AddLeave(hosts, leaves, kept);
+            }
+            bool stuck = false;
+            for (int h = 0; h < hosts.Count(); h++)
+            {
+                array<EntityAI> may = new array<EntityAI>();
+                OZT_Offs.PartsOf(hosts[h], may);
+                array<EntityAI> held = new array<EntityAI>();
+                OZT_Offs.Stuck(hosts[h], leaves[h], may, held);
+                if (held.Count() > 0)
+                    stuck = true;
+            }
+            if (!stuck)
+                continue;
+            unkept.Insert(OZT_Ui.NameOf(line.Item));
+            m_Cart.Unsell(s);
+        }
+    }
+
+    // Does the part hang on another part the line keeps? Then it goes with
+    // that one and does not come off on its own.
+    protected bool RidesKept(OZT_CartLine line, EntityAI part)
+    {
+        InventoryLocation il = new InventoryLocation();
+        EntityAI at = part;
+        while (at && at != line.Item)
+        {
+            if (!at.GetInventory().GetCurrentInventoryLocation(il))
+                return false;
+            if (il.GetType() != InventoryLocationType.ATTACHMENT)
+                return false;
+            EntityAI up = il.GetParent();
+            if (!up || up == line.Item)
+                return false;
+            int ul;
+            int uh;
+            up.GetNetworkID(ul, uh);
+            if (line.Keeps(ul, uh, 0))
+                return true;
+            at = up;
+        }
+        return false;
     }
 
     // Would `host` take a thing of `type` in that slot now, as the engine sees it?
@@ -2915,6 +3132,8 @@ class OZT_TradeMenu : UIScriptedMenu
             if (!part || !part.GetInventory().GetCurrentInventoryLocation(il))
                 continue;
             if (freed.Find(il.GetSlot()) > -1)
+                continue;
+            if (m_OffToo.Find(part) > -1)
                 continue;
             int pl;
             int ph;

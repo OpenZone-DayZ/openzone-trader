@@ -143,6 +143,9 @@ class OZT_Deal
     protected ref array<EntityAI> m_Shut;
     protected ref array<OZT_RoundLot> m_KeptLots;
 
+    // The things the sell lines name, sold whole: what a sold part leaves.
+    protected ref array<EntityAI> m_SoldRoots;
+
     // True while a plan is laid with the first thing that needs cells set aside
     // for the hands: the second laying of PlanPlaces.
     protected bool m_Aside;
@@ -202,6 +205,7 @@ class OZT_Deal
         m_Moves = new array<ref OZT_Move>();
         m_Shut = new array<EntityAI>();
         m_KeptLots = new array<OZT_RoundLot>();
+        m_SoldRoots = new array<EntityAI>();
         m_Lines = "";
     }
 
@@ -267,6 +271,9 @@ class OZT_Deal
         if (why != "")
             return why;
         why = ReadBuys(buys);
+        if (why != "")
+            return why;
+        why = CheckOffs();
         if (why != "")
             return why;
 
@@ -410,9 +417,14 @@ class OZT_Deal
                 if (entry.Category == OZT_Const.CATEGORY_CHANGE)
                     m_NotesOut = m_NotesOut + price;
                 if (entire)
+                {
                     m_Gone.Insert(e);
+                    m_SoldRoots.Insert(e);
+                }
                 else
+                {
                     AddGrow(e, -units);
+                }
                 m_Lines = m_Lines + " -" + e.GetType() + "x" + units.ToString() + "=" + price.ToString();
             }
             else
@@ -430,6 +442,7 @@ class OZT_Deal
                 price = tree.Total;
                 int back = m_Res.KeptRounds;
                 TakeTree(tree);
+                m_SoldRoots.Insert(e);
                 back = m_Res.KeptRounds - back;
                 string word = " -" + e.GetType() + "=" + price.ToString();
                 word = word + "(" + tree.Gone.Count().ToString() + " sold, " + tree.Moves.Count().ToString() + " kept";
@@ -698,11 +711,11 @@ class OZT_Deal
         return false;
     }
 
-    // Has an earlier line of this deal bought a part into that slot of that
-    // thing already?
     // A part of the player's that a bought part pushes out of its slot: kept,
     // like a part that comes off a sold thing.
-    protected bool Displace(EntityAI part)
+    // `first`: it moves before the parts already planned -- it holds one of
+    // them on.
+    protected bool Displace(EntityAI part, bool first = false)
     {
         if (m_Shut.Find(part) > -1)
             return false;
@@ -715,12 +728,17 @@ class OZT_Deal
         move.Item = part;
         move.W = w;
         move.H = h;
-        m_Moves.Insert(move);
+        if (first)
+            m_Moves.InsertAt(move, 0);
+        else
+            m_Moves.Insert(move);
         m_Shut.Insert(part);
         m_Res.Kept = m_Moves.Count();
         return true;
     }
 
+    // Has an earlier line of this deal bought a part into that slot of that
+    // thing already?
     protected bool TakenOnto(EntityAI host, int slotId)
     {
         for (int i = 0; i < m_Ontos.Count(); i++)
@@ -730,6 +748,70 @@ class OZT_Deal
                 return true;
         }
         return false;
+    }
+
+    // Does every part the deal takes off a thing come off, as the game lets
+    // it (OZT_Offs)? A part sold off a thing the player keeps, a part a bought
+    // one pushes out, a part kept off a sold thing or not taken with it --
+    // thing by thing, the sold parts of a sold thing taken off first where
+    // they hold the rest. The answer does not depend on where anything goes.
+    protected string CheckOffs()
+    {
+        array<EntityAI> hosts = new array<EntityAI>();
+        array<ref array<EntityAI>> leaves = new array<ref array<EntityAI>>();
+        for (int m = 0; m < m_Moves.Count(); m++)
+            OZT_Offs.AddLeave(hosts, leaves, m_Moves[m].Item);
+        for (int r = 0; r < m_SoldRoots.Count(); r++)
+            OZT_Offs.AddLeave(hosts, leaves, m_SoldRoots[r]);
+        for (int h = 0; h < hosts.Count(); h++)
+        {
+            EntityAI host = hosts[h];
+            array<EntityAI> may = new array<EntityAI>();
+            SoldPartsOf(host, may);
+            array<EntityAI> stuck = new array<EntityAI>();
+            OZT_Offs.Stuck(host, leaves[h], may, stuck);
+            if (stuck.Count() == 0)
+                continue;
+            // On a thing the player keeps, what holds the part on comes off
+            // with it, into the bags, before it (a light on a rifle whose rail
+            // handguard is replaced or sold); the screen says so.
+            bool freed = false;
+            array<EntityAI> holders = new array<EntityAI>();
+            if (m_Gone.Find(host) < 0)
+                freed = OZT_Offs.Holders(host, leaves[h], holders);
+            for (int k = 0; k < holders.Count() && freed; k++)
+            {
+                if (m_Shut.Find(holders[k]) > -1)
+                    continue;
+                if (!Displace(holders[k], true))
+                    freed = false;
+            }
+            if (freed)
+            {
+                OZT_Log.Dbg("deal: " + holders.Count().ToString() + " part(s) come off " + host.GetType() + " with " + stuck[0].GetType());
+                continue;
+            }
+            OZT_Log.Dbg("deal: " + stuck[0].GetType() + " does not come off " + host.GetType());
+            return OZT_Const.NO_PARTS;
+        }
+        return "";
+    }
+
+    // The sold parts in the slots of a thing a sold tree holds.
+    protected void SoldPartsOf(EntityAI host, array<EntityAI> into)
+    {
+        for (int t = 0; t < m_Trees.Count(); t++)
+        {
+            OZT_Tree tree = m_Trees[t];
+            for (int n = 0; n < tree.Nodes.Count(); n++)
+            {
+                OZT_Node node = tree.Nodes[n];
+                if (node.State != OZT_Tree.SOLD || !node.Up)
+                    continue;
+                if (node.Up.Item == host)
+                    into.Insert(node.Item);
+            }
+        }
     }
 
     // ---- 4. the money --------------------------------------------------------------

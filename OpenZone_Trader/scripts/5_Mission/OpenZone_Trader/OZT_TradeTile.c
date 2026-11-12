@@ -62,6 +62,11 @@ class OZT_Tile
     protected TextWidget m_QtyTop;
     protected bool m_Picked;
 
+    // The thing the parts strip shows: lit as the selection is while a part
+    // of it is picked in the strip (the owner, 2026-11-12: the selection fell
+    // off and the thing being changed was lost from sight).
+    bool Held;
+
     void OZT_Tile(int kind, string type, EntityAI item)
     {
         Kind = kind;
@@ -231,7 +236,7 @@ class OZT_Tile
         {
             bed = OZT_Look.Dark();
         }
-        if (on)
+        if (on || Held)
         {
             edge = OZT_Look.Accent();
             if (Why == 0)

@@ -15,9 +15,10 @@ packaging/<Mod>.workshop.png
                             the preview image the item's page shows, 1024x512
 ```
 
-Three mods ship: `OpenZone_Trader`, and two glues that each hard-require another mod:
-`OpenZone_Trader_VPP` (the TRADERS pane; needs VPP Admin Tools and the core's OpenZone_VPP)
-and `OpenZone_Trader_Research` (the research gate; needs OpenZone Research). The stand tools
+Four mods ship: `OpenZone_Trader`, and three glues that each hard-require another mod:
+`OpenZone_Trader_VPP` (the TRADERS pane; needs VPP Admin Tools and the core's OpenZone_VPP),
+`OpenZone_Trader_Research` (the research gate; needs OpenZone Research) and
+`OpenZone_Trader_TraderPlus` (the TraderPlus bank as money; needs TraderPlus). The stand tools
 (`OpenZone_Trader_Bridge`, `OpenZone_TraderProbe`, `OpenZone_TraderProbe_Bridge`) never ship.
 
 None of them has a Workshop item yet, so there is no `meta.cpp`: the first

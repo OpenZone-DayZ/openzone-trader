@@ -1,0 +1,299 @@
+{
+  "layout": "ozt_vpp_rtrade",
+  "note": "Research > Trade (design 5.5; mockup ResearchTrade): what the trader's files hold on the nodes of the research tree -- locks, discounts, access to points -- as the server has them, who has each node, and conditions that name nodes the tree no longer has. A page of the trader's VPP glue, compiled only beside the research gate (OZT_VppPaneResearch.c, #ifdef OpenZone_Trader_Research), registered under the module research after the research glue's own pages. Read only: the edits are the trader's pages.",
+  "root": {
+    "frame": {
+      "name": "PaneTrdRTrade",
+      "size": "$vpp.content",
+      "hidden": true,
+      "priority": 2,
+      "note": "Hidden: the shell shows the open page's pane, moves it right of the rail and sizes it to the content area.",
+      "children": [
+        {
+          "frame": {
+            "name": "PaneTrdRTradeIn",
+            "size": "fill",
+            "children": [
+              {
+                "label": {
+                  "name": "TrdRsTitle",
+                  "at": [
+                    24,
+                    8
+                  ],
+                  "size": [
+                    600,
+                    28
+                  ],
+                  "text": "#STR_OZT_VPP_RS_TITLE",
+                  "font": "title",
+                  "color": "$vppText"
+                }
+              },
+              {
+                "label": {
+                  "name": "TrdRsSub",
+                  "at": [
+                    24,
+                    36
+                  ],
+                  "size": [
+                    640,
+                    18
+                  ],
+                  "text": "#STR_OZT_VPP_RS_SUB",
+                  "font": "small",
+                  "color": "$vppMuted"
+                }
+              },
+              {
+                "button": {
+                  "name": "BtnTrdRsRefresh",
+                  "at": [
+                    24,
+                    15
+                  ],
+                  "size": [
+                    110,
+                    30
+                  ],
+                  "text": "#STR_OZT_VPP_REFRESH",
+                  "font": "small",
+                  "bg": "$vppRaised",
+                  "edge": "$vppEdge",
+                  "color": "$vppText",
+                  "anchor": "right"
+                }
+              },
+              {
+                "panel": {
+                  "name": "TrdRsHeadRule",
+                  "at": [
+                    0,
+                    63
+                  ],
+                  "size": [
+                    1060,
+                    1
+                  ],
+                  "color": "$vppEdge",
+                  "note": "The script sets its width with the window's (TrdLayout)."
+                }
+              },
+              {
+                "frame": {
+                  "name": "TrdRsLeft",
+                  "size": [
+                    400,
+                    580
+                  ],
+                  "children": [
+                    {
+                      "label": {
+                        "name": "TrdRsFindLbl",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          400,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_RS_FIND",
+                        "font": "tiny",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdRsFind",
+                        "at": [
+                          0,
+                          18
+                        ],
+                        "size": [
+                          400,
+                          28
+                        ],
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdRsFilter",
+                        "at": [
+                          0,
+                          52
+                        ],
+                        "size": [
+                          400,
+                          28
+                        ],
+                        "text": "-",
+                        "font": "small",
+                        "bg": "$vppCell",
+                        "edge": "$vppEdge",
+                        "color": "$vppText",
+                        "note": "Steps through: every node the trader's files name, those with access to points, those the tree no longer has."
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdRsNodesHead",
+                        "at": [
+                          0,
+                          86
+                        ],
+                        "size": [
+                          400,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_RS_NODES",
+                        "font": "tiny",
+                        "color": "$vppAccent"
+                      }
+                    },
+                    {
+                      "listbox": {
+                        "name": "TrdRsNodes",
+                        "at": [
+                          0,
+                          104
+                        ],
+                        "size": [
+                          400,
+                          356
+                        ],
+                        "font": "field",
+                        "color": "$vppText",
+                        "props": {
+                          "style": "NoScrollBar",
+                          "title visible": false,
+                          "highlight row": true,
+                          "lines": 14
+                        },
+                        "note": "The nodes of the research tree the trader's files name: locks, discounts, access to points."
+                      }
+                    },
+                    {
+                      "text": {
+                        "name": "TrdRsMissing",
+                        "at": [
+                          0,
+                          28
+                        ],
+                        "size": [
+                          400,
+                          80
+                        ],
+                        "plain": true,
+                        "grow": false,
+                        "font": "small",
+                        "color": "$vppAlert",
+                        "text": "",
+                        "anchor": "bottom"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdRsDraftNote",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          400,
+                          20
+                        ],
+                        "text": "",
+                        "font": "tiny",
+                        "color": "$vppAlert",
+                        "anchor": "bottom"
+                      }
+                    }
+                  ],
+                  "at": [
+                    24,
+                    76
+                  ],
+                  "note": "The nodes; the script sizes it with the window."
+                }
+              },
+              {
+                "frame": {
+                  "name": "TrdRsRight",
+                  "size": [
+                    596,
+                    580
+                  ],
+                  "children": [
+                    {
+                      "label": {
+                        "name": "TrdRsHead",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          596,
+                          26
+                        ],
+                        "text": "#STR_OZT_VPP_RS_PICK",
+                        "font": "header",
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdRsNodeSub",
+                        "at": [
+                          0,
+                          28
+                        ],
+                        "size": [
+                          596,
+                          18
+                        ],
+                        "text": "",
+                        "font": "small",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "listbox": {
+                        "name": "TrdRsDetail",
+                        "at": [
+                          0,
+                          54
+                        ],
+                        "size": [
+                          596,
+                          526
+                        ],
+                        "font": "field",
+                        "color": "$vppText",
+                        "props": {
+                          "style": "NoScrollBar",
+                          "title visible": false,
+                          "highlight row": true,
+                          "lines": 21
+                        },
+                        "note": "What the picked node opens, the discounts it gives, the points whose access needs it, who has it, and where the research family holds."
+                      }
+                    }
+                  ],
+                  "at": [
+                    440,
+                    76
+                  ],
+                  "note": "The picked node; the script sizes it with the window."
+                }
+              }
+            ],
+            "note": "Proportional: follows the pane when the shell resizes it; the script places the rest (TrdLayout)."
+          }
+        }
+      ]
+    }
+  }
+}

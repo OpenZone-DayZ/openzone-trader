@@ -429,3 +429,26 @@ STR_OZT_VPP_LC_DEF_LOOK,"Вигляд (клас, порожньо: Paper)",Look 
 STR_OZT_VPP_LC_DEF_ADD,Записати,Save
 STR_OZT_VPP_LC_DEF_DEL,Прибрати,Remove
 STR_OZT_VPP_LC_NOT_APPLIED,Цієї ліцензії ще немає на сервері: застосуйте чернетку,The server does not have this licence yet: apply the draft
+STR_OZT_VPP_MOD_RESEARCH,ДОСЛIДЖЕННЯ,RESEARCH
+STR_OZT_VPP_PAGE_RTRADE,Торгівля,Trade
+STR_OZT_VPP_RS_TITLE,Торгівля,Trade
+STR_OZT_VPP_RS_SUB,"Що в торговців тримається на вузлах дерева: замки, знижки, доступ до точок. Тут лише перегляд, правка на сторінках торговця.","What the traders hold on the nodes of the tree: locks, discounts, access to points. A view only: the edits are on the trader's pages."
+STR_OZT_VPP_RS_FIND,"Знайти вузол, клас або власника","Find a node, a class or an owner"
+STR_OZT_VPP_RS_NODES,"ВУЗЛИ, ЯКI НАЗИВАЮТЬ ФАЙЛИ ТОРГОВЦЯ",NODES THE TRADER'S FILES NAME
+STR_OZT_VPP_RS_PICK,Виберіть вузол ліворуч,Pick a node on the left
+STR_OZT_VPP_RS_LOCKS,замків,locks
+STR_OZT_VPP_RS_CUTS,знижок,discounts
+STR_OZT_VPP_RS_ACCESS,доступ,access
+STR_OZT_VPP_RS_SHOW_ALL,Показано: усі вузли,Shown: every node
+STR_OZT_VPP_RS_SHOW_ACCESS,Показано: з доступом до точок,Shown: with access to points
+STR_OZT_VPP_RS_SHOW_MISSING,Показано: немає в дереві,Shown: not in the tree
+STR_OZT_VPP_RS_MISSING,НЕМАЄ В ДЕРЕВI,NOT IN THE TREE
+STR_OZT_VPP_RS_MISSING_H,"Замок із таким вузлом не відкривається ніколи, знижка за ним не дається. Виправте на сторінці Умови й знижки.","A lock with such a node never opens, a discount on it is never given. Fix it on the Conditions and discounts page."
+STR_OZT_VPP_RS_GONE,у дереві немає,not in the tree
+STR_OZT_VPP_RS_DRAFT,"Чернетка торговця ще не застосована: тут лише те, що вже діє на сервері",The trader's draft is not applied yet: this shows what is in force on the server
+STR_OZT_VPP_RS_H_LOCKS,ВIДКРИВАЄ: ЗАМКИ,OPENS: LOCKS
+STR_OZT_VPP_RS_H_CUTS,ЗНИЖКИ: ЛИШЕ НА КУПIВЛЮ,DISCOUNTS: ON BUYING ONLY
+STR_OZT_VPP_RS_H_ACCESS,ДОСТУП ДО ТОЧОК,ACCESS TO POINTS
+STR_OZT_VPP_RS_H_WHO,ХТО ВЖЕ МАЄ,WHO HAS IT
+STR_OZT_VPP_RS_H_FAMILY,ДЕ ДIЄ СIМЕЙСТВО ДОСЛIДЖЕННЯ,WHERE THE RESEARCH FAMILY HOLDS
+STR_OZT_VPP_RS_TURNED,(навпаки: без вузла),(turned round: without the node)

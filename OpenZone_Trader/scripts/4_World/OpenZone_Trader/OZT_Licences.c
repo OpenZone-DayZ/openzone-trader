@@ -172,4 +172,15 @@ class OZT_LicenceGate : OZT_GateProvider
             return def.Name;
         return arg;
     }
+
+    // The settings' licences, for the admin window's picker.
+    override void Choices(string kind, array<string> values, array<string> labels)
+    {
+        array<ref OZT_LicenceDef> defs = OZT_Config.Get().Settings().Licences;
+        for (int i = 0; i < defs.Count(); i++)
+        {
+            values.Insert(defs[i].Id);
+            labels.Insert(defs[i].Name);
+        }
+    }
 }

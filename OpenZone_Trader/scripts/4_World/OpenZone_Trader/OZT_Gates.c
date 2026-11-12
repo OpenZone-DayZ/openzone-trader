@@ -62,6 +62,20 @@ class OZT_GateProvider
     {
         return kind + " " + arg;
     }
+
+    // For the admin window: the values a condition of this kind may name, and
+    // beside each what the admin reads (both lists the same length). None: the
+    // value is a free word.
+    void Choices(string kind, array<string> values, array<string> labels)
+    {
+    }
+
+    // For the admin window: who holds the condition `kind arg` now (`arg` may hold
+    // alternatives joined by "|"), as the admin reads it -- the factions that have
+    // completed a research node, say. None: nobody, or the provider cannot tell.
+    void Holders(string kind, string arg, array<string> who)
+    {
+    }
 }
 
 class OZT_Gates
@@ -86,6 +100,19 @@ class OZT_Gates
         }
         s_Providers.Insert(p);
         OZT_Log.Dbg("gate provider registered: " + p.Family());
+    }
+
+    // Every provider in the order they came (the admin window's `gates`).
+    static int Count()
+    {
+        return s_Providers.Count();
+    }
+
+    static OZT_GateProvider At(int i)
+    {
+        if (i < 0 || i >= s_Providers.Count())
+            return null;
+        return s_Providers[i];
     }
 
     static OZT_GateProvider ByKind(string kind)
@@ -363,5 +390,23 @@ class OZT_FactionGate : OZT_GateProvider
         if (kind == "faction")
             return OZ_Identity.Get().FactionName(arg);
         return kind + " " + arg;
+    }
+
+    // The factions the source of factions knows, for `faction` and `leader`; a
+    // post is a free word.
+    override void Choices(string kind, array<string> values, array<string> labels)
+    {
+        if (kind != "faction" && kind != "leader")
+            return;
+        OZ_IdentityService id = OZ_Identity.Get();
+        array<string> ids;
+        id.FactionIds(ids);
+        if (!ids)
+            return;
+        for (int i = 0; i < ids.Count(); i++)
+        {
+            values.Insert(ids[i]);
+            labels.Insert(id.FactionName(ids[i]));
+        }
     }
 }

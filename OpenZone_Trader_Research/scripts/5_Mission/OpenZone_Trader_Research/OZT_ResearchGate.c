@@ -56,6 +56,81 @@ class OZT_ResearchGate : OZT_GateProvider
             return node.Name;
         return arg;
     }
+
+    // For the admin window's picker: every node of the tree, read as
+    // "name - branch (its owners) - T<tier>".
+    override void Choices(string kind, array<string> values, array<string> labels)
+    {
+        OZL_TreeConfig tree = OZL_Config.Get().Tree();
+        if (!tree || !tree.Branches)
+            return;
+        OZ_IdentityService ids = OZ_Identity.Get();
+        for (int b = 0; b < tree.Branches.Count(); b++)
+        {
+            OZL_TreeBranch br = tree.Branches[b];
+            if (!br)
+                continue;
+            string owners = "";
+            for (int o = 0; o < br.Owners.Count(); o++)
+            {
+                if (o > 0)
+                    owners = owners + ", ";
+                owners = owners + ids.FactionName(br.Owners[o]);
+            }
+            string branch = br.Name;
+            if (branch == "")
+                branch = br.Id;
+            if (owners != "")
+                branch = branch + " (" + owners + ")";
+            for (int n = 0; n < br.Nodes.Count(); n++)
+            {
+                OZL_TreeNode node = br.Nodes[n];
+                if (!node || node.Id == "")
+                    continue;
+                string name = node.Name;
+                if (name == "")
+                    name = node.Id;
+                string label = name + " - " + branch + " - T" + node.Tier.ToString();
+                values.Insert(node.Id);
+                labels.Insert(label);
+            }
+        }
+    }
+
+    // The owners of research (factions) that have completed the node, or any of
+    // the alternatives. Research knows every owner it has read (OZL_State.Owners:
+    // all state files are read at its start); one it has not met has completed
+    // nothing.
+    override void Holders(string kind, string arg, array<string> who)
+    {
+        array<string> alts = new array<string>();
+        arg.Split("|", alts);
+        array<string> owners;
+        OZL_State.Owners(owners);
+        if (!owners)
+            return;
+        OZ_IdentityService ids = OZ_Identity.Get();
+        for (int i = 0; i < owners.Count(); i++)
+        {
+            string owner = owners[i];
+            OZL_FactionState state = OZL_State.Get(owner);
+            if (!state)
+                continue;
+            bool has = false;
+            for (int a = 0; a < alts.Count(); a++)
+            {
+                string node = alts[a].Trim();
+                if (node != "" && state.IsCompleted(node))
+                    has = true;
+            }
+            if (!has)
+                continue;
+            string shown = ids.FactionName(owner);
+            if (shown != owner)
+                shown = shown + " (" + owner + ")";
+            who.Insert(shown);
+        }
+    }
 }
 
 // Registered at the mission's start, beside the trader's own providers.

@@ -70,8 +70,8 @@ modded class OZ_VppAdminMenu
         super.TrdOnAnswer(op, ok, json, error);
     }
 
-    // The section answers the import with the points list; its report waits in the
-    // server's profile.
+    // The section answers the import with its report, a line a row, whether it ran
+    // or not: what it could not read is in it.
     protected void TrdImAnswer(bool ok, string json, string error)
     {
         array<string> rows = new array<string>();
@@ -80,16 +80,46 @@ modded class OZ_VppAdminMenu
         {
             rows.Insert(Words(error));
             inks.Insert(OZT_Metal.BAD);
-            TrdFill("TrdImReport", rows, inks, -1);
-            return;
         }
-        rows.Insert(TrdTr("#STR_OZT_VPP_IM_NO_REPORT"));
-        inks.Insert(0);
+        OZT_AdminImportReport parsed = new OZT_AdminImportReport();
+        string err;
+        if (json != "" && JsonFileLoader<OZT_AdminImportReport>.LoadData(json, parsed, err))
+        {
+            OZT_AdminImportReport rep = parsed.Copy();
+            for (int i = 0; i < rep.Lines.Count(); i++)
+            {
+                rows.Insert(rep.Lines[i]);
+                inks.Insert(TrdImInk(rep.Lines[i]));
+            }
+        }
         TrdFill("TrdImReport", rows, inks, -1);
+        if (!ok)
+            return;
+
+        string when = TrdTr("#STR_OZT_VPP_IM_WHEN_DRY");
         m_TrdImStep = 1;
         if (m_TrdImApplying)
+        {
             m_TrdImStep = 2;
+            when = TrdTr("#STR_OZT_VPP_IM_WHEN_APPLY");
+            // The three files and the points are new on the server.
+            Ask(OZT_Const.SECTION_ADMIN, "list", "{}");
+        }
+        SayTrd("TrdImWhen", when + "  " + OZ_VppJournal.Clock());
         TrdImPaintSteps();
+    }
+
+    // The report's lines in the window's colours: what was skipped or changed in the
+    // alert colour, the rest as text.
+    protected int TrdImInk(string line)
+    {
+        array<string> marks = {"skipped", "not taken", "left to", "dropped", "could not", "pays nothing", "rounded", "twice", "MaxStock 0", "of their own"};
+        for (int i = 0; i < marks.Count(); i++)
+        {
+            if (line.Contains(marks[i]))
+                return OZT_Metal.ALERT;
+        }
+        return 0;
     }
 
     override void OnConfirmed(string action)

@@ -40,6 +40,11 @@ class OZT_Config
         ServerLoad();
         OZT_Book.Rebuild();
         OZT_Points.Respawn();
+        // What the ready tick says at a start, said again: a provider or a gate
+        // the new files name and nobody brings is one of this load's problems,
+        // which the admin window shows after an apply (OZT_Admin, `problems`).
+        OZT_Money.CheckNamed();
+        OZT_Gates.CheckNamed();
     }
 
     OZT_Settings Settings()

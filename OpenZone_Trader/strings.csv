@@ -213,6 +213,23 @@ STR_OZT_VPP_IM_STEPS_NONE,1. Пробний прогін   2. Перевірте
 STR_OZT_VPP_IM_STEPS_DRY,Пробний прогін зроблено: перевірте звіт і застосуйте,"The dry run is done: read the report, then apply"
 STR_OZT_VPP_IM_STEPS_DONE,Iмпорт застосовано,The import is applied
 STR_OZT_VPP_IM_WAIT,Чекаємо на сервер...,Waiting for the server...
-STR_OZT_VPP_IM_NO_REPORT,Готово. Звіт лежить на сервері: OpenZone\TraderPlusImport\report.txt,Done. The report is on the server: OpenZone\TraderPlusImport\report.txt
 STR_OZT_VPP_IM_APPLY_ASK,"Застосувати імпорт? Буде замінено наші три файли (старі ядро кладе в резерв), перезаписано склади й видано ліцензії з рахунків TraderPlus.","Apply the import? Our three files are replaced (the core keeps the old ones in its backup), the stock is written over and licences are given from TraderPlus's accounts."
 STR_OZT_VPP_YES_APPLY,"Так, застосувати","Yes, apply"
+STR_OZT_VPP_LC_HOLDERS,мають,held by
+STR_OZT_VPP_LC_PICK,"Виберіть ліцензію в списку: тут буде, де вона продається й що відкриває",Pick a licence on the list: where it is sold and what it opens shows here
+STR_OZT_VPP_LC_SOLD,Продається:,Sold in:
+STR_OZT_VPP_LC_OPENS,Відкриває:,Opens:
+STR_OZT_VPP_LC_LOOK,Вигляд:,Looks like:
+STR_OZT_VPP_IN,у,in
+STR_OZT_VPP_USE_POINT,точку,the point
+STR_OZT_VPP_USE_CATEGORY,категорію,the category
+STR_OZT_VPP_USE_LINE,рядок,the line
+STR_OZT_VPP_USE_DISCOUNT,знижку,a discount of
+STR_OZT_VPP_LC_ONLINE,Гравці онлайн: клік ставить ім'я в поле,Players online: a click puts the name in the field
+STR_OZT_VPP_LC_HELD,Що має,Held by
+STR_OZT_VPP_LC_TAKE,Забрати вибрану,Take back the picked one
+STR_OZT_VPP_LC_NONE_HELD,нічого,nothing
+STR_OZT_VPP_LC_PICK_HELD,"Виберіть ліцензію в списку того, що має гравець",Pick a licence on the list of what the player holds
+STR_OZT_VPP_IM_WHEN_DRY,пробний прогін,dry run
+STR_OZT_VPP_IM_WHEN_APPLY,застосовано,applied
+STR_OZT_ADMIN_NOT_STOCKED,Цей товар у цій категорії точки не має складу,These goods have no stock in that category of the point

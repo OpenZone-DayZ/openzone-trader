@@ -105,11 +105,51 @@
                       }
                     },
                     {
+                      "listbox": {
+                        "name": "TrdLcDefs",
+                        "at": [
+                          0,
+                          22
+                        ],
+                        "size": [
+                          556,
+                          190
+                        ],
+                        "font": "field",
+                        "color": "$vppText",
+                        "props": {
+                          "style": "NoScrollBar",
+                          "title visible": false,
+                          "highlight row": true,
+                          "lines": 7
+                        },
+                        "note": "The server's licences: name, id, how many hold them (licence_list); a click names it in the grant form."
+                      }
+                    },
+                    {
+                      "text": {
+                        "name": "TrdLcDefInfo",
+                        "at": [
+                          0,
+                          218
+                        ],
+                        "size": [
+                          556,
+                          58
+                        ],
+                        "plain": true,
+                        "grow": false,
+                        "font": "small",
+                        "color": "$vppMuted",
+                        "text": ""
+                      }
+                    },
+                    {
                       "text": {
                         "name": "TrdLcNote",
                         "at": [
                           0,
-                          22
+                          284
                         ],
                         "size": [
                           556,
@@ -186,6 +226,44 @@
                     },
                     {
                       "label": {
+                        "name": "TrdLcOnlineLbl",
+                        "at": [
+                          0,
+                          82
+                        ],
+                        "size": [
+                          440,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_LC_ONLINE",
+                        "font": "tiny",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "listbox": {
+                        "name": "TrdLcOnline",
+                        "at": [
+                          0,
+                          100
+                        ],
+                        "size": [
+                          440,
+                          92
+                        ],
+                        "font": "field",
+                        "color": "$vppText",
+                        "props": {
+                          "style": "NoScrollBar",
+                          "title visible": false,
+                          "highlight row": true,
+                          "lines": 4
+                        },
+                        "note": "Players online: a click puts the name into the field."
+                      }
+                    },
+                    {
+                      "label": {
                         "name": "TrdLcIdLbl",
                         "at": [
                           0,
@@ -244,6 +322,76 @@
                           32
                         ],
                         "text": "#STR_OZT_VPP_LC_REVOKE",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppBad",
+                        "color": "$vppBad"
+                      }
+                    },
+                    {
+                      "panel": {
+                        "name": "TrdLcSplit",
+                        "at": [
+                          0,
+                          298
+                        ],
+                        "size": [
+                          440,
+                          1
+                        ],
+                        "color": "$vppEdge"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdLcHeldHead",
+                        "at": [
+                          0,
+                          306
+                        ],
+                        "size": [
+                          440,
+                          22
+                        ],
+                        "text": "#STR_OZT_VPP_LC_HELD",
+                        "font": "small",
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "listbox": {
+                        "name": "TrdLcHeld",
+                        "at": [
+                          0,
+                          332
+                        ],
+                        "size": [
+                          440,
+                          150
+                        ],
+                        "font": "field",
+                        "color": "$vppText",
+                        "props": {
+                          "style": "NoScrollBar",
+                          "title visible": false,
+                          "highlight row": true,
+                          "lines": 6
+                        },
+                        "note": "What the player in the field holds; a picked row can be taken back."
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdLcTake",
+                        "at": [
+                          0,
+                          490
+                        ],
+                        "size": [
+                          440,
+                          30
+                        ],
+                        "text": "#STR_OZT_VPP_LC_TAKE",
                         "font": "small",
                         "bg": "$vppRaised",
                         "edge": "$vppBad",

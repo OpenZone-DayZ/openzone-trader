@@ -159,17 +159,56 @@ FrameWidgetClass PaneTrdLicences {
        "text halign" left
        "text valign" center
       }
+      // The server's licences: name, id, how many hold them (licence_list); a click names it in the grant form.
+      TextListboxWidgetClass TrdLcDefs {
+       visible 1
+       position 0 22
+       size 556 190
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       color 0.88 0.875 0.855 1
+       priority 1
+       font "gui/fonts/MetronBook14"
+       "exact text" 1
+       style NoScrollBar
+       "title visible" 0
+       "highlight row" 1
+       lines 7
+      }
+      MultilineTextWidgetClass TrdLcDefInfo {
+       visible 1
+       ignorepointer 1
+       position 0 218
+       size 556 58
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       color 0.627 0.624 0.6 1
+       priority 2
+       text ""
+       font "gui/fonts/sdf_MetronBook24"
+       "exact text" 1
+       "exact text size" 13
+       "text halign" left
+       "text valign" top
+       wrap 1
+       "size to text h" 0
+       "size to text v" 0
+      }
       MultilineTextWidgetClass TrdLcNote {
        visible 1
        ignorepointer 1
-       position 0 22
+       position 0 284
        size 556 48
        hexactpos 1
        vexactpos 1
        hexactsize 1
        vexactsize 1
        color 0.627 0.624 0.6 1
-       priority 1
+       priority 3
        text "#STR_OZT_VPP_LC_NOTE"
        font "gui/fonts/sdf_MetronBook24"
        "exact text" 1
@@ -271,6 +310,42 @@ FrameWidgetClass PaneTrdLicences {
         }
        }
       }
+      TextWidgetClass TrdLcOnlineLbl {
+       visible 1
+       ignorepointer 1
+       position 0 82
+       size 440 16
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       color 0.627 0.624 0.6 1
+       priority 3
+       text "#STR_OZT_VPP_LC_ONLINE"
+       font "gui/fonts/sdf_MetronBook24"
+       "exact text" 1
+       "exact text size" 10
+       "text halign" left
+       "text valign" center
+      }
+      // Players online: a click puts the name into the field.
+      TextListboxWidgetClass TrdLcOnline {
+       visible 1
+       position 0 100
+       size 440 92
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       color 0.88 0.875 0.855 1
+       priority 4
+       font "gui/fonts/MetronBook14"
+       "exact text" 1
+       style NoScrollBar
+       "title visible" 0
+       "highlight row" 1
+       lines 4
+      }
       TextWidgetClass TrdLcIdLbl {
        visible 1
        ignorepointer 1
@@ -281,7 +356,7 @@ FrameWidgetClass PaneTrdLicences {
        hexactsize 1
        vexactsize 1
        color 0.627 0.624 0.6 1
-       priority 3
+       priority 5
        text "#STR_OZT_VPP_LC_ID"
        font "gui/fonts/sdf_MetronBook24"
        "exact text" 1
@@ -298,7 +373,7 @@ FrameWidgetClass PaneTrdLicences {
        hexactsize 1
        vexactsize 1
        color 0.235 0.235 0.227 1
-       priority 4
+       priority 6
        style rover_sim_colorable
        {
         PanelWidgetClass TrdLcIdFill {
@@ -340,7 +415,7 @@ FrameWidgetClass PaneTrdLicences {
        hexactsize 1
        vexactsize 1
        text ""
-       priority 5
+       priority 7
        {
         PanelWidgetClass BtnTrdLcGrantEdge {
          visible 1
@@ -397,7 +472,7 @@ FrameWidgetClass PaneTrdLicences {
        hexactsize 1
        vexactsize 1
        text ""
-       priority 6
+       priority 8
        {
         PanelWidgetClass BtnTrdLcRevokeEdge {
          visible 1
@@ -437,6 +512,112 @@ FrameWidgetClass PaneTrdLicences {
          color 0.88 0.32 0.29 1
          priority 2
          text "#STR_OZT_VPP_LC_REVOKE"
+         font "gui/fonts/sdf_MetronBook24"
+         "exact text" 1
+         "exact text size" 13
+         "text halign" center
+         "text valign" center
+        }
+       }
+      }
+      PanelWidgetClass TrdLcSplit {
+       visible 1
+       ignorepointer 1
+       position 0 298
+       size 440 1
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       color 0.235 0.235 0.227 1
+       priority 9
+       style rover_sim_colorable
+      }
+      TextWidgetClass TrdLcHeldHead {
+       visible 1
+       ignorepointer 1
+       position 0 306
+       size 440 22
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       color 0.88 0.875 0.855 1
+       priority 10
+       text "#STR_OZT_VPP_LC_HELD"
+       font "gui/fonts/sdf_MetronBook24"
+       "exact text" 1
+       "exact text size" 13
+       "text halign" left
+       "text valign" center
+      }
+      // What the player in the field holds; a picked row can be taken back.
+      TextListboxWidgetClass TrdLcHeld {
+       visible 1
+       position 0 332
+       size 440 150
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       color 0.88 0.875 0.855 1
+       priority 11
+       font "gui/fonts/MetronBook14"
+       "exact text" 1
+       style NoScrollBar
+       "title visible" 0
+       "highlight row" 1
+       lines 6
+      }
+      ButtonWidgetClass BtnTrdLcTake {
+       visible 1
+       position 0 490
+       size 440 30
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text ""
+       priority 12
+       {
+        PanelWidgetClass BtnTrdLcTakeEdge {
+         visible 1
+         ignorepointer 1
+         position -1 -1
+         size 442 32
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.88 0.32 0.29 1
+         priority 0
+         style rover_sim_colorable
+        }
+        PanelWidgetClass BtnTrdLcTakeBg {
+         visible 1
+         ignorepointer 1
+         position 0 0
+         size 440 30
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.118 0.118 0.114 1
+         priority 1
+         style rover_sim_colorable
+        }
+        TextWidgetClass BtnTrdLcTakeText {
+         visible 1
+         ignorepointer 1
+         position 0 0
+         size 440 30
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.88 0.32 0.29 1
+         priority 2
+         text "#STR_OZT_VPP_LC_TAKE"
          font "gui/fonts/sdf_MetronBook24"
          "exact text" 1
          "exact text size" 13

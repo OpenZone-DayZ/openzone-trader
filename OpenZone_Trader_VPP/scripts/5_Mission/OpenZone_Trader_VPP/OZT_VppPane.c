@@ -320,8 +320,18 @@ modded class OZ_VppAdminMenu
     // The ops the section answers with the points list.
     protected bool TrdListOp(string verb)
     {
-        array<string> verbs = {"list", "respawn", "place", "adopt", "move", "turn", "remove", "set", "outfit", "licence", "import_traderplus"};
+        array<string> verbs = {"list", "respawn", "place", "adopt", "move", "turn", "remove", "set", "outfit", "licence"};
         return verbs.Find(verb) != -1;
+    }
+
+    // The section's reads are asked all the time and are not news for the
+    // window's journal (its failures still reach it).
+    override bool IsReadOp(string op)
+    {
+        array<string> reads = {"stock_list", "licence_list", "problems", "gates", "gate_holders"};
+        if (reads.Find(op) != -1)
+            return true;
+        return super.IsReadOp(op);
     }
 
     // The list as the script's own copy: what the serializer made lives only as

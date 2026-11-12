@@ -14,6 +14,11 @@ class OZT_Log
     // or a cross-check.
     private static int s_Warned;
 
+    // The first PROBLEMS_KEPT of those warnings, as lines: the admin window's
+    // pages show them after an apply (OZT_Admin, op `problems`).
+    static const int PROBLEMS_KEPT = 200;
+    private static ref array<string> s_Problems = new array<string>();
+
     static void Info(string msg)
     {
         Print(OZT_Const.LOG_PREFIX + msg);
@@ -22,17 +27,26 @@ class OZT_Log
     static void Warn(string msg)
     {
         s_Warned++;
+        if (s_Problems.Count() < PROBLEMS_KEPT)
+            s_Problems.Insert(msg);
         Print(OZT_Const.LOG_PREFIX + "WARNING: " + msg);
     }
 
     static void ResetWarned()
     {
         s_Warned = 0;
+        s_Problems.Clear();
     }
 
     static int Warned()
     {
         return s_Warned;
+    }
+
+    static void Problems(array<string> into)
+    {
+        for (int i = 0; i < s_Problems.Count(); i++)
+            into.Insert(s_Problems[i]);
     }
 
     static void Error(string msg)

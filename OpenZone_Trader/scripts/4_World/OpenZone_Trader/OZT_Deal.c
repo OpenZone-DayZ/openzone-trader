@@ -590,13 +590,20 @@ class OZT_Deal
         int root = -1;
         if (host)
         {
-            // The slot may hold a thing this deal sells: then it is free.
+            // The slot may hold a thing this deal sells: then it is free. A
+            // part it does not sell comes off into the bags, as a kept part
+            // of a sold thing does -- a cell planned, moved before anything is
+            // deleted -- and the bought part takes its slot (the owner,
+            // 2026-11-12: replace a part, sell the old one or keep it).
             why = AddPart(parts, entry.ClassName, line.SlotName, -1, host.GetType());
             if (why != "")
                 return why;
             EntityAI there = host.GetInventory().FindAttachment(parts[0].SlotId);
             if (there && m_Gone.Find(there) < 0)
-                return OZT_Const.NO_CHANGED;
+            {
+                if (!Displace(there))
+                    return OZT_Const.NO_CHANGED;
+            }
             if (TakenOnto(host, parts[0].SlotId))
                 return OZT_Const.NO_CHANGED;
             root = 0;
@@ -693,6 +700,27 @@ class OZT_Deal
 
     // Has an earlier line of this deal bought a part into that slot of that
     // thing already?
+    // A part of the player's that a bought part pushes out of its slot: kept,
+    // like a part that comes off a sold thing.
+    protected bool Displace(EntityAI part)
+    {
+        if (m_Shut.Find(part) > -1)
+            return false;
+        int w;
+        int h;
+        OZT_InvModel.SizeOf(part, w, h);
+        if (w <= 0 || h <= 0)
+            return false;
+        OZT_Move move = new OZT_Move();
+        move.Item = part;
+        move.W = w;
+        move.H = h;
+        m_Moves.Insert(move);
+        m_Shut.Insert(part);
+        m_Res.Kept = m_Moves.Count();
+        return true;
+    }
+
     protected bool TakenOnto(EntityAI host, int slotId)
     {
         for (int i = 0; i < m_Ontos.Count(); i++)

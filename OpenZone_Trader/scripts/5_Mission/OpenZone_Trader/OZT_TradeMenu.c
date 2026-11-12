@@ -1844,7 +1844,7 @@ class OZT_TradeMenu : UIScriptedMenu
     }
 
     // A click on an empty slot: the shelf shows what fits it.
-    protected void AimFilter(OZT_PartsEntry slot, int cell)
+    protected void AimFilter(OZT_PartsEntry slot, int cell, bool toggle = true)
     {
         if (!m_PartsAt || !slot)
             return;
@@ -1855,7 +1855,8 @@ class OZT_TradeMenu : UIScriptedMenu
         }
         if (m_Filter && m_Filter.Host == slot.Host && m_Filter.HostFit == slot.HostFit && m_Filter.SlotName == slot.SlotName)
         {
-            ClearFilter();
+            if (toggle)
+                ClearFilter();
             return;
         }
         m_Filter = slot;
@@ -1920,7 +1921,16 @@ class OZT_TradeMenu : UIScriptedMenu
             int low;
             int high;
             slot.Host.GetNetworkID(low, high);
+            // One part bought onto one slot: a second choice replaces the first.
+            int prior = OZT_PartsReader.OntoLine(m_Cart, low, high, slot.SlotName);
+            if (prior > -1)
+                m_Cart.BuyCount(prior, 0);
             m_Cart.BuyOnto(type, part.Buy, low, high, slot.SlotName);
+            // What stands there goes to the sale by default; taken out of the
+            // sale again, it comes off into the bags with the deal.
+            bool stood = slot.What == OZT_PartsEntry.PART && slot.State != OZT_PartsEntry.ONTO;
+            if (stood && SellLineOf(slot.Low, slot.High) < 0)
+                AddSell(slot.Low, slot.High);
         }
         ClearFilter();
         CartChanged();
@@ -1961,7 +1971,7 @@ class OZT_TradeMenu : UIScriptedMenu
         }
         else if (kind == OZT_Tile.OWN && slot.Host)
         {
-            twin = OntoTwin(slot.Host);
+            twin = OntoTwin(slot.Host, slotId);
             host = twin;
         }
         bool takes = false;
@@ -1977,14 +1987,34 @@ class OZT_TradeMenu : UIScriptedMenu
     }
 
     // A local twin of a thing the player carries, with its parts and with the
-    // parts the cart already buys onto it; the caller deletes it.
-    protected EntityAI OntoTwin(EntityAI real)
+    // parts the cart already buys onto it; the caller deletes it. The slot
+    // being filled is left empty -- what stands there and what the cart chose
+    // for it are what a new choice replaces -- and so is every part the cart
+    // sells.
+    protected EntityAI OntoTwin(EntityAI real, int skipSlot)
     {
         EntityAI twin = EntityAI.Cast(GetGame().CreateObjectEx(real.GetType(), "0 0 0", ECE_LOCAL));
         if (!twin)
             return null;
         twin.DisableSimulation(true);
-        OZT_Shelf.CopyParts(real, twin, 2);
+        int n = real.GetInventory().AttachmentCount();
+        InventoryLocation il = new InventoryLocation();
+        for (int i = 0; i < n; i++)
+        {
+            EntityAI part = real.GetInventory().GetAttachmentFromIndex(i);
+            if (!part || !part.GetInventory().GetCurrentInventoryLocation(il))
+                continue;
+            if (il.GetSlot() == skipSlot)
+                continue;
+            int pl;
+            int ph;
+            part.GetNetworkID(pl, ph);
+            if (SellLineOf(pl, ph) > -1)
+                continue;
+            EntityAI copy = twin.GetInventory().CreateAttachmentEx(part.GetType(), il.GetSlot());
+            if (copy)
+                OZT_Shelf.CopyParts(part, copy, 1);
+        }
         int low;
         int high;
         real.GetNetworkID(low, high);
@@ -1994,7 +2024,7 @@ class OZT_TradeMenu : UIScriptedMenu
             if (line.OnLow != low || line.OnHigh != high)
                 continue;
             int sid = InventorySlots.GetSlotIdFromString(line.OnSlot);
-            if (sid != InventorySlots.INVALID)
+            if (sid != InventorySlots.INVALID && sid != skipSlot)
                 twin.GetInventory().CreateAttachmentEx(line.Type, sid);
         }
         return twin;
@@ -2006,6 +2036,14 @@ class OZT_TradeMenu : UIScriptedMenu
     {
         if (!e || !m_PartsAt)
             return;
+        // A part of the player's own thing dropped on their things comes off
+        // into the bags, whatever the trader would pay for it.
+        bool ownPart = m_PartsAt.Kind == OZT_Tile.OWN && e.What == OZT_PartsEntry.PART;
+        if (ownPart && zone == ZONE_OWN && e.State != OZT_PartsEntry.ONTO)
+        {
+            TakePartOff(e.Low, e.High);
+            return;
+        }
         if (e.State == OZT_PartsEntry.INCLUDED)
         {
             SayInfo(OZT_Ui.Words("STR_OZT_UI_PARTS_INCLUDED"), OZT_Look.Alert());
@@ -2114,6 +2152,82 @@ class OZT_TradeMenu : UIScriptedMenu
             return;
         }
         me.PredictiveTakeEntityToInventory(FindInventoryLocationType.CARGO, item);
+    }
+
+    // Was the drop on an empty slot of the strip of a thing the player carries?
+    protected bool OwnSlotUnder()
+    {
+        if (!m_ActDropEntry || !m_PartsAt || m_PartsAt.Kind != OZT_Tile.OWN)
+            return false;
+        return m_ActDropEntry.What == OZT_PartsEntry.EMPTY && m_ActDropEntry.Host != null;
+    }
+
+    // A part of the player's own thing taken off into the bags, as the game's
+    // inventory takes it: a magazine out of the weapon in the hands through the
+    // weapon manager, anything else by a predictive move to a free cargo place.
+    protected void TakePartOff(int low, int high)
+    {
+        PlayerBase me = PlayerBase.Cast(GetGame().GetPlayer());
+        EntityAI part = EntityAI.Cast(GetGame().GetObjectByNetworkId(low, high));
+        if (!me || !part || part.GetHierarchyRootPlayer() != me)
+            return;
+        if (SellLineOf(low, high) > -1)
+        {
+            SayInfo(OZT_Ui.Words("STR_OZT_UI_IN_DEAL"), OZT_Look.Alert());
+            return;
+        }
+        InventoryLocation src = new InventoryLocation();
+        if (!part.GetInventory().GetCurrentInventoryLocation(src))
+            return;
+        if (src.GetType() != InventoryLocationType.ATTACHMENT)
+            return;
+        InventoryLocation dst = new InventoryLocation();
+        if (!me.GetInventory().FindFreeLocationFor(part, FindInventoryLocationType.CARGO, dst))
+        {
+            SayInfo(OZT_Ui.Words("STR_OZT_UI_NO_ROOM"), OZT_Look.Alert());
+            return;
+        }
+        Weapon_Base wpn = Weapon_Base.Cast(src.GetParent());
+        if (wpn && Magazine.Cast(part) && me.GetHumanInventory().GetEntityInHands() == wpn)
+        {
+            me.GetWeaponManager().DetachMagazine(dst);
+            return;
+        }
+        me.PredictiveTakeToDst(src, dst);
+    }
+
+    // The player's own loose part put onto an empty slot of a thing they carry,
+    // as the game's inventory puts it: a magazine into the weapon in the hands
+    // through the weapon manager, anything else by a predictive move, when the
+    // engine says the slot takes it.
+    protected void PutPartOn(int low, int high, OZT_PartsEntry slot)
+    {
+        PlayerBase me = PlayerBase.Cast(GetGame().GetPlayer());
+        EntityAI part = EntityAI.Cast(GetGame().GetObjectByNetworkId(low, high));
+        EntityAI host = slot.Host;
+        if (!me || !part || !host || part == host)
+            return;
+        if (part.GetHierarchyRootPlayer() != me || host.GetHierarchyRootPlayer() != me)
+            return;
+        if (SellLineOf(low, high) > -1)
+        {
+            SayInfo(OZT_Ui.Words("STR_OZT_UI_IN_DEAL"), OZT_Look.Alert());
+            return;
+        }
+        Weapon_Base wpn = Weapon_Base.Cast(host);
+        Magazine mag = Magazine.Cast(part);
+        if (wpn && mag && me.GetHumanInventory().GetEntityInHands() == wpn)
+        {
+            me.GetWeaponManager().AttachMagazine(mag);
+            return;
+        }
+        int slotId = slot.SlotId;
+        if (slotId == InventorySlots.INVALID || !host.GetInventory().CanAddAttachmentEx(part, slotId))
+        {
+            SayInfo(OZT_Ui.Words("STR_OZT_UI_PARTS_NO_FIT"), OZT_Look.Alert());
+            return;
+        }
+        me.PredictiveTakeEntityToTargetAttachmentEx(host, part, slotId);
     }
 
     protected int SellLineOf(int low, int high)
@@ -2253,6 +2367,12 @@ class OZT_TradeMenu : UIScriptedMenu
                 AimFilter(slot, cell);
                 return true;
             }
+            // A filled slot of the player's own thing filters as well: goods
+            // that would take its place (the owner, 2026-11-12). The press goes
+            // on to the part itself, so a double click still acts on it.
+            bool ownCard = m_PartsAt && m_PartsAt.Kind == OZT_Tile.OWN;
+            if (slot && ownCard && slot.What == OZT_PartsEntry.PART && slot.Host)
+                AimFilter(slot, cell, false);
         }
 
         OZT_Tile t = TileOf(w);
@@ -2591,6 +2711,8 @@ class OZT_TradeMenu : UIScriptedMenu
 
         if (kind == OZT_Tile.SHELF)
             AddBuy(m_ActType);
+        else if (kind == OZT_Tile.OWN && OwnSlotUnder())
+            PutPartOn(m_ActLow, m_ActHigh, m_ActDropEntry);
         else if (kind == OZT_Tile.OWN && (m_ActZone == ZONE_OWN || m_ActZone == ZONE_CHAR))
             MoveOwn(m_ActLow, m_ActHigh, m_ActZone == ZONE_CHAR);
         else if (kind == OZT_Tile.OWN)

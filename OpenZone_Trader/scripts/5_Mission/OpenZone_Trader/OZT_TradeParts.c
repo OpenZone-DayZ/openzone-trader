@@ -243,22 +243,24 @@ class OZT_PartsReader
             e.Host = host;
             e.HostType = host.GetType();
 
+            // A part bought onto this slot in this deal stands in it, in place
+            // of what is there now: that goes to the sale, or off into the
+            // bags (the server's Displace).
+            int onto = OntoLine(cart, hostLow, hostHigh, e.SlotName);
+            if (onto > -1)
+            {
+                e.What = OZT_PartsEntry.PART;
+                e.State = OZT_PartsEntry.ONTO;
+                e.Type = cart.Buys[onto].Type;
+                e.Item = shelf.Of(e.Type);
+                e.Price = cart.Buys[onto].Each;
+                e.Line = onto;
+                into.Insert(e);
+                continue;
+            }
             EntityAI part = host.GetInventory().FindAttachment(id);
             if (!part)
             {
-                // A part bought onto this slot in this deal.
-                int onto = OntoLine(cart, hostLow, hostHigh, e.SlotName);
-                if (onto > -1)
-                {
-                    e.What = OZT_PartsEntry.PART;
-                    e.State = OZT_PartsEntry.ONTO;
-                    e.Type = cart.Buys[onto].Type;
-                    e.Item = shelf.Of(e.Type);
-                    e.Price = cart.Buys[onto].Each;
-                    e.Line = onto;
-                    into.Insert(e);
-                    continue;
-                }
                 e.What = OZT_PartsEntry.EMPTY;
                 into.Insert(e);
                 continue;
@@ -377,7 +379,7 @@ class OZT_PartsReader
         return false;
     }
 
-    protected static int OntoLine(OZT_Cart cart, int low, int high, string slot)
+    static int OntoLine(OZT_Cart cart, int low, int high, string slot)
     {
         for (int i = 0; i < cart.Buys.Count(); i++)
         {

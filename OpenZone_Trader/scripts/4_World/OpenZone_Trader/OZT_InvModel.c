@@ -297,7 +297,9 @@ class OZT_InvModel
     }
 
     // A local twin of a real thing with its parts, two levels down, for the
-    // same questions about parts bought onto it; the caller's to delete.
+    // same questions about parts bought onto it; the caller's to delete. A part
+    // this deal sells or moves away is left off: its slot is free by the time
+    // the bought parts go on.
     EntityAI TwinOf(EntityAI real)
     {
         if (!real)
@@ -319,6 +321,8 @@ class OZT_InvModel
         {
             EntityAI part = from.GetInventory().GetAttachmentFromIndex(i);
             if (!part || !part.GetInventory().GetCurrentInventoryLocation(il))
+                continue;
+            if (m_Gone.Find(part) > -1 || m_Shut.Find(part) > -1)
                 continue;
             EntityAI copy = to.GetInventory().CreateAttachmentEx(part.GetType(), il.GetSlot());
             if (copy && depth > 0)

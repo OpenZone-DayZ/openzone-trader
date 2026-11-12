@@ -21,10 +21,17 @@ name = "openzone-trader"
 #                                OpenZone_VPP. It joins `mods` on a stand that loads
 #                                both: elsewhere the server stops at the missing addon.
 #                                Its layout is built by declaring it for one call.
+# OpenZone_Trader_TraderPlus  -- the TraderPlus bank as money (provider id `traderplus`),
+#                                a glue pbo that hard-requires TraderPlus's banking pbo.
+#                                It joins `mods`, and TraderPlus the stand's extra mods,
+#                                for a run that tries it.
 # OpenZone_Trader_Research    -- the research gate, a glue pbo that hard-requires the
 #                                research mod. It joins `mods`, and the research mod
 #                                the stand's extra mods, for a run that tries it.
-mods = ["OpenZone_Trader", "OpenZone_Trader_Bridge", "OpenZone_TraderProbe", "OpenZone_TraderProbe_Bridge"]
+# Since 2026-11-12 this stand loads VPP Admin Tools and TraderPlus from Steam's content
+# folder (dayz-mcp.local.toml), so both glues are in `mods`; a machine without them
+# takes them out again.
+mods = ["OpenZone_Trader", "OpenZone_Trader_VPP", "OpenZone_Trader_TraderPlus", "OpenZone_Trader_Bridge", "OpenZone_TraderProbe", "OpenZone_TraderProbe_Bridge"]
 # The layout generator reads the series' design tokens from the core, so the
 # trade screen wears the same palette and type as the PDA and the research tree.
 # The trader's own file is laid over it: the few colours and sizes a trade
@@ -48,5 +55,5 @@ noise        = ["Bridge.Url is not https", "bridge: "]
 [expect.counters]
 # The stall and Ostap, a trader's character (phase 4).
 traders  = 2
-goods    = 15
+goods    = 29
 problems = 0

@@ -38,9 +38,12 @@ class OZT_Const
     // and the research tree's). A large id makes EnterScriptedMenu answer nothing.
     static const int MENU_TRADE = 136;
 
-    // Kinds of a trader point.
+    // Kinds of a trader point. An object and an npc are made by the server; a
+    // map point is a thing already standing in the world (a building, a prop of
+    // the map), which the server finds and never makes, moves or deletes.
     static const string KIND_OBJECT = "object";
     static const string KIND_NPC    = "npc";
+    static const string KIND_MAP    = "map";
 
     // Quantity rules of a goods entry: one price for the piece whatever is in
     // it; a price per unit of a stack; a price for a full one, scaled by what is

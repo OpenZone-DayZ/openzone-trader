@@ -10,18 +10,25 @@
 // on, so that is where it stands: the trade screen covers the world, and the
 // copy is deleted when the trying ends. While it exists it is one more entry
 // of the client's ClientData.m_PlayerBaseList.
+//
+// Several things at once (the owner, 2026-11-12): one copy, one tried thing per
+// slot of the character; a thing tried on a slot replaces what the player
+// wears there or what was tried there before, taking one off gives the slot
+// back what the player wears, and the last one off ends the trying.
 
 class OZT_TryOn
 {
     protected PlayerPreviewWidget m_View;
     protected PlayerBase m_Copy;
-    protected string m_Type;
-    protected int m_Slot;
+    // What is tried on, and the slot of the character each took: one per slot.
+    protected ref array<string> m_Types;
+    protected ref array<int> m_Slots;
 
     void OZT_TryOn(PlayerPreviewWidget view)
     {
         m_View = view;
-        m_Slot = InventorySlots.INVALID;
+        m_Types = new array<string>();
+        m_Slots = new array<int>();
     }
 
     bool IsOn()
@@ -29,15 +36,23 @@ class OZT_TryOn
         return m_Copy != null;
     }
 
-    // The class that is tried on, and the slot of the character it took.
-    string Tried()
+    int Count()
     {
-        return m_Type;
+        return m_Types.Count();
     }
 
-    int SlotId()
+    bool Has(string type)
     {
-        return m_Slot;
+        return m_Types.Find(type) > -1;
+    }
+
+    // The class tried on a slot of the character; "" when none is.
+    string TriedOn(int slot)
+    {
+        int at = m_Slots.Find(slot);
+        if (at < 0)
+            return "";
+        return m_Types[at];
     }
 
     // The slot names a class may sit on, from its own config.
@@ -97,16 +112,17 @@ class OZT_TryOn
             if (!part.GetInventory().GetCurrentInventoryLocation(il))
                 continue;
             EntityAI twin = to.GetInventory().CreateAttachmentEx(part.GetType(), il.GetSlot());
+            if (twin)
+                OZT_Shelf.ShowIfMagazine(to, twin);
             if (twin && depth > 0)
                 CopyGear(part, twin, depth - 1);
         }
     }
 
-    // The character in the goods. False when the class names no slot of the
-    // character or the game made no copy.
+    // One more thing on the character, on its slot. False when the class names
+    // no slot of the character or the game made no copy.
     bool Put(string type)
     {
-        Drop();
         if (!m_View)
             return false;
         PlayerBase me = PlayerBase.Cast(GetGame().GetPlayer());
@@ -114,12 +130,19 @@ class OZT_TryOn
         if (!me || slot == InventorySlots.INVALID)
             return false;
 
-        m_Copy = PlayerBase.Cast(GetGame().CreateObjectEx(me.GetType(), me.GetPosition(), ECE_LOCAL));
         if (!m_Copy)
-            return false;
-        m_Copy.SetOrientation(me.GetOrientation());
-        CopyGear(me, m_Copy, 2);
-        // What stands on the slot goes first.
+        {
+            m_Copy = PlayerBase.Cast(GetGame().CreateObjectEx(me.GetType(), me.GetPosition(), ECE_LOCAL));
+            if (!m_Copy)
+                return false;
+            m_Copy.SetOrientation(me.GetOrientation());
+            CopyGear(me, m_Copy, 2);
+            m_View.SetPlayer(m_Copy);
+            m_View.SetModelPosition("0 0 0.605");
+        }
+        // What stands on the slot goes first: the player's own, or what was
+        // tried there before.
+        Forget(slot);
         EntityAI on = m_Copy.GetInventory().FindAttachment(slot);
         if (on)
             GetGame().ObjectDelete(on);
@@ -127,21 +150,64 @@ class OZT_TryOn
         if (!made)
         {
             OZT_Log.Dbg("trying on: " + type + " was not made on the copy");
-            Drop();
+            Restore(me, slot);
+            if (m_Types.Count() == 0)
+                Drop();
             return false;
         }
-        m_Type = type;
-        m_Slot = slot;
-        m_View.SetPlayer(m_Copy);
-        m_View.SetModelPosition("0 0 0.605");
+        m_Types.Insert(type);
+        m_Slots.Insert(slot);
         return true;
     }
 
-    // Back to the player as they are.
+    // One thing off: its slot gets back what the player wears there. The last
+    // one off ends the trying.
+    void TakeOff(string type)
+    {
+        int at = m_Types.Find(type);
+        if (at < 0 || !m_Copy)
+            return;
+        int slot = m_Slots[at];
+        m_Types.RemoveOrdered(at);
+        m_Slots.RemoveOrdered(at);
+        if (m_Types.Count() == 0)
+        {
+            Drop();
+            return;
+        }
+        EntityAI on = m_Copy.GetInventory().FindAttachment(slot);
+        if (on)
+            GetGame().ObjectDelete(on);
+        Restore(PlayerBase.Cast(GetGame().GetPlayer()), slot);
+    }
+
+    protected void Forget(int slot)
+    {
+        int at = m_Slots.Find(slot);
+        if (at < 0)
+            return;
+        m_Slots.RemoveOrdered(at);
+        m_Types.RemoveOrdered(at);
+    }
+
+    // What the player wears on a slot, made again on the copy with its parts.
+    protected void Restore(PlayerBase me, int slot)
+    {
+        if (!me || !m_Copy)
+            return;
+        EntityAI worn = me.GetInventory().FindAttachment(slot);
+        if (!worn)
+            return;
+        EntityAI twin = m_Copy.GetInventory().CreateAttachmentEx(worn.GetType(), slot);
+        if (twin)
+            CopyGear(worn, twin, 1);
+    }
+
+    // Everything off: back to the player as they are.
     void Drop()
     {
-        m_Type = "";
-        m_Slot = InventorySlots.INVALID;
+        m_Types.Clear();
+        m_Slots.Clear();
         if (!m_Copy)
             return;
         // The widget must not be left holding what is deleted.

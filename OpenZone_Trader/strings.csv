@@ -83,6 +83,7 @@ STR_OZT_UI_LIST_NOTE,"Торговець платить вказану суму 
 # Trying on.
 STR_OZT_UI_TRY_ON,ПРИМIРЯТИ,TRY ON
 STR_OZT_UI_TAKE_OFF,ЗНЯТИ,TAKE OFF
+STR_OZT_UI_TAKE_ALL_OFF,ЗНЯТИ ВСЕ,TAKE ALL OFF
 STR_OZT_UI_TRYING,примірка: ще не куплено,trying on: not bought yet
 # The parts strip.
 STR_OZT_UI_PARTS_ROUNDS,Набої,Rounds
@@ -111,4 +112,7 @@ STR_OZT_ADMIN_NO_POINT,Такої точки немає,There is no such point
 STR_OZT_ADMIN_BAD_KIND,"Вид — object або npc","The kind is object or npc"
 STR_OZT_ADMIN_BAD_CLASS,"Такого класу немає; для npc — лише клас вижившого","No such class; an npc takes a survivor class only"
 STR_OZT_ADMIN_NOT_WRITABLE,"Файл торговців не прочитано, правку не записано","The traders file could not be read; the edit was not written"
+STR_OZT_ADMIN_NO_THING,"Там, куди ви дивились, немає речі, яка може стати торговцем","Where you looked there is no thing that can become a trader"
+STR_OZT_ADMIN_TAKEN,Ця річ уже торговець,This thing is a trader already
+STR_OZT_ADMIN_MAP_FIXED,"Річ мапи стоїть, як її поставила мапа: її не пересунути, не повернути й не вдягнути","A thing of the map stays as the map has it: it cannot be moved, turned or dressed"
 STR_OZT_NO_ACCESS,Цей торговець з вами не торгує,This trader does not deal with you

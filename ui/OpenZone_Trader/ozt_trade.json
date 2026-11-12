@@ -541,6 +541,24 @@
                               "color": "$muted",
                               "align": "right"
                             }
+                          },
+                          {
+                            "button": {
+                              "name": "TryOffBtn",
+                              "at": [
+                                12,
+                                6
+                              ],
+                              "size": [
+                                150,
+                                28
+                              ],
+                              "text": "#STR_OZT_UI_TAKE_ALL_OFF",
+                              "font": "hint",
+                              "color": "$text",
+                              "hidden": true,
+                              "note": "Shown while anything is tried on: takes every tried thing off at once (OZT_TradeMenu.EndTry)."
+                            }
                           }
                         ]
                       }

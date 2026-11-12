@@ -287,6 +287,45 @@ class OZT_InvModel
         return probe;
     }
 
+    // A thing of the class made anew, local like the probes and the caller's to
+    // delete: what a deal fits parts to, one after another, to ask the engine
+    // about each beside the ones before it.
+    EntityAI FreshOf(string type)
+    {
+        vector feet = m_Player.GetPosition();
+        return EntityAI.Cast(GetGame().CreateObjectEx(type, feet, ECE_LOCAL | ECE_NOPERSISTENCY_WORLD));
+    }
+
+    // A local twin of a real thing with its parts, two levels down, for the
+    // same questions about parts bought onto it; the caller's to delete.
+    EntityAI TwinOf(EntityAI real)
+    {
+        if (!real)
+            return null;
+        EntityAI twin = FreshOf(real.GetType());
+        if (twin)
+            CopyParts(real, twin, 2);
+        return twin;
+    }
+
+    // Recursion by locals only (dayz-modding, enforce-script.md: an object's
+    // field handed to the next call from inside the loop would overwrite this
+    // call's parameters).
+    protected void CopyParts(EntityAI from, EntityAI to, int depth)
+    {
+        int n = from.GetInventory().AttachmentCount();
+        InventoryLocation il = new InventoryLocation();
+        for (int i = 0; i < n; i++)
+        {
+            EntityAI part = from.GetInventory().GetAttachmentFromIndex(i);
+            if (!part || !part.GetInventory().GetCurrentInventoryLocation(il))
+                continue;
+            EntityAI copy = to.GetInventory().CreateAttachmentEx(part.GetType(), il.GetSlot());
+            if (copy && depth > 0)
+                CopyParts(part, copy, depth - 1);
+        }
+    }
+
     protected bool SizeOfClass(string type, out int w, out int h)
     {
         w = 0;

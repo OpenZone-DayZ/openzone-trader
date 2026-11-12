@@ -15,11 +15,20 @@
 // asked point; after a reload at the asked point with its middle at ground
 // level, half buried. And a model's bounding box does not say where its foot
 // is: a building's box includes the foundation it carries below the ground.
+//
+// A MAP POINT (kind map) is a thing that already stands: a building or a prop
+// of the map. The server looks for it where the point says, by its class -- or
+// by its model, for a prop the map has no class for -- and only remembers it:
+// it is never made, turned, moved or deleted here.
 
 class OZT_PointLive
 {
     string Id;
     Object Body;
+
+    // The server made the body (an object or an npc point) and deletes it
+    // again; a map point's body is the map's.
+    bool Owned;
 
     // The point's position, as the file gives it. Distances are measured from
     // here; for a tall model that is metres above the ground.
@@ -40,7 +49,18 @@ class OZT_Points
             vector at = p.Position();
 
             Object body;
-            if (p.Kind == OZT_Const.KIND_NPC)
+            bool ours = true;
+            if (p.Kind == OZT_Const.KIND_MAP)
+            {
+                ours = false;
+                body = FindMapThing(p.ClassName, p.Model, at);
+                if (!body)
+                {
+                    OZT_Log.Error("point '" + p.Id + "': nothing of '" + MapName(p.ClassName, p.Model) + "' stands at " + at.ToString());
+                    continue;
+                }
+            }
+            else if (p.Kind == OZT_Const.KIND_NPC)
             {
                 body = MakeNpc(p, at);
             }
@@ -55,11 +75,13 @@ class OZT_Points
                 OZT_Log.Error("point '" + p.Id + "': the game made nothing of class '" + p.ClassName + "'");
                 continue;
             }
-            body.SetOrientation(Vector(p.Yaw, 0, 0));
+            if (ours)
+                body.SetOrientation(Vector(p.Yaw, 0, 0));
 
             OZT_PointLive live = new OZT_PointLive();
             live.Id = p.Id;
             live.Body = body;
+            live.Owned = ours;
             live.Stands = at;
             s_Live.Insert(live);
 
@@ -89,7 +111,7 @@ class OZT_Points
             OZT_Point point = OZT_Config.Get().FindTrader(live.Id);
             if (!point || !live.Body)
                 continue;
-            string line = OZT_ClientPoints.Line(live.Id, live.Body.GetType(), live.Stands, point.Radius);
+            string line = OZT_ClientPoints.Line(live.Id, OZT_ClientPoints.KeyOf(live.Body), live.Stands, point.Radius);
             if (chunk != "" && chunk.Length() + line.Length() + 1 > OZT_ClientPoints.CHUNK_CHARS)
             {
                 OZ_SyncExtras.Put(p, OZT_ClientPoints.SYNC_POINTS + chunks.ToString(), chunk);
@@ -253,10 +275,58 @@ class OZT_Points
     {
         for (int i = 0; i < s_Live.Count(); i++)
         {
-            if (s_Live[i].Body)
+            if (s_Live[i].Body && s_Live[i].Owned)
                 GetGame().ObjectDelete(s_Live[i].Body);
         }
         s_Live.Clear();
+    }
+
+    // The thing of the map nearest to `at`, within a metre, of that class --
+    // or, when the class is "", of that model. A character and an item never
+    // count: they come and go.
+    static Object FindMapThing(string type, string model, vector at)
+    {
+        array<Object> near = new array<Object>();
+        GetGame().GetObjectsAtPosition3D(at, OZT_ClientPoints.NEAR, near, null);
+        Object best = null;
+        float bestAway = -1;
+        for (int i = 0; i < near.Count(); i++)
+        {
+            Object o = near[i];
+            if (!o || o.IsMan() || o.IsInherited(ItemBase))
+                continue;
+            bool same = false;
+            if (type != "")
+                same = SameText(o.GetType(), type);
+            else
+                same = model != "" && SameText(o.GetShapeName(), model);
+            if (!same)
+                continue;
+            float away = vector.Distance(o.GetPosition(), at);
+            if (bestAway < 0 || away < bestAway)
+            {
+                best = o;
+                bestAway = away;
+            }
+        }
+        return best;
+    }
+
+    // How a map point's thing is named in a log line.
+    static string MapName(string type, string model)
+    {
+        if (type != "")
+            return type;
+        return model;
+    }
+
+    protected static bool SameText(string a, string b)
+    {
+        string x = a;
+        x.ToLower();
+        string y = b;
+        y.ToLower();
+        return x == y;
     }
 
     // How far the player stands from the point, in metres. Below zero: the

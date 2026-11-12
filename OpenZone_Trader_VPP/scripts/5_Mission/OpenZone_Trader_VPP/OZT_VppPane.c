@@ -27,6 +27,9 @@ modded class OZ_VppAdminMenu
     protected bool m_TrdNoChange = false;
     protected bool m_TrdDelArmed = false;
 
+    // The point picked is a thing of the map: its kind and its thing stay.
+    protected bool m_TrdMap = false;
+
     override void OnCreate(Widget RootW)
     {
         super.OnCreate(RootW);
@@ -94,7 +97,7 @@ modded class OZ_VppAdminMenu
         for (int i = 0; i < m_TrdList.Points.Count(); i++)
         {
             OZT_AdminPoint p = m_TrdList.Points[i];
-            string line = p.Id + "  " + p.Name + "  (" + p.Kind + ", " + p.ClassName + ")";
+            string line = p.Id + "  " + p.Name + "  (" + p.Kind + ", " + TrdThing(p) + ")";
             if (p.Standing != 1)
                 line = line + "  NOT STANDING";
             lb.AddItem(line, NULL, 0);
@@ -113,7 +116,7 @@ modded class OZ_VppAdminMenu
         OZT_AdminPoint p = m_TrdList.Points[index];
         SetEdit("TrdId", p.Id);
         SetEdit("TrdName", p.Name);
-        SetEdit("TrdClass", p.ClassName);
+        SetEdit("TrdClass", TrdThing(p));
         SetEdit("TrdRadius", p.Radius.ToString());
         SetEdit("TrdBuy", p.BuyFactor.ToString());
         SetEdit("TrdSell", p.SellFactor.ToString());
@@ -130,8 +133,10 @@ modded class OZ_VppAdminMenu
         // field is the series' known heap trap (dayz-modding).
         bool npc = p.Kind == OZT_Const.KIND_NPC;
         bool noChange = p.NoExchange == 1;
+        bool isMap = p.Kind == OZT_Const.KIND_MAP;
         m_TrdNpc = npc;
         m_TrdNoChange = noChange;
+        m_TrdMap = isMap;
         PaintTrdSwitches();
 
         string info = "at " + p.X.ToString() + " " + p.Y.ToString() + " " + p.Z.ToString();
@@ -145,6 +150,8 @@ modded class OZ_VppAdminMenu
         string kind = "KIND: object";
         if (m_TrdNpc)
             kind = "KIND: npc (a survivor class)";
+        if (m_TrdMap)
+            kind = "KIND: map (the map's own thing)";
         SayTrd("BtnTrdKindText", kind);
         string change = "CHANGES NOTES: yes";
         if (m_TrdNoChange)
@@ -167,6 +174,14 @@ modded class OZ_VppAdminMenu
         TextWidget t = TextWidget.Cast(M_SUB_WIDGET.FindAnyWidget(name));
         if (t)
             t.SetText(text);
+    }
+
+    // What stands at a point: its class, or a classless prop's model.
+    protected string TrdThing(OZT_AdminPoint p)
+    {
+        if (p.ClassName != "")
+            return p.ClassName;
+        return p.Model;
     }
 
     protected string PickedTrd()
@@ -208,6 +223,11 @@ modded class OZ_VppAdminMenu
 
         if (nm == "BtnTrdKind")
         {
+            if (m_TrdMap)
+            {
+                Hint("traders: a map point keeps its kind and its thing");
+                return true;
+            }
             if (m_TrdNpc)
                 m_TrdNpc = false;
             else
@@ -237,6 +257,11 @@ modded class OZ_VppAdminMenu
         if (nm == "BtnTrdPlace")
         {
             PlaceTrd();
+            return true;
+        }
+        if (nm == "BtnTrdAdopt")
+        {
+            AdoptTrd();
             return true;
         }
 
@@ -271,6 +296,55 @@ modded class OZ_VppAdminMenu
         JsonFileLoader<OZT_AdminPlace>.MakeData(req, body, err, false);
         Ask(OZT_Const.SECTION_ADMIN, "place", body);
         m_TrdPicked = -1;
+    }
+
+    // The thing where the admin looked before opening the window becomes a
+    // point of kind map: the camera has not moved since, so its ray still
+    // points at it. The server finds the thing again and makes nothing.
+    protected void AdoptTrd()
+    {
+        Object thing = AimedTrd();
+        if (!thing)
+        {
+            Hint("traders: nothing where you look - close the window, look at the thing, open it again");
+            return;
+        }
+        OZT_AdminAdopt req = new OZT_AdminAdopt();
+        req.Id = GetEdit("TrdId");
+        req.Name = GetEdit("TrdName");
+        req.ClassName = thing.GetType();
+        if (req.ClassName == "")
+            req.Model = thing.GetShapeName();
+        vector at = thing.GetPosition();
+        req.X = at[0];
+        req.Y = at[1];
+        req.Z = at[2];
+        string body;
+        string err;
+        JsonFileLoader<OZT_AdminAdopt>.MakeData(req, body, err, false);
+        Ask(OZT_Const.SECTION_ADMIN, "adopt", body);
+        m_TrdPicked = -1;
+        Hint("traders: asking to make " + OZT_ClientPoints.KeyOf(thing) + " a trader");
+    }
+
+    // The first thing on the camera's ray, the player left out.
+    protected Object AimedTrd()
+    {
+        Object me = GetGame().GetPlayer();
+        vector from = GetGame().GetCurrentCameraPosition();
+        vector to = from + GetGame().GetCurrentCameraDirection() * 50;
+        vector contact;
+        vector normal;
+        int comp;
+        set<Object> hits = new set<Object>();
+        DayZPhysics.RaycastRV(from, to, contact, normal, comp, hits, null, me, true, false, ObjIntersectView, 0.0);
+        for (int i = 0; i < hits.Count(); i++)
+        {
+            Object o = hits.Get(i);
+            if (o && o != me)
+                return o;
+        }
+        return null;
     }
 
     protected void SaveTrd(string id)

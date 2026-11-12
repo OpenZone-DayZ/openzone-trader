@@ -1,6 +1,6 @@
 {
   "layout": "ozt_vpp_pane",
-  "note": "TRADERS pane of the OpenZone admin window -- its own pbo (OpenZone_Trader_VPP) and its own layout: a server without VPP never loads it, and the core must not know the pane exists. OZT_VppPane.OnCreate builds it under M_SUB_WIDGET and calls RegisterPane(traders, TRADERS, pane, TrdHint), so the root stands at [0, vpp.paneY] and starts hidden, like the core's panes. Names OZT_VppPane.c resolves by string: TrdList, TrdCatsKnown, TrdInfo, BtnTrdKindText, BtnTrdChangeText through FindAnyWidget; TrdId, TrdName, TrdClass, TrdRadius, TrdBuy, TrdSell, TrdProvider, TrdCats through the inherited SetEdit/GetEdit; and the buttons dispatched in OnClick: BtnTrdPlace, BtnTrdMove, BtnTrdTurn, BtnTrdRemove, BtnTrdOutfit, BtnTrdRespawn, BtnTrdRefresh, BtnTrdKind, BtnTrdChange, BtnTrdSave. Console captions stay English, as in every pane of the window.",
+  "note": "TRADERS pane of the OpenZone admin window -- its own pbo (OpenZone_Trader_VPP) and its own layout: a server without VPP never loads it, and the core must not know the pane exists. OZT_VppPane.OnCreate builds it under M_SUB_WIDGET and calls RegisterPane(traders, TRADERS, pane, TrdHint), so the root stands at [0, vpp.paneY] and starts hidden, like the core's panes. Names OZT_VppPane.c resolves by string: TrdList, TrdCatsKnown, TrdInfo, BtnTrdKindText, BtnTrdChangeText through FindAnyWidget; TrdId, TrdName, TrdClass, TrdRadius, TrdBuy, TrdSell, TrdProvider, TrdCats through the inherited SetEdit/GetEdit; and the buttons dispatched in OnClick: BtnTrdPlace, BtnTrdMove, BtnTrdTurn, BtnTrdRemove, BtnTrdOutfit, BtnTrdRespawn, BtnTrdRefresh, BtnTrdKind, BtnTrdChange, BtnTrdSave, BtnTrdAdopt. Console captions stay English, as in every pane of the window.",
   "root": {
     "frame": {
       "name": "PaneTraders",
@@ -50,6 +50,16 @@
                                 { "button": { "name": "BtnTrdOutfit", "w": 152, "text": "OUTFIT FROM ME" } },
                                 { "button": { "name": "BtnTrdRespawn", "w": 152, "text": "RESPAWN ALL" } },
                                 { "button": { "name": "BtnTrdRefresh", "w": 154, "text": "REFRESH" } }
+                              ]
+                            }
+                          },
+                          {
+                            "hbox": {
+                              "name": "TrdActs3",
+                              "h": "$size.button",
+                              "gap": "$space.tight",
+                              "children": [
+                                { "button": { "name": "BtnTrdAdopt", "w": 470, "text": "AIMED THING BECOMES A TRADER", "edge": "$ok", "color": "$ok", "note": "What the camera points at -- where the admin looked before opening the window -- becomes a point of kind map (OZT_VppPane.AdoptTrd)." } }
                               ]
                             }
                           }

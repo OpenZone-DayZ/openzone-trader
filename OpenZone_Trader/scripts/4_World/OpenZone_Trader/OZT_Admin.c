@@ -59,6 +59,8 @@ class OZT_Admin : OZ_AdminSection
         string why = "";
         if (verb == "place")
             why = Place(file, json, admin);
+        else if (verb == "adopt")
+            why = Adopt(file, json, admin);
         else if (verb == "move")
             why = Move(file, arg, admin);
         else if (verb == "turn")
@@ -127,6 +129,56 @@ class OZT_Admin : OZ_AdminSection
         return "";
     }
 
+    // A thing already in the world becomes a trader (kind map): what the
+    // admin's client saw, found again here near the place it named. Nothing is
+    // made; the thing keeps its place and its facing.
+    protected string Adopt(OZT_TradersFile file, string json, PlayerBase admin)
+    {
+        if (!admin)
+            return "STR_OZT_ADMIN_NO_PLAYER";
+        OZT_AdminAdopt req = new OZT_AdminAdopt();
+        string err;
+        if (!JsonFileLoader<OZT_AdminAdopt>.LoadData(json, req, err))
+            return "STR_OZT_ADMIN_BAD_REQUEST";
+        if (!OZT_Ids.IsSafe(req.Id) || IndexOf(file, req.Id) > -1)
+            return "STR_OZT_ADMIN_BAD_ID";
+        vector seen = Vector(req.X, req.Y, req.Z);
+        Object thing = OZT_Points.FindMapThing(req.ClassName, req.Model, seen);
+        if (!thing)
+            return "STR_OZT_ADMIN_NO_THING";
+        // A trader's own body is a point already; a character or an item never
+        // stays put (FindMapThing leaves those out).
+        if (OZT_Points.IdOf(thing) != "")
+            return "STR_OZT_ADMIN_TAKEN";
+
+        OZT_Point p = new OZT_Point();
+        p.Id = req.Id;
+        p.Name = req.Name;
+        if (p.Name == "")
+            p.Name = req.Id;
+        p.Kind = OZT_Const.KIND_MAP;
+        p.ClassName = thing.GetType();
+        p.Model = "";
+        if (p.ClassName == "")
+            p.Model = thing.GetShapeName();
+        vector at = thing.GetPosition();
+        p.Pos = new array<float>();
+        p.Pos.Insert(at[0]);
+        p.Pos.Insert(at[1]);
+        p.Pos.Insert(at[2]);
+        vector ori = thing.GetOrientation();
+        p.Yaw = ori[0];
+        p.Radius = 3;
+        p.Categories = new array<string>();
+        array<ref OZT_Category> cats = OZT_Config.Get().Goods().Categories;
+        for (int c = 0; c < cats.Count(); c++)
+            p.Categories.Insert(cats[c].Id);
+        p.Outfit = new OZT_Outfit();
+        p.Outfit.Items = new array<ref OZT_OutfitItem>();
+        file.Traders.Insert(p);
+        return "";
+    }
+
     protected string Move(OZT_TradersFile file, string id, PlayerBase admin)
     {
         if (!admin)
@@ -134,6 +186,8 @@ class OZT_Admin : OZ_AdminSection
         int i = IndexOf(file, id);
         if (i < 0)
             return "STR_OZT_ADMIN_NO_POINT";
+        if (file.Traders[i].Kind == OZT_Const.KIND_MAP)
+            return "STR_OZT_ADMIN_MAP_FIXED";
         vector at = admin.GetPosition();
         OZT_Point p = file.Traders[i];
         p.Pos = new array<float>();
@@ -150,6 +204,8 @@ class OZT_Admin : OZ_AdminSection
         int i = IndexOf(file, id);
         if (i < 0)
             return "STR_OZT_ADMIN_NO_POINT";
+        if (file.Traders[i].Kind == OZT_Const.KIND_MAP)
+            return "STR_OZT_ADMIN_MAP_FIXED";
         file.Traders[i].Yaw = Heading(admin);
         return "";
     }
@@ -172,14 +228,18 @@ class OZT_Admin : OZ_AdminSection
         string err;
         if (!JsonFileLoader<OZT_AdminSet>.LoadData(json, req, err))
             return "STR_OZT_ADMIN_BAD_REQUEST";
-        string why = ClassFor(req.Kind, req.ClassName);
-        if (why != "")
-            return why;
-
         OZT_Point p = file.Traders[i];
+        // A map point keeps its kind and its thing: the pane's kind and class
+        // name what the server makes, and a map point's thing is the map's.
+        if (p.Kind != OZT_Const.KIND_MAP)
+        {
+            string why = ClassFor(req.Kind, req.ClassName);
+            if (why != "")
+                return why;
+            p.Kind = req.Kind;
+            p.ClassName = req.ClassName;
+        }
         p.Name = req.Name;
-        p.Kind = req.Kind;
-        p.ClassName = req.ClassName;
         if (req.Radius > 0)
             p.Radius = req.Radius;
         p.Categories = new array<string>();
@@ -209,6 +269,8 @@ class OZT_Admin : OZ_AdminSection
         int i = IndexOf(file, id);
         if (i < 0)
             return "STR_OZT_ADMIN_NO_POINT";
+        if (file.Traders[i].Kind == OZT_Const.KIND_MAP)
+            return "STR_OZT_ADMIN_MAP_FIXED";
         OZT_Outfit outfit = new OZT_Outfit();
         outfit.Items = new array<ref OZT_OutfitItem>();
         GameInventory inv = admin.GetInventory();
@@ -293,6 +355,7 @@ class OZT_Admin : OZ_AdminSection
             a.Name = p.Name;
             a.Kind = p.Kind;
             a.ClassName = p.ClassName;
+            a.Model = p.Model;
             a.X = p.Pos[0];
             a.Y = p.Pos[1];
             a.Z = p.Pos[2];

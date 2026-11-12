@@ -339,7 +339,9 @@ class OZT_Config
         for (int i = 0; i < m_Traders.Traders.Count(); i++)
         {
             OZT_Point p = m_Traders.Traders[i];
-            if (!ClassKnown(p.ClassName))
+            // A map point's thing is the map's: a building class, or a prop
+            // with no class at all; whether it stands is OZT_Points' to find.
+            if (p.Kind != OZT_Const.KIND_MAP && !ClassKnown(p.ClassName))
             {
                 Problem("Traders: '" + p.Id + "' is skipped: no such class '" + p.ClassName + "'");
                 continue;

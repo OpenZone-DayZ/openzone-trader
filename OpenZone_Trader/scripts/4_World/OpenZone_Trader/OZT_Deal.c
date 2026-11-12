@@ -1153,6 +1153,10 @@ class OZT_Deal
     // of the class for a thing that does not exist yet, the carried thing
     // itself for a part that goes onto it. The item check and the script check,
     // no occupancy: which slot is free is the plan's own to know.
+    // The parts go on one after another, each asked of a thing that already
+    // holds the ones before it: a thing's own script may refuse a part beside
+    // another (an AK takes a bayonet or a suppressor, never both), which a bare
+    // probe of the class never shows (2026-11-12, the owner's run).
     protected string CheckFits()
     {
         for (int b = 0; b < m_BuyParts.Count(); b++)
@@ -1160,28 +1164,72 @@ class OZT_Deal
             array<ref OZT_PartMake> parts = m_BuyParts[b].Items;
             if (parts.Count() == 0)
                 continue;
-            if (!GatesTake(m_Model.ProbeOf(m_BuyClasses[b]), parts))
+            EntityAI fresh = m_Model.FreshOf(m_BuyClasses[b]);
+            bool takes = GatesTake(fresh, parts);
+            if (fresh)
+                GetGame().ObjectDelete(fresh);
+            if (!takes)
                 return OZT_Const.NO_CHANGED;
         }
+
+        // Parts bought onto one thing of the player's, whatever lines they came
+        // in, go onto one twin of it, in order: each onto line's first part on
+        // the thing, the rest on that part.
+        array<EntityAI> hosts = new array<EntityAI>();
         for (int o = 0; o < m_Ontos.Count(); o++)
         {
-            OZT_Onto onto = m_Ontos[o];
-            if (!GatesTake(onto.Host, onto.Parts.Items))
+            EntityAI host = m_Ontos[o].Host;
+            if (hosts.Find(host) > -1)
+                continue;
+            hosts.Insert(host);
+            array<ref OZT_PartMake> all = new array<ref OZT_PartMake>();
+            for (int k = o; k < m_Ontos.Count(); k++)
+            {
+                if (m_Ontos[k].Host != host)
+                    continue;
+                int offset = all.Count();
+                array<ref OZT_PartMake> its = m_Ontos[k].Parts.Items;
+                for (int j = 0; j < its.Count(); j++)
+                {
+                    OZT_PartMake src = its[j];
+                    OZT_PartMake cp = new OZT_PartMake();
+                    cp.ClassName = src.ClassName;
+                    cp.SlotName = src.SlotName;
+                    cp.SlotId = src.SlotId;
+                    cp.On = src.On;
+                    if (cp.On >= 0)
+                        cp.On = cp.On + offset;
+                    all.Insert(cp);
+                }
+            }
+            EntityAI twin = m_Model.TwinOf(host);
+            bool fine = GatesTake(twin, all);
+            if (twin)
+                GetGame().ObjectDelete(twin);
+            if (!fine)
                 return OZT_Const.NO_CHANGED;
         }
         return "";
     }
 
+    // `host` is a local thing (FreshOf, TwinOf) that this fills: each part is
+    // asked of the engine where it would go, then made there, so the next one
+    // is asked beside it. A part's `On` is the index of the part it hangs on.
     protected bool GatesTake(EntityAI host, array<ref OZT_PartMake> parts)
     {
         if (!host)
             return false;
+        array<EntityAI> made = new array<EntityAI>();
         for (int i = 0; i < parts.Count(); i++)
         {
             OZT_PartMake p = parts[i];
             EntityAI on = host;
             if (p.On >= 0)
-                on = m_Model.ProbeOf(parts[p.On].ClassName);
+            {
+                on = null;
+                if (p.On < made.Count())
+                    on = made[p.On];
+            }
             EntityAI part = m_Model.ProbeOf(p.ClassName);
             if (!on || !part)
                 return false;
@@ -1192,6 +1240,10 @@ class OZT_Deal
                 OZT_Log.Dbg("deal: the gates refuse " + p.ClassName + " in the slot " + p.SlotName + " of " + on.GetType());
                 return false;
             }
+            EntityAI put = on.GetInventory().CreateAttachmentEx(p.ClassName, p.SlotId);
+            if (!put)
+                put = on.GetInventory().CreateAttachment(p.ClassName);
+            made.Insert(put);
         }
         return true;
     }

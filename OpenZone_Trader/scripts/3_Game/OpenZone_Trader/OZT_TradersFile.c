@@ -69,6 +69,10 @@ class OZT_Point
     string Name = "";
     string Kind = "object";
     string ClassName = "";
+
+    // A map point's model, for a prop the map has no class for (its class is
+    // then ""): the thing is known by its model and its place.
+    string Model = "";
     ref array<float> Pos;
     float Yaw = 0;
     float Radius = 3;
@@ -100,6 +104,7 @@ class OZT_Point
         c.Name = Name;
         c.Kind = Kind;
         c.ClassName = ClassName;
+        c.Model = Model;
         c.Pos = new array<float>();
         if (Pos)
         {
@@ -179,7 +184,7 @@ class OZT_TradersFile : OZ_ConfigBase
                     why = "its Id must be letters, digits, _ and - only, at most 64";
                 else if (ids.Find(p.Id) > -1)
                     why = "the Id is listed twice";
-                else if (p.ClassName == "")
+                else if (p.ClassName == "" && (p.Kind != OZT_Const.KIND_MAP || p.Model == ""))
                     why = "it has no ClassName";
                 else if (p.Pos.Count() != 3)
                     why = "Pos must be three numbers";
@@ -191,9 +196,10 @@ class OZT_TradersFile : OZ_ConfigBase
                 }
                 ids.Insert(p.Id);
 
-                if (p.Kind != OZT_Const.KIND_OBJECT && p.Kind != OZT_Const.KIND_NPC)
+                bool known = p.Kind == OZT_Const.KIND_OBJECT || p.Kind == OZT_Const.KIND_NPC;
+                if (!known && p.Kind != OZT_Const.KIND_MAP)
                 {
-                    OZT_Log.Warn("Traders: '" + p.Id + "' has the kind '" + p.Kind + "'; it is \"object\" or \"npc\". Using \"object\"");
+                    OZT_Log.Warn("Traders: '" + p.Id + "' has the kind '" + p.Kind + "'; it is \"object\", \"npc\" or \"map\". Using \"object\"");
                     p.Kind = OZT_Const.KIND_OBJECT;
                     warnings++;
                 }

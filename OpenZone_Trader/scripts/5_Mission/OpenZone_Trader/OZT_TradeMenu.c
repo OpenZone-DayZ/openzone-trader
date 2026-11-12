@@ -723,37 +723,43 @@ class OZT_TradeMenu : UIScriptedMenu
         bool on = false;
         if (m_Try && m_Try.IsOn())
             on = true;
+        // The button speaks of the selected goods: off when they are tried on.
+        bool tried = false;
+        if (on && m_PickType != "" && m_Try.Has(m_PickType))
+            tried = true;
+        if (tried)
+            OZT_Ui.Say(layoutRoot, "TryBtnText", OZT_Ui.Words("STR_OZT_UI_TAKE_OFF"));
+        else
+            OZT_Ui.Say(layoutRoot, "TryBtnText", OZT_Ui.Words("STR_OZT_UI_TRY_ON"));
+        OZT_Ui.Show(layoutRoot, "TryOffBtn", on);
         if (on)
         {
-            OZT_Ui.Say(layoutRoot, "TryBtnText", OZT_Ui.Words("STR_OZT_UI_TAKE_OFF"));
             OZT_Ui.Say(layoutRoot, "CharMeta", OZT_Ui.Words("STR_OZT_UI_TRYING"));
             OZT_Ui.Tint(layoutRoot, "CharMeta", OZT_Look.Accent());
         }
         else
         {
-            OZT_Ui.Say(layoutRoot, "TryBtnText", OZT_Ui.Words("STR_OZT_UI_TRY_ON"));
             OZT_Ui.Say(layoutRoot, "CharMeta", "");
         }
     }
 
-    // The button: on with the selected goods, or off.
+    // The button: the selected goods on, beside what is tried already, or off
+    // again when they are on.
     protected void ToggleTry()
     {
-        if (!m_Try)
+        if (!m_Try || m_PickType == "")
             return;
-        if (m_Try.IsOn())
-        {
-            EndTry();
-            return;
-        }
-        if (m_PickType == "" || !m_Try.Put(m_PickType))
+        if (m_Try.Has(m_PickType))
+            m_Try.TakeOff(m_PickType);
+        else if (!m_Try.Put(m_PickType))
             return;
         m_DirtySlots = true;
         PaintTry();
     }
 
-    // Trying ends when something else is selected, when the goods are taken
-    // off, when a deal is made and when the screen closes.
+    // All the trying ends with TAKE ALL OFF, when the last thing is taken off,
+    // when a deal is made and when the screen closes; choosing other goods
+    // leaves it as it is.
     protected void EndTry()
     {
         if (!m_Try || !m_Try.IsOn())
@@ -998,10 +1004,13 @@ class OZT_TradeMenu : UIScriptedMenu
             OZT_WireGoods g = m_Data.Goods[i];
             if (g.Buy <= 0)
                 continue;
-            // Under a slot's filter: what fits the slot, from every category.
+            // Under a slot's filter: what fits the slot, from every category,
+            // and what the thing would take beside what it holds.
             if (m_Filter)
             {
                 if (!OZT_Fit.SlotOf(m_Filter.HostType, g.ClassName, m_Filter.SlotName))
+                    continue;
+                if (!EngineTakes(g.ClassName, m_Filter))
                     continue;
             }
             else if (cat != "" && g.Category != cat)
@@ -1013,7 +1022,8 @@ class OZT_TradeMenu : UIScriptedMenu
                 // Money is not goods: the notes stand only in their own tab.
                 continue;
             }
-            EntityAI e = m_Shelf.Of(g.ClassName);
+            // Drawn as it comes: with what the price book gives it.
+            EntityAI e = m_Shelf.LookOf(g.ClassName, g.With, null);
             if (!e)
                 continue;
             OZT_Tile t = new OZT_Tile(OZT_Tile.SHELF, g.ClassName, e);
@@ -1229,13 +1239,16 @@ class OZT_TradeMenu : UIScriptedMenu
             Widget into = sw.FindAnyWidget("SlotHold");
             // The slot of what is tried on shows the goods, lit: a tile of the
             // shelf, so a double click on it buys them.
-            if (m_Try && m_Try.IsOn() && ids[i] != InventorySlots.INVALID && ids[i] == m_Try.SlotId())
+            string triedHere = "";
+            if (m_Try && m_Try.IsOn() && ids[i] != InventorySlots.INVALID)
+                triedHere = m_Try.TriedOn(ids[i]);
+            if (triedHere != "")
             {
-                EntityAI stand = m_Shelf.Of(m_Try.Tried());
-                OZT_WireGoods tg = GoodsOf(m_Try.Tried());
+                EntityAI stand = m_Shelf.Of(triedHere);
+                OZT_WireGoods tg = GoodsOf(triedHere);
                 if (stand && tg && into)
                 {
-                    OZT_Tile tried = new OZT_Tile(OZT_Tile.SHELF, m_Try.Tried(), stand);
+                    OZT_Tile tried = new OZT_Tile(OZT_Tile.SHELF, triedHere, stand);
                     tried.Price = tg.Buy;
                     if (tried.Build(into))
                     {
@@ -1273,7 +1286,14 @@ class OZT_TradeMenu : UIScriptedMenu
         for (int b = 0; b < m_Cart.Buys.Count(); b++)
         {
             OZT_CartLine buy = m_Cart.Buys[b];
-            EntityAI stand = m_Shelf.Of(buy.Type);
+            // Drawn as it will come: what it comes with and what the deal
+            // fits to it. A part bought onto the player's own thing is drawn
+            // alone.
+            array<string> comes = null;
+            OZT_WireGoods bought = GoodsOf(buy.Type);
+            if (bought && !buy.IsOnto())
+                comes = bought.With;
+            EntityAI stand = m_Shelf.LookOf(buy.Type, comes, buy.Fits);
             if (!stand)
                 continue;
             OZT_Tile bt = new OZT_Tile(OZT_Tile.BUY, buy.Type, stand);
@@ -1517,8 +1537,7 @@ class OZT_TradeMenu : UIScriptedMenu
         m_PickKey = KeyOf(t);
         m_PickType = t.Type;
         AimParts(t);
-        if (m_Try && m_Try.IsOn() && m_Try.Tried() != t.Type)
-            EndTry();
+        PaintTry();
         RepaintPicks(m_ShelfGrid);
         RepaintPicks(m_OwnGrid);
         RepaintPicks(m_BuyGrid);
@@ -1573,7 +1592,6 @@ class OZT_TradeMenu : UIScriptedMenu
         m_PickKind = 0;
         m_PickKey = "";
         m_PickType = "";
-        EndTry();
         PaintTry();
         OZT_Ui.Say(layoutRoot, "SelName", "");
         OZT_Ui.Say(layoutRoot, "SelPrice", "");
@@ -1858,7 +1876,7 @@ class OZT_TradeMenu : UIScriptedMenu
     {
         if (!slot || !m_PartsAt || !m_Data)
             return;
-        if (!OZT_Fit.SlotOf(slot.HostType, type, slot.SlotName))
+        if (!OZT_Fit.SlotOf(slot.HostType, type, slot.SlotName) || !EngineTakes(type, slot))
         {
             SayInfo(OZT_Ui.Words("STR_OZT_UI_PARTS_NO_FIT"), OZT_Look.Alert());
             return;
@@ -1898,6 +1916,80 @@ class OZT_TradeMenu : UIScriptedMenu
         }
         ClearFilter();
         CartChanged();
+    }
+
+    // The thing's own script has its word too (an AK takes a bayonet or a
+    // suppressor, never both). Asked of a local thing that already holds what
+    // the deal puts there -- the goods' look, or a twin of the player's own
+    // thing with the parts the cart buys onto it -- as the server asks it
+    // (OZT_Deal.CheckFits). A sold thing never gets here.
+    protected bool EngineTakes(string type, OZT_PartsEntry slot)
+    {
+        EntityAI part = m_Shelf.Of(type);
+        int slotId = InventorySlots.GetSlotIdFromString(slot.SlotName);
+        if (!part || slotId == InventorySlots.INVALID)
+            return false;
+        EntityAI host = null;
+        EntityAI twin = null;
+        int kind = m_PartsAt.Kind;
+        if (kind == OZT_Tile.SHELF)
+        {
+            OZT_WireGoods sg = GoodsOf(m_PartsAt.Type);
+            array<string> scomes = null;
+            if (sg)
+                scomes = sg.With;
+            host = m_Shelf.LookHost(m_PartsAt.Type, scomes, null, slot.HostFit);
+        }
+        else if (kind == OZT_Tile.BUY)
+        {
+            if (m_PartsAt.Line < 0 || m_PartsAt.Line >= m_Cart.Buys.Count())
+                return false;
+            OZT_CartLine line = m_Cart.Buys[m_PartsAt.Line];
+            OZT_WireGoods lg = GoodsOf(line.Type);
+            array<string> lcomes = null;
+            if (lg && !line.IsOnto())
+                lcomes = lg.With;
+            host = m_Shelf.LookHost(line.Type, lcomes, line.Fits, slot.HostFit);
+        }
+        else if (kind == OZT_Tile.OWN && slot.Host)
+        {
+            twin = OntoTwin(slot.Host);
+            host = twin;
+        }
+        bool takes = false;
+        if (host)
+        {
+            InventoryLocation loc = new InventoryLocation();
+            loc.SetAttachment(host, part, slotId);
+            takes = GameInventory.LocationTestAddEntity(loc, false, true, false, false, true, false);
+        }
+        if (twin)
+            GetGame().ObjectDelete(twin);
+        return takes;
+    }
+
+    // A local twin of a thing the player carries, with its parts and with the
+    // parts the cart already buys onto it; the caller deletes it.
+    protected EntityAI OntoTwin(EntityAI real)
+    {
+        EntityAI twin = EntityAI.Cast(GetGame().CreateObjectEx(real.GetType(), "0 0 0", ECE_LOCAL));
+        if (!twin)
+            return null;
+        twin.DisableSimulation(true);
+        OZT_Shelf.CopyParts(real, twin, 2);
+        int low;
+        int high;
+        real.GetNetworkID(low, high);
+        for (int b = 0; b < m_Cart.Buys.Count(); b++)
+        {
+            OZT_CartLine line = m_Cart.Buys[b];
+            if (line.OnLow != low || line.OnHigh != high)
+                continue;
+            int sid = InventorySlots.GetSlotIdFromString(line.OnSlot);
+            if (sid != InventorySlots.INVALID)
+                twin.GetInventory().CreateAttachmentEx(line.Type, sid);
+        }
+        return twin;
     }
 
     // A double click on a part, or a part dropped on a side: keep it, sell
@@ -2163,6 +2255,11 @@ class OZT_TradeMenu : UIScriptedMenu
         if (w && w.GetName() == "ListBtn")
         {
             ToggleList();
+            return true;
+        }
+        if (w && w.GetName() == "TryOffBtn")
+        {
+            EndTry();
             return true;
         }
         if (w && w.GetName() == "TryBtn")

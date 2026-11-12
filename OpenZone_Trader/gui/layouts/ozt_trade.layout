@@ -597,6 +597,64 @@ FrameWidgetClass OZT_Trade {
          "text halign" right
          "text valign" center
         }
+        // Shown while anything is tried on: takes every tried thing off at once (OZT_TradeMenu.EndTry).
+        ButtonWidgetClass TryOffBtn {
+         visible 0
+         position 12 6
+         size 150 28
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         text ""
+         priority 3
+         {
+          PanelWidgetClass TryOffBtnEdge {
+           visible 1
+           ignorepointer 1
+           position -1 -1
+           size 152 30
+           hexactpos 1
+           vexactpos 1
+           hexactsize 1
+           vexactsize 1
+           color 0.235 0.235 0.227 1
+           priority 0
+           style rover_sim_colorable
+          }
+          PanelWidgetClass TryOffBtnBg {
+           visible 1
+           ignorepointer 1
+           position 0 0
+           size 150 28
+           hexactpos 1
+           vexactpos 1
+           hexactsize 1
+           vexactsize 1
+           color 0.118 0.118 0.114 1
+           priority 1
+           style rover_sim_colorable
+          }
+          TextWidgetClass TryOffBtnText {
+           visible 1
+           ignorepointer 1
+           position 0 0
+           size 150 28
+           hexactpos 1
+           vexactpos 1
+           hexactsize 1
+           vexactsize 1
+           color 0.88 0.875 0.855 1
+           priority 2
+           text "#STR_OZT_UI_TAKE_ALL_OFF"
+           font "gui/fonts/sdf_MetronBook24"
+           "exact text" 1
+           "exact text size" 14
+           "text halign" center
+           "text valign" center
+          }
+         }
+        }
        }
       }
       PanelWidgetClass CharBed {

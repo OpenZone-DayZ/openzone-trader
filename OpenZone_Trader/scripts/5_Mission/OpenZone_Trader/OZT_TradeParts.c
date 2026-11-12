@@ -140,14 +140,25 @@ class OZT_PartsReader
         if (at.Kind == OZT_Tile.BUY && at.Line >= 0 && at.Line < cart.Buys.Count())
             line = cart.Buys[at.Line];
 
+        // The loop reads its host from locals, and the recursion below is handed
+        // locals too. Handed `e.Type` straight from inside this loop, the call
+        // came back with this frame's `hostType` set to the part's class: every
+        // slot after a fitted part was the part's slot, and a click on the
+        // rifle's magazine slot behind a fitted scope filtered the shelf by the
+        // scope's slots -- nothing (2026-11-12; the engine trap in dayz-modding,
+        // "a recursive call ... overwrites the caller's parameter").
+        int onFit = hostFit;
+        string onType = hostType;
+        int onDepth = depth;
+
         for (int i = 0; i < slots.Count() && into.Count() < MAX_CELLS; i++)
         {
             OZT_PartsEntry e = new OZT_PartsEntry();
             e.SlotName = slots[i];
             e.SlotId = InventorySlots.GetSlotIdFromString(slots[i]);
-            e.Depth = depth;
-            e.HostFit = hostFit;
-            e.HostType = hostType;
+            e.Depth = onDepth;
+            e.HostFit = onFit;
+            e.HostType = onType;
             e.What = OZT_PartsEntry.EMPTY;
 
             int k = IndexOfName(incSlot, slots[i]);
@@ -163,7 +174,7 @@ class OZT_PartsReader
             }
             int f = -1;
             if (line)
-                f = FitIn(line, hostFit, slots[i]);
+                f = FitIn(line, onFit, slots[i]);
             if (f > -1)
             {
                 e.What = OZT_PartsEntry.PART;
@@ -173,7 +184,11 @@ class OZT_PartsReader
                 e.Price = line.Fits[f].Each;
                 e.Fit = f;
                 into.Insert(e);
-                ReadGoods(at, f, e.Type, e.Item, depth + 1, data, cart, shelf, into);
+                string partType = e.Type;
+                EntityAI partItem = e.Item;
+                int partFit = f;
+                int partDepth = onDepth + 1;
+                ReadGoods(at, partFit, partType, partItem, partDepth, data, cart, shelf, into);
                 continue;
             }
             into.Insert(e);

@@ -27,6 +27,9 @@ class OZT_ClientPoints
     // a character settles on the ground it was put on.
     static const float NEAR = 1.0;
 
+    // The key of a prop the map has no class for: its model, after this.
+    static const string MODEL_KEY = "p3d:";
+
     private static ref array<ref OZT_ClientPoint> s_Points = new array<ref OZT_ClientPoint>();
 
     static void Clear()
@@ -67,7 +70,7 @@ class OZT_ClientPoints
     {
         if (!obj)
             return null;
-        string type = obj.GetType();
+        string type = KeyOf(obj);
         vector at = obj.GetPosition();
         for (int i = 0; i < s_Points.Count(); i++)
         {
@@ -80,6 +83,16 @@ class OZT_ClientPoints
                 return p;
         }
         return null;
+    }
+
+    // What names a thing on both sides: its class, or -- for a prop of the map
+    // that has none (a map point) -- its model behind MODEL_KEY.
+    static string KeyOf(Object obj)
+    {
+        string type = obj.GetType();
+        if (type == "")
+            type = MODEL_KEY + obj.GetShapeName();
+        return type;
     }
 
     // One point as a line of the packet. The server writes with it, so both

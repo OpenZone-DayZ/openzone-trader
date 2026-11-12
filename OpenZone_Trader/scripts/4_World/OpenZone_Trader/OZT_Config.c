@@ -452,7 +452,12 @@ class OZT_Config
                 // discount that holds at the cheapest trader makes the cheapest
                 // price (design §8.2, the money loop with discounts).
                 float most = MostDiscount(cat, e);
-                int costs = RoundUpTo(e.Buy * cheapest * (100 - most) / 100, unit);
+                // A stocked line: a unit sold and bought straight back costs
+                // the coefficient's step more (design §11.1).
+                float step = 1;
+                if (e.Stock && e.Stock.Coefficient < 1)
+                    step = e.Stock.Coefficient;
+                int costs = RoundUpTo(e.Buy * cheapest * (100 - most) / 100 * step, unit);
                 float pays = e.Sell * dearest * best;
                 if (e.Quantity != OZT_Const.RULE_UNIT)
                     pays = RoundDownTo(pays, unit);

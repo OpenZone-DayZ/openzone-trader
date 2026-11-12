@@ -72,6 +72,15 @@ class OZT_Settings : OZ_ConfigBase
     // (decision 4 of the design); 0: everything goes to the bags.
     int WearBought = 1;
 
+    // Stock at a server start (design §11.1, TraderPlus's switches): 0 keeps
+    // the stock files as they are, 1 fills every line with a Max above 0 to Max
+    // and drops the rest, 2 the same with a random count up to Max.
+    int StartStock = 0;
+    // 1: a line at or above its Max loses its Destock share at a start.
+    int DestockAtStart = 0;
+    // 1: what players sell goes into the pristine line whatever its condition.
+    int StockOnlyPristine = 0;
+
     override int LatestVersion()
     {
         return 1;
@@ -154,6 +163,12 @@ class OZT_Settings : OZ_ConfigBase
             warnings++;
         }
 
+        if (StartStock < 0 || StartStock > 2)
+        {
+            OZT_Log.Warn("Settings: StartStock " + StartStock.ToString() + " is 0, 1 or 2; using 0");
+            StartStock = 0;
+            warnings++;
+        }
         if (CooldownMs < 0 || CooldownMs > 600000)
         {
             OZT_Log.Warn("Settings: CooldownMs " + CooldownMs.ToString() + " is outside 0..600000, using 1000");

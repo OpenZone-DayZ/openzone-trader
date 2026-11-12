@@ -6,6 +6,35 @@
 
 class OZT_Open
 {
+    // One goods record of the answer: what one costs here with what comes with
+    // it, and what that is; for a stocked class, of one condition and with the
+    // count the stock holds. Locked goods are not shown to this player (design
+    // §8.2): nothing to buy, and the shelf shows nothing it cannot sell. Null:
+    // nothing to show.
+    protected static OZT_WireGoods Record(PlayerBase player, OZT_Point trader, OZT_BookEntry e, int level, int unit)
+    {
+        OZT_WireGoods wg = new OZT_WireGoods();
+        wg.ClassName = e.ClassName;
+        wg.Category = e.Category;
+        wg.Level = level;
+        if (e.Stocked)
+            wg.Stock = OZT_Book.StockOf(trader, e, level, null);
+        wg.Buy = OZT_Book.ShelfWith(player, trader, e, level);
+        if (level == 0)
+        {
+            array<string> comes;
+            OZT_Book.ComesAt(player, trader, e, 1, null, comes);
+            for (int w = 0; w < comes.Count(); w++)
+                wg.With.Insert(comes[w]);
+        }
+        if (e.Sell > 0)
+            wg.Sell = OZT_Config.RoundDownTo(e.Sell * trader.SellFactor, unit);
+        wg.Rule = e.Rule;
+        if (wg.Buy <= 0 && wg.Sell <= 0)
+            return null;
+        return wg;
+    }
+
     // The answer of `open`: the trader, what this player may buy and sell here
     // and for how much, and the player's money. Prices carry the trader's own
     // factors already.
@@ -82,23 +111,31 @@ class OZT_Open
                 OZT_BookEntry e = OZT_Book.EntryOf(cat.Goods[g].ClassName);
                 if (!e)
                     continue;
-                OZT_WireGoods wg = new OZT_WireGoods();
-                wg.ClassName = e.ClassName;
-                wg.Category = e.Category;
-                // What one costs here with what comes with it, and what that is.
-                // Locked goods are not shown to this player (design §8.2):
-                // nothing to buy, and the shelf shows nothing it cannot sell.
-                wg.Buy = OZT_Book.BuyWith(player, trader, e, 1);
-                array<string> comes;
-                OZT_Book.Comes(player, trader, e, comes);
-                for (int w = 0; w < comes.Count(); w++)
-                    wg.With.Insert(comes[w]);
-                if (e.Sell > 0)
-                    wg.Sell = OZT_Config.RoundDownTo(e.Sell * trader.SellFactor, unit);
-                wg.Rule = e.Rule;
-                if (wg.Buy <= 0 && wg.Sell <= 0)
+                if (!e.Stocked)
+                {
+                    OZT_WireGoods wg = Record(player, trader, e, 0, unit);
+                    if (wg)
+                        res.Goods.Insert(wg);
                     continue;
-                res.Goods.Insert(wg);
+                }
+                // A stocked class (design §11.1): a record per condition the
+                // stock holds; nothing held, one record that says so.
+                bool any = false;
+                for (int lv = 0; lv < OZT_Const.LEVEL_RUINED; lv++)
+                {
+                    if (OZT_Book.StockOf(trader, e, lv, null) <= 0)
+                        continue;
+                    OZT_WireGoods held = Record(player, trader, e, lv, unit);
+                    if (!held)
+                        continue;
+                    res.Goods.Insert(held);
+                    any = true;
+                }
+                if (any)
+                    continue;
+                OZT_WireGoods none = Record(player, trader, e, 0, unit);
+                if (none)
+                    res.Goods.Insert(none);
             }
         }
 

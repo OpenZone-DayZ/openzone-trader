@@ -81,6 +81,10 @@ class OZT_Point
     float SellFactor = 1;
     string Provider = "";
 
+    // The stock this point sells from (design §11.1): its own id when empty;
+    // points that name one stock share one shelf.
+    string Stock = "";
+
     // 1: this trader does not change the server's banknotes; 0, and a file that
     // does not say: it does (the screen's change tab, at face value). Said this
     // way round because a key a nested object lacks reads zero. Only item money
@@ -96,6 +100,13 @@ class OZT_Point
     ref array<ref OZT_Condition> Access;
     ref array<string> GatesOn;
     ref array<string> GatesOff;
+
+    string StockId()
+    {
+        if (Stock != "")
+            return Stock;
+        return Id;
+    }
 
     OZT_Point Copy()
     {
@@ -122,6 +133,7 @@ class OZT_Point
         c.BuyFactor = BuyFactor;
         c.SellFactor = SellFactor;
         c.Provider = Provider;
+        c.Stock = Stock;
         c.NoExchange = NoExchange;
         if (Outfit)
             c.Outfit = Outfit.Copy();
@@ -212,6 +224,12 @@ class OZT_TradersFile : OZ_ConfigBase
                     p.BuyFactor = 1;
                 if (p.SellFactor <= 0)
                     p.SellFactor = 1;
+                if (p.Stock != "" && !OZT_Ids.IsSafe(p.Stock))
+                {
+                    OZT_Log.Warn("Traders: '" + p.Id + "' names the stock '" + p.Stock + "': letters, digits, _ and - only. Using its own");
+                    p.Stock = "";
+                    warnings++;
+                }
                 kept.Insert(p);
             }
         }

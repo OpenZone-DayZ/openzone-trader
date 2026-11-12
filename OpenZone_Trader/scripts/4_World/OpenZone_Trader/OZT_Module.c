@@ -35,6 +35,9 @@ class OZT_Module : CF_ModuleWorld
         OZT_Config.ServerLoad();
 
         OZT_Book.Rebuild();
+        // The stock of every shelf, restocked and destocked by the settings
+        // (design §11.1).
+        OZT_Stock.Start();
         OZT_Money.Provide(new OZT_ItemMoney());
         // The identity kinds are this mod's own: they need the core alone.
         OZT_Gates.Provide(new OZT_FactionGate());
@@ -87,6 +90,7 @@ class OZT_Module : CF_ModuleWorld
         OZT_Money.Reset();
         OZT_Gates.Reset();
         OZT_Book.Reset();
+        OZT_Stock.Reset();
 
         // The core empties its own registries at mission end; the objects at
         // the points are ours to take away, and so is our handler of its packet.

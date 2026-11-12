@@ -29,8 +29,11 @@ class OZT_WireGoods
     // What this trader pays for a pristine one. 0: not taken here.
     int Sell = 0;
     string Rule = "";
-    // -1 while stock is unlimited: the headroom for finite stock (design §11).
+    // How many this trader holds of the line (design §11.1); -1: unlimited.
     int Stock = -1;
+    // The condition the line's things are in: 0 pristine .. 3 badly damaged.
+    // A stocked class is sent once per condition it holds.
+    int Level = 0;
     // What comes attached to one at this trader, each charged at its own
     // price: Buy is the sum.
     ref array<string> With;
@@ -183,6 +186,9 @@ class OZT_WireBuy
     int OnLow = 0;
     int OnHigh = 0;
     string SlotName = "";
+    // The condition of the stock line bought from (design §11.1); 0 for
+    // everything that is not stocked.
+    int Level = 0;
 
     void OZT_WireBuy()
     {
@@ -198,6 +204,7 @@ class OZT_WireBuy
         c.OnLow = OnLow;
         c.OnHigh = OnHigh;
         c.SlotName = SlotName;
+        c.Level = Level;
         if (Fit)
         {
             for (int i = 0; i < Fit.Count(); i++)

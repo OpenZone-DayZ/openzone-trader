@@ -83,6 +83,10 @@ class OZT_Tree
     int Inside;
 
     protected OZT_Point m_Trader;
+    // The deal's stock moves (design §11.1): every sold node and lot of a
+    // stocked class is brought into it as it is priced. Null: prices at the
+    // stock as it stands, nothing moved (the `open` answer).
+    protected OZT_StockCursor m_Cursor;
     protected ref array<EntityAI> m_Keep;
     protected ref array<EntityAI> m_KeepRounds;
     protected ref array<EntityAI> m_Whole;
@@ -101,11 +105,12 @@ class OZT_Tree
 
     // `keep` is what the request keeps (null: nothing); `whole` is every thing
     // the same deal sells whole (null: nothing else is sold).
-    static OZT_Tree Read(OZT_Point trader, EntityAI root, array<ref OZT_WireKeep> keep, array<EntityAI> whole)
+    static OZT_Tree Read(OZT_Point trader, EntityAI root, array<ref OZT_WireKeep> keep, array<EntityAI> whole, OZT_StockCursor cursor = null)
     {
         OZT_Tree t = new OZT_Tree();
         t.m_Trader = trader;
         t.m_Whole = whole;
+        t.m_Cursor = cursor;
         if (keep)
         {
             for (int k = 0; k < keep.Count(); k++)
@@ -124,7 +129,7 @@ class OZT_Tree
         }
 
         OZT_Node top = t.AddNode(root, null, NOT_TAKEN);
-        int price = OZT_Book.SellPrice(trader, OZT_Book.EntryOf(root.GetType()), root, 1);
+        int price = OZT_Book.SellPriceAt(trader, OZT_Book.EntryOf(root.GetType()), root, 1, cursor);
         if (price <= 0)
             return t;
         top.State = SOLD;
@@ -189,7 +194,7 @@ class OZT_Tree
                 Riders(kept);
                 continue;
             }
-            int price = OZT_Book.SellPrice(m_Trader, OZT_Book.EntryOf(part.GetType()), part, 1);
+            int price = OZT_Book.SellPriceAt(m_Trader, OZT_Book.EntryOf(part.GetType()), part, 1, m_Cursor);
             if (price <= 0)
             {
                 OZT_Node stays = AddNode(part, node, NOT_TAKEN);
@@ -359,18 +364,29 @@ class OZT_Tree
             return;
 
         float price = entry.Sell * m_Trader.SellFactor * OZT_Config.Get().Settings().Condition.Of(lot.Level);
-        if (entry.Rule == OZT_Const.RULE_UNIT)
+        int paid;
+        if (entry.Stocked && entry.Rule == OZT_Const.RULE_UNIT)
         {
-            price = price * lot.Count;
+            // Rounds of a stocked pile go into its pristine line round by
+            // round, at the stock each brings it to (design §11.1): what a
+            // deal hands back of a pile is new.
+            paid = OZT_Book.SellUnits(m_Trader, entry, 0, lot.Count, price, m_Cursor);
         }
         else
         {
-            float most = PileMax(lot.Pile);
-            if (most < lot.Count)
-                most = lot.Count;
-            price = price * lot.Count / most;
+            if (entry.Rule == OZT_Const.RULE_UNIT)
+            {
+                price = price * lot.Count;
+            }
+            else
+            {
+                float most = PileMax(lot.Pile);
+                if (most < lot.Count)
+                    most = lot.Count;
+                price = price * lot.Count / most;
+            }
+            paid = OZT_Config.RoundDownTo(price, OZT_Config.Get().Unit());
         }
-        int paid = OZT_Config.RoundDownTo(price, OZT_Config.Get().Unit());
         if (paid <= 0)
             return;
         lot.Kept = false;

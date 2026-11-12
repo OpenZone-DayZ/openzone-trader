@@ -79,7 +79,7 @@
         { "Id": "weapons", "Name": "Зброя",
           "Discounts": [ { "Percent": 10, "When": [ { "Kind": "post", "Arg": "quartermaster" } ] } ],
           "Goods": [
-            { "ClassName": "AKM", "Buy": 2500, "Sell": 1250 },
+            { "ClassName": "AKM", "Buy": 2500, "Sell": 1250, "Stock": { "Max": 3, "Coefficient": 0.95, "Destock": 0.25 } },
             { "ClassName": "Mag_AKM_30Rnd", "Buy": 180, "Sell": 90 },
             { "ClassName": "PSO1Optic", "Buy": 600, "Sell": 300 },
             { "ClassName": "PSO11Optic", "Buy": 900, "Sell": 450 },
@@ -93,10 +93,10 @@
             { "ClassName": "AK_WoodHndgrd", "Buy": 150, "Sell": 75 },
             { "ClassName": "AK_RailHndgrd", "Buy": 300, "Sell": 150 },
             { "ClassName": "AK_PlasticHndgrd", "Buy": 200, "Sell": 100 },
-            { "ClassName": "UniversalLight", "Buy": 200, "Sell": 100 },
+            { "ClassName": "UniversalLight", "Buy": 200, "Sell": 100, "Stock": { "Max": 0, "Coefficient": 1 } },
             { "ClassName": "Mag_AKM_Palm30Rnd", "Buy": 220, "Sell": 110 },
             { "ClassName": "Mag_AKM_Drum75Rnd", "Buy": 600, "Sell": 300 },
-            { "ClassName": "M4A1", "Buy": 3000, "Sell": 1500 },
+            { "ClassName": "M4A1", "Buy": 3000, "Sell": 1500, "Stock": { "Max": 2, "Coefficient": 0.9 } },
             { "ClassName": "Mag_STANAG_30Rnd", "Buy": 200, "Sell": 100 },
             { "ClassName": "M4_RISHndgrd", "Buy": 300, "Sell": 150 },
             { "ClassName": "M4_PlasticHndgrd", "Buy": 150, "Sell": 75 },
@@ -115,7 +115,7 @@
         { "Id": "ammo", "Name": "Набої",
           "Requires": [ { "Kind": "faction", "Arg": "duty" } ],
           "Goods": [
-            { "ClassName": "Ammo_762x39", "Buy": 10, "Sell": 5, "Quantity": "unit" },
+            { "ClassName": "Ammo_762x39", "Buy": 10, "Sell": 5, "Quantity": "unit", "Stock": { "Max": 300 } },
             { "ClassName": "Ammo_556x45", "Buy": 10, "Sell": 5, "Quantity": "unit" },
             { "ClassName": "Nail", "Buy": 5, "Quantity": "unit" }
         ] },

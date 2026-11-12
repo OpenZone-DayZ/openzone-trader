@@ -9,6 +9,9 @@ class OZT_Const
     static const string GOODS    = "$profile:OpenZone\\OZ_Trader_Goods.json";
     static const string TRADERS  = "$profile:OpenZone\\OZ_Trader_Traders.json";
 
+    // The stock of each shelf (design §11.1): one small file per stock.
+    static const string STOCK_DIR = "$profile:OpenZone\\TraderStock";
+
     // The stand verb writes the last full answer of the service here.
     static const string LAST_ANSWER = "$profile:OpenZone\\trader_last.json";
 

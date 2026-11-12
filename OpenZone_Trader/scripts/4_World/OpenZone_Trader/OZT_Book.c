@@ -109,6 +109,12 @@ class OZT_BookEntry
     // Its category's gates and its own, together (design §8.2).
     ref array<ref OZT_Condition> Requires;
     ref array<ref OZT_Discount> Discounts;
+
+    // Finite goods (design §11.1): the line's Stock block; unlimited without.
+    bool Stocked;
+    int MaxStock;
+    float Coefficient = 1;
+    float Destock;
 }
 
 class OZT_Book
@@ -144,6 +150,14 @@ class OZT_Book
                 e.Discounts = new array<ref OZT_Discount>();
                 OZT_Discount.CopyAll(cat.Discounts, e.Discounts);
                 OZT_Discount.CopyAll(line.Discounts, e.Discounts);
+                e.Coefficient = 1;
+                if (line.Stock)
+                {
+                    e.Stocked = true;
+                    e.MaxStock = line.Stock.Max;
+                    e.Coefficient = line.Stock.Coefficient;
+                    e.Destock = line.Stock.Destock;
+                }
                 s_ByClass.Set(e.ClassName, e);
             }
         }
@@ -164,6 +178,7 @@ class OZT_Book
             // Money has no gates: a note is worth its face value to everyone.
             money.Requires = new array<ref OZT_Condition>();
             money.Discounts = new array<ref OZT_Discount>();
+            money.Coefficient = 1;
             s_ByClass.Set(money.ClassName, money);
         }
     }
@@ -265,6 +280,147 @@ class OZT_Book
         }
     }
 
+    // ---- stock (design §11.1) ----------------------------------------------------
+
+    // The share of a stocked line's price its condition gives: a pristine line
+    // is the goods' own price, a worn one the settings' factor of it.
+    static float LevelShare(int level)
+    {
+        if (level <= 0)
+            return 1;
+        return OZT_Config.Get().Settings().Condition.Of(level);
+    }
+
+    // The health a thing bought from a worn line is made with: the middle of
+    // its level's band (worn at 0.7 and below, damaged at 0.5, badly damaged
+    // at 0.3). Below zero: new.
+    static float LevelHealth(int level)
+    {
+        if (level == 1)
+            return 0.6;
+        if (level == 2)
+            return 0.4;
+        if (level == 3)
+            return 0.2;
+        return -1;
+    }
+
+    // The line a thing sold in this condition goes into.
+    static int StockLevel(int level)
+    {
+        if (OZT_Config.Get().Settings().StockOnlyPristine == 1)
+            return 0;
+        return level;
+    }
+
+    static float Curve(float coef, int n)
+    {
+        if (coef == 1 || n <= 0)
+            return 1;
+        return Math.Pow(coef, n);
+    }
+
+    // The line as it stands, or as the deal behind `cursor` has left it.
+    static int StockOf(OZT_Point trader, OZT_BookEntry e, int level, OZT_StockCursor cursor)
+    {
+        if (cursor)
+            return cursor.Count(e.ClassName, level);
+        return OZT_Stock.Count(trader.StockId(), e.ClassName, level);
+    }
+
+    // What this player pays here for `count` of the goods from the line of
+    // `level`. Unlimited goods: BuyFor, pristine only. Stocked goods: unit by
+    // unit at the stock each leaves, Buy x factor x share x Coefficient^(S-1-j),
+    // each rounded up to a note, the player's discount after that; 0 when the
+    // line holds fewer than `count`. With a cursor the units are taken from it.
+    static int BuyForAt(PlayerBase player, OZT_Point trader, OZT_BookEntry e, int level, int count, OZT_StockCursor cursor)
+    {
+        if (!e || count <= 0)
+            return 0;
+        if (!e.Stocked)
+        {
+            if (level != 0)
+                return 0;
+            return BuyFor(player, trader, e, count);
+        }
+        if (BuyPrice(trader, e, 1) <= 0)
+            return 0;
+        if (player && Locked(player, trader, e))
+            return 0;
+        int stock = StockOf(trader, e, level, cursor);
+        if (stock < count)
+            return 0;
+        float pct = 0;
+        if (player)
+            pct = OZT_Gates.Best(player, trader, e.Discounts);
+        int unit = OZT_Config.Get().Unit();
+        float base = e.Buy * trader.BuyFactor * LevelShare(level);
+        int sum = 0;
+        for (int j = 0; j < count; j++)
+        {
+            int piece = OZT_Config.RoundUpTo(base * Curve(e.Coefficient, stock - 1 - j), unit);
+            if (pct > 0)
+                piece = OZT_Config.RoundUpTo(piece * (100 - pct) / 100, unit);
+            sum = sum + piece;
+        }
+        if (cursor)
+            cursor.Move(e.ClassName, level, -count);
+        return sum;
+    }
+
+    // What one of the line costs now, for the shelf: a sold-out line shows
+    // the price its first unit would have.
+    static int ShelfPrice(PlayerBase player, OZT_Point trader, OZT_BookEntry e, int level)
+    {
+        if (!e || !e.Stocked)
+            return BuyFor(player, trader, e, 1);
+        int stock = StockOf(trader, e, level, null);
+        if (stock >= 1)
+            return BuyForAt(player, trader, e, level, 1, null);
+        if (BuyFor(player, trader, e, 1) <= 0)
+            return 0;
+        float pct = 0;
+        if (player)
+            pct = OZT_Gates.Best(player, trader, e.Discounts);
+        int unit = OZT_Config.Get().Unit();
+        int piece = OZT_Config.RoundUpTo(e.Buy * trader.BuyFactor * LevelShare(level), unit);
+        if (pct > 0)
+            piece = OZT_Config.RoundUpTo(piece * (100 - pct) / 100, unit);
+        return piece;
+    }
+
+    // What comes attached to `count` of the goods at this trader, stock
+    // counted: a stocked part the line cannot give `count` of stays off, as at a
+    // trader who does not sell it. Nothing is taken here.
+    static void ComesAt(PlayerBase player, OZT_Point trader, OZT_BookEntry e, int count, OZT_StockCursor cursor, out array<string> parts)
+    {
+        array<string> all;
+        Comes(player, trader, e, all);
+        parts = new array<string>();
+        for (int i = 0; i < all.Count(); i++)
+        {
+            OZT_BookEntry part = EntryOf(all[i]);
+            if (part && part.Stocked && StockOf(trader, part, 0, cursor) < count)
+                continue;
+            parts.Insert(all[i]);
+        }
+    }
+
+    // The shelf's price of one of a line with what comes with it (pristine
+    // only: a worn line comes bare).
+    static int ShelfWith(PlayerBase player, OZT_Point trader, OZT_BookEntry e, int level)
+    {
+        int own = ShelfPrice(player, trader, e, level);
+        if (own <= 0 || level != 0)
+            return own;
+        array<string> parts;
+        ComesAt(player, trader, e, 1, null, parts);
+        int sum = own;
+        for (int i = 0; i < parts.Count(); i++)
+            sum = sum + ShelfPrice(player, trader, EntryOf(parts[i]), 0);
+        return sum;
+    }
+
     // What the player pays for `count` of the goods as this trader sells
     // them: each with what comes with it, every part at its own price. Nothing
     // comes free, so a sum of classes makes no loop while no class alone does.
@@ -296,6 +452,66 @@ class OZT_Book
         // A note at face value, worn or not: what money counts it as.
         if (e.Category == OZT_Const.CATEGORY_CHANGE)
             return e.Sell * count;
+        float price = SellPlain(trader, e, item, count);
+        int unit = OZT_Config.Get().Unit();
+        return OZT_Config.RoundDownTo(price, unit);
+    }
+
+    // What the trader pays for `count` units of `item`, stock counted (design
+    // §11.1). Unlimited goods: SellPrice. A stocked line pays its units at the
+    // stock each grows it to, x Coefficient^(max(S+j,1)-1) (TraderPlus's own
+    // formula); a unit is a unit of a stack under the unit rule, the thing
+    // otherwise. With a cursor the units are brought into it when the trader
+    // takes them.
+    static int SellPriceAt(OZT_Point trader, OZT_BookEntry e, EntityAI item, int count, OZT_StockCursor cursor)
+    {
+        if (!e || !e.Stocked)
+            return SellPrice(trader, e, item, count);
+        if (!item || !Deals(trader, e) || e.Sell <= 0)
+            return 0;
+        int level = item.GetHealthLevel();
+        if (level >= OZT_Const.LEVEL_RUINED)
+            return 0;
+        int units = 1;
+        if (e.Rule == OZT_Const.RULE_UNIT)
+            units = count;
+        if (units < 1)
+            return 0;
+        float each = SellPlain(trader, e, item, count) / units;
+        int into = StockLevel(level);
+        // A pile's units go into the pristine line: what a deal hands back
+        // of a pile is new.
+        if (e.Rule == OZT_Const.RULE_UNIT)
+            into = 0;
+        int paid = SellUnits(trader, e, into, units, each, cursor);
+        return paid;
+    }
+
+    // `units` units brought into the line of `level` at `each` apiece before
+    // the curve; the sum rounded down to a note. Brought into the cursor when
+    // anything is paid.
+    static int SellUnits(OZT_Point trader, OZT_BookEntry e, int level, int units, float each, OZT_StockCursor cursor)
+    {
+        int stock = StockOf(trader, e, level, cursor);
+        float sum = 0;
+        for (int j = 0; j < units; j++)
+        {
+            int n = stock + j;
+            if (n < 1)
+                n = 1;
+            sum = sum + each * Curve(e.Coefficient, n - 1);
+        }
+        int paid = OZT_Config.RoundDownTo(sum, OZT_Config.Get().Unit());
+        if (paid > 0 && cursor)
+            cursor.Move(e.ClassName, level, units);
+        return paid;
+    }
+
+    // The trader's price for `count` units of `item` before rounding, by the
+    // goods' quantity rule and the thing's condition.
+    static float SellPlain(OZT_Point trader, OZT_BookEntry e, EntityAI item, int count)
+    {
+        int level = item.GetHealthLevel();
         float price = e.Sell * trader.SellFactor * OZT_Config.Get().Settings().Condition.Of(level);
         if (e.Rule == OZT_Const.RULE_UNIT)
         {
@@ -318,7 +534,6 @@ class OZT_Book
         {
             price = price * OZT_Stack.Fraction(item);
         }
-        int unit = OZT_Config.Get().Unit();
-        return OZT_Config.RoundDownTo(price, unit);
+        return price;
     }
 }

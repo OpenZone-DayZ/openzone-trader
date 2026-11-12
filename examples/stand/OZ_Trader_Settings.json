@@ -12,5 +12,8 @@
     "Holders": [ "OZT_ProbeWallet" ],
     "Condition": { "Pristine": 1, "Worn": 0.85, "Damaged": 0.6, "BadlyDamaged": 0.35 },
     "CooldownMs": 0,
-    "WearBought": 1
+    "WearBought": 1,
+    "StartStock": 1,
+    "DestockAtStart": 1,
+    "StockOnlyPristine": 0
 }

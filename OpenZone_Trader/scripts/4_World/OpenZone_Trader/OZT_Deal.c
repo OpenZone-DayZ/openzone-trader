@@ -126,6 +126,11 @@ class OZT_Deal
     protected ref array<string> m_BuyClasses;
     protected ref array<int> m_BuyCounts;
     protected ref array<string> m_BuyRules;
+    // The condition of the stock line each bought line comes from (design
+    // §11.1): 0 for everything that is not stocked.
+    protected ref array<int> m_BuyLevels;
+    // What the deal takes from the trader's stock and brings into it.
+    protected ref OZT_StockCursor m_Cursor;
 
     // The parts of each bought line (an empty list for a plain one), and the
     // parts bought onto things the player carries.
@@ -195,6 +200,7 @@ class OZT_Deal
         m_BuyClasses = new array<string>();
         m_BuyCounts = new array<int>();
         m_BuyRules = new array<string>();
+        m_BuyLevels = new array<int>();
         m_BuyParts = new array<ref OZT_PartList>();
         m_Ontos = new array<ref OZT_Onto>();
         m_Homeless = new array<string>();
@@ -267,6 +273,7 @@ class OZT_Deal
         string why = CheckPlayer(traderId, commit);
         if (why != "")
             return why;
+        m_Cursor = new OZT_StockCursor(m_Trader.StockId());
         why = ReadSells(sells);
         if (why != "")
             return why;
@@ -411,7 +418,7 @@ class OZT_Deal
                 }
                 // A ruined thing prices at zero.
                 OZT_BookEntry entry = OZT_Book.EntryOf(e.GetType());
-                price = OZT_Book.SellPrice(m_Trader, entry, e, units);
+                price = OZT_Book.SellPriceAt(m_Trader, entry, e, units, m_Cursor);
                 if (price <= 0)
                     return OZT_Const.NO_NOT_TAKEN;
                 if (entry.Category == OZT_Const.CATEGORY_CHANGE)
@@ -431,7 +438,7 @@ class OZT_Deal
             {
                 // "Not taken" before "not empty": if the trader does not want
                 // the thing, emptying it would not help.
-                OZT_Tree tree = OZT_Tree.Read(m_Trader, e, line.Keep, whole);
+                OZT_Tree tree = OZT_Tree.Read(m_Trader, e, line.Keep, whole, m_Cursor);
                 if (!tree.Taken())
                     return OZT_Const.NO_NOT_TAKEN;
                 if (tree.Inside > 0)
@@ -529,7 +536,18 @@ class OZT_Deal
             // catalogue the client holds is stale.
             if (OZT_Book.Locked(m_Player, m_Trader, entry))
                 return OZT_Const.NO_LOCKED;
-            int price = OZT_Book.BuyFor(m_Player, m_Trader, entry, line.Count);
+            // A stock line (design §11.1): its condition, and enough in it.
+            int level = line.Level;
+            bool stocked = false;
+            if (entry)
+                stocked = entry.Stocked;
+            if (level < 0 || level >= OZT_Const.LEVEL_RUINED)
+                return OZT_Const.NO_CHANGED;
+            if (level > 0 && !stocked)
+                return OZT_Const.NO_CHANGED;
+            if (stocked && line.Count > 0 && m_Cursor.Count(entry.ClassName, level) < line.Count)
+                return OZT_Const.NO_STOCK;
+            int price = OZT_Book.BuyForAt(m_Player, m_Trader, entry, level, line.Count, m_Cursor);
             if (price <= 0)
                 return OZT_Const.NO_CHANGED;
 
@@ -585,6 +603,7 @@ class OZT_Deal
                 m_BuyClasses.Insert(entry.ClassName);
                 m_BuyCounts.Insert(line.Count);
                 m_BuyRules.Insert(entry.Rule);
+                m_BuyLevels.Insert(level);
                 m_BuyParts.Insert(list);
             }
             m_Lines = m_Lines + word;
@@ -622,9 +641,14 @@ class OZT_Deal
             root = 0;
         }
 
-        // What the goods come with at this trader, each for every piece.
+        // What the goods come with at this trader, each for every piece: a
+        // stocked part the stock cannot give stays off; a worn line comes bare
+        // (design §11.1).
         array<string> comes;
-        OZT_Book.Comes(m_Player, m_Trader, entry, comes);
+        if (line.Level == 0)
+            OZT_Book.ComesAt(m_Player, m_Trader, entry, line.Count, m_Cursor, comes);
+        else
+            comes = new array<string>();
         for (int c = 0; c < comes.Count(); c++)
         {
             why = AddPart(parts, comes[c], "", root, entry.ClassName);
@@ -633,7 +657,7 @@ class OZT_Deal
                 OZT_Log.Error("deal: '" + entry.ClassName + "' comes with '" + comes[c] + "', which found no slot on it");
                 return OZT_Const.NO_INTERNAL;
             }
-            extra = extra + OZT_Book.BuyFor(m_Player, m_Trader, OZT_Book.EntryOf(comes[c]), line.Count);
+            extra = extra + OZT_Book.BuyForAt(m_Player, m_Trader, OZT_Book.EntryOf(comes[c]), 0, line.Count, m_Cursor);
         }
 
         // What the request fits: goods of this trader, an entry hanging on the
@@ -647,7 +671,9 @@ class OZT_Deal
             OZT_BookEntry sold = OZT_Book.EntryOf(fit.ClassName);
             if (OZT_Book.Locked(m_Player, m_Trader, sold))
                 return OZT_Const.NO_LOCKED;
-            int cost = OZT_Book.BuyFor(m_Player, m_Trader, sold, 1);
+            if (sold && sold.Stocked && m_Cursor.Count(sold.ClassName, 0) < 1)
+                return OZT_Const.NO_STOCK;
+            int cost = OZT_Book.BuyForAt(m_Player, m_Trader, sold, 0, 1, m_Cursor);
             if (cost <= 0)
                 return OZT_Const.NO_CHANGED;
             if (fit.On >= f)
@@ -1076,7 +1102,7 @@ class OZT_Deal
             if (m_BuyRules[b] == OZT_Const.RULE_UNIT && OZT_Stack.Countable(probe))
                 PlaceUnits(type, m_BuyCounts[b], false);
             else
-                PlacePieces(type, m_BuyCounts[b], wear, m_BuyParts[b]);
+                PlacePieces(type, m_BuyCounts[b], wear, m_BuyParts[b], OZT_Book.LevelHealth(m_BuyLevels[b]));
         }
 
         // The rounds that come back: stacks of their own, as they were.
@@ -1234,8 +1260,9 @@ class OZT_Deal
     // `count` pieces of a class: a free slot of the character first when bought
     // gear is worn (decision 4), then a cargo. A thing that goes onto a slot
     // needs no cells and is never the one set aside. `parts` arrive on every
-    // piece; they need no place of their own.
-    protected void PlacePieces(string type, int count, bool wear, OZT_PartList parts)
+    // piece; they need no place of their own. `health` below zero: new;
+    // otherwise the health a worn stock line's things are made with.
+    protected void PlacePieces(string type, int count, bool wear, OZT_PartList parts, float health = -1)
     {
         for (int i = 0; i < count; i++)
         {
@@ -1249,12 +1276,12 @@ class OZT_Deal
                 placed = m_Model.PlaceInCargo(type, false, place);
             if (placed)
             {
-                AddMake(type, place, 0, -1);
+                AddMake(type, place, 0, health);
                 if (parts.Items.Count() > 0)
                     m_Makes[m_Makes.Count() - 1].Parts = parts;
                 continue;
             }
-            AddHomeless(type, 0, -1);
+            AddHomeless(type, 0, health);
             m_HomelessParts.Set(m_HomelessParts.Count() - 1, parts);
         }
     }
@@ -1437,6 +1464,9 @@ class OZT_Deal
 
         if (!m_Money.Physical() && m_Net < 0)
             m_Money.Give(m_Player, -m_Net, "deal");
+
+        // The stock moves of the deal onto the shelf and into its file.
+        m_Cursor.Commit();
 
         string uid = Uid();
         int now = GetGame().GetTime();

@@ -11,6 +11,79 @@ class OZT_Open
     // count the stock holds. Locked goods are not shown to this player (design
     // §8.2): nothing to buy, and the shelf shows nothing it cannot sell. Null:
     // nothing to show.
+    // Colour variants (design §3.8): records of one category with the same
+    // price, rule, condition and stock kind and what comes with them, whose
+    // classes share their parent in the game's config and the name the game
+    // shows (vanilla's colours are children of one *_ColorBase), form a group
+    // the shelf draws as one tile. Each record keeps its class and its stock.
+    protected static void GroupVariants(array<ref OZT_WireGoods> goods)
+    {
+        array<string> keys = new array<string>();
+        map<string, int> sizes = new map<string, int>();
+        for (int i = 0; i < goods.Count(); i++)
+        {
+            string key = VariantKey(goods[i]);
+            keys.Insert(key);
+            if (key == "")
+                continue;
+            int had = 0;
+            sizes.Find(key, had);
+            sizes.Set(key, had + 1);
+        }
+
+        map<string, string> ids = new map<string, string>();
+        for (int k = 0; k < goods.Count(); k++)
+        {
+            int size = 0;
+            if (keys[k] == "" || !sizes.Find(keys[k], size) || size < 2)
+                continue;
+            string id;
+            if (!ids.Find(keys[k], id))
+            {
+                id = "v" + ids.Count().ToString();
+                ids.Set(keys[k], id);
+            }
+            goods[k].Group = id;
+        }
+    }
+
+    protected static string VariantKey(OZT_WireGoods g)
+    {
+        if (g.Look != "" || g.Buy <= 0 || g.Category == OZT_Const.CATEGORY_CHANGE)
+            return "";
+        string root = ConfigRootOf(g.ClassName);
+        if (root == "")
+            return "";
+        string parent;
+        if (!GetGame().ConfigGetBaseName(root + " " + g.ClassName, parent) || parent == "")
+            return "";
+        string shown;
+        GetGame().ConfigGetText(root + " " + g.ClassName + " displayName", shown);
+        if (shown == "")
+            return "";
+        string stocked = "u";
+        if (g.Stock >= 0)
+            stocked = "s";
+        string parts = "";
+        for (int w = 0; w < g.With.Count(); w++)
+            parts += g.With[w] + ",";
+        string key = g.Category + "|" + parent + "|" + shown;
+        key += "|" + g.Buy.ToString() + "|" + g.Sell.ToString() + "|" + g.Rule;
+        key += "|" + g.Level.ToString() + "|" + stocked + "|" + parts;
+        return key;
+    }
+
+    protected static string ConfigRootOf(string type)
+    {
+        if (GetGame().ConfigIsExisting("CfgVehicles " + type))
+            return "CfgVehicles";
+        if (GetGame().ConfigIsExisting("CfgWeapons " + type))
+            return "CfgWeapons";
+        if (GetGame().ConfigIsExisting("CfgMagazines " + type))
+            return "CfgMagazines";
+        return "";
+    }
+
     protected static OZT_WireGoods Record(PlayerBase player, OZT_Point trader, OZT_BookEntry e, int level, int unit)
     {
         OZT_WireGoods wg = new OZT_WireGoods();
@@ -151,6 +224,9 @@ class OZT_Open
                     res.Goods.Insert(none);
             }
         }
+
+        if (OZT_Config.Get().Settings().GroupVariants == 1)
+            GroupVariants(res.Goods);
 
         // The change tab: the server's notes at face value, when this trader
         // changes them. The screen names the tab itself.

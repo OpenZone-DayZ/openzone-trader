@@ -79,6 +79,14 @@ class OZT_Tile
     // off and the thing being changed was lost from sight).
     bool Held;
 
+    // Colour variants on the shelf (design §3.8): the group, the colours in
+    // the shelf's order and which one the tile shows.
+    string Group;
+    ref array<string> VarTypes;
+    int VarAt;
+    protected Widget m_VarPrev;
+    protected Widget m_VarNext;
+
     void OZT_Tile(int kind, string type, EntityAI item)
     {
         Kind = kind;
@@ -123,6 +131,8 @@ class OZT_Tile
         m_PriceText = TextWidget.Cast(Root.FindAnyWidget("TilePrice"));
         m_QtyText = TextWidget.Cast(Root.FindAnyWidget("TileQty"));
         m_QtyTop = TextWidget.Cast(Root.FindAnyWidget("TileQtyTop"));
+        m_VarPrev = Root.FindAnyWidget("TileVarPrev");
+        m_VarNext = Root.FindAnyWidget("TileVarNext");
         if (m_Pic && Item)
         {
             m_Pic.SetItem(Item);
@@ -250,6 +260,11 @@ class OZT_Tile
             if (level > 0)
                 m_Pip.SetColor(OZT_Look.Condition(level));
         }
+        bool variants = Kind == SHELF && VarTypes && VarTypes.Count() > 1;
+        if (m_VarPrev)
+            m_VarPrev.Show(variants);
+        if (m_VarNext)
+            m_VarNext.Show(variants);
         SetPicked(m_Picked);
     }
 

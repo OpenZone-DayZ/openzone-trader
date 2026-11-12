@@ -66,6 +66,10 @@ class OZT_TradeMenu : UIScriptedMenu
     protected string m_Trader;
     protected ref OZT_OpenRes m_Data;
     protected ref OZT_Shelf m_Shelf;
+
+    // The colour each group of variants shows on the shelf (design §3.8), by
+    // class: kept while the screen is open, across new answers of `open`.
+    protected ref map<string, string> m_VariantPick;
     protected ref OZT_Cart m_Cart;
 
     protected ref OZT_TileGrid m_ShelfGrid;
@@ -216,6 +220,7 @@ class OZT_TradeMenu : UIScriptedMenu
     void OZT_TradeMenu()
     {
         m_Shelf = new OZT_Shelf();
+        m_VariantPick = new map<string, string>();
         m_Cart = new OZT_Cart();
         m_TabIds = new array<string>();
         m_OwnIds = new array<string>();
@@ -1204,28 +1209,42 @@ class OZT_TradeMenu : UIScriptedMenu
             return;
         m_ShelfGrid.Clear();
         string cat = m_TabIds[m_ShelfTab];
+
+        // The colours of each group the shelf shows now (design §3.8).
+        map<string, ref array<string>> colours = new map<string, ref array<string>>();
+        for (int v = 0; v < m_Data.Goods.Count(); v++)
+        {
+            OZT_WireGoods vg = m_Data.Goods[v];
+            if (vg.Group == "" || !ShelfShows(vg, cat))
+                continue;
+            array<string> members = colours.Get(vg.Group);
+            if (!members)
+            {
+                members = new array<string>();
+                colours.Set(vg.Group, members);
+            }
+            if (members.Find(vg.ClassName) < 0)
+                members.Insert(vg.ClassName);
+        }
+
         for (int i = 0; i < m_Data.Goods.Count(); i++)
         {
             OZT_WireGoods g = m_Data.Goods[i];
-            if (g.Buy <= 0)
+            if (!ShelfShows(g, cat))
                 continue;
-            // Under a slot's filter: what fits the slot, from every category,
-            // and what the thing would take beside what it holds.
-            if (m_Filter)
+            // One tile per group: the colour picked last, else the first.
+            array<string> group = null;
+            int at = 0;
+            if (g.Group != "")
+                group = colours.Get(g.Group);
+            if (group && group.Count() > 1)
             {
-                if (!OZT_Fit.SlotOf(m_Filter.HostType, g.ClassName, m_Filter.SlotName))
+                string shown;
+                if (!m_VariantPick.Find(g.Group, shown) || group.Find(shown) < 0)
+                    shown = group[0];
+                if (g.ClassName != shown)
                     continue;
-                if (!EngineTakes(g.ClassName, m_Filter))
-                    continue;
-            }
-            else if (cat != "" && g.Category != cat)
-            {
-                continue;
-            }
-            else if (cat == "" && g.Category == OZT_Const.CATEGORY_CHANGE)
-            {
-                // Money is not goods: the notes stand only in their own tab.
-                continue;
+                at = group.Find(shown);
             }
             // Drawn as it comes: with what the price book gives it, a worn
             // stock line in its condition.
@@ -1242,6 +1261,12 @@ class OZT_TradeMenu : UIScriptedMenu
             t.Price = g.Buy;
             t.Index = i;
             t.Level = g.Level;
+            if (group && group.Count() > 1)
+            {
+                t.Group = g.Group;
+                t.VarTypes = group;
+                t.VarAt = at;
+            }
             // A stocked line shows what it holds; a sold-out one lies dark.
             if (g.Stock > 0)
                 t.Count = g.Stock;
@@ -1253,6 +1278,40 @@ class OZT_TradeMenu : UIScriptedMenu
                 Relight(t, true);
         }
         m_ShelfGrid.Arrange();
+    }
+
+    // Goods the shelf shows in this tab (or under a slot's filter).
+    protected bool ShelfShows(OZT_WireGoods g, string cat)
+    {
+        if (g.Buy <= 0)
+            return false;
+        // Under a slot's filter: what fits the slot, from every category,
+        // and what the thing would take beside what it holds.
+        if (m_Filter)
+        {
+            if (!OZT_Fit.SlotOf(m_Filter.HostType, g.ClassName, m_Filter.SlotName))
+                return false;
+            return EngineTakes(g.ClassName, m_Filter);
+        }
+        if (cat != "")
+            return g.Category == cat;
+        // Money is not goods: the notes stand only in their own tab.
+        return g.Category != OZT_Const.CATEGORY_CHANGE;
+    }
+
+    // An arrow of a tile of colour variants: the next or the previous colour
+    // of its group, and the shelf drawn again (design §3.8).
+    protected void StepVariant(OZT_Tile t, bool forward)
+    {
+        if (!t || !t.VarTypes || t.VarTypes.Count() < 2)
+            return;
+        int n = t.VarTypes.Count();
+        int at = t.VarAt + 1;
+        if (!forward)
+            at = t.VarAt - 1 + n;
+        at = at % n;
+        m_VariantPick.Set(t.Group, t.VarTypes[at]);
+        FillShelf();
     }
 
     // Everything the player carries, one tile each: what the trader pays for
@@ -2640,6 +2699,20 @@ class OZT_TradeMenu : UIScriptedMenu
             bool ownCard = m_PartsAt && m_PartsAt.Kind == OZT_Tile.OWN;
             if (slot && ownCard && slot.What == OZT_PartsEntry.PART && slot.Host)
                 AimFilter(slot, cell, false);
+        }
+
+        // A colour arrow takes the press itself: it switches the colour and
+        // neither picks nor drags the tile (design §3.8).
+        if (w)
+        {
+            string arrow = w.GetName();
+            if (arrow.IndexOf("TileVarPrev") == 0 || arrow.IndexOf("TileVarNext") == 0)
+            {
+                OZT_Tile vt = m_ShelfGrid.Of(w);
+                if (vt)
+                    StepVariant(vt, arrow.IndexOf("TileVarNext") == 0);
+                return true;
+            }
         }
 
         OZT_Tile t = TileOf(w);

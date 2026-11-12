@@ -41,6 +41,9 @@ class OZT_WireGoods
     // What comes attached to one at this trader, each charged at its own
     // price: Buy is the sum.
     ref array<string> With;
+    // Colour variants (design §3.8): records of one group stand on the shelf
+    // as one tile. Empty: the record stands alone.
+    string Group = "";
 
     void OZT_WireGoods()
     {

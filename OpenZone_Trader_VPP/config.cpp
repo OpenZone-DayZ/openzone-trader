@@ -1,5 +1,6 @@
-// OpenZone Trader VPP -- the pane TRADERS of the OpenZone admin window, its own
-// pbo (design §9.5).
+// OpenZone Trader VPP -- the module TRADER of the OpenZone admin window, its own
+// pbo (design §9.5; the window's rework 2026-11-12, design §5.6): the trader's
+// pages on the window's rail.
 //
 // The glue knows two mods at once, the trader and the core's VPP window, and so
 // lives in a third pbo: a server without VPP Admin Tools runs the trader

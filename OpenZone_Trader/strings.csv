@@ -138,3 +138,81 @@ STR_OZT_ADMIN_NO_THING,"Там, куди ви дивились, немає ре�
 STR_OZT_ADMIN_TAKEN,Ця річ уже торговець,This thing is a trader already
 STR_OZT_ADMIN_MAP_FIXED,"Річ мапи стоїть, як її поставила мапа: її не пересунути, не повернути й не вдягнути","A thing of the map stays as the map has it: it cannot be moved, turned or dressed"
 STR_OZT_NO_ACCESS,Цей торговець з вами не торгує,This trader does not deal with you
+# The OpenZone admin window's trader pages (VPP rework 2026-11-12, OpenZone_Trader_VPP).
+STR_OZT_VPP_MOD,ТОРГОВЕЦЬ,TRADER
+STR_OZT_VPP_PAGE_POINTS,Точки,Points
+STR_OZT_VPP_PAGE_LICENCES,Ліцензії,Licences
+STR_OZT_VPP_PAGE_IMPORT,Iмпорт TraderPlus,TraderPlus import
+STR_OZT_VPP_REFRESH,Оновити,Refresh
+STR_OZT_VPP_UNREADABLE,Відповідь не прочитано:,The answer could not be read:
+STR_OZT_VPP_KIND_OBJECT,об'єкт,object
+STR_OZT_VPP_KIND_NPC,NPC,NPC
+STR_OZT_VPP_KIND_MAP,річ мапи,map thing
+STR_OZT_VPP_CHANGE_YES,міняє купюри,changes notes
+STR_OZT_VPP_CHANGE_NO,не міняє,does not change
+STR_OZT_VPP_PT_TITLE,Точки торговців,Trader points
+STR_OZT_VPP_PT_SUB,"Де стоять торговці, чим торгують і хто до них допущений","Where the traders stand, what they deal in and who may trade there"
+STR_OZT_VPP_PT_RESPAWN,Перезапустити точки,Respawn all points
+STR_OZT_VPP_PT_RESPAWN_ASK,Перезапустити всі точки? Торговців буде прибрано й поставлено знову за файлом.,Respawn every point? The traders are taken away and made again from the file.
+STR_OZT_VPP_YES_RESPAWN,"Так, перезапустити","Yes, respawn"
+STR_OZT_VPP_PT_NEW,"Нова точка: id, клас, вид","A new point: id, class, kind"
+STR_OZT_VPP_PT_PLACE,+ На моєму місці,+ Where I stand
+STR_OZT_VPP_PT_ADOPT,"Торговцем: те, що бачу",Make what I see a trader
+STR_OZT_VPP_PT_PICK,Виберіть точку в списку,Pick a point on the list
+STR_OZT_VPP_PT_PICK_FIRST,Спершу виберіть точку в списку,Pick a point on the list first
+STR_OZT_VPP_PT_SEC_MAIN,ОСНОВНЕ,MAIN
+STR_OZT_VPP_PT_NAME,Назва,Name
+STR_OZT_VPP_PT_RADIUS,"Радіус, м","Radius, m"
+STR_OZT_VPP_PT_KIND,Вид,Kind
+STR_OZT_VPP_PT_CLASS,Клас,Class
+STR_OZT_VPP_PT_BUY,Купівля x,Buy x
+STR_OZT_VPP_PT_SELL,Скупка x,Sell x
+STR_OZT_VPP_PT_CATS,Категорії,Categories
+STR_OZT_VPP_PT_CATS_KNOWN,Категорії книги цін:,Categories of the price book:
+STR_OZT_VPP_PT_SEC_PLACE,МIСЦЕ,PLACE
+STR_OZT_VPP_PT_MOVE,"Сюди, де я",Move here
+STR_OZT_VPP_PT_TURN,Обличчям як я,Face as I do
+STR_OZT_VPP_PT_OUTFIT,Одягти як я,Dress as I am
+STR_OZT_VPP_PT_SEC_MONEY,ГРОШI Й ДОСТУП,MONEY AND ACCESS
+STR_OZT_VPP_PT_MONEY,Гроші,Money
+STR_OZT_VPP_PT_CHANGE,Розмін,Change
+STR_OZT_VPP_PT_REMOVE,Прибрати точку,Remove point
+STR_OZT_VPP_PT_SAVE,Зберегти точку,Save point
+STR_OZT_VPP_PT_REMOVE_ASK,Прибрати точку,Remove the point
+STR_OZT_VPP_PT_REMOVE_TAIL,"? Її рядок зникне з файла торговців, а торговець зі світу.",? Its entry leaves the traders file and the trader leaves the world.
+STR_OZT_VPP_YES_REMOVE,"Так, прибрати","Yes, remove"
+STR_OZT_VPP_PT_STANDING,стоїть у світі,stands in the world
+STR_OZT_VPP_PT_NOT_STANDING,не стоїть,not standing
+STR_OZT_VPP_PT_FACING,поворот,facing
+STR_OZT_VPP_PT_WEARS,одягу,worn
+STR_OZT_VPP_PT_MAP_FIXED,Річ мапи лишає свій вид і свою річ,A map point keeps its kind and its thing
+STR_OZT_VPP_PT_NOTHING_AIMED,"Там, куди ви дивились, нічого немає: закрийте вікно, подивіться на річ і відкрийте його знову","Nothing where you looked: close the window, look at the thing, open it again"
+STR_OZT_VPP_PT_ADOPTING,Робимо торговцем:,Making a trader of:
+STR_OZT_VPP_LC_TITLE,Ліцензії,Licences
+STR_OZT_VPP_LC_SUB,"Запис на персонажі, без строку. Купується як товар @licence:<id> або видається тут.","A record on the character, with no expiry. Bought as goods @licence:<id> or given here."
+STR_OZT_VPP_LC_DEFS,ЛIЦЕНЗIЇ СЕРВЕРА,THE SERVER'S LICENCES
+STR_OZT_VPP_LC_NOTE,"Ліцензію відкриває будь-яка умова виду licence: на точці (хто може торгувати), на категорії чи рядку товару, на знижці. Iмпорт TraderPlus переносить ліцензії з рахунків TraderPlus на персонажів.","A licence opens any condition of the kind licence: on a point (who may trade there), on a category or a goods line, on a discount. The TraderPlus import moves licences from TraderPlus's accounts onto the characters."
+STR_OZT_VPP_LC_GIVE,Видати або забрати,Grant or take back
+STR_OZT_VPP_LC_WHO,Гравець: ім'я онлайн або Steam ID (17 цифр),Player: a name online or a Steam ID (17 digits)
+STR_OZT_VPP_LC_ID,Ліцензія (id),Licence (id)
+STR_OZT_VPP_LC_GRANT,Видати,Grant
+STR_OZT_VPP_LC_REVOKE,Забрати,Take back
+STR_OZT_VPP_LC_NEED,Назвіть гравця й ліцензію,Name a player and a licence
+STR_OZT_VPP_LC_REVOKE_ASK,Забрати ліцензію,Take back the licence
+STR_OZT_VPP_LC_REVOKE_FROM,у гравця,from
+STR_OZT_VPP_YES_REVOKE,"Так, забрати","Yes, take back"
+STR_OZT_VPP_IM_TITLE,Iмпорт з TraderPlus,Import from TraderPlus
+STR_OZT_VPP_IM_SUB,"Файли TraderPlus стають нашими трьома файлами, складом і ліцензіями. Техніка лишається TraderPlus.","TraderPlus's files become our three files, our stock and our licences. Vehicles stay with TraderPlus."
+STR_OZT_VPP_IM_ROOT,Тека TraderPlus у профілі сервера (порожньо: $profile:TraderPlus),TraderPlus's folder in the server's profile (empty: $profile:TraderPlus)
+STR_OZT_VPP_IM_ROOT_H,"Лише тека під $profile:, без ..","Only a folder under $profile:, with no .."
+STR_OZT_VPP_IM_DRY,Пробний прогін,Dry run
+STR_OZT_VPP_IM_APPLY,Застосувати імпорт,Apply the import
+STR_OZT_VPP_IM_NOTE,"Пробний прогін нічого не змінює: файли й звіт лягають у OpenZone\TraderPlusImport. Застосування замінює наші три файли (старі ядро кладе в резерв), склади й ліцензії.","A dry run changes nothing: the files and the report go to OpenZone\TraderPlusImport. The apply replaces our three files (the core keeps the old ones in its backup), the stock and the licences."
+STR_OZT_VPP_IM_REPORT,Звіт,Report
+STR_OZT_VPP_IM_STEPS_NONE,1. Пробний прогін   2. Перевірте звіт   3. Застосуйте,1. Dry run   2. Read the report   3. Apply
+STR_OZT_VPP_IM_STEPS_DRY,Пробний прогін зроблено: перевірте звіт і застосуйте,"The dry run is done: read the report, then apply"
+STR_OZT_VPP_IM_STEPS_DONE,Iмпорт застосовано,The import is applied
+STR_OZT_VPP_IM_WAIT,Чекаємо на сервер...,Waiting for the server...
+STR_OZT_VPP_IM_NO_REPORT,Готово. Звіт лежить на сервері: OpenZone\TraderPlusImport\report.txt,Done. The report is on the server: OpenZone\TraderPlusImport\report.txt
+STR_OZT_VPP_IM_APPLY_ASK,"Застосувати імпорт? Буде замінено наші три файли (старі ядро кладе в резерв), перезаписано склади й видано ліцензії з рахунків TraderPlus.","Apply the import? Our three files are replaced (the core keeps the old ones in its backup), the stock is written over and licences are given from TraderPlus's accounts."
+STR_OZT_VPP_YES_APPLY,"Так, застосувати","Yes, apply"

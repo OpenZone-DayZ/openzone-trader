@@ -1,0 +1,772 @@
+{
+  "layout": "ozt_vpp_points",
+  "note": "Trader > Points of the OpenZone admin window (VPP rework 2026-11-12, design 5.6; mockup TraderPoints). OZT_VppPane.c creates it under M_SUB_WIDGET and registers it as page trader.points. The list is the section's `list`; the card edits the picked point. Names the script resolves by string: every Trd* and BtnTrd* widget. Captions are stringtable keys of OpenZone_Trader (UA original, EN).",
+  "root": {
+    "frame": {
+      "name": "PaneTrdPoints",
+      "size": "$vpp.content",
+      "hidden": true,
+      "priority": 2,
+      "note": "Hidden: the shell shows the open page's pane, moves it right of the rail and sizes it to the content area.",
+      "children": [
+        {
+          "frame": {
+            "name": "PaneTrdPointsIn",
+            "size": "fill",
+            "children": [
+              {
+                "label": {
+                  "name": "TrdPtTitle",
+                  "at": [
+                    24,
+                    8
+                  ],
+                  "size": [
+                    600,
+                    28
+                  ],
+                  "text": "#STR_OZT_VPP_PT_TITLE",
+                  "font": "title",
+                  "color": "$vppText"
+                }
+              },
+              {
+                "label": {
+                  "name": "TrdPtSub",
+                  "at": [
+                    24,
+                    36
+                  ],
+                  "size": [
+                    640,
+                    18
+                  ],
+                  "text": "#STR_OZT_VPP_PT_SUB",
+                  "font": "small",
+                  "color": "$vppMuted"
+                }
+              },
+              {
+                "button": {
+                  "name": "BtnTrdRefresh",
+                  "at": [
+                    24,
+                    15
+                  ],
+                  "size": [
+                    110,
+                    30
+                  ],
+                  "text": "#STR_OZT_VPP_REFRESH",
+                  "font": "small",
+                  "bg": "$vppRaised",
+                  "edge": "$vppEdge",
+                  "color": "$vppText",
+                  "anchor": "right"
+                }
+              },
+              {
+                "button": {
+                  "name": "BtnTrdRespawn",
+                  "at": [
+                    142,
+                    15
+                  ],
+                  "size": [
+                    190,
+                    30
+                  ],
+                  "text": "#STR_OZT_VPP_PT_RESPAWN",
+                  "font": "small",
+                  "bg": "$vppRaised",
+                  "edge": "$vppEdge",
+                  "color": "$vppText",
+                  "anchor": "right"
+                }
+              },
+              {
+                "panel": {
+                  "name": "TrdPtHeadRule",
+                  "at": [
+                    0,
+                    63
+                  ],
+                  "size": [
+                    1060,
+                    1
+                  ],
+                  "color": "$vppEdge",
+                  "note": "The script sets its width with the window's (TrdLayout)."
+                }
+              },
+              {
+                "label": {
+                  "name": "TrdNewLbl",
+                  "at": [
+                    24,
+                    72
+                  ],
+                  "size": [
+                    380,
+                    16
+                  ],
+                  "text": "#STR_OZT_VPP_PT_NEW",
+                  "font": "tiny",
+                  "color": "$vppMuted"
+                }
+              },
+              {
+                "field": {
+                  "name": "TrdId",
+                  "at": [
+                    24,
+                    90
+                  ],
+                  "size": [
+                    126,
+                    28
+                  ],
+                  "color": "$vppText"
+                }
+              },
+              {
+                "field": {
+                  "name": "TrdNewClass",
+                  "at": [
+                    156,
+                    90
+                  ],
+                  "size": [
+                    160,
+                    28
+                  ],
+                  "color": "$vppText"
+                }
+              },
+              {
+                "button": {
+                  "name": "BtnTrdNewKind",
+                  "at": [
+                    322,
+                    89
+                  ],
+                  "size": [
+                    82,
+                    30
+                  ],
+                  "text": "-",
+                  "font": "small",
+                  "bg": "$vppCell",
+                  "edge": "$vppEdge",
+                  "color": "$vppText"
+                }
+              },
+              {
+                "button": {
+                  "name": "BtnTrdPlace",
+                  "at": [
+                    24,
+                    124
+                  ],
+                  "size": [
+                    186,
+                    30
+                  ],
+                  "text": "#STR_OZT_VPP_PT_PLACE",
+                  "font": "small",
+                  "bg": "$vppAccent",
+                  "edge": "$vppAccent",
+                  "color": "$vppScreen"
+                }
+              },
+              {
+                "button": {
+                  "name": "BtnTrdAdopt",
+                  "at": [
+                    218,
+                    124
+                  ],
+                  "size": [
+                    186,
+                    30
+                  ],
+                  "text": "#STR_OZT_VPP_PT_ADOPT",
+                  "font": "small",
+                  "bg": "$vppRaised",
+                  "edge": "$vppEdge",
+                  "color": "$vppText",
+                  "note": "What the camera points at -- where the admin looked before opening the window -- becomes a point of kind map."
+                }
+              },
+              {
+                "listbox": {
+                  "name": "TrdList",
+                  "at": [
+                    24,
+                    166
+                  ],
+                  "size": [
+                    380,
+                    490
+                  ],
+                  "font": "field",
+                  "color": "$vppText",
+                  "props": {
+                    "style": "NoScrollBar",
+                    "title visible": false,
+                    "highlight row": true,
+                    "lines": 18
+                  },
+                  "note": "The points as the section's `list` answers them."
+                }
+              },
+              {
+                "frame": {
+                  "name": "TrdPtCard",
+                  "size": [
+                    520,
+                    580
+                  ],
+                  "children": [
+                    {
+                      "label": {
+                        "name": "TrdPtHead",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          520,
+                          26
+                        ],
+                        "text": "#STR_OZT_VPP_PT_PICK",
+                        "font": "header",
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdPtHeadSub",
+                        "at": [
+                          0,
+                          26
+                        ],
+                        "size": [
+                          520,
+                          18
+                        ],
+                        "text": "",
+                        "font": "small",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdPtSecMain",
+                        "at": [
+                          0,
+                          50
+                        ],
+                        "size": [
+                          520,
+                          18
+                        ],
+                        "text": "#STR_OZT_VPP_PT_SEC_MAIN",
+                        "font": "tiny",
+                        "color": "$vppAccent"
+                      }
+                    },
+                    {
+                      "panel": {
+                        "name": "TrdPtSecMainRule",
+                        "at": [
+                          0,
+                          69
+                        ],
+                        "size": [
+                          520,
+                          1
+                        ],
+                        "color": "$vppEdge"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdNameLbl",
+                        "at": [
+                          0,
+                          76
+                        ],
+                        "size": [
+                          86,
+                          28
+                        ],
+                        "text": "#STR_OZT_VPP_PT_NAME",
+                        "font": "small",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdName",
+                        "at": [
+                          90,
+                          76
+                        ],
+                        "size": [
+                          160,
+                          28
+                        ],
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdRadiusLbl",
+                        "at": [
+                          264,
+                          76
+                        ],
+                        "size": [
+                          86,
+                          28
+                        ],
+                        "text": "#STR_OZT_VPP_PT_RADIUS",
+                        "font": "small",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdRadius",
+                        "at": [
+                          354,
+                          76
+                        ],
+                        "size": [
+                          166,
+                          28
+                        ],
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "BtnTrdKindLbl",
+                        "at": [
+                          0,
+                          110
+                        ],
+                        "size": [
+                          86,
+                          28
+                        ],
+                        "text": "#STR_OZT_VPP_PT_KIND",
+                        "font": "small",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdKind",
+                        "at": [
+                          90,
+                          109
+                        ],
+                        "size": [
+                          160,
+                          30
+                        ],
+                        "text": "-",
+                        "font": "small",
+                        "bg": "$vppCell",
+                        "edge": "$vppEdge",
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdClassLbl",
+                        "at": [
+                          264,
+                          110
+                        ],
+                        "size": [
+                          86,
+                          28
+                        ],
+                        "text": "#STR_OZT_VPP_PT_CLASS",
+                        "font": "small",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdClass",
+                        "at": [
+                          354,
+                          110
+                        ],
+                        "size": [
+                          166,
+                          28
+                        ],
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdBuyLbl",
+                        "at": [
+                          0,
+                          144
+                        ],
+                        "size": [
+                          86,
+                          28
+                        ],
+                        "text": "#STR_OZT_VPP_PT_BUY",
+                        "font": "small",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdBuy",
+                        "at": [
+                          90,
+                          144
+                        ],
+                        "size": [
+                          160,
+                          28
+                        ],
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdSellLbl",
+                        "at": [
+                          264,
+                          144
+                        ],
+                        "size": [
+                          86,
+                          28
+                        ],
+                        "text": "#STR_OZT_VPP_PT_SELL",
+                        "font": "small",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdSell",
+                        "at": [
+                          354,
+                          144
+                        ],
+                        "size": [
+                          166,
+                          28
+                        ],
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdCatsLbl",
+                        "at": [
+                          0,
+                          178
+                        ],
+                        "size": [
+                          86,
+                          28
+                        ],
+                        "text": "#STR_OZT_VPP_PT_CATS",
+                        "font": "small",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdCats",
+                        "at": [
+                          90,
+                          178
+                        ],
+                        "size": [
+                          430,
+                          28
+                        ],
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "text": {
+                        "name": "TrdCatsKnown",
+                        "at": [
+                          0,
+                          210
+                        ],
+                        "size": [
+                          520,
+                          28
+                        ],
+                        "plain": true,
+                        "grow": false,
+                        "font": "tiny",
+                        "color": "$vppMuted",
+                        "text": "-"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdPtSecPlace",
+                        "at": [
+                          0,
+                          244
+                        ],
+                        "size": [
+                          520,
+                          18
+                        ],
+                        "text": "#STR_OZT_VPP_PT_SEC_PLACE",
+                        "font": "tiny",
+                        "color": "$vppAccent"
+                      }
+                    },
+                    {
+                      "panel": {
+                        "name": "TrdPtSecPlaceRule",
+                        "at": [
+                          0,
+                          263
+                        ],
+                        "size": [
+                          520,
+                          1
+                        ],
+                        "color": "$vppEdge"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdInfo",
+                        "at": [
+                          0,
+                          268
+                        ],
+                        "size": [
+                          520,
+                          20
+                        ],
+                        "text": "",
+                        "font": "small",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdMove",
+                        "at": [
+                          0,
+                          292
+                        ],
+                        "size": [
+                          168,
+                          30
+                        ],
+                        "text": "#STR_OZT_VPP_PT_MOVE",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppEdge",
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdTurn",
+                        "at": [
+                          176,
+                          292
+                        ],
+                        "size": [
+                          168,
+                          30
+                        ],
+                        "text": "#STR_OZT_VPP_PT_TURN",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppEdge",
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdOutfit",
+                        "at": [
+                          352,
+                          292
+                        ],
+                        "size": [
+                          168,
+                          30
+                        ],
+                        "text": "#STR_OZT_VPP_PT_OUTFIT",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppEdge",
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdPtSecMoney",
+                        "at": [
+                          0,
+                          332
+                        ],
+                        "size": [
+                          520,
+                          18
+                        ],
+                        "text": "#STR_OZT_VPP_PT_SEC_MONEY",
+                        "font": "tiny",
+                        "color": "$vppAccent"
+                      }
+                    },
+                    {
+                      "panel": {
+                        "name": "TrdPtSecMoneyRule",
+                        "at": [
+                          0,
+                          351
+                        ],
+                        "size": [
+                          520,
+                          1
+                        ],
+                        "color": "$vppEdge"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdProviderLbl",
+                        "at": [
+                          0,
+                          358
+                        ],
+                        "size": [
+                          86,
+                          28
+                        ],
+                        "text": "#STR_OZT_VPP_PT_MONEY",
+                        "font": "small",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdProvider",
+                        "at": [
+                          90,
+                          358
+                        ],
+                        "size": [
+                          160,
+                          28
+                        ],
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "BtnTrdChangeLbl",
+                        "at": [
+                          264,
+                          358
+                        ],
+                        "size": [
+                          86,
+                          28
+                        ],
+                        "text": "#STR_OZT_VPP_PT_CHANGE",
+                        "font": "small",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdChange",
+                        "at": [
+                          354,
+                          357
+                        ],
+                        "size": [
+                          166,
+                          30
+                        ],
+                        "text": "-",
+                        "font": "small",
+                        "bg": "$vppCell",
+                        "edge": "$vppEdge",
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdRemove",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          160,
+                          32
+                        ],
+                        "text": "#STR_OZT_VPP_PT_REMOVE",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppBad",
+                        "color": "$vppBad",
+                        "anchor": "bottom"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdSave",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          200,
+                          32
+                        ],
+                        "text": "#STR_OZT_VPP_PT_SAVE",
+                        "font": "small",
+                        "bg": "$vppAccent",
+                        "edge": "$vppAccent",
+                        "color": "$vppScreen",
+                        "anchor": "bottom-right"
+                      }
+                    }
+                  ],
+                  "at": [
+                    420,
+                    76
+                  ],
+                  "note": "The picked point. The script moves it right of the list and sizes its height with the window."
+                }
+              }
+            ],
+            "note": "Proportional: follows the pane when the shell resizes it; the script places the rest (TrdLayout)."
+          }
+        }
+      ]
+    }
+  }
+}

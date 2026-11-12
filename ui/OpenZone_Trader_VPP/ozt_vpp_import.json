@@ -1,0 +1,278 @@
+{
+  "layout": "ozt_vpp_import",
+  "note": "Trader > TraderPlus import (design 5.6, 11.3; mockup TraderImport). Page trader.import, OZT_VppPaneImport.c: a dry run, its report, and the apply, which asks on the window's confirm strip first.",
+  "root": {
+    "frame": {
+      "name": "PaneTrdImport",
+      "size": "$vpp.content",
+      "hidden": true,
+      "priority": 2,
+      "note": "Hidden: the shell shows the open page's pane, moves it right of the rail and sizes it to the content area.",
+      "children": [
+        {
+          "frame": {
+            "name": "PaneTrdImportIn",
+            "size": "fill",
+            "children": [
+              {
+                "label": {
+                  "name": "TrdImTitle",
+                  "at": [
+                    24,
+                    8
+                  ],
+                  "size": [
+                    600,
+                    28
+                  ],
+                  "text": "#STR_OZT_VPP_IM_TITLE",
+                  "font": "title",
+                  "color": "$vppText"
+                }
+              },
+              {
+                "label": {
+                  "name": "TrdImSub",
+                  "at": [
+                    24,
+                    36
+                  ],
+                  "size": [
+                    640,
+                    18
+                  ],
+                  "text": "#STR_OZT_VPP_IM_SUB",
+                  "font": "small",
+                  "color": "$vppMuted"
+                }
+              },
+              {
+                "panel": {
+                  "name": "TrdImHeadRule",
+                  "at": [
+                    0,
+                    63
+                  ],
+                  "size": [
+                    1060,
+                    1
+                  ],
+                  "color": "$vppEdge",
+                  "note": "The script sets its width with the window's (TrdLayout)."
+                }
+              },
+              {
+                "label": {
+                  "name": "TrdImSteps",
+                  "at": [
+                    24,
+                    15
+                  ],
+                  "size": [
+                    420,
+                    30
+                  ],
+                  "text": "",
+                  "font": "small",
+                  "color": "$vppMuted",
+                  "align": "right",
+                  "anchor": "right"
+                }
+              },
+              {
+                "frame": {
+                  "name": "TrdImLeft",
+                  "size": [
+                    400,
+                    580
+                  ],
+                  "children": [
+                    {
+                      "label": {
+                        "name": "TrdImRootLbl",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          400,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_IM_ROOT",
+                        "font": "tiny",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdImRoot",
+                        "at": [
+                          0,
+                          18
+                        ],
+                        "size": [
+                          400,
+                          28
+                        ],
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "text": {
+                        "name": "TrdImRootNote",
+                        "at": [
+                          0,
+                          52
+                        ],
+                        "size": [
+                          400,
+                          32
+                        ],
+                        "plain": true,
+                        "grow": false,
+                        "font": "tiny",
+                        "color": "$vppFaint",
+                        "text": "#STR_OZT_VPP_IM_ROOT_H"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdImDry",
+                        "at": [
+                          0,
+                          92
+                        ],
+                        "size": [
+                          400,
+                          34
+                        ],
+                        "text": "#STR_OZT_VPP_IM_DRY",
+                        "font": "small",
+                        "bg": "$vppAccent",
+                        "edge": "$vppAccent",
+                        "color": "$vppScreen"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdImApply",
+                        "at": [
+                          0,
+                          134
+                        ],
+                        "size": [
+                          400,
+                          34
+                        ],
+                        "text": "#STR_OZT_VPP_IM_APPLY",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppBad",
+                        "color": "$vppBad"
+                      }
+                    },
+                    {
+                      "text": {
+                        "name": "TrdImNote",
+                        "at": [
+                          0,
+                          180
+                        ],
+                        "size": [
+                          400,
+                          90
+                        ],
+                        "plain": true,
+                        "grow": false,
+                        "font": "tiny",
+                        "color": "$vppMuted",
+                        "text": "#STR_OZT_VPP_IM_NOTE"
+                      }
+                    }
+                  ],
+                  "at": [
+                    24,
+                    76
+                  ]
+                }
+              },
+              {
+                "frame": {
+                  "name": "TrdImRight",
+                  "size": [
+                    596,
+                    580
+                  ],
+                  "children": [
+                    {
+                      "label": {
+                        "name": "TrdImHead",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          300,
+                          24
+                        ],
+                        "text": "#STR_OZT_VPP_IM_REPORT",
+                        "font": "header",
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdImWhen",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          300,
+                          24
+                        ],
+                        "text": "",
+                        "font": "small",
+                        "color": "$vppMuted",
+                        "align": "right",
+                        "anchor": "right"
+                      }
+                    },
+                    {
+                      "listbox": {
+                        "name": "TrdImReport",
+                        "at": [
+                          0,
+                          30
+                        ],
+                        "size": [
+                          596,
+                          550
+                        ],
+                        "font": "field",
+                        "color": "$vppText",
+                        "props": {
+                          "style": "NoScrollBar",
+                          "title visible": false,
+                          "highlight row": true,
+                          "lines": 22
+                        },
+                        "note": "The import's report, a line a row (import_traderplus)."
+                      }
+                    }
+                  ],
+                  "at": [
+                    440,
+                    76
+                  ],
+                  "note": "The report; the script sizes it with the window."
+                }
+              }
+            ],
+            "note": "Proportional: follows the pane when the shell resizes it; the script places the rest (TrdLayout)."
+          }
+        }
+      ]
+    }
+  }
+}

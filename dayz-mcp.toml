@@ -16,11 +16,11 @@ name = "openzone-trader"
 # OpenZone_TraderProbe        -- client + server stand tool of phase 0: scenes, the two
 #                                inventory dumps, the stand's wallet and notes.
 # OpenZone_TraderProbe_Bridge -- server only: the `ozt_probe` verb.
-# OpenZone_Trader_VPP         -- the pane TRADERS of the OpenZone admin window, a glue
+# OpenZone_Trader_VPP         -- the module TRADER of the OpenZone admin window, a glue
 #                                pbo that hard-requires VPP Admin Tools and the core's
 #                                OpenZone_VPP. It joins `mods` on a stand that loads
 #                                both: elsewhere the server stops at the missing addon.
-#                                Its layout is built by declaring it for one call.
+#                                Its page layouts are built by declaring it for one call.
 # OpenZone_Trader_TraderPlus  -- the TraderPlus bank as money (provider id `traderplus`),
 #                                a glue pbo that hard-requires TraderPlus's banking pbo.
 #                                It joins `mods`, and TraderPlus the stand's extra mods,

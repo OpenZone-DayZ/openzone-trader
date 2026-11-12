@@ -1,0 +1,268 @@
+{
+  "layout": "ozt_vpp_licences",
+  "note": "Trader > Licences (design 5.6, 11.2; mockup TraderLicences). Page trader.licences, OZT_VppPaneLicences.c. Grant and take back with the section's `licence` op; who holds what comes from `licence_list`; the definitions are the settings file's Licences, edited in the draft.",
+  "root": {
+    "frame": {
+      "name": "PaneTrdLicences",
+      "size": "$vpp.content",
+      "hidden": true,
+      "priority": 2,
+      "note": "Hidden: the shell shows the open page's pane, moves it right of the rail and sizes it to the content area.",
+      "children": [
+        {
+          "frame": {
+            "name": "PaneTrdLicencesIn",
+            "size": "fill",
+            "children": [
+              {
+                "label": {
+                  "name": "TrdLcTitle",
+                  "at": [
+                    24,
+                    8
+                  ],
+                  "size": [
+                    600,
+                    28
+                  ],
+                  "text": "#STR_OZT_VPP_LC_TITLE",
+                  "font": "title",
+                  "color": "$vppText"
+                }
+              },
+              {
+                "label": {
+                  "name": "TrdLcSub",
+                  "at": [
+                    24,
+                    36
+                  ],
+                  "size": [
+                    640,
+                    18
+                  ],
+                  "text": "#STR_OZT_VPP_LC_SUB",
+                  "font": "small",
+                  "color": "$vppMuted"
+                }
+              },
+              {
+                "button": {
+                  "name": "BtnTrdLcRefresh",
+                  "at": [
+                    24,
+                    15
+                  ],
+                  "size": [
+                    110,
+                    30
+                  ],
+                  "text": "#STR_OZT_VPP_REFRESH",
+                  "font": "small",
+                  "bg": "$vppRaised",
+                  "edge": "$vppEdge",
+                  "color": "$vppText",
+                  "anchor": "right"
+                }
+              },
+              {
+                "panel": {
+                  "name": "TrdLcHeadRule",
+                  "at": [
+                    0,
+                    63
+                  ],
+                  "size": [
+                    1060,
+                    1
+                  ],
+                  "color": "$vppEdge",
+                  "note": "The script sets its width with the window's (TrdLayout)."
+                }
+              },
+              {
+                "frame": {
+                  "name": "TrdLcLeft",
+                  "size": [
+                    556,
+                    580
+                  ],
+                  "children": [
+                    {
+                      "label": {
+                        "name": "TrdLcDefsHead",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          500,
+                          18
+                        ],
+                        "text": "#STR_OZT_VPP_LC_DEFS",
+                        "font": "tiny",
+                        "color": "$vppAccent"
+                      }
+                    },
+                    {
+                      "text": {
+                        "name": "TrdLcNote",
+                        "at": [
+                          0,
+                          22
+                        ],
+                        "size": [
+                          556,
+                          48
+                        ],
+                        "plain": true,
+                        "grow": false,
+                        "font": "tiny",
+                        "color": "$vppMuted",
+                        "text": "#STR_OZT_VPP_LC_NOTE"
+                      }
+                    }
+                  ],
+                  "at": [
+                    24,
+                    76
+                  ],
+                  "note": "The server's licences; the script sizes it with the window."
+                }
+              },
+              {
+                "frame": {
+                  "name": "TrdLcRight",
+                  "size": [
+                    440,
+                    580
+                  ],
+                  "children": [
+                    {
+                      "label": {
+                        "name": "TrdLcGiveHead",
+                        "at": [
+                          0,
+                          0
+                        ],
+                        "size": [
+                          440,
+                          22
+                        ],
+                        "text": "#STR_OZT_VPP_LC_GIVE",
+                        "font": "header",
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdLcWhoLbl",
+                        "at": [
+                          0,
+                          30
+                        ],
+                        "size": [
+                          440,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_LC_WHO",
+                        "font": "tiny",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdLcWho",
+                        "at": [
+                          0,
+                          48
+                        ],
+                        "size": [
+                          440,
+                          28
+                        ],
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "label": {
+                        "name": "TrdLcIdLbl",
+                        "at": [
+                          0,
+                          200
+                        ],
+                        "size": [
+                          440,
+                          16
+                        ],
+                        "text": "#STR_OZT_VPP_LC_ID",
+                        "font": "tiny",
+                        "color": "$vppMuted"
+                      }
+                    },
+                    {
+                      "field": {
+                        "name": "TrdLcId",
+                        "at": [
+                          0,
+                          218
+                        ],
+                        "size": [
+                          440,
+                          28
+                        ],
+                        "color": "$vppText"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdLcGrant",
+                        "at": [
+                          0,
+                          254
+                        ],
+                        "size": [
+                          216,
+                          32
+                        ],
+                        "text": "#STR_OZT_VPP_LC_GRANT",
+                        "font": "small",
+                        "bg": "$vppAccent",
+                        "edge": "$vppAccent",
+                        "color": "$vppScreen"
+                      }
+                    },
+                    {
+                      "button": {
+                        "name": "BtnTrdLcRevoke",
+                        "at": [
+                          224,
+                          254
+                        ],
+                        "size": [
+                          216,
+                          32
+                        ],
+                        "text": "#STR_OZT_VPP_LC_REVOKE",
+                        "font": "small",
+                        "bg": "$vppRaised",
+                        "edge": "$vppBad",
+                        "color": "$vppBad"
+                      }
+                    }
+                  ],
+                  "at": [
+                    596,
+                    76
+                  ],
+                  "note": "Grant or take back; the script keeps it at the right edge."
+                }
+              }
+            ],
+            "note": "Proportional: follows the pane when the shell resizes it; the script places the rest (TrdLayout)."
+          }
+        }
+      ]
+    }
+  }
+}

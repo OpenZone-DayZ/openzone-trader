@@ -107,7 +107,13 @@ class OZT_Card
         if (g && g.Name != "")
             title = g.Name;
         OZT_Ui.Say(m_Root, "CardName", title);
-        // The game's own words and colours for weight and condition.
+        // The game's own words and colours for weight and condition; a
+        // licence (design §11.2) is no thing and has neither.
+        bool licence = g && g.Look != "";
+        OZT_Ui.Show(m_Root, "ItemWeightWidgetBackground", !licence);
+        OZT_Ui.Show(m_Root, "ItemWeightWidget", !licence);
+        OZT_Ui.Show(m_Root, "ItemDamageWidgetBackground", !licence);
+        OZT_Ui.Show(m_Root, "ItemDamageWidget", !licence);
         InspectMenuNew.UpdateItemInfoWeight(m_Root, item);
         InspectMenuNew.UpdateItemInfoDamage(m_Root, item);
 
@@ -134,7 +140,7 @@ class OZT_Card
 
         string about = "";
         InventoryItem ii = InventoryItem.Cast(item);
-        if (ii)
+        if (ii && !licence)
             about = ii.GetTooltip();
         RichTextWidget desc = RichTextWidget.Cast(m_Root.FindAnyWidget("CardDesc"));
         if (desc)
@@ -148,7 +154,7 @@ class OZT_Card
         for (int r = 0; r < ROWS; r++)
             OZT_Ui.Show(m_Root, "CardRow" + r.ToString(), false);
 
-        if (ii)
+        if (ii && !licence)
         {
             int w;
             int h;

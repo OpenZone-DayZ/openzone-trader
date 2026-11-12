@@ -176,7 +176,7 @@
                   "font": "small",
                   "bg": "$vppAccent",
                   "edge": "$vppAccent",
-                  "color": "$vppScreen"
+                  "color": "$vppText"
                 }
               },
               {
@@ -1118,7 +1118,7 @@
                         "font": "small",
                         "bg": "$vppAccent",
                         "edge": "$vppAccent",
-                        "color": "$vppScreen",
+                        "color": "$vppText",
                         "anchor": "right"
                       }
                     }

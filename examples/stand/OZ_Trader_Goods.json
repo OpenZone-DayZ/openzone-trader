@@ -96,6 +96,19 @@
             { "ClassName": "UniversalLight", "Buy": 200, "Sell": 100 },
             { "ClassName": "Mag_AKM_Palm30Rnd", "Buy": 220, "Sell": 110 },
             { "ClassName": "Mag_AKM_Drum75Rnd", "Buy": 600, "Sell": 300 },
+            { "ClassName": "M4A1", "Buy": 3000, "Sell": 1500 },
+            { "ClassName": "Mag_STANAG_30Rnd", "Buy": 200, "Sell": 100 },
+            { "ClassName": "M4_RISHndgrd", "Buy": 300, "Sell": 150 },
+            { "ClassName": "M4_PlasticHndgrd", "Buy": 150, "Sell": 75 },
+            { "ClassName": "M4_MPHndgrd", "Buy": 200, "Sell": 100 },
+            { "ClassName": "M4_OEBttstck", "Buy": 150, "Sell": 75 },
+            { "ClassName": "M4_MPBttstck", "Buy": 200, "Sell": 100 },
+            { "ClassName": "M4_CQBBttstck", "Buy": 250, "Sell": 125 },
+            { "ClassName": "M4_Suppressor", "Buy": 800, "Sell": 400 },
+            { "ClassName": "M4_CarryHandleOptic", "Buy": 300, "Sell": 150 },
+            { "ClassName": "ACOGOptic", "Buy": 900, "Sell": 450 },
+            { "ClassName": "M68Optic", "Buy": 500, "Sell": 250 },
+            { "ClassName": "M4_T3NRDSOptic", "Buy": 600, "Sell": 300 },
             { "ClassName": "MakarovIJ70", "Buy": 650, "Sell": 325, "With": ["Mag_IJ70_8Rnd"] },
             { "ClassName": "Mag_IJ70_8Rnd", "Buy": 60, "Sell": 30 }
         ] },
@@ -103,6 +116,7 @@
           "Requires": [ { "Kind": "faction", "Arg": "duty" } ],
           "Goods": [
             { "ClassName": "Ammo_762x39", "Buy": 10, "Sell": 5, "Quantity": "unit" },
+            { "ClassName": "Ammo_556x45", "Buy": 10, "Sell": 5, "Quantity": "unit" },
             { "ClassName": "Nail", "Buy": 5, "Quantity": "unit" }
         ] },
         { "Id": "food", "Name": "Харчі",

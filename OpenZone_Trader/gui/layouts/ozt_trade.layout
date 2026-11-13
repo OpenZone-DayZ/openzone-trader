@@ -504,6 +504,84 @@ FrameWidgetClass OZT_Trade {
         }
        }
       }
+      // The loading of an open by pages: the menu puts it in the middle of the empty shelf, then at the foot of the shelf while the rest of the goods come, and hides it at the last page. Priority 700: above the tiles' pictures and marks (610-612), below the dialogs (952).
+      PanelWidgetClass ShelfLoad {
+       visible 1
+       ignorepointer 1
+       position 120 260
+       size 320 58
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       color 0.118 0.118 0.114 1
+       priority 700
+       style rover_sim_colorable
+       {
+        TextWidgetClass ShelfLoadText {
+         visible 1
+         ignorepointer 1
+         position 12 6
+         size 220 26
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.88 0.875 0.855 1
+         priority 0
+         text "#STR_OZT_UI_LOADING_GOODS"
+         font "gui/fonts/sdf_MetronBook24"
+         "exact text" 1
+         "exact text size" 15
+         "text halign" left
+         "text valign" center
+        }
+        TextWidgetClass ShelfLoadPct {
+         visible 1
+         ignorepointer 1
+         position 232 6
+         size 76 26
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.95 0.62 0.3 1
+         priority 1
+         text ""
+         font "gui/fonts/sdf_MetronBook24"
+         "exact text" 1
+         "exact text size" 15
+         "text halign" right
+         "text valign" center
+        }
+        PanelWidgetClass ShelfLoadTrack {
+         visible 1
+         ignorepointer 1
+         position 12 38
+         size 296 6
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 1 1 1 0.07
+         priority 2
+         style rover_sim_colorable
+        }
+        PanelWidgetClass ShelfLoadBar {
+         visible 1
+         ignorepointer 1
+         position 12 38
+         size 296 6
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.91 0.47 0.17 1
+         priority 3
+         style rover_sim_colorable
+        }
+       }
+      }
      }
     }
     ImageWidgetClass ArtChar {

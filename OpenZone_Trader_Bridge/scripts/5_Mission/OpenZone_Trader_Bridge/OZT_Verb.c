@@ -27,6 +27,8 @@ class OZT_VerbOps
             return OpImport(args, detail);
         if (op == "stock")
             return OpStock(args, detail);
+        if (op == "pace")
+            return OpPace(args, detail);
 
         PlayerBase player = Player();
         if (!player)
@@ -74,7 +76,25 @@ class OZT_VerbOps
 
     static string KnownOps()
     {
-        return "status, reload, fps, recur, import, stock, balance, price, pay, damage, open, fit, quote, deal, licence, show, tree, load, fits, hurt, admin, flag";
+        return "status, reload, fps, recur, import, stock, pace, balance, price, pay, damage, open, fit, quote, deal, licence, show, tree, load, fits, hurt, admin, flag";
+    }
+
+    // The pace of the open by pages, for a measurement: rate= bytes a second,
+    // burst= bytes at once; drop=1 lets every kept shelf go. Without arguments,
+    // what stands now.
+    static bool OpPace(map<string, string> args, out string detail)
+    {
+        string rate = Arg(args, "rate", "");
+        if (rate != "")
+            OZT_OpenStreams.s_Rate = rate.ToFloat();
+        string burst = Arg(args, "burst", "");
+        if (burst != "")
+            OZT_OpenStreams.s_Burst = burst.ToFloat();
+        if (Arg(args, "drop", "") == "1")
+            OZT_ShelfCaches.Reset();
+        detail = "pace: rate " + OZT_OpenStreams.s_Rate.ToString() + " B/s, burst " + OZT_OpenStreams.s_Burst.ToString() + " B; ";
+        detail = detail + OZT_ShelfCaches.Count().ToString() + " shelf/shelves kept, " + OZT_OpenStreams.Count().ToString() + " stream(s)";
+        return true;
     }
 
     // ---- what the ops share ---------------------------------------------------

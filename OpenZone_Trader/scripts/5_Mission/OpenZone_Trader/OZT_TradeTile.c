@@ -393,6 +393,17 @@ class OZT_TileGrid
     // found by the widget, not by a walk through every tile.
     protected ref map<Widget, OZT_Tile> m_ByRoot;
 
+    // Where the packing stopped (Arrange, ArrangeMore): the tiles packed, the
+    // cells taken a row a bit, the first row worth a look for each width, the
+    // row the last tile of each shape went to, the rows used, the rows the
+    // cells are drawn for.
+    protected int m_Packed;
+    protected ref array<int> m_PackRows;
+    protected ref array<int> m_PackFrom;
+    protected ref map<int, int> m_PackShape;
+    protected int m_Used;
+    protected int m_Drawn;
+
     // `prefix` names the scroll, its content and its canvas in the layout:
     // <prefix>Scroll, <prefix>Content, <prefix>Lines.
     void OZT_TileGrid(Widget root, string prefix, int minRows)
@@ -407,11 +418,37 @@ class OZT_TileGrid
         m_Cell = Math.Floor(CELL_UNITS * OZT_Ui.Px());
         if (m_Cell < 8)
             m_Cell = 8;
+        m_PackRows = new array<int>();
+        m_PackFrom = new array<int>();
+        m_PackShape = new map<int, int>();
+        ResetPacking();
     }
 
     bool IsReady()
     {
         return m_Scroll && m_Content;
+    }
+
+    // Where the scroll stands in its panel, in pixels.
+    bool Frame(out float x, out float y, out float w, out float h)
+    {
+        if (!m_Scroll)
+            return false;
+        m_Scroll.GetPos(x, y);
+        m_Scroll.GetSize(w, h);
+        return true;
+    }
+
+    protected void ResetPacking()
+    {
+        m_Packed = 0;
+        m_Used = 0;
+        m_Drawn = -1;
+        m_PackRows.Clear();
+        m_PackFrom.Clear();
+        for (int w = 0; w <= COLS; w++)
+            m_PackFrom.Insert(0);
+        m_PackShape.Clear();
     }
 
     // The scroll from `top` to `bottom`, pixels of its panel: the tab strip
@@ -451,6 +488,7 @@ class OZT_TileGrid
             m_Tiles[i].Unbuild();
         m_Tiles.Clear();
         m_ByRoot.Clear();
+        ResetPacking();
     }
 
     // Adds a tile and makes its widgets; false when the layout did not load.
@@ -543,31 +581,34 @@ class OZT_TileGrid
     // (load test, 2026-11-13).
     void Arrange()
     {
+        ResetPacking();
+        ArrangeMore();
+    }
+
+    // The tiles added since the last packing, packed after the ones packed
+    // already: the same places a packing of all of them from the start gives,
+    // since first fit goes in order (a page of an open, OZT_TradeMenu.ShelfAppend).
+    //
+    // The row the last tile of each shape (W * 100 + H) went to is kept too: no
+    // tile of that shape fits above it any more, cells only fill. A tall tile
+    // looked from from[W] down, past every row with W free cells and no room
+    // below them, and a big book's shelf walked itself for each one (load test,
+    // 2026-11-13: 340 ms of 3362 tiles, the weapons alone 13 ms).
+    void ArrangeMore()
+    {
         if (!IsReady())
             return;
-
-        array<int> rows = new array<int>();
-        array<int> from = new array<int>();
-        for (int fw = 0; fw <= COLS; fw++)
-            from.Insert(0);
-        // The row the last tile of each shape (W * 100 + H) went to: no tile of
-        // that shape fits above it any more, cells only fill. A tall tile looked
-        // from from[W] down, past every row with W free cells and no room below
-        // them, and a big book's shelf walked itself for each one (load test,
-        // 2026-11-13: 340 ms of 3362 tiles, the weapons alone 13 ms).
-        map<int, int> shapeFrom = new map<int, int>();
-        int used = 0;
-        for (int i = 0; i < m_Tiles.Count(); i++)
+        for (int i = m_Packed; i < m_Tiles.Count(); i++)
         {
             OZT_Tile t = m_Tiles[i];
             int mask = ((1 << t.W) - 1);
-            int y = from[t.W];
-            while (y < rows.Count() && FreeRun(rows[y]) < t.W)
+            int y = m_PackFrom[t.W];
+            while (y < m_PackRows.Count() && FreeRun(m_PackRows[y]) < t.W)
                 y++;
-            from[t.W] = y;
+            m_PackFrom[t.W] = y;
             int shape = t.W * 100 + t.H;
             int last;
-            if (shapeFrom.Find(shape, last) && last > y)
+            if (m_PackShape.Find(shape, last) && last > y)
                 y = last;
             bool placed = false;
             while (!placed)
@@ -579,7 +620,7 @@ class OZT_TileGrid
                     for (int j = 0; j < t.H; j++)
                     {
                         int at = y + j;
-                        if (at < rows.Count() && (rows[at] & shifted) != 0)
+                        if (at < m_PackRows.Count() && (m_PackRows[at] & shifted) != 0)
                         {
                             fits = false;
                             break;
@@ -590,25 +631,26 @@ class OZT_TileGrid
                     for (int k = 0; k < t.H; k++)
                     {
                         int row = y + k;
-                        while (rows.Count() <= row)
-                            rows.Insert(0);
-                        rows[row] = rows[row] | shifted;
+                        while (m_PackRows.Count() <= row)
+                            m_PackRows.Insert(0);
+                        m_PackRows[row] = m_PackRows[row] | shifted;
                     }
                     t.Col = x;
                     t.Row = y;
                     placed = true;
-                    if (y + t.H > used)
-                        used = y + t.H;
+                    if (y + t.H > m_Used)
+                        m_Used = y + t.H;
                     break;
                 }
                 if (!placed)
                     y++;
             }
-            shapeFrom.Set(shape, t.Row);
+            m_PackShape.Set(shape, t.Row);
             t.Place(m_Cell);
         }
+        m_Packed = m_Tiles.Count();
 
-        m_Rows = used;
+        m_Rows = m_Used;
         if (m_Rows < m_MinRows)
             m_Rows = m_MinRows;
         m_Content.SetSize(COLS * m_Cell, m_Rows * m_Cell);
@@ -638,23 +680,39 @@ class OZT_TileGrid
         return best;
     }
 
+    // The cell lines down to the last row; after a packing that only added
+    // rows, the lines of the new rows alone.
     protected void DrawCells()
     {
         if (!m_Lines)
             return;
-        m_Lines.Clear();
+        int fromRow = m_Drawn;
+        if (fromRow < 0 || fromRow > m_Rows)
+        {
+            m_Lines.Clear();
+            fromRow = 0;
+        }
+        else if (fromRow == m_Rows)
+        {
+            return;
+        }
         float w = COLS * m_Cell;
+        float top = fromRow * m_Cell;
         float h = m_Rows * m_Cell;
         int color = OZT_Look.GridLine();
         for (int x = 0; x <= COLS; x++)
         {
             float px = x * m_Cell;
-            m_Lines.DrawLine(px, 0, px, h, 1, color);
+            m_Lines.DrawLine(px, top, px, h, 1, color);
         }
-        for (int y = 0; y <= m_Rows; y++)
+        int first = fromRow;
+        if (first > 0)
+            first++;
+        for (int y = first; y <= m_Rows; y++)
         {
             float py = y * m_Cell;
             m_Lines.DrawLine(0, py, w, py, 1, color);
         }
+        m_Drawn = m_Rows;
     }
 }

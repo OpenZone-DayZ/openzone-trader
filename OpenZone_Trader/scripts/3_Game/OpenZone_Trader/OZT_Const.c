@@ -27,6 +27,35 @@ class OZT_Const
     // Server -> client, unasked: a part of the open (OZT_OpenRes.Part) after a
     // stock moved, for a screen open at a point that sells from that stock.
     static const string OP_STOCK = "stock";
+    // Server -> client: a page of the goods of an open (OZT_OpenPage). A whole
+    // open is a head (OP_OPEN, OZT_OpenRes with Ask) and pages after it; the
+    // last page says so (More 0).
+    static const string OP_PAGE = "page";
+
+    // THE OPEN BY PAGES (load test, 2026-11-13). A big book's open was built in
+    // one server frame (0.12 s that the whole server stood) and sent as one
+    // message the screen waited three seconds for, empty. Now the goods of a
+    // trader are built once per set of gate answers, a slice a frame
+    // (OZT_ShelfCache), and sent in pages at a pace (OZT_OpenStream).
+    //
+    // Rows a page carries: about 3.7 KB, five parts of the core's transport.
+    static const int PAGE_ROWS = 100;
+    // Server work a frame for building shelves, in TickCount ticks (10 MHz):
+    // 3 ms. A frame of the server is 16-33 ms; the storage mod keeps its jobs
+    // to 5 ms by the same reasoning.
+    static const int BUILD_TICKS = 30000;
+    // The pace of a stream, bytes a second, and what may leave at once.
+    // Measured on the stand with 126 KB in 35 pages (2026-11-13), the last page
+    // on the client after: 2.88 s at 40 KB/s, 2.69 s at 60, 2.15 s at 150,
+    // 1.94 s at 400; the whole answer as one message took 3.0 s. Past ~60 KB/s
+    // the rest waits in the engine's queue, in front of the player's next
+    // answer (a quote): 200 KB/s keeps that wait near a second and a half.
+    static const float STREAM_RATE = 200000;
+    static const float STREAM_BURST = 24000;
+    // A built shelf nobody opened for this long is let go; at most this many
+    // are kept (the oldest goes first).
+    static const float SHELF_IDLE = 300;
+    static const int SHELF_MAX = 16;
 
     // What the server tells a client to show (OZ_Rpc.Show): this prefix, then
     // the trader's id.

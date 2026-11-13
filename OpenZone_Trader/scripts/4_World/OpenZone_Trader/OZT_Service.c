@@ -16,7 +16,10 @@ class OZT_Open
     // classes share their parent in the game's config and the name the game
     // shows (vanilla's colours are children of one *_ColorBase), form a group
     // the shelf draws as one tile. Each record keeps its class and its stock.
-    protected static void GroupVariants(array<ref OZT_WireGoods> goods)
+    //
+    // The ids are "v" and a number from `first` on (a shelf built a category at
+    // a time numbers its groups on); the number after the last one is returned.
+    static int GroupVariants(array<ref OZT_WireGoods> goods, int first = 0)
     {
         array<string> keys = new array<string>();
         map<string, int> sizes = new map<string, int>();
@@ -40,26 +43,53 @@ class OZT_Open
             string id;
             if (!ids.Find(keys[k], id))
             {
-                id = "v" + ids.Count().ToString();
+                id = "v" + (first + ids.Count()).ToString();
                 ids.Set(keys[k], id);
             }
             goods[k].Group = id;
         }
+        return first + ids.Count();
+    }
+
+    // What config says of a class for its colour group: its parent and the name
+    // the game shows, "" when it has no group. Kept by class: config does not
+    // change while the mission runs, and a big book's open asked it three to
+    // five times a record (load test, 2026-11-13: 19 ms of 120).
+    protected static ref map<string, string> s_ClassKey = new map<string, string>();
+
+    static void Reset()
+    {
+        s_ClassKey.Clear();
+    }
+
+    protected static string ClassKey(string type)
+    {
+        string kept;
+        if (s_ClassKey.Find(type, kept))
+            return kept;
+        kept = "";
+        string root = ConfigRootOf(type);
+        if (root != "")
+        {
+            string parent;
+            if (GetGame().ConfigGetBaseName(root + " " + type, parent) && parent != "")
+            {
+                string shown;
+                GetGame().ConfigGetText(root + " " + type + " displayName", shown);
+                if (shown != "")
+                    kept = parent + "|" + shown;
+            }
+        }
+        s_ClassKey.Set(type, kept);
+        return kept;
     }
 
     protected static string VariantKey(OZT_WireGoods g)
     {
         if (g.Look != "" || g.Buy <= 0 || g.Category == OZT_Const.CATEGORY_CHANGE)
             return "";
-        string root = ConfigRootOf(g.ClassName);
-        if (root == "")
-            return "";
-        string parent;
-        if (!GetGame().ConfigGetBaseName(root + " " + g.ClassName, parent) || parent == "")
-            return "";
-        string shown;
-        GetGame().ConfigGetText(root + " " + g.ClassName + " displayName", shown);
-        if (shown == "")
+        string named = ClassKey(g.ClassName);
+        if (named == "")
             return "";
         string stocked = "u";
         if (g.Stock >= 0)
@@ -67,7 +97,7 @@ class OZT_Open
         string parts = "";
         for (int w = 0; w < g.With.Count(); w++)
             parts += g.With[w] + ",";
-        string key = g.Category + "|" + parent + "|" + shown;
+        string key = g.Category + "|" + named;
         key += "|" + g.Buy.ToString() + "|" + g.Sell.ToString() + "|" + g.Rule;
         key += "|" + g.Level.ToString() + "|" + stocked + "|" + parts;
         return key;
@@ -98,13 +128,21 @@ class OZT_Open
         }
         if (e.Stocked)
             wg.Stock = OZT_Book.StockOf(trader, e, level, null);
-        wg.Buy = OZT_Book.ShelfWith(player, trader, e, level);
-        if (level == 0)
+        // OZT_Book.ShelfWith, with what comes along asked once and only for
+        // goods that name something: it was asked twice a record, an array or
+        // two made each time (load test, 2026-11-13).
+        int own = OZT_Book.ShelfPrice(player, trader, e, level);
+        wg.Buy = own;
+        if (level == 0 && e.With && e.With.Count() > 0)
         {
             array<string> comes;
             OZT_Book.ComesAt(player, trader, e, 1, null, comes);
             for (int w = 0; w < comes.Count(); w++)
+            {
                 wg.With.Insert(comes[w]);
+                if (own > 0)
+                    wg.Buy = wg.Buy + OZT_Book.ShelfPrice(player, trader, OZT_Book.EntryFor(trader, comes[w]), 0);
+            }
         }
         if (e.Sell > 0)
             wg.Sell = OZT_Config.RoundDownTo(e.Sell * trader.SellFactor, unit);
@@ -134,7 +172,7 @@ class OZT_Open
 
     // The records of one line of the book at this trader: a stocked class has a
     // record per condition the stock holds, or one that says nothing is held.
-    protected static void AddRecords(PlayerBase player, OZT_Point trader, OZT_BookEntry e, int unit, array<ref OZT_WireGoods> into)
+    static void AddRecords(PlayerBase player, OZT_Point trader, OZT_BookEntry e, int unit, array<ref OZT_WireGoods> into)
     {
         if (!e.Stocked)
         {
@@ -161,42 +199,26 @@ class OZT_Open
             into.Insert(none);
     }
 
-    // The answer to a request already read: an open, or a part of one (the classes
-    // in req.Only, and the player's side whole).
-    static string AnswerTo(PlayerBase player, OZT_OpenReq req, out bool ok, out string error)
+    // Why this player may not have the open of this trader now, as a key of the
+    // string table; "" when they may.
+    static string Refusal(PlayerBase player, OZT_Point trader)
     {
-        ok = false;
-        error = OZT_Const.NO_INTERNAL;
-        string err;
-        bool part = req.Part == 1;
-
-        OZT_Point trader = OZT_Config.Get().FindTrader(req.Trader);
         float away = -1;
         if (trader)
             away = OZT_Points.Away(trader.Id, player);
         if (away < 0)
-        {
-            error = OZT_Const.NO_CLOSED;
-            return "";
-        }
+            return OZT_Const.NO_CLOSED;
         if (away > trader.Radius)
-        {
-            error = OZT_Const.NO_TOO_FAR;
-            return "";
-        }
+            return OZT_Const.NO_TOO_FAR;
         if (!OZT_Gates.Admits(player, trader))
-        {
-            error = OZT_Const.NO_ACCESS;
-            return "";
-        }
+            return OZT_Const.NO_ACCESS;
+        return "";
+    }
 
-        OZT_MoneyProvider money = OZT_Money.Of(trader);
-        if (!money)
-            return "";
-
-        // How long a big book takes (TickCount ticks at 10 MHz): the goods, the
-        // player's things, the writing of the answer, each said in the debug log.
-        int t0 = TickCount(0);
+    // The head of an answer: the trader, the money and what the player holds of
+    // it, the licences; no goods and nothing the player carries.
+    static OZT_OpenRes HeadOf(PlayerBase player, OZT_Point trader, OZT_MoneyProvider money)
+    {
         OZT_OpenRes res = new OZT_OpenRes();
         res.Revision = OZT_Config.Get().Revision();
         res.Trader = trader.Id;
@@ -221,85 +243,55 @@ class OZT_Open
         array<string> granted = OZT_Licences.Of(OZT_Licences.UidOf(player));
         for (int h = 0; h < granted.Count(); h++)
             res.Licences.Insert(granted[h]);
+        return res;
+    }
 
-        int unit = OZT_Config.Get().Unit();
-        if (part)
+    // The categories of a trader's shelf in its order, the change tab last when
+    // the trader changes notes.
+    static void CategoriesOf(OZT_Point trader, array<ref OZT_WireCategory> into)
+    {
+        for (int c = 0; c < trader.Categories.Count(); c++)
         {
-            // The classes asked for, each once, at the line this trader deals by;
-            // a class it no longer deals in gets no record, and the screen drops
-            // what it had of it.
-            res.Part = 1;
-            map<string, bool> asked = new map<string, bool>();
-            if (req.Only)
-            {
-                for (int q = 0; q < req.Only.Count(); q++)
-                {
-                    string type = req.Only[q];
-                    if (type == "" || asked.Contains(type))
-                        continue;
-                    asked.Set(type, true);
-                    res.Only.Insert(type);
-                    OZT_BookEntry pe = OZT_Book.EntryFor(trader, type);
-                    if (!pe || trader.Categories.Find(pe.Category) < 0)
-                        continue;
-                    AddRecords(player, trader, pe, unit, res.Goods);
-                }
-            }
+            OZT_Category cat = OZT_Config.Get().FindCategory(trader.Categories[c]);
+            if (!cat)
+                continue;
+            OZT_WireCategory wc = new OZT_WireCategory();
+            wc.Id = cat.Id;
+            wc.Name = cat.Name;
+            into.Insert(wc);
         }
-        else
-        {
-            for (int c = 0; c < trader.Categories.Count(); c++)
-            {
-                OZT_Category cat = OZT_Config.Get().FindCategory(trader.Categories[c]);
-                if (!cat)
-                    continue;
-                OZT_WireCategory wc = new OZT_WireCategory();
-                wc.Id = cat.Id;
-                wc.Name = cat.Name;
-                res.Categories.Insert(wc);
-
-                for (int g = 0; g < cat.Goods.Count(); g++)
-                {
-                    // A class in two of the trader's categories stands in the
-                    // first only: its line there is the one the deals use.
-                    OZT_BookEntry e = OZT_Book.EntryFor(trader, cat.Goods[g].ClassName);
-                    if (!e || e.Category != cat.Id)
-                        continue;
-                    AddRecords(player, trader, e, unit, res.Goods);
-                }
-            }
-        }
-
-        int tGoods = TickCount(t0);
-        // Colour groups are of the whole shelf: a part keeps the groups the
-        // screen has.
-        if (!part && OZT_Config.Get().Settings().GroupVariants == 1)
-            GroupVariants(res.Goods);
-        int tGroups = TickCount(t0);
-
-        // The change tab: the server's notes at face value, when this trader
-        // changes them. The screen names the tab itself.
-        if (!part && OZT_Book.Changes(trader))
+        if (OZT_Book.Changes(trader))
         {
             OZT_WireCategory change = new OZT_WireCategory();
             change.Id = OZT_Const.CATEGORY_CHANGE;
             change.Name = "";
-            res.Categories.Insert(change);
-            array<ref OZT_Note> changed = OZT_Config.Get().Settings().Notes;
-            for (int m = 0; m < changed.Count(); m++)
-            {
-                OZT_WireGoods note = new OZT_WireGoods();
-                note.ClassName = changed[m].ClassName;
-                note.Category = OZT_Const.CATEGORY_CHANGE;
-                note.Buy = changed[m].Value;
-                note.Sell = changed[m].Value;
-                note.Rule = OZT_Const.RULE_UNIT;
-                res.Goods.Insert(note);
-            }
+            into.Insert(change);
         }
+    }
 
-        // What the player carries that this trader pays for, each with what it
-        // brings as it is now. The screen marks everything else as not taken.
+    // The change tab: the server's notes at face value, when this trader
+    // changes them. The screen names the tab itself.
+    static void NotesOf(OZT_Point trader, array<ref OZT_WireGoods> into)
+    {
+        if (!OZT_Book.Changes(trader))
+            return;
+        array<ref OZT_Note> changed = OZT_Config.Get().Settings().Notes;
+        for (int m = 0; m < changed.Count(); m++)
+        {
+            OZT_WireGoods note = new OZT_WireGoods();
+            note.ClassName = changed[m].ClassName;
+            note.Category = OZT_Const.CATEGORY_CHANGE;
+            note.Buy = changed[m].Value;
+            note.Sell = changed[m].Value;
+            note.Rule = OZT_Const.RULE_UNIT;
+            into.Insert(note);
+        }
+    }
+
+    // What the player carries that this trader pays for, each with what it
+    // brings as it is now. The screen marks everything else as not taken.
+    static void YoursOf(PlayerBase player, OZT_Point trader, array<ref OZT_WireOwn> into)
+    {
         array<EntityAI> all = new array<EntityAI>();
         player.GetInventory().EnumerateInventory(InventoryTraversalType.PREORDER, all);
         for (int i = 0; i < all.Count(); i++)
@@ -342,8 +334,92 @@ class OZT_Open
                 if (tree.Inside > 0)
                     wo.Why = 2;
             }
-            res.Yours.Insert(wo);
+            into.Insert(wo);
         }
+    }
+
+    // The answer to a request already read, whole in one message: a part of an
+    // open (the classes in req.Only, and the player's side whole), or a whole
+    // open for the stand's verb. A screen's whole open goes by pages
+    // (OZT_OpenStreams).
+    static string AnswerTo(PlayerBase player, OZT_OpenReq req, out bool ok, out string error)
+    {
+        ok = false;
+        error = OZT_Const.NO_INTERNAL;
+        string err;
+        bool part = req.Part == 1;
+
+        OZT_Point trader = OZT_Config.Get().FindTrader(req.Trader);
+        string refused = Refusal(player, trader);
+        if (refused != "")
+        {
+            error = refused;
+            return "";
+        }
+
+        OZT_MoneyProvider money = OZT_Money.Of(trader);
+        if (!money)
+            return "";
+
+        // How long a big book takes (TickCount ticks at 10 MHz): the goods, the
+        // player's things, the writing of the answer, each said in the debug log.
+        int t0 = TickCount(0);
+        OZT_OpenRes res = HeadOf(player, trader, money);
+
+        int unit = OZT_Config.Get().Unit();
+        if (part)
+        {
+            // The classes asked for, each once, at the line this trader deals by;
+            // a class it no longer deals in gets no record, and the screen drops
+            // what it had of it.
+            res.Part = 1;
+            map<string, bool> asked = new map<string, bool>();
+            if (req.Only)
+            {
+                for (int q = 0; q < req.Only.Count(); q++)
+                {
+                    string type = req.Only[q];
+                    if (type == "" || asked.Contains(type))
+                        continue;
+                    asked.Set(type, true);
+                    res.Only.Insert(type);
+                    OZT_BookEntry pe = OZT_Book.EntryFor(trader, type);
+                    if (!pe || trader.Categories.Find(pe.Category) < 0)
+                        continue;
+                    AddRecords(player, trader, pe, unit, res.Goods);
+                }
+            }
+        }
+        else
+        {
+            CategoriesOf(trader, res.Categories);
+            for (int c = 0; c < trader.Categories.Count(); c++)
+            {
+                OZT_Category cat = OZT_Config.Get().FindCategory(trader.Categories[c]);
+                if (!cat)
+                    continue;
+                for (int g = 0; g < cat.Goods.Count(); g++)
+                {
+                    // A class in two of the trader's categories stands in the
+                    // first only: its line there is the one the deals use.
+                    OZT_BookEntry e = OZT_Book.EntryFor(trader, cat.Goods[g].ClassName);
+                    if (!e || e.Category != cat.Id)
+                        continue;
+                    AddRecords(player, trader, e, unit, res.Goods);
+                }
+            }
+        }
+
+        int tGoods = TickCount(t0);
+        // Colour groups are of the whole shelf: a part keeps the groups the
+        // screen has.
+        if (!part && OZT_Config.Get().Settings().GroupVariants == 1)
+            GroupVariants(res.Goods);
+        int tGroups = TickCount(t0);
+
+        if (!part)
+            NotesOf(trader, res.Goods);
+        YoursOf(player, trader, res.Yours);
         int tYours = TickCount(t0);
 
         int records = res.Goods.Count();
@@ -399,7 +475,25 @@ class OZT_Service : OZ_ServiceHandler
         }
 
         if (op == OZT_Const.OP_OPEN)
-            return OZT_Open.Answer(player, json, ok, error);
+        {
+            OZT_OpenReq req = new OZT_OpenReq();
+            string err;
+            if (!JsonFileLoader<OZT_OpenReq>.LoadData(json, req, err))
+            {
+                error = OZT_Const.NO_INTERNAL;
+                OZT_Log.Dbg("open refused: unreadable body (" + err + ")");
+                return "";
+            }
+            // A part, or an open from a screen that does not number them: the
+            // answer whole, now.
+            if (req.Part == 1 || req.Ask <= 0)
+                return OZT_Open.AnswerTo(player, req, ok, error);
+            // A screen's whole open: its head now, the goods by pages after it.
+            if (!OZT_OpenStreams.Start(player, req, error))
+                return "";
+            error = OZ_Const.DEFER;
+            return "";
+        }
         int t0 = TickCount(0);
         string body = "";
         if (op == OZT_Const.OP_DEAL)

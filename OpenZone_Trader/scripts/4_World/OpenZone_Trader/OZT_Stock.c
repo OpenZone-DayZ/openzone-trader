@@ -391,6 +391,8 @@ class OZT_StockNews
 {
     static void Tell(string stock, PlayerBase dealer, array<string> classes = null)
     {
+        // The kept shelves of the open by pages read those classes again.
+        OZT_ShelfCaches.Moved(stock, classes);
         array<OZT_Point> points = new array<OZT_Point>();
         array<ref OZT_Point> all = OZT_Config.Get().Traders().Traders;
         for (int i = 0; i < all.Count(); i++)

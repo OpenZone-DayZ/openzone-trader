@@ -448,6 +448,84 @@
                         "font": "hint",
                         "color": "$text"
                       }
+                    },
+                    {
+                      "panel": {
+                        "name": "ShelfLoad",
+                        "at": [
+                          120,
+                          260
+                        ],
+                        "size": [
+                          320,
+                          58
+                        ],
+                        "color": "$raised",
+                        "priority": 700,
+                        "note": "The loading of an open by pages: the menu puts it in the middle of the empty shelf, then at the foot of the shelf while the rest of the goods come, and hides it at the last page. Priority 700: above the tiles' pictures and marks (610-612), below the dialogs (952).",
+                        "children": [
+                          {
+                            "label": {
+                              "name": "ShelfLoadText",
+                              "at": [
+                                12,
+                                6
+                              ],
+                              "size": [
+                                220,
+                                26
+                              ],
+                              "text": "#STR_OZT_UI_LOADING_GOODS",
+                              "font": "body",
+                              "color": "$text"
+                            }
+                          },
+                          {
+                            "label": {
+                              "name": "ShelfLoadPct",
+                              "at": [
+                                232,
+                                6
+                              ],
+                              "size": [
+                                76,
+                                26
+                              ],
+                              "font": "body",
+                              "color": "$gold",
+                              "align": "right"
+                            }
+                          },
+                          {
+                            "panel": {
+                              "name": "ShelfLoadTrack",
+                              "at": [
+                                12,
+                                38
+                              ],
+                              "size": [
+                                296,
+                                6
+                              ],
+                              "color": "$rule"
+                            }
+                          },
+                          {
+                            "panel": {
+                              "name": "ShelfLoadBar",
+                              "at": [
+                                12,
+                                38
+                              ],
+                              "size": [
+                                296,
+                                6
+                              ],
+                              "color": "$accent"
+                            }
+                          }
+                        ]
+                      }
                     }
                   ]
                 }

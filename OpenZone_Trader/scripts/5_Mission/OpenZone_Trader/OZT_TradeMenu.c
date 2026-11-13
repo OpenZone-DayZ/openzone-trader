@@ -193,6 +193,30 @@ class OZT_TradeMenu : UIScriptedMenu
     protected bool m_OpenFlying;
     protected bool m_DealFlying;
 
+    // THE OPEN BY PAGES (load test, 2026-11-13). The number of the last whole
+    // open asked; while its pages come the shelf fills as they do and a panel
+    // says how far it is; news of a stock that comes meanwhile waits for the
+    // last page, as the storage mod's changes wait for its stream's end.
+    protected int m_Ask;
+    protected bool m_Loading;
+    protected bool m_Streaming;
+    protected int m_LoadLines;
+    protected int m_LoadDone;
+    protected int m_LoadPages;
+    protected int m_LoadBytes;
+    protected ref array<string> m_RowCats;
+    protected ref array<string> m_Pending;
+    protected Widget m_Load;
+    protected Widget m_LoadTrack;
+    protected Widget m_LoadBar;
+    // The tile each colour group stands on, for goods of a group that come
+    // after its first.
+    protected ref map<string, OZT_Tile> m_GroupTiles;
+    // The categories with anything to buy, and with anything to sell: one walk
+    // over the goods (it was a walk per category and side at every answer).
+    protected ref map<string, bool> m_CatBuy;
+    protected ref map<string, bool> m_CatSell;
+
     // True while the info line holds what stays with the player: the next
     // quote that keeps nothing takes it away.
     protected bool m_SaidStays;
@@ -241,6 +265,11 @@ class OZT_TradeMenu : UIScriptedMenu
         m_SlotTiles = new array<ref OZT_Tile>();
         m_OffToo = new array<EntityAI>();
         m_QuoteIn = -1;
+        m_RowCats = new array<string>();
+        m_Pending = new array<string>();
+        m_GroupTiles = new map<string, OZT_Tile>();
+        m_CatBuy = new map<string, bool>();
+        m_CatSell = new map<string, bool>();
     }
 
     // The trader the next opening is for.
@@ -289,6 +318,11 @@ class OZT_TradeMenu : UIScriptedMenu
         m_List = new OZT_PriceList();
         m_Ghost = layoutRoot.FindAnyWidget("TradeGhost");
         m_GhostPic = ItemPreviewWidget.Cast(layoutRoot.FindAnyWidget("GhostPic"));
+        m_Load = layoutRoot.FindAnyWidget("ShelfLoad");
+        m_LoadTrack = layoutRoot.FindAnyWidget("ShelfLoadTrack");
+        m_LoadBar = layoutRoot.FindAnyWidget("ShelfLoadBar");
+        if (m_Load)
+            m_Load.Show(false);
         return layoutRoot;
     }
 
@@ -522,12 +556,27 @@ class OZT_TradeMenu : UIScriptedMenu
             for (int i = 0; i < only.Count(); i++)
                 req.Only.Insert(only[i]);
         }
+        else
+        {
+            // A whole open comes by pages, numbered so that the pages of an
+            // older one are let go.
+            m_Ask++;
+            req.Ask = m_Ask;
+        }
         string json;
         string err;
         if (!JsonFileLoader<OZT_OpenReq>.MakeData(req, json, err, false))
             return;
         m_OpenFlying = true;
         m_OpenT0 = TickCount(0);
+        if (!only)
+        {
+            m_Loading = true;
+            m_Streaming = false;
+            m_LoadLines = 0;
+            m_LoadDone = 0;
+            PaintLoading();
+        }
         OZ_Rpc.ServiceRequest(OZT_Const.SERVICE, OZT_Const.OP_OPEN, json);
     }
 
@@ -556,17 +605,27 @@ class OZT_TradeMenu : UIScriptedMenu
             m_OpenFlying = false;
             if (!ok)
             {
+                m_Streaming = false;
+                m_Loading = false;
+                PaintLoading();
                 SayInfo(OZT_Ui.Words(error), OZT_Look.Bad());
                 return;
             }
+            // The head of an open by pages keeps the open flying (BeginStream).
             TakeOpen(json);
-            // A stock changed while this answer flew: it may predate that.
-            if (m_NewsWaits)
+            // A stock changed while this answer flew: it may predate that. An
+            // open by pages asks once its last page is in (EndStream).
+            if (m_NewsWaits && !m_OpenFlying)
             {
                 m_NewsWaits = false;
                 m_Quote = null;
                 AskOpen();
             }
+            return;
+        }
+        if (op == OZT_Const.OP_PAGE)
+        {
+            TakePage(ok, json);
             return;
         }
         if (op == OZT_Const.OP_STOCK)
@@ -595,6 +654,13 @@ class OZT_TradeMenu : UIScriptedMenu
         if (!ok || !m_Data)
             return;
         m_ByNews = true;
+        // The pages of an open are coming: the news is put in place after the
+        // last one (EndStream).
+        if (m_Streaming)
+        {
+            m_Pending.Insert(json);
+            return;
+        }
         if (m_OpenFlying || m_DealFlying)
         {
             m_NewsWaits = true;
@@ -617,8 +683,23 @@ class OZT_TradeMenu : UIScriptedMenu
             return;
         }
         OZT_WireRows.Unpack(res);
+        // The head of an open by pages: the goods come after it (TakePage). One
+        // that answers an older open is let go.
+        if (res.Ask > 0)
+        {
+            if (res.Ask == m_Ask && !pushed)
+                BeginStream(res, json.Length());
+            return;
+        }
         bool part = res.Part == 1;
         int records = res.Goods.Count();
+        // A whole open in one message (a server that does not page): the
+        // loading ends with it.
+        if (!part && !pushed)
+        {
+            m_Loading = false;
+            PaintLoading();
+        }
         // The shelf keeps its shape: its tiles are repainted where they lie.
         bool keep = false;
         if (part)
@@ -651,6 +732,7 @@ class OZT_TradeMenu : UIScriptedMenu
         }
         bool first = m_Data == null;
         m_Data = res;
+        CountShelved();
         // A licence bought opens a category, a stock sold out may close one.
         if (first || TabsSig() != m_TabSig)
         {
@@ -685,6 +767,201 @@ class OZT_TradeMenu : UIScriptedMenu
         if (!m_Cart.IsEmpty() && !m_Quote)
             QuoteSoon(QUOTE_AFTER);
         PaintDeal();
+    }
+
+    // The head of an open by pages: the money, the player's things and the
+    // tabs now, the goods page by page after it (TakePage). The cart is held to
+    // the shelf only once the last page is in.
+    protected void BeginStream(OZT_OpenRes res, int bytes)
+    {
+        m_OpenFlying = true;
+        m_Streaming = true;
+        m_Loading = true;
+        m_LoadLines = res.Lines;
+        m_LoadDone = 0;
+        m_LoadPages = 0;
+        m_LoadBytes = bytes;
+        m_RowCats.Clear();
+        if (res.RowCats)
+            m_RowCats.InsertAll(res.RowCats);
+        m_Pending.Clear();
+        bool first = m_Data == null;
+        m_Data = res;
+        CountShelved();
+        if (first || TabsSig() != m_TabSig)
+            MakeTabs();
+        if (first)
+        {
+            PaintOwnFilter();
+            SayInfo(OZT_Ui.Words("STR_OZT_UI_HELLO"), OZT_Look.Text());
+        }
+        SayShelfMeta();
+        OZT_Ui.Say(layoutRoot, "OwnMoney", MoneyWords(res));
+        m_DirtyParts = true;
+        m_DirtyShelf = true;
+        m_DirtyOwn = true;
+        m_DirtySlots = true;
+        m_DirtyCarts = true;
+        m_Seen = ThingsSignature();
+        PaintLoading();
+        if (OZ_Log.IsDebug())
+        {
+            string said = "open head: " + bytes.ToString() + " B, " + res.Lines.ToString() + " line(s) to come, ";
+            said = said + OZT_Open.Ms(TickCount(m_OpenT0)) + " ms after the ask";
+            OZT_Log.Dbg(said);
+        }
+    }
+
+    // A page of the open: its goods after the ones the screen has, their tiles
+    // packed where the shelf's packing stopped; the last page ends the loading.
+    protected void TakePage(bool ok, string json)
+    {
+        if (!ok || !m_Streaming || !m_Data)
+            return;
+        OZT_OpenPage page = new OZT_OpenPage();
+        string err;
+        if (!JsonFileLoader<OZT_OpenPage>.LoadData(json, page, err))
+        {
+            OZT_Log.Error("a page of the open could not be read: " + err);
+            return;
+        }
+        if (page.Ask != m_Ask)
+            return;
+        int from = m_Data.Goods.Count();
+        OZT_WireRows.UnpackRows(page.Rows, m_RowCats, m_Data.Goods);
+        m_LoadDone = page.Done;
+        m_LoadPages++;
+        m_LoadBytes = m_LoadBytes + json.Length();
+        if (m_LoadPages == 1 && OZ_Log.IsDebug())
+            OZT_Log.Dbg("open first page: " + page.Rows.Count().ToString() + " record(s), " + OZT_Open.Ms(TickCount(m_OpenT0)) + " ms after the ask");
+        // A category's first goods give it its tab.
+        if (CountShelvedFrom(from) && TabsSig() != m_TabSig)
+            MakeTabs();
+        if (!m_DirtyShelf)
+            ShelfAppend(from);
+        if (page.More == 0)
+            EndStream();
+        else
+            PaintLoading();
+    }
+
+    // The last page is in: the loading ends, and what waited for it is done.
+    protected void EndStream()
+    {
+        m_Streaming = false;
+        m_OpenFlying = false;
+        m_Loading = false;
+        PaintLoading();
+        if (OZ_Log.IsDebug())
+        {
+            string said = "open streamed: " + m_Data.Goods.Count().ToString() + " record(s), " + m_LoadPages.ToString() + " page(s), ";
+            said = said + m_LoadBytes.ToString() + " B, the last " + OZT_Open.Ms(TickCount(m_OpenT0)) + " ms after the ask";
+            OZT_Log.Dbg(said);
+        }
+        if (m_Cart.Prune(m_Data) > 0)
+        {
+            m_Quote = null;
+            if (m_ByNews)
+                SayInfo(OZT_Ui.Words("STR_OZT_UI_CART_CUT"), OZT_Look.Alert());
+        }
+        if (!m_NewsWaits)
+            m_ByNews = false;
+        m_DirtyCarts = true;
+        // News of a stock that came with the pages, in the order it came.
+        array<string> waited = new array<string>();
+        waited.InsertAll(m_Pending);
+        m_Pending.Clear();
+        for (int i = 0; i < waited.Count(); i++)
+            TakeOpen(waited[i], true);
+        if (m_NewsWaits)
+        {
+            m_NewsWaits = false;
+            m_Quote = null;
+            AskOpen();
+            return;
+        }
+        if (!m_Cart.IsEmpty() && !m_Quote)
+            QuoteSoon(QUOTE_AFTER);
+        PaintDeal();
+    }
+
+    // The loading of a whole open: in the middle of the empty shelf until the
+    // first goods are on it, then at the foot of the shelf; the share of the
+    // book's lines that came.
+    protected void PaintLoading()
+    {
+        if (!m_Load)
+            return;
+        m_Load.Show(m_Loading);
+        if (!m_Loading)
+            return;
+        float sx;
+        float sy;
+        float sw;
+        float sh;
+        if (!m_ShelfGrid || !m_ShelfGrid.Frame(sx, sy, sw, sh))
+            return;
+        float bw;
+        float bh;
+        m_Load.GetSize(bw, bh);
+        float x = sx + (sw - bw) / 2;
+        float y = sy + (sh - bh) / 2;
+        if (m_ShelfGrid.Count() > 0)
+            y = sy + sh - bh - Math.Round(8 * OZT_Ui.Px());
+        m_Load.SetPos(x, y);
+
+        float share = 0;
+        string pct = "";
+        if (m_LoadLines > 0)
+        {
+            float done = m_LoadDone;
+            share = done / m_LoadLines;
+            if (share > 1)
+                share = 1;
+            int whole = Math.Floor(share * 100);
+            pct = whole.ToString() + " %";
+        }
+        OZT_Ui.Say(layoutRoot, "ShelfLoadPct", pct);
+        if (m_LoadTrack && m_LoadBar)
+        {
+            float tw;
+            float th;
+            m_LoadTrack.GetSize(tw, th);
+            m_LoadBar.SetSize(tw * share, th);
+        }
+    }
+
+    // Which categories have anything to buy and anything to sell, from the
+    // goods the screen has.
+    protected void CountShelved()
+    {
+        m_CatBuy.Clear();
+        m_CatSell.Clear();
+        CountShelvedFrom(0);
+    }
+
+    // The goods from `from` on into the counts; true when a category got its
+    // first goods on either side.
+    protected bool CountShelvedFrom(int from)
+    {
+        bool grew = false;
+        if (!m_Data)
+            return false;
+        for (int i = from; i < m_Data.Goods.Count(); i++)
+        {
+            OZT_WireGoods g = m_Data.Goods[i];
+            if (g.Buy > 0 && !m_CatBuy.Contains(g.Category))
+            {
+                m_CatBuy.Set(g.Category, true);
+                grew = true;
+            }
+            if (g.Sell > 0 && !m_CatSell.Contains(g.Category))
+            {
+                m_CatSell.Set(g.Category, true);
+                grew = true;
+            }
+        }
+        return grew;
     }
 
     // A part of the open into the screen's picture: the player's side whole, and
@@ -1004,7 +1281,9 @@ class OZT_TradeMenu : UIScriptedMenu
         if (now == m_Seen)
             return;
         m_Seen = now;
-        AskOpen();
+        // The player's side alone: a part of the open with no classes (it was
+        // the whole open, a big book's every page, at every change of a bag).
+        AskOpenOf(new array<string>());
     }
 
     protected int ThingsSignature()
@@ -1148,17 +1427,9 @@ class OZT_TradeMenu : UIScriptedMenu
     // it; what the trader takes of it keeps its tab beside the player's things.
     protected bool Shelved(string category, bool buying)
     {
-        for (int i = 0; i < m_Data.Goods.Count(); i++)
-        {
-            OZT_WireGoods g = m_Data.Goods[i];
-            if (g.Category != category)
-                continue;
-            if (buying && g.Buy > 0)
-                return true;
-            if (!buying && g.Sell > 0)
-                return true;
-        }
-        return false;
+        if (buying)
+            return m_CatBuy.Contains(category);
+        return m_CatSell.Contains(category);
     }
 
     // The categories of one strip: the change tab, and those with anything
@@ -1472,14 +1743,20 @@ class OZT_TradeMenu : UIScriptedMenu
             return;
         int t0 = TickCount(0);
         m_ShelfGrid.Clear();
+        m_GroupTiles.Clear();
         string cat = m_TabIds[m_ShelfTab];
 
-        // The colours of each group the shelf shows now (design §3.8).
+        // What the shelf shows, asked once a record (under a slot's filter the
+        // question asks the engine), and the colours of each group it shows
+        // (design §3.8).
+        array<bool> shows = new array<bool>();
         map<string, ref array<string>> colours = new map<string, ref array<string>>();
         for (int v = 0; v < m_Data.Goods.Count(); v++)
         {
             OZT_WireGoods vg = m_Data.Goods[v];
-            if (vg.Group == "" || !ShelfShows(vg, cat))
+            bool shown = ShelfShows(vg, cat);
+            shows.Insert(shown);
+            if (vg.Group == "" || !shown)
                 continue;
             array<string> members = colours.Get(vg.Group);
             if (!members)
@@ -1493,9 +1770,9 @@ class OZT_TradeMenu : UIScriptedMenu
 
         for (int i = 0; i < m_Data.Goods.Count(); i++)
         {
-            OZT_WireGoods g = m_Data.Goods[i];
-            if (!ShelfShows(g, cat))
+            if (!shows[i])
                 continue;
+            OZT_WireGoods g = m_Data.Goods[i];
             // One tile per group: the colour picked last, else the first.
             array<string> group = null;
             int at = 0;
@@ -1503,46 +1780,31 @@ class OZT_TradeMenu : UIScriptedMenu
                 group = colours.Get(g.Group);
             if (group && group.Count() > 1)
             {
-                string shown;
-                if (!m_VariantPick.Find(g.Group, shown) || group.Find(shown) < 0)
-                    shown = group[0];
-                if (g.ClassName != shown)
+                string picked;
+                if (!m_VariantPick.Find(g.Group, picked) || group.Find(picked) < 0)
+                    picked = group[0];
+                if (g.ClassName != picked)
                     continue;
-                at = group.Find(shown);
+                at = group.Find(picked);
             }
-            // Packed by the class's size alone: the picture and the widgets are
-            // made when the tile comes near the view (ShelfReveal).
-            string pic = g.ClassName;
-            if (g.Look != "")
-                pic = g.Look;
-            int tw;
-            int th;
-            if (!OZT_Tile.ConfigSize(pic, tw, th))
+            OZT_Tile t = ShelfTile(g, i);
+            if (!t)
                 continue;
-            OZT_Tile t = new OZT_Tile(OZT_Tile.SHELF, g.ClassName, null);
-            t.SizeTo(tw, th);
-            t.Price = g.Buy;
-            t.Index = i;
-            t.Level = g.Level;
-            if (group && group.Count() > 1)
+            if (group)
             {
                 t.Group = g.Group;
                 t.VarTypes = group;
                 t.VarAt = at;
+                m_GroupTiles.Set(g.Group, t);
             }
-            // A stocked line shows what it holds; a sold-out one lies dark.
-            if (g.Stock > 0)
-                t.Count = g.Stock;
-            else if (g.Stock == 0)
-                t.SoldOut = true;
-            if (g.Look != "")
-                t.Owned = HoldsLicence(g.ClassName);
             m_ShelfGrid.AddLazy(t);
         }
         int tRecords = TickCount(t0);
         m_ShelfGrid.Arrange();
         int tPacked = TickCount(t0);
         ShelfReveal(true);
+        if (m_Loading)
+            PaintLoading();
         if (OZ_Log.IsDebug())
         {
             string said = "shelf laid: records " + OZT_Open.Ms(tRecords) + " ms, packing " + OZT_Open.Ms(tPacked - tRecords);
@@ -1550,6 +1812,81 @@ class OZT_TradeMenu : UIScriptedMenu
             said = said + m_ShelfGrid.Count().ToString() + " tile(s)";
             OZT_Log.Dbg(said);
         }
+    }
+
+    // A shelf tile for a record, packed by the class's size alone: the picture
+    // and the widgets are made when the tile comes near the view (ShelfReveal).
+    // Null when the game has no such class.
+    protected OZT_Tile ShelfTile(OZT_WireGoods g, int index)
+    {
+        string pic = g.ClassName;
+        if (g.Look != "")
+            pic = g.Look;
+        int tw;
+        int th;
+        if (!OZT_Tile.ConfigSize(pic, tw, th))
+            return null;
+        OZT_Tile t = new OZT_Tile(OZT_Tile.SHELF, g.ClassName, null);
+        t.SizeTo(tw, th);
+        t.Price = g.Buy;
+        t.Index = index;
+        t.Level = g.Level;
+        // A stocked line shows what it holds; a sold-out one lies dark.
+        if (g.Stock > 0)
+            t.Count = g.Stock;
+        else if (g.Stock == 0)
+            t.SoldOut = true;
+        if (g.Look != "")
+            t.Owned = HoldsLicence(g.ClassName);
+        return t;
+    }
+
+    // Goods that came after the shelf was laid (a page of the open): their
+    // tiles after the ones there, packed where the packing stopped. A colour
+    // of a group already on the shelf joins its tile's colours.
+    protected void ShelfAppend(int from)
+    {
+        if (!m_Data || !m_ShelfGrid.IsReady())
+            return;
+        string cat = m_TabIds[m_ShelfTab];
+        int added = 0;
+        for (int i = from; i < m_Data.Goods.Count(); i++)
+        {
+            OZT_WireGoods g = m_Data.Goods[i];
+            if (!ShelfShows(g, cat))
+                continue;
+            if (g.Group != "")
+            {
+                OZT_Tile head;
+                if (m_GroupTiles.Find(g.Group, head) && head)
+                {
+                    if (head.VarTypes.Find(g.ClassName) < 0)
+                    {
+                        head.VarTypes.Insert(g.ClassName);
+                        if (head.Root)
+                            head.PaintMarks();
+                    }
+                    continue;
+                }
+            }
+            OZT_Tile t = ShelfTile(g, i);
+            if (!t)
+                continue;
+            if (g.Group != "")
+            {
+                t.Group = g.Group;
+                t.VarTypes = new array<string>();
+                t.VarTypes.Insert(g.ClassName);
+                t.VarAt = 0;
+                m_GroupTiles.Set(g.Group, t);
+            }
+            m_ShelfGrid.AddLazy(t);
+            added++;
+        }
+        if (added == 0)
+            return;
+        m_ShelfGrid.ArrangeMore();
+        m_ShelfMore = true;
     }
 
     // The shelf's tiles take their records' numbers again where they lie: a part
@@ -4030,7 +4367,9 @@ class OZT_TradeMenu : UIScriptedMenu
     // Sends the deal the last quote was for, with the net it gave.
     void ConfirmDeal()
     {
-        if (m_DealFlying || m_Cart.IsEmpty())
+        // Not while the pages of an open come: the deal's own part of the open
+        // would cross them.
+        if (m_DealFlying || m_Streaming || m_Cart.IsEmpty())
             return;
         if (!m_Quote || !m_QuoteOk || m_QuoteFor != m_Cart.Revision)
             return;

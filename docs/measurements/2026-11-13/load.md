@@ -116,11 +116,57 @@ so the wait is the engine's pace for guaranteed messages: 6.6 KB (load4, 8 parts
 27 KB (load2) in 0.5 s, 52 KB (load3) in 1.1 s, 124 KB (load1) in 3.0-3.2 s on every try. About
 45-50 KB/s; the server is free meanwhile, the player waits. Bytes are the lever.
 
+## The open by pages (the owner: "the player waits on an empty screen", "is the 0.12 s blocking
+## for the whole server", "load it in parts like the storage mod")
+
+Yes, it was: a server script runs in the server's one frame, so the 0.12 s of an open stopped
+everybody, and the screen stood empty until the last of the answer was in. Now, after the storage
+mod's stream of a box:
+
+- **A built shelf is kept** (`OZT_ShelfCache.c`). A goods record differs from one player to another
+  only where a gate speaks (a lock, a discount, a part that comes along by its own gates), so the
+  answers to every condition and discount the trader's lines name, asked once, decide the list
+  (`OZT_GatePrint`). Players whose answers agree share one shelf. It is built a slice a frame
+  (3 ms of server work at most, `OZT_Const.BUILD_TICKS`), a category's colour groups and rows when
+  the category is whole; kept 300 s after its last open, 16 at most.
+- **A deal does not throw it away**: the classes it moved are marked (`OZT_StockNews.Tell` ->
+  `OZT_ShelfCaches.Moved`) and read again before they are sent next (`MendMoved`).
+- **The open is a head and pages** (`OZT_OpenStreams`, moved by `MissionServer.OnUpdate`): the head
+  at once (money, the player's things, categories, how many lines will come), then pages of 100
+  rows at a pace (200 KB/s, `OZT_Const.STREAM_RATE`), the last saying so.
+- **The screen fills as pages come** (`OZT_TradeMenu.BeginStream`, `TakePage`, `EndStream`): tiles
+  are appended and packed where the packing stopped (`OZT_TileGrid.ArrangeMore`, the same places a
+  packing from the start gives), tabs appear with their first goods, and a panel says how far it
+  is: in the middle of the empty shelf, then at its foot ("Завантаження товару 40 %" / "Loading
+  goods"). News of a stock that comes meanwhile is held to the last page and put in place then; a
+  deal waits for the last page.
+- A change of the player's own things asks the player's side alone (a part with no classes), not
+  the whole open again.
+
+| open of load1 (3404 records, 126 KB, 35-38 pages) | before | after |
+|---|---|---|
+| server work | 83-156 ms in ONE frame | cold 143 ms over 31-33 frames (about 4 ms a frame); kept shelf 10-12 ms in all |
+| the head (money, things, tabs) on the client | with everything, 3.1-3.4 s | 41-72 ms after the ask |
+| the first goods on the shelf | with everything, 3.1-3.4 s | 47-108 ms after the ask |
+| everything on the client | 3.0-3.4 s | 1.9-3.2 s (by the pace, below) |
+
+The pace, the same 126 KB, the last page on the client after the ask: 2.88 s at 40 KB/s, 2.69 s at
+60, 2.15 s at 150, 1.94 s at 400; the whole answer as one message took 3.0 s. Past about 60 KB/s
+the rest waits in the engine's queue, where an answer to the player's next request waits behind
+it; 200 KB/s is the default. The stand's verb sets it for a measurement:
+`oz_trader {"op":"pace","rate":"150000","burst":"30000"}` (`drop=1` lets every kept shelf go).
+
+Checked on the stand, in English and Ukrainian: the loading panel over the empty shelf and at its
+foot, above the tiles (priority 700); tabs growing with the pages; news sent while the pages came
+put in place after the last one (one tile repainted, the shelf kept its shape); a purchase from the
+screen (quote 3 ms, deal 12 ms, its part 27 ms after the ask); the kept shelf mended by that deal
+(the apple 3 on the next open, built nothing).
+
 ## Left to do
 
-1. The first open of a big book still waits about 3 s on the engine's pace. A client cache of the
-   open per trader (sent again only when the book changed; the stock as a short list of numbers)
-   would spare it. A design question, not started.
-2. Packing the ALL tab of 3362 tiles takes 61 ms of one frame on every switch to it.
-3. Saving goods from the admin window under the core's cap (per category, or the cap).
-4. Capital `І` in names from the files.
+1. Packing the ALL tab of 3362 tiles takes 61 ms of one frame on every switch to it.
+2. Saving goods from the admin window under the core's cap (per category, or the cap).
+3. Capital `І` in names from the files.
+4. Not measured: many players opening at once (the shelves share the 3 ms of a frame, the oldest
+   open first); a kept shelf of a trader whose gates answer differently for many players (one
+   shelf per set of answers, 16 kept).

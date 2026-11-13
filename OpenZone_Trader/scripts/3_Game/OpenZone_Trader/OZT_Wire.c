@@ -16,6 +16,9 @@ class OZT_OpenReq
     // side whole -- the money, the things carried, the licences.
     int Part = 0;
     ref array<string> Only;
+    // The screen's number of this open: the head and the pages carry it back,
+    // and the screen drops what answers an open it no longer waits for.
+    int Ask = 0;
 
     void OZT_OpenReq()
     {
@@ -116,6 +119,11 @@ class OZT_OpenRes
     // place in RowCats; Goods is empty on the wire then and filled on arrival.
     ref array<string> Rows;
     ref array<string> RowCats;
+    // The head of an open sent by pages (OZT_OpenPage): the request's number,
+    // and the lines of the book the pages will go through, for the screen's
+    // progress. No goods come with the head; RowCats names the pages' categories.
+    int Ask = 0;
+    int Lines = 0;
 
     void OZT_OpenRes()
     {
@@ -128,6 +136,24 @@ class OZT_OpenRes
         Only = new array<string>();
         Rows = new array<string>();
         RowCats = new array<string>();
+    }
+}
+
+// A page of an open's goods, after its head (OZT_OpenRes with Ask): rows in the
+// book's order, the lines of the book they have gone through so far, and More 0
+// on the last page.
+class OZT_OpenPage
+{
+    string Trader = "";
+    int Ask = 0;
+    int Seq = 0;
+    int Done = 0;
+    int More = 0;
+    ref array<string> Rows;
+
+    void OZT_OpenPage()
+    {
+        Rows = new array<string>();
     }
 }
 
@@ -217,19 +243,29 @@ class OZT_WireRows
             res.Goods = new array<ref OZT_WireGoods>();
         if (!res.Rows || res.Rows.Count() == 0)
             return;
+        UnpackRows(res.Rows, res.RowCats, res.Goods);
+        res.Rows.Clear();
+    }
+
+    // Rows into records at the end of `into`, the categories named by `cats`
+    // (a page's rows by its head's RowCats).
+    static void UnpackRows(array<string> rows, array<string> cats, array<ref OZT_WireGoods> into)
+    {
+        if (!rows || !into)
+            return;
         array<string> f = new array<string>();
-        for (int i = 0; i < res.Rows.Count(); i++)
+        for (int i = 0; i < rows.Count(); i++)
         {
             f.Clear();
-            string row = res.Rows[i];
+            string row = rows[i];
             row.Split("|", f);
             if (f.Count() < 6)
                 continue;
             OZT_WireGoods g = new OZT_WireGoods();
             g.ClassName = f[0];
             int c = f[1].ToInt();
-            if (res.RowCats && c >= 0 && c < res.RowCats.Count())
-                g.Category = res.RowCats[c];
+            if (cats && c >= 0 && c < cats.Count())
+                g.Category = cats[c];
             g.Buy = f[2].ToInt();
             g.Sell = f[3].ToInt();
             g.Stock = f[4].ToInt();
@@ -248,9 +284,8 @@ class OZT_WireRows
                 g.Name = Value(f[9]);
             if (f.Count() > 10)
                 g.Look = Value(f[10]);
-            res.Goods.Insert(g);
+            into.Insert(g);
         }
-        res.Rows.Clear();
     }
 }
 

@@ -110,6 +110,9 @@ class OZT_Module : CF_ModuleWorld
         OZT_Stock.Reset();
         OZT_Licences.Reset();
         OZT_Fit.Reset();
+        OZT_Open.Reset();
+        OZT_OpenStreams.Reset();
+        OZT_ShelfCaches.Reset();
 
         // The core empties its own registries at mission end; the objects at
         // the points are ours to take away, and so is our handler of its packet.

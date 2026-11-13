@@ -23,6 +23,7 @@ STR_OZT_UI_YOURS_META,"усе, що у ваших сумках",everything in yo
 STR_OZT_UI_YOURS_SELLABLE,"лише те, що можна продати",only what can be sold
 STR_OZT_UI_CHARACTER,ПЕРСОНАЖ,CHARACTER
 STR_OZT_UI_ALL,УСЕ,ALL
+STR_OZT_UI_LOADING_GOODS,Завантаження товару,Loading goods
 STR_OZT_UI_BUY_EMPTY,"Перетягніть сюди товар або двічі клацніть його на полиці","Drag goods here, or double-click them on the shelf"
 STR_OZT_UI_SELL_EMPTY,"Перетягніть сюди свої речі або двічі клацніть їх","Drag your items here, or double-click them"
 STR_OZT_UI_TO_PAY,До сплати,To pay

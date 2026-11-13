@@ -13,7 +13,14 @@ packaging/<Mod>.workshop.bbcode
                             (at most 8000 BYTES: a Cyrillic letter is two)
 packaging/<Mod>.workshop.png
                             the preview image the item's page shows, 1024x512
+packaging/<Mod>.shot<N>.<en|uk>.jpg
+                            the item's screenshot strip, in order, English and Ukrainian;
+                            flat beside the preview, never in packaging/<Mod>/, which
+                            package.ps1 copies into the mod
 ```
+
+The strip goes up with `workshop_publish("<Mod>", previews=[...], content=False)`. Every
+call ADDS pictures, so send each one once; taking one down is done on the item's page.
 
 Four mods ship: `OpenZone_Trader`, and three glues that each hard-require another mod:
 `OpenZone_Trader_VPP` (the TRADERS pane; needs VPP Admin Tools and the core's OpenZone_VPP),

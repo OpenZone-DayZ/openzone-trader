@@ -1,0 +1,52 @@
+{
+  "layout": "ozt_trade_pick",
+  "note": "One row of a category dropdown of the trade screen. The root takes the pointer and carries the category's place as its user id; the menu sizes it, marks the category in view (PickMark, the text lit) and the row under the cursor (PickBg), and sets the text (OZT_TradeMenu.c).",
+  "root": {
+    "frame": {
+      "name": "OZT_TradePick",
+      "size": [
+        528,
+        32
+      ],
+      "children": [
+        {
+          "panel": {
+            "name": "PickBg",
+            "size": "fill",
+            "color": "$raised"
+          }
+        },
+        {
+          "panel": {
+            "name": "PickMark",
+            "at": [
+              0,
+              0
+            ],
+            "size": [
+              3,
+              32
+            ],
+            "color": "$accent",
+            "hidden": true
+          }
+        },
+        {
+          "label": {
+            "name": "PickText",
+            "at": [
+              14,
+              0
+            ],
+            "size": [
+              500,
+              32
+            ],
+            "font": "small",
+            "color": "$muted"
+          }
+        }
+      ]
+    }
+  }
+}

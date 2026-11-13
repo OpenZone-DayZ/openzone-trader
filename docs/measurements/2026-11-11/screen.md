@@ -65,6 +65,12 @@ and a pile of twelve 7.62x39 rounds in the pants. The screen is opened by the se
 | S.46 | ОТРИМАТИ, F | "РІВНИЙ ОБМІН" 0, Продаєте +100, Купуєте -100, Грошей після угоди 2 300; then "Угоду укладено" | `net 0 (items): -OZT_ProbeNote100x1=100 +OZT_ProbeNote20x5=100`; the 100s 3 to 2, five 20s in the jacket. `dump 51`: SAME (`change-100-into-five-20`) |
 | S.47 | English: the tab, a 500 given, the shelf's 100, F | "Change" on both strips; "HOW MANY TO GIVE" / GIVE, "HOW MANY TO TAKE" / TAKE at 5; EVEN TRADE 0, Money after 2 300 | the 100s 3 to 8, the 500s 4 to 3. `dump 54`: SAME (`change-500-into-five-100-en`) |
 | S.48 | Ukrainian again on a later build: a 500 given | the rest of the stack reads "1 500 · 3": a note's sum is its face value, so the client says it (before, a stack partly in the deal showed its count and no sum); the deal as S.47. `dump 61`: SAME (`change-500-into-five-100-ua`) | `quote` answered |
+| S.49 | the category dropdowns (the owner, 2026-11-13: the tabs of a 19-category book filled the inventory), English, the load test's trader `load1` | one row each side, "ALL" and an arrow down; the shelf's goods start right under it (the tabs took seven rows) | -- |
+| S.50 | a press on the shelf's dropdown | the list over the grid: ALL marked (accent edge, lit text), the row under the cursor lit, a scrollbar, the arrow up | -- |
+| S.51 | a press on "Набої"; then the wheel twice down over the shut row | the list shuts, the shelf shows the ammunition and the row reads "Набої"; the wheel: Обвіс, then Головні убори | -- |
+| S.52 | YOUR ITEMS' dropdown, the wheel in its list to the end, a press on "Change" | the list scrolls to Change; both sides turn to Change: the trader's six notes, the player's five stacks | -- |
+| S.53 | a press on the shelf's dropdown, then Esc | the list shuts, the screen stays | -- |
+| S.54 | Ukrainian: the shelf's dropdown shut and open | "УСЕ" and the arrow; the open list: УСЕ marked, Зброя .. Їжа, the row under the cursor lit | -- |
 
 No `SCRIPT (E)` line and no `ERROR` line in the client's or the server's log of any of
 these runs; the boots' verdicts were a pass.

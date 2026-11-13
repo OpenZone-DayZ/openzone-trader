@@ -15,19 +15,22 @@ class OZT_TradeMenu : UIScriptedMenu
 {
     static const string LAYOUT     = "OpenZone_Trader/gui/layouts/ozt_trade.layout";
     static const string ROOT       = "OZT_Trade";
-    static const string TAB_LAYOUT = "OpenZone_Trader/gui/layouts/ozt_trade_tab.layout";
-    static const string TAB_ROOT   = "OZT_TradeTab";
+    static const string PICK_LAYOUT = "OpenZone_Trader/gui/layouts/ozt_trade_pick.layout";
+    static const string PICK_ROOT   = "OZT_TradePick";
 
-    // The tab strips, in layout units (ozt_trade.json): where a strip starts
-    // and where the grid under it ends; a tab's height in one row and in
-    // several; how wide a tab must be for its name.
+    // The category dropdowns, in layout units (ozt_trade.json): where the
+    // button stands and how tall it is, how tall a row of its list is, and
+    // where the grid under it ends. They were tab strips, in as many rows as
+    // the categories needed, and a big book's took the shelf (the owner,
+    // 2026-11-13: "a dropdown, it is handier").
     static const float STRIP_TOP   = 48;
+    static const float PICK_HIGH   = 36;
+    static const float PICK_ROW    = 32;
     static const float GRID_BOTTOM = 492;
-    static const float TAB_HIGH    = 44;
-    static const float TAB_LOW     = 30;
-    static const float TAB_LETTER  = 7;
-    static const float TAB_AIR     = 24;
-    static const float TAB_LEAST   = 72;
+    // Which dropdown is open.
+    static const int PICK_NONE  = 0;
+    static const int PICK_SHELF = 1;
+    static const int PICK_OWN   = 2;
     static const string SLOT_LAYOUT = "OpenZone_Trader/gui/layouts/ozt_trade_slot.layout";
     static const string SLOT_ROOT   = "OZT_TradeSlot";
     static const string SLOT_LIST   = "CfgVehicles SurvivorBase InventoryEquipment playerSlots";
@@ -82,11 +85,21 @@ class OZT_TradeMenu : UIScriptedMenu
     // player may buy, the player's things one for what the trader takes.
     protected ref array<string> m_TabIds;
     protected ref array<string> m_OwnIds;
-    protected ref array<Widget> m_ShelfTabs;
-    protected ref array<Widget> m_OwnTabs;
+    protected ref array<string> m_TabNames;
+    protected ref array<string> m_OwnNames;
     protected int m_ShelfTab;
     protected int m_OwnTab;
     protected string m_TabSig;
+
+    // The open dropdown (PICK_*), its rows, the row under the cursor; a row
+    // pressed is taken, and the list shut, in Update with the button up (a
+    // row is not unlinked under its own press).
+    protected int m_PickOpen;
+    protected ref array<Widget> m_PickRows;
+    protected int m_PickHover = -1;
+    protected bool m_PickShutSoon;
+    protected int m_PickWant = -1;
+    protected int m_PickWantSide;
 
     // The player's things: everything in the bags, or only what sells (the
     // owner, 2026-11-12). The player's choice for the whole session.
@@ -259,8 +272,9 @@ class OZT_TradeMenu : UIScriptedMenu
         m_Cart = new OZT_Cart();
         m_TabIds = new array<string>();
         m_OwnIds = new array<string>();
-        m_ShelfTabs = new array<Widget>();
-        m_OwnTabs = new array<Widget>();
+        m_TabNames = new array<string>();
+        m_OwnNames = new array<string>();
+        m_PickRows = new array<Widget>();
         m_SlotWidgets = new array<Widget>();
         m_SlotTiles = new array<ref OZT_Tile>();
         m_OffToo = new array<EntityAI>();
@@ -359,6 +373,7 @@ class OZT_TradeMenu : UIScriptedMenu
 
     override void OnHide()
     {
+        ClosePick();
         if (m_GhostPic)
             m_GhostPic.SetItem(null);
         ClearSlots();
@@ -433,6 +448,8 @@ class OZT_TradeMenu : UIScriptedMenu
                 m_Qty.Shut();
             else if (m_List && m_List.IsOpen())
                 m_List.Shut();
+            else if (m_PickOpen != PICK_NONE)
+                ClosePick();
             else if (m_Filter)
                 ClearFilter();
             else
@@ -452,10 +469,25 @@ class OZT_TradeMenu : UIScriptedMenu
 
         TurnPlayer();
         DragFrame();
-        HoverFrame(timeslice);
+        if (m_PickOpen != PICK_NONE)
+            PickHoverFrame();
+        else
+            HoverFrame(timeslice);
 
         if (!LeftDown() && !m_Dragged)
         {
+            // A dropdown's row pressed, or a press beside an open list.
+            if (m_PickShutSoon)
+            {
+                m_PickShutSoon = false;
+                int wantSide = m_PickWantSide;
+                int want = m_PickWant;
+                m_PickWant = -1;
+                m_PickWantSide = PICK_NONE;
+                ClosePick();
+                if (want > -1)
+                    ChooseTab(wantSide, want);
+            }
             if (m_ActKind != 0)
                 RunAct();
             if (m_DirtyShelf)
@@ -1487,100 +1519,227 @@ class OZT_TradeMenu : UIScriptedMenu
         m_TabSig = TabsSig();
         m_TabIds.Clear();
         m_OwnIds.Clear();
-        array<string> shelfNames = new array<string>();
-        array<string> ownNames = new array<string>();
-        TabsOf(true, m_TabIds, shelfNames);
-        TabsOf(false, m_OwnIds, ownNames);
-        float shelfStrip = MakeStrip("ShelfTabs", shelfNames, m_ShelfTabs);
-        float ownStrip = MakeStrip("OwnTabs", ownNames, m_OwnTabs);
-        // The grid starts below its strip and ends where the layout ends it.
+        m_TabNames.Clear();
+        m_OwnNames.Clear();
+        TabsOf(true, m_TabIds, m_TabNames);
+        TabsOf(false, m_OwnIds, m_OwnNames);
+        // The grid starts below its dropdown and ends where the layout ends it.
         float px = OZT_Ui.Px();
         float top = Math.Round(STRIP_TOP * px);
+        float strip = Math.Round(PICK_HIGH * px);
         float gap = Math.Round(4 * px);
         float bottom = Math.Round(GRID_BOTTOM * px);
-        m_ShelfGrid.Reframe(top + shelfStrip + gap, bottom);
-        m_OwnGrid.Reframe(top + ownStrip + gap, bottom);
+        m_ShelfGrid.Reframe(top + strip + gap, bottom);
+        m_OwnGrid.Reframe(top + strip + gap, bottom);
         m_ShelfTab = m_TabIds.Find(shelfWas);
         if (m_ShelfTab < 0)
             m_ShelfTab = 0;
         m_OwnTab = m_OwnIds.Find(ownWas);
         if (m_OwnTab < 0)
             m_OwnTab = 0;
+        // An open list is laid again for the categories there are now (the
+        // pages of an open bring them one by one).
+        if (m_PickOpen != PICK_NONE)
+        {
+            int side = m_PickOpen;
+            ClosePick();
+            OpenPick(side);
+        }
         PaintTabs();
-    }
-
-    // The tabs of a strip, in as many rows as their names need: one row
-    // while every tab has room for the longest name, more when the admin's
-    // categories are many (the owner, 2026-11-11: categories are the admin's
-    // own). Tabs of a row share its width. Returns the strip's height in
-    // pixels; the grid below gives that height up.
-    protected float MakeStrip(string strip, array<string> names, array<Widget> into)
-    {
-        Widget host = layoutRoot.FindAnyWidget(strip);
-        if (!host)
-            return 0;
-        for (int old = 0; old < into.Count(); old++)
-        {
-            if (into[old])
-                into[old].Unlink();
-        }
-        into.Clear();
-
-        float px = OZT_Ui.Px();
-        float gap = Math.Round(4 * px);
-        float all = OZT_TileGrid.COLS * Math.Floor(OZT_TileGrid.CELL_UNITS * px);
-        int n = names.Count();
-        if (n < 1)
-            return 0;
-
-        // The longest name by its letters: about seven units a letter in the
-        // tab's font, and some air on both sides.
-        int longest = 0;
-        for (int k = 0; k < n; k++)
-        {
-            int letters = names[k].LengthUtf8();
-            if (letters > longest)
-                longest = letters;
-        }
-        float need = (longest * TAB_LETTER + TAB_AIR) * px;
-        float least = TAB_LEAST * px;
-        if (need < least)
-            need = least;
-        int perRow = Math.Floor((all + gap) / (need + gap));
-        if (perRow < 1)
-            perRow = 1;
-        int rows = (n + perRow - 1) / perRow;
-        int inRow = (n + rows - 1) / rows;
-        float h = Math.Round(TAB_HIGH * px);
-        if (rows > 1)
-            h = Math.Round(TAB_LOW * px);
-
-        for (int i = 0; i < n; i++)
-        {
-            Widget tab = OZT_Ui.Make(TAB_LAYOUT, host, TAB_ROOT);
-            if (!tab)
-                continue;
-            int row = i / inRow;
-            int col = i - row * inRow;
-            int here = n - row * inRow;
-            if (here > inRow)
-                here = inRow;
-            float w = Math.Floor((all - gap * (here - 1)) / here);
-            tab.SetUserID(i);
-            tab.SetPos(col * (w + gap), row * (h + gap));
-            tab.SetSize(w, h);
-            OZT_Ui.Say(tab, "TabText", names[i]);
-            into.Insert(tab);
-        }
-        float tall = rows * h + (rows - 1) * gap;
-        host.SetSize(all, tall);
-        return tall;
     }
 
     protected void PaintTabs()
     {
-        PaintStrip(m_ShelfTabs, m_ShelfTab);
-        PaintStrip(m_OwnTabs, m_OwnTab);
+        PaintPick("Shelf", m_TabNames, m_ShelfTab);
+        PaintPick("Own", m_OwnNames, m_OwnTab);
+        if (m_PickOpen != PICK_NONE)
+            PaintPickRows();
+    }
+
+    // A dropdown's button: the name of the category in view, and the arrow.
+    protected void PaintPick(string side, array<string> names, int current)
+    {
+        string name = "";
+        if (current >= 0 && current < names.Count())
+            name = names[current];
+        OZT_Ui.Say(layoutRoot, side + "PickText", name);
+        bool open = m_PickOpen == PICK_OWN;
+        if (side == "Shelf")
+            open = m_PickOpen == PICK_SHELF;
+        DrawArrow(side, open);
+    }
+
+    // The arrow of a dropdown, drawn as two strokes: down while it is shut, up
+    // while its list is open (the fonts of the series have no arrow glyph).
+    protected void DrawArrow(string side, bool up)
+    {
+        CanvasWidget c = CanvasWidget.Cast(layoutRoot.FindAnyWidget(side + "PickArrow"));
+        if (!c)
+            return;
+        c.Clear();
+        float w;
+        float h;
+        c.GetSize(w, h);
+        float px = OZT_Ui.Px();
+        float cx = Math.Round(w / 2);
+        float cy = Math.Round(h / 2);
+        float dx = Math.Round(5 * px);
+        float dy = Math.Round(3 * px);
+        float stroke = Math.Round(2 * px);
+        if (stroke < 1)
+            stroke = 1;
+        int color = OZT_Look.Text();
+        float tipY = cy + dy;
+        float endY = cy - dy;
+        if (up)
+        {
+            tipY = cy - dy;
+            endY = cy + dy;
+        }
+        c.DrawLine(cx - dx, endY, cx, tipY, stroke, color);
+        c.DrawLine(cx, tipY, cx + dx, endY, stroke, color);
+    }
+
+    // The list of a dropdown opened under its button: a row per category, the
+    // one in view marked and brought into sight; more rows than the shelf is
+    // tall scroll.
+    protected void OpenPick(int side)
+    {
+        ClosePick();
+        string prefix = "Own";
+        array<string> names = m_OwnNames;
+        int current = m_OwnTab;
+        if (side == PICK_SHELF)
+        {
+            prefix = "Shelf";
+            names = m_TabNames;
+            current = m_ShelfTab;
+        }
+        Widget list = layoutRoot.FindAnyWidget(prefix + "PickList");
+        Widget content = layoutRoot.FindAnyWidget(prefix + "PickContent");
+        Widget button = layoutRoot.FindAnyWidget(prefix + "Pick");
+        ScrollWidget scroll = ScrollWidget.Cast(layoutRoot.FindAnyWidget(prefix + "PickScroll"));
+        if (!list || !content || !button || names.Count() == 0)
+            return;
+        DropHover();
+        float px = OZT_Ui.Px();
+        float rowH = Math.Round(PICK_ROW * px);
+        float step = rowH + 1;
+        float bx;
+        float by;
+        button.GetPos(bx, by);
+        float bw;
+        float bh;
+        button.GetSize(bw, bh);
+        float all = names.Count() * step - 1;
+        float room = Math.Round(GRID_BOTTOM * px) - by - bh - Math.Round(2 * px);
+        float tall = all;
+        float rowW = bw;
+        if (tall > room)
+        {
+            tall = room;
+            // The scrollbar stands on the right; the rows end before it.
+            rowW = bw - Math.Round(12 * px);
+        }
+        for (int i = 0; i < names.Count(); i++)
+        {
+            Widget row = OZT_Ui.Make(PICK_LAYOUT, content, PICK_ROOT);
+            if (!row)
+                continue;
+            row.SetUserID(i);
+            row.SetPos(0, i * step);
+            row.SetSize(rowW, rowH);
+            OZT_Ui.Say(row, "PickText", names[i]);
+            m_PickRows.Insert(row);
+        }
+        list.SetPos(bx, by + bh + Math.Round(2 * px));
+        list.SetSize(bw, tall);
+        content.SetSize(rowW, all);
+        list.Show(true);
+        m_PickOpen = side;
+        m_PickHover = -1;
+        if (scroll)
+        {
+            scroll.Update();
+            float pos01 = 0;
+            if (all > tall)
+                pos01 = (current * step - (tall - rowH) / 2) / (all - tall);
+            if (pos01 < 0)
+                pos01 = 0;
+            if (pos01 > 1)
+                pos01 = 1;
+            scroll.VScrollToPos01(pos01);
+        }
+        PaintPickRows();
+        DrawArrow(prefix, true);
+    }
+
+    protected void ClosePick()
+    {
+        if (m_PickOpen == PICK_NONE)
+            return;
+        for (int i = 0; i < m_PickRows.Count(); i++)
+        {
+            if (m_PickRows[i])
+                m_PickRows[i].Unlink();
+        }
+        m_PickRows.Clear();
+        OZT_Ui.Show(layoutRoot, "ShelfPickList", false);
+        OZT_Ui.Show(layoutRoot, "OwnPickList", false);
+        m_PickOpen = PICK_NONE;
+        m_PickHover = -1;
+        DrawArrow("Shelf", false);
+        DrawArrow("Own", false);
+    }
+
+    // The rows of the open list: the category in view marked, the row under
+    // the cursor lit.
+    protected void PaintPickRows()
+    {
+        int current = m_OwnTab;
+        if (m_PickOpen == PICK_SHELF)
+            current = m_ShelfTab;
+        for (int i = 0; i < m_PickRows.Count(); i++)
+        {
+            Widget row = m_PickRows[i];
+            if (!row)
+                continue;
+            int id = row.GetUserID();
+            bool on = id == current;
+            OZT_Ui.Show(row, "PickMark", on);
+            int text = OZT_Look.Muted();
+            if (on || id == m_PickHover)
+                text = OZT_Look.Text();
+            OZT_Ui.Tint(row, "PickText", text);
+            int bed = OZT_Look.Raised();
+            if (id == m_PickHover)
+                bed = OZT_Look.TileLit();
+            OZT_Ui.Tint(row, "PickBg", bed);
+        }
+    }
+
+    // A category taken from a dropdown, or stepped to by the wheel over its
+    // button.
+    protected void ChooseTab(int side, int tab)
+    {
+        if (side == PICK_SHELF)
+        {
+            if (tab < 0 || tab >= m_TabIds.Count() || tab == m_ShelfTab)
+                return;
+            m_ShelfTab = tab;
+            m_DirtyShelf = true;
+            FollowChange(tab, true);
+        }
+        else
+        {
+            if (tab < 0 || tab >= m_OwnIds.Count() || tab == m_OwnTab)
+                return;
+            m_OwnTab = tab;
+            m_DirtyOwn = true;
+            m_DirtySlots = true;
+            FollowChange(tab, false);
+        }
+        PaintTabs();
     }
 
     protected bool IsChangeTab(int tab, bool shelf)
@@ -1629,29 +1788,7 @@ class OZT_TradeMenu : UIScriptedMenu
         }
     }
 
-    protected void PaintStrip(array<Widget> tabs, int current)
-    {
-        for (int i = 0; i < tabs.Count(); i++)
-        {
-            Widget tab = tabs[i];
-            if (!tab)
-                continue;
-            bool on = tab.GetUserID() == current;
-            OZT_Ui.Show(tab, "TabLine", on);
-            if (on)
-            {
-                OZT_Ui.Tint(tab, "TabText", OZT_Look.Text());
-                OZT_Ui.Tint(tab, "TabBg", OZT_Look.TileLit());
-            }
-            else
-            {
-                OZT_Ui.Tint(tab, "TabText", OZT_Look.Muted());
-                OZT_Ui.Tint(tab, "TabBg", OZT_Look.Raised());
-            }
-        }
-    }
-
-    // The index of the tab a widget is, or is in; -1 when it is none.
+    // The user id of the row a widget is, or is in; -1 when it is none.
     protected int TabOf(Widget w, array<Widget> tabs)
     {
         while (w)
@@ -3364,29 +3501,30 @@ class OZT_TradeMenu : UIScriptedMenu
         if (button != MouseState.LEFT || !m_Data)
             return super.OnMouseButtonDown(w, x, y, button);
 
-        int tab = TabOf(w, m_ShelfTabs);
-        if (tab > -1)
+        // While a dropdown is open: a row takes its category, the list's own
+        // scrollbar scrolls, a press anywhere else only shuts it. What is
+        // taken is taken in Update, with the button up.
+        if (m_PickOpen != PICK_NONE)
         {
-            if (tab != m_ShelfTab)
-            {
-                m_ShelfTab = tab;
-                m_DirtyShelf = true;
-                FollowChange(tab, true);
-                PaintTabs();
-            }
+            int row = TabOf(w, m_PickRows);
+            string openPrefix = "Own";
+            if (m_PickOpen == PICK_SHELF)
+                openPrefix = "Shelf";
+            if (row < 0 && IsInside(w, layoutRoot.FindAnyWidget(openPrefix + "PickList")))
+                return false;
+            m_PickWant = row;
+            m_PickWantSide = m_PickOpen;
+            m_PickShutSoon = true;
             return true;
         }
-        tab = TabOf(w, m_OwnTabs);
-        if (tab > -1)
+        if (IsInside(w, layoutRoot.FindAnyWidget("ShelfPick")))
         {
-            if (tab != m_OwnTab)
-            {
-                m_OwnTab = tab;
-                m_DirtyOwn = true;
-                m_DirtySlots = true;
-                FollowChange(tab, false);
-                PaintTabs();
-            }
+            OpenPick(PICK_SHELF);
+            return true;
+        }
+        if (IsInside(w, layoutRoot.FindAnyWidget("OwnPick")))
+        {
+            OpenPick(PICK_OWN);
             return true;
         }
 
@@ -3531,6 +3669,43 @@ class OZT_TradeMenu : UIScriptedMenu
     }
 
     // ---- the card and the price list -------------------------------------------------------------------
+
+    // The row of the open dropdown under the cursor, lit; no card while a list
+    // is open.
+    protected void PickHoverFrame()
+    {
+        int at = TabOf(GetWidgetUnderCursor(), m_PickRows);
+        if (at == m_PickHover)
+            return;
+        m_PickHover = at;
+        PaintPickRows();
+    }
+
+    // The wheel over a shut dropdown's button steps to the next or the
+    // previous category: as quick as a tab was.
+    override bool OnMouseWheel(Widget w, int x, int y, int wheel)
+    {
+        if (m_PickOpen == PICK_NONE && m_Data && wheel != 0)
+        {
+            int side = PICK_NONE;
+            if (IsInside(w, layoutRoot.FindAnyWidget("ShelfPick")))
+                side = PICK_SHELF;
+            else if (IsInside(w, layoutRoot.FindAnyWidget("OwnPick")))
+                side = PICK_OWN;
+            if (side != PICK_NONE)
+            {
+                int now = m_OwnTab;
+                if (side == PICK_SHELF)
+                    now = m_ShelfTab;
+                int next = now + 1;
+                if (wheel > 0)
+                    next = now - 1;
+                ChooseTab(side, next);
+                return true;
+            }
+        }
+        return super.OnMouseWheel(w, x, y, wheel);
+    }
 
     protected void DropHover()
     {

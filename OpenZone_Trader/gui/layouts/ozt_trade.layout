@@ -331,19 +331,74 @@ FrameWidgetClass OZT_Trade {
         }
        }
       }
-      // The menu lays one ozt_trade_tab per category here, the first being ALL.
-      PanelWidgetClass ShelfTabs {
+      // The category dropdown (the owner, 2026-11-13: tabs in rows ate the shelf of a big book). It shows the category in view; a press opens ShelfPickList under it, the wheel over it steps to the next or the previous category.
+      FrameWidgetClass ShelfPick {
        visible 1
-       ignorepointer 1
        position 16 48
-       size 528 44
+       size 528 36
        hexactpos 1
        vexactpos 1
        hexactsize 1
        vexactsize 1
-       color 0 0 0 0
        priority 1
-       style rover_sim_colorable
+       {
+        PanelWidgetClass ShelfPickBg {
+         visible 1
+         ignorepointer 1
+         position 0 0
+         size 1 1
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 0
+         color 0.118 0.118 0.114 1
+         priority 0
+         style rover_sim_colorable
+        }
+        PanelWidgetClass ShelfPickLine {
+         visible 1
+         ignorepointer 1
+         valign bottom_ref
+         position 0 0
+         size 528 2
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.91 0.47 0.17 1
+         priority 1
+         style rover_sim_colorable
+        }
+        TextWidgetClass ShelfPickText {
+         visible 1
+         ignorepointer 1
+         position 12 0
+         size 470 36
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.88 0.875 0.855 1
+         priority 2
+         text ""
+         font "gui/fonts/sdf_MetronBook24"
+         "exact text" 1
+         "exact text size" 15
+         "text halign" left
+         "text valign" center
+        }
+        CanvasWidgetClass ShelfPickArrow {
+         visible 1
+         position 494 0
+         size 22 36
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         priority 3
+         ignorepointer 1
+        }
+       }
       }
       // The flat grid: twelve cells across, a tile takes the cells the item takes in the inventory; the menu moves the grid down below as many rows of tabs as the categories need.
       ScrollWidgetClass ShelfScroll {
@@ -579,6 +634,47 @@ FrameWidgetClass OZT_Trade {
          color 0.91 0.47 0.17 1
          priority 3
          style rover_sim_colorable
+        }
+       }
+      }
+      // The open dropdown: one ozt_trade_pick row per category, laid by the menu into ShelfPickContent and scrolled when they are more than the shelf is tall. Priority 800: above the tiles (610-612) and the loading panel (700), below the dialogs (952).
+      PanelWidgetClass ShelfPickList {
+       visible 0
+       ignorepointer 1
+       position 16 86
+       size 528 300
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       color 0.075 0.075 0.071 1
+       priority 800
+       style rover_sim_colorable
+       {
+        ScrollWidgetClass ShelfPickScroll {
+         visible 1
+         position 0 0
+         size 1 1
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 0
+         priority 0
+         clipchildren 1
+         "Scrollbar V" 1
+         style blank
+         {
+          FrameWidgetClass ShelfPickContent {
+           visible 1
+           position 0 0
+           size 528 300
+           hexactpos 1
+           vexactpos 1
+           hexactsize 1
+           vexactsize 1
+           priority 0
+          }
+         }
         }
        }
       }
@@ -1594,19 +1690,74 @@ FrameWidgetClass OZT_Trade {
         }
        }
       }
-      // The menu lays one ozt_trade_tab per category here, the first being ALL.
-      PanelWidgetClass OwnTabs {
+      // The category dropdown (the owner, 2026-11-13: tabs in rows ate the shelf of a big book). It shows the category in view; a press opens OwnPickList under it, the wheel over it steps to the next or the previous category.
+      FrameWidgetClass OwnPick {
        visible 1
-       ignorepointer 1
        position 16 48
-       size 528 44
+       size 528 36
        hexactpos 1
        vexactpos 1
        hexactsize 1
        vexactsize 1
-       color 0 0 0 0
        priority 1
-       style rover_sim_colorable
+       {
+        PanelWidgetClass OwnPickBg {
+         visible 1
+         ignorepointer 1
+         position 0 0
+         size 1 1
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 0
+         color 0.118 0.118 0.114 1
+         priority 0
+         style rover_sim_colorable
+        }
+        PanelWidgetClass OwnPickLine {
+         visible 1
+         ignorepointer 1
+         valign bottom_ref
+         position 0 0
+         size 528 2
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.91 0.47 0.17 1
+         priority 1
+         style rover_sim_colorable
+        }
+        TextWidgetClass OwnPickText {
+         visible 1
+         ignorepointer 1
+         position 12 0
+         size 470 36
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         color 0.88 0.875 0.855 1
+         priority 2
+         text ""
+         font "gui/fonts/sdf_MetronBook24"
+         "exact text" 1
+         "exact text size" 15
+         "text halign" left
+         "text valign" center
+        }
+        CanvasWidgetClass OwnPickArrow {
+         visible 1
+         position 494 0
+         size 22 36
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         priority 3
+         ignorepointer 1
+        }
+       }
       }
       // The flat grid: twelve cells across, a tile takes the cells the item takes in the inventory; the menu moves the grid down below as many rows of tabs as the categories need.
       ScrollWidgetClass OwnScroll {
@@ -1709,6 +1860,47 @@ FrameWidgetClass OZT_Trade {
        "exact text size" 20
        "text halign" right
        "text valign" center
+      }
+      // The open dropdown: one ozt_trade_pick row per category, laid by the menu into OwnPickContent and scrolled when they are more than the shelf is tall. Priority 800: above the tiles (610-612) and the loading panel (700), below the dialogs (952).
+      PanelWidgetClass OwnPickList {
+       visible 0
+       ignorepointer 1
+       position 16 86
+       size 528 300
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       color 0.075 0.075 0.071 1
+       priority 800
+       style rover_sim_colorable
+       {
+        ScrollWidgetClass OwnPickScroll {
+         visible 1
+         position 0 0
+         size 1 1
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 0
+         priority 0
+         clipchildren 1
+         "Scrollbar V" 1
+         style blank
+         {
+          FrameWidgetClass OwnPickContent {
+           visible 1
+           position 0 0
+           size 528 300
+           hexactpos 1
+           vexactpos 1
+           hexactsize 1
+           vexactsize 1
+           priority 0
+          }
+         }
+        }
+       }
       }
      }
     }

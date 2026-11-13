@@ -318,18 +318,69 @@
                       }
                     },
                     {
-                      "panel": {
-                        "name": "ShelfTabs",
+                      "frame": {
+                        "name": "ShelfPick",
                         "at": [
                           16,
                           48
                         ],
                         "size": [
                           528,
-                          44
+                          36
                         ],
-                        "color": "$none",
-                        "note": "The menu lays one ozt_trade_tab per category here, the first being ALL."
+                        "note": "The category dropdown (the owner, 2026-11-13: tabs in rows ate the shelf of a big book). It shows the category in view; a press opens ShelfPickList under it, the wheel over it steps to the next or the previous category.",
+                        "children": [
+                          {
+                            "panel": {
+                              "name": "ShelfPickBg",
+                              "size": "fill",
+                              "color": "$raised"
+                            }
+                          },
+                          {
+                            "panel": {
+                              "name": "ShelfPickLine",
+                              "anchor": "bottom",
+                              "size": [
+                                528,
+                                2
+                              ],
+                              "color": "$accent"
+                            }
+                          },
+                          {
+                            "label": {
+                              "name": "ShelfPickText",
+                              "at": [
+                                12,
+                                0
+                              ],
+                              "size": [
+                                470,
+                                36
+                              ],
+                              "font": "body",
+                              "color": "$text"
+                            }
+                          },
+                          {
+                            "raw": {
+                              "name": "ShelfPickArrow",
+                              "class": "CanvasWidgetClass",
+                              "at": [
+                                494,
+                                0
+                              ],
+                              "size": [
+                                22,
+                                36
+                              ],
+                              "props": {
+                                "ignorepointer": 1
+                              }
+                            }
+                          }
+                        ]
                       }
                     },
                     {
@@ -522,6 +573,52 @@
                                 6
                               ],
                               "color": "$accent"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "panel": {
+                        "name": "ShelfPickList",
+                        "at": [
+                          16,
+                          86
+                        ],
+                        "size": [
+                          528,
+                          300
+                        ],
+                        "color": "$head",
+                        "hidden": true,
+                        "priority": 800,
+                        "note": "The open dropdown: one ozt_trade_pick row per category, laid by the menu into ShelfPickContent and scrolled when they are more than the shelf is tall. Priority 800: above the tiles (610-612) and the loading panel (700), below the dialogs (952).",
+                        "children": [
+                          {
+                            "raw": {
+                              "name": "ShelfPickScroll",
+                              "class": "ScrollWidgetClass",
+                              "size": "fill",
+                              "props": {
+                                "clipchildren": 1,
+                                "Scrollbar V": 1,
+                                "style": "blank"
+                              },
+                              "children": [
+                                {
+                                  "frame": {
+                                    "name": "ShelfPickContent",
+                                    "at": [
+                                      0,
+                                      0
+                                    ],
+                                    "size": [
+                                      528,
+                                      300
+                                    ]
+                                  }
+                                }
+                              ]
                             }
                           }
                         ]
@@ -1322,18 +1419,69 @@
                       }
                     },
                     {
-                      "panel": {
-                        "name": "OwnTabs",
+                      "frame": {
+                        "name": "OwnPick",
                         "at": [
                           16,
                           48
                         ],
                         "size": [
                           528,
-                          44
+                          36
                         ],
-                        "color": "$none",
-                        "note": "The menu lays one ozt_trade_tab per category here, the first being ALL."
+                        "note": "The category dropdown (the owner, 2026-11-13: tabs in rows ate the shelf of a big book). It shows the category in view; a press opens OwnPickList under it, the wheel over it steps to the next or the previous category.",
+                        "children": [
+                          {
+                            "panel": {
+                              "name": "OwnPickBg",
+                              "size": "fill",
+                              "color": "$raised"
+                            }
+                          },
+                          {
+                            "panel": {
+                              "name": "OwnPickLine",
+                              "anchor": "bottom",
+                              "size": [
+                                528,
+                                2
+                              ],
+                              "color": "$accent"
+                            }
+                          },
+                          {
+                            "label": {
+                              "name": "OwnPickText",
+                              "at": [
+                                12,
+                                0
+                              ],
+                              "size": [
+                                470,
+                                36
+                              ],
+                              "font": "body",
+                              "color": "$text"
+                            }
+                          },
+                          {
+                            "raw": {
+                              "name": "OwnPickArrow",
+                              "class": "CanvasWidgetClass",
+                              "at": [
+                                494,
+                                0
+                              ],
+                              "size": [
+                                22,
+                                36
+                              ],
+                              "props": {
+                                "ignorepointer": 1
+                              }
+                            }
+                          }
+                        ]
                       }
                     },
                     {
@@ -1435,6 +1583,52 @@
                         "font": "sum",
                         "color": "$gold",
                         "align": "right"
+                      }
+                    },
+                    {
+                      "panel": {
+                        "name": "OwnPickList",
+                        "at": [
+                          16,
+                          86
+                        ],
+                        "size": [
+                          528,
+                          300
+                        ],
+                        "color": "$head",
+                        "hidden": true,
+                        "priority": 800,
+                        "note": "The open dropdown: one ozt_trade_pick row per category, laid by the menu into OwnPickContent and scrolled when they are more than the shelf is tall. Priority 800: above the tiles (610-612) and the loading panel (700), below the dialogs (952).",
+                        "children": [
+                          {
+                            "raw": {
+                              "name": "OwnPickScroll",
+                              "class": "ScrollWidgetClass",
+                              "size": "fill",
+                              "props": {
+                                "clipchildren": 1,
+                                "Scrollbar V": 1,
+                                "style": "blank"
+                              },
+                              "children": [
+                                {
+                                  "frame": {
+                                    "name": "OwnPickContent",
+                                    "at": [
+                                      0,
+                                      0
+                                    ],
+                                    "size": [
+                                      528,
+                                      300
+                                    ]
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
                       }
                     }
                   ]

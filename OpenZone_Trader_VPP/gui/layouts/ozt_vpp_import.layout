@@ -698,7 +698,7 @@ FrameWidgetClass PaneTrdImport {
      userID 68608
      style rover_sim_colorable
     }
-    TextWidgetClass ti19 {
+    TextWidgetClass TrdImReportTitle {
      visible 1
      ignorepointer 1
      color 0.878 0.875 0.855 1
@@ -716,7 +716,7 @@ FrameWidgetClass PaneTrdImport {
      "text halign" left
      "text valign" center
     }
-    FrameWidgetClass ti20 {
+    FrameWidgetClass TrdImWhenBox {
      visible 1
      ignorepointer 1
      position 60 16

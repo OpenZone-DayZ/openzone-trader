@@ -428,6 +428,58 @@ modded class OZ_VppAdminMenu
             it.Show(on);
     }
 
+    // A pill the converter drew in parts (an edge and a ground, each a middle and two
+    // round ends, an icon, the words) made as wide as its words plus padR and stood at x
+    // of its parent: a part that reaches into the pill's right half stretches, a part
+    // that starts there moves, the rest stays. No wider than room, and the words are
+    // cut at their width when they do not fit. A text not drawn yet answers no width:
+    // nothing moves until it does. Returns the new width, 0 when nothing was done.
+    protected float TrdHugPill(Widget pill, TextWidget words, float x, float room, float padR)
+    {
+        if (!pill || !words)
+            return 0;
+        int tw = OZ_VppFlex.TextWidth(words);
+        if (tw <= 0)
+            return 0;
+        float px;
+        float py;
+        float pw;
+        float ph;
+        pill.GetPos(px, py);
+        pill.GetSize(pw, ph);
+        if (pw <= 0)
+            return 0;
+        float wx;
+        float wy;
+        words.GetPos(wx, wy);
+        float w = wx + tw + 2 + padR;
+        if (w > room)
+            w = room;
+        float least = wx + padR + 1;
+        if (w < least)
+            w = least;
+        float dw = w - pw;
+        float half = pw / 2;
+        float cx;
+        float cy;
+        float cw;
+        float ch;
+        Widget c = pill.GetChildren();
+        while (c)
+        {
+            c.GetPos(cx, cy);
+            c.GetSize(cw, ch);
+            if (cx > half)
+                c.SetPos(cx + dw, cy);
+            else if (cx + cw > half)
+                c.SetSize(cw + dw, ch);
+            c = c.GetSibling();
+        }
+        pill.SetPos(x, py);
+        pill.SetSize(w, ph);
+        return w;
+    }
+
     // A string of the trader's stringtable in the client's language. Take it into
     // a local before it meets another: two translations in one expression lose
     // one of them (dayz-modding, mod-structure.md).

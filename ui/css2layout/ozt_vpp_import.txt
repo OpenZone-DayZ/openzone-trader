@@ -6,6 +6,7 @@ FILES
   OpenZone_Trader_VPP/gui/layouts/ozt_vpp_import.layout
   OpenZone_Trader_VPP/gui/layouts/ozt_vpp_import_file.layout
   OpenZone_Trader_VPP/gui/layouts/ozt_vpp_import_row.layout
+  OpenZone_Trader_VPP/gui/layouts/_demo_ozt_vpp_import.layout
 
 NAMED WIDGETS OF THE PAGE (FindAnyWidget)
   TrdImStep1  Frame (parts: TrdImStep1Bg)
@@ -21,6 +22,8 @@ NAMED WIDGETS OF THE PAGE (FindAnyWidget)
   BtnTrdImDry  ButtonWidget (parts: BtnTrdImDryEdge, BtnTrdImDryBg)
   BtnTrdImDryText  TextWidget (a caption: recolour only)
   TrdImHead  Frame (parts: TrdImHeadLine)
+  TrdImReportTitle  TextWidget (a caption: recolour only)
+  TrdImWhenBox  Frame
   TrdImWhen  TextWidget (filled by script)
   TrdImOkN  TextWidget (filled by script)
   TrdImWarnN  TextWidget (filled by script)

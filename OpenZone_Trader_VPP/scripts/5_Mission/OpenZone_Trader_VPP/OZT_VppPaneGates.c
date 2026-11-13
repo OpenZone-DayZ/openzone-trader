@@ -551,6 +551,8 @@ modded class OZ_VppAdminMenu
         TrdNeedDoc(OZT_Const.CFG_TRADERS);
         TrdNeedGates();
         TrdGtPaint();
+        TrdGtPlaceTitle();
+        m_TrdGtFlowDue = 3;
     }
 
     override void TrdRepaint(string key)
@@ -566,7 +568,10 @@ modded class OZ_VppAdminMenu
     override void TrdLayout(float w, float h)
     {
         super.TrdLayout(w, h);
-        if (!M_SUB_WIDGET || TrdShownKey() != "gates" || !TrdGtLoaded())
+        if (!M_SUB_WIDGET || TrdShownKey() != "gates")
+            return;
+        TrdGtPlaceTitle();
+        if (!TrdGtLoaded())
             return;
         int i;
         if (m_TrdGtGroups)
@@ -599,8 +604,41 @@ modded class OZ_VppAdminMenu
         if (m_TrdGtFlowDue <= 0)
             return;
         m_TrdGtFlowDue--;
-        if (M_SUB_WIDGET && TrdShownKey() == "gates" && TrdGtLoaded())
+        if (!M_SUB_WIDGET || TrdShownKey() != "gates")
+            return;
+        TrdGtPlaceTitle();
+        if (TrdGtLoaded())
             TrdGtReflow();
+    }
+
+    // The page's title as wide as its words, and the chip of the glue 12 units after it,
+    // as wide as its own words, up to 12 units before the search box: the layout drew both
+    // for the Ukrainian title, and the English one is longer.
+    protected void TrdGtPlaceTitle()
+    {
+        TextWidget title = TextWidget.Cast(TrdW("TrdGtTitle"));
+        TextWidget words = TextWidget.Cast(TrdW("TrdGtChipText"));
+        Widget chip = TrdW("TrdGtChip");
+        Widget find = TrdW("TrdGtFindBox");
+        if (!title || !words || !chip || !find)
+            return;
+        int tw = OZ_VppFlex.TextWidth(title);
+        if (tw <= 0)
+            return;
+        float s = UnitScale();
+        float x;
+        float y;
+        float w;
+        float h;
+        title.GetPos(x, y);
+        title.GetSize(w, h);
+        title.SetSize(tw + 2, h);
+        float at = x + tw + 12 * s;
+        float fx;
+        float fy;
+        find.GetPos(fx, fy);
+        float room = fx - 12 * s - at;
+        TrdHugPill(chip, words, at, room, 10 * s);
     }
 
     // Everything of the page that stands by the length of its words, placed: nothing is
@@ -608,6 +646,7 @@ modded class OZ_VppAdminMenu
     protected void TrdGtReflow()
     {
         m_TrdGtFlowing = true;
+        TrdGtPlaceTitle();
         TrdGtPlaceFams();
         TrdGtPlacePills();
         TrdGtPlaceList();

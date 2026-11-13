@@ -1,6 +1,6 @@
 gates: TraderGates.dc.html -> OpenZone_Trader_VPP/gui/layouts/ozt_vpp_gates.layout
 design size 1360 x 812, measured again one, two and three steps of 240 x 160 larger
-widgets: 432; 1 of them the browser re-flows as the page grows (the rule keeps them as designed)
+widgets: 433; 1 of them the browser re-flows as the page grows (the rule keeps them as designed)
 
 FILES
   OpenZone_Trader_VPP/gui/layouts/ozt_vpp_gates.layout
@@ -20,9 +20,14 @@ FILES
   OpenZone_Trader_VPP/gui/layouts/ozt_vpp_gates_branch.layout
   OpenZone_Trader_VPP/gui/layouts/ozt_vpp_gates_val.layout
   OpenZone_Trader_VPP/gui/layouts/ozt_vpp_gates_sel.layout
+  OpenZone_Trader_VPP/gui/layouts/_demo_ozt_vpp_gates.layout
 
 NAMED WIDGETS OF THE PAGE (FindAnyWidget)
+  TrdGtTitle  TextWidget (a caption: recolour only)
+  TrdGtChip  Frame (parts: TrdGtChipEdge, TrdGtChipBg)
+  TrdGtChipText  TextWidget (a caption: recolour only)
   TrdGtSub  TextWidget (filled by script)
+  TrdGtFindBox  Frame (parts: TrdGtFindBoxEdge, TrdGtFindBoxBg)
   TrdGtFind  EditBox
   BtnTrdGtRefresh  ButtonWidget (parts: BtnTrdGtRefreshEdge, BtnTrdGtRefreshBg)
   BtnTrdGtCopy  ButtonWidget (parts: BtnTrdGtCopyEdge, BtnTrdGtCopyBg)
@@ -66,9 +71,9 @@ NAMED WIDGETS OF THE PAGE (FindAnyWidget)
   BtnTrdGtFamMoreText  TextWidget (filled by script)
   TrdGtAnswer  TextWidget (filled by script)
   TrdGtWarn  TextWidget (filled by script)
-  BtnTrdGtWith  ButtonWidget (parts: BtnTrdGtWithEdge, tc38, tc39, BtnTrdGtWithBg, tc40, tc41)
+  BtnTrdGtWith  ButtonWidget (parts: BtnTrdGtWithEdge, tc27, tc28, BtnTrdGtWithBg, tc29, tc30)
   BtnTrdGtWithText  TextWidget (filled by script)
-  BtnTrdGtAll  ButtonWidget (parts: BtnTrdGtAllEdge, tc42, tc43, BtnTrdGtAllBg, tc44, tc45)
+  BtnTrdGtAll  ButtonWidget (parts: BtnTrdGtAllEdge, tc31, tc32, BtnTrdGtAllBg, tc33, tc34)
   BtnTrdGtAllText  TextWidget (filled by script)
   TrdGtList  Frame
   TrdGtListRows  WrapSpacer: the list's rows go here (ozt_vpp_gates_group, ozt_vpp_gates_line, ozt_vpp_gates_linew); its ScrollWidget is TrdGtListScroll

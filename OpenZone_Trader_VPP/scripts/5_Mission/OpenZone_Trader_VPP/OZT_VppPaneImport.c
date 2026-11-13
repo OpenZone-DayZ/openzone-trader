@@ -37,6 +37,9 @@ modded class OZ_VppAdminMenu
         {
             TrdImPaintSteps();
             TrdImFlowCounts();
+            TrdImFlowTitle();
+            // A heading drawn for the first time answers its width a frame later.
+            GetGame().GetCallQueue(CALL_CATEGORY_GUI).CallLater(this.TrdImFlowTitle, 80, false);
         }
     }
 
@@ -49,6 +52,16 @@ modded class OZ_VppAdminMenu
             m_TrdImFiles.Fit();
         TrdImPlaceSigns();
         TrdImFlowCounts();
+        TrdImFlowTitle();
+    }
+
+    // The report's heading as wide as its word and the run's time 10 units after it: the
+    // layout drew both for "Звіт", and "Report" is longer.
+    protected void TrdImFlowTitle()
+    {
+        if (!M_SUB_WIDGET)
+            return;
+        CoreFlowAfter("TrdImReportTitle", "TrdImWhenBox", 10);
     }
 
     // The three steps of the head: a step done wears a check, the one to do next is

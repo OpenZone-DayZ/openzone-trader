@@ -50,7 +50,7 @@ FrameWidgetClass PaneTrdGates {
      userID 68608
      style rover_sim_colorable
     }
-    TextWidgetClass tc3 {
+    TextWidgetClass TrdGtTitle {
      visible 1
      ignorepointer 1
      color 0.878 0.875 0.855 1
@@ -68,7 +68,7 @@ FrameWidgetClass PaneTrdGates {
      "text halign" left
      "text valign" center
     }
-    FrameWidgetClass tc4 {
+    FrameWidgetClass TrdGtChip {
      visible 1
      ignorepointer 1
      position 201 21
@@ -79,7 +79,7 @@ FrameWidgetClass PaneTrdGates {
      vexactsize 1
      priority 3
      {
-      PanelWidgetClass tc5 {
+      PanelWidgetClass TrdGtChipEdge {
        visible 1
        ignorepointer 1
        color 0.91 0.471 0.169 1
@@ -92,7 +92,7 @@ FrameWidgetClass PaneTrdGates {
        priority 1
        style rover_sim_colorable
       }
-      FrameWidgetClass tc6 {
+      FrameWidgetClass tc3 {
        visible 1
        ignorepointer 1
        position 0 0
@@ -104,7 +104,7 @@ FrameWidgetClass PaneTrdGates {
        priority 2
        clipchildren 1
        {
-        ImageWidgetClass tc7 {
+        ImageWidgetClass TrdGtChipEdgeL {
          visible 1
          ignorepointer 1
          color 0.91 0.471 0.169 1
@@ -121,7 +121,7 @@ FrameWidgetClass PaneTrdGates {
         }
        }
       }
-      FrameWidgetClass tc8 {
+      FrameWidgetClass tc4 {
        visible 1
        ignorepointer 1
        position 469 0
@@ -133,7 +133,7 @@ FrameWidgetClass PaneTrdGates {
        priority 3
        clipchildren 1
        {
-        ImageWidgetClass tc9 {
+        ImageWidgetClass TrdGtChipEdgeR {
          visible 1
          ignorepointer 1
          color 0.91 0.471 0.169 1
@@ -150,7 +150,7 @@ FrameWidgetClass PaneTrdGates {
         }
        }
       }
-      PanelWidgetClass tc10 {
+      PanelWidgetClass TrdGtChipBg {
        visible 1
        ignorepointer 1
        color 0.047 0.047 0.047 1
@@ -163,7 +163,7 @@ FrameWidgetClass PaneTrdGates {
        priority 4
        style rover_sim_colorable
       }
-      FrameWidgetClass tc11 {
+      FrameWidgetClass tc5 {
        visible 1
        ignorepointer 1
        position 1 1
@@ -175,7 +175,7 @@ FrameWidgetClass PaneTrdGates {
        priority 5
        clipchildren 1
        {
-        ImageWidgetClass tc12 {
+        ImageWidgetClass TrdGtChipBgL {
          visible 1
          ignorepointer 1
          color 0.047 0.047 0.047 1
@@ -192,7 +192,7 @@ FrameWidgetClass PaneTrdGates {
         }
        }
       }
-      FrameWidgetClass tc13 {
+      FrameWidgetClass tc6 {
        visible 1
        ignorepointer 1
        position 469 1
@@ -204,7 +204,7 @@ FrameWidgetClass PaneTrdGates {
        priority 6
        clipchildren 1
        {
-        ImageWidgetClass tc14 {
+        ImageWidgetClass TrdGtChipBgR {
          visible 1
          ignorepointer 1
          color 0.047 0.047 0.047 1
@@ -221,7 +221,7 @@ FrameWidgetClass PaneTrdGates {
         }
        }
       }
-      ImageWidgetClass tc15 {
+      ImageWidgetClass tc7 {
        visible 1
        ignorepointer 1
        color 0.627 0.624 0.6 1
@@ -236,7 +236,7 @@ FrameWidgetClass PaneTrdGates {
        mode blend
        "src alpha" 1
       }
-      TextWidgetClass tc16 {
+      TextWidgetClass TrdGtChipText {
        visible 1
        ignorepointer 1
        color 0.627 0.624 0.6 1
@@ -275,10 +275,9 @@ FrameWidgetClass PaneTrdGates {
      "text halign" left
      "text valign" center
     }
-    PanelWidgetClass tc17 {
+    FrameWidgetClass TrdGtFindBox {
      visible 1
      ignorepointer 1
-     color 0.235 0.235 0.228 1
      position 750 23
      size 220 36
      hexactpos 1
@@ -287,9 +286,21 @@ FrameWidgetClass PaneTrdGates {
      vexactsize 1
      priority 5
      userID 65548
-     style rover_sim_colorable
      {
-      PanelWidgetClass tc18 {
+      PanelWidgetClass TrdGtFindBoxEdge {
+       visible 1
+       ignorepointer 1
+       color 0.235 0.235 0.228 1
+       position 0 0
+       size 220 36
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       priority 1
+       style rover_sim_colorable
+      }
+      PanelWidgetClass TrdGtFindBoxBg {
        visible 1
        ignorepointer 1
        color 0.028 0.028 0.028 1
@@ -299,10 +310,10 @@ FrameWidgetClass PaneTrdGates {
        vexactpos 1
        hexactsize 1
        vexactsize 1
-       priority 1
+       priority 2
        style rover_sim_colorable
       }
-      ImageWidgetClass tc19 {
+      ImageWidgetClass tc8 {
        visible 1
        ignorepointer 1
        color 0.627 0.624 0.6 1
@@ -312,7 +323,7 @@ FrameWidgetClass PaneTrdGates {
        vexactpos 1
        hexactsize 1
        vexactsize 1
-       priority 2
+       priority 3
        image0 "set:ozv_ui image:i_766118da"
        mode blend
        "src alpha" 1
@@ -327,7 +338,7 @@ FrameWidgetClass PaneTrdGates {
        vexactpos 1
        hexactsize 1
        vexactsize 1
-       priority 3
+       priority 4
        text "#STR_OZT_VPP_GT_FIND_PH"
        font "OpenZone_VPP/gui/fonts/ozv_sans28"
        "exact text" 1
@@ -344,7 +355,7 @@ FrameWidgetClass PaneTrdGates {
        vexactpos 1
        hexactsize 1
        vexactsize 1
-       priority 4
+       priority 5
        text ""
        style Default
        font "OpenZone_VPP/gui/fonts/ozv_field15"
@@ -391,7 +402,7 @@ FrameWidgetClass PaneTrdGates {
        priority 2
        style rover_sim_colorable
       }
-      ImageWidgetClass tc20 {
+      ImageWidgetClass tc9 {
        visible 1
        ignorepointer 1
        color 0.878 0.875 0.855 1
@@ -447,7 +458,7 @@ FrameWidgetClass PaneTrdGates {
        priority 2
        style rover_sim_colorable
       }
-      ImageWidgetClass tc21 {
+      ImageWidgetClass tc10 {
        visible 1
        ignorepointer 1
        color 0.878 0.875 0.855 1
@@ -462,7 +473,7 @@ FrameWidgetClass PaneTrdGates {
        mode blend
        "src alpha" 1
       }
-      TextWidgetClass tc22 {
+      TextWidgetClass tc11 {
        visible 1
        ignorepointer 1
        color 0.878 0.875 0.855 1
@@ -521,7 +532,7 @@ FrameWidgetClass PaneTrdGates {
        priority 2
        style rover_sim_colorable
       }
-      TextWidgetClass tc23 {
+      TextWidgetClass tc12 {
        visible 1
        ignorepointer 1
        color 0.878 0.875 0.855 1
@@ -583,7 +594,7 @@ FrameWidgetClass PaneTrdGates {
      userID 68608
      style rover_sim_colorable
     }
-    TextWidgetClass tc24 {
+    TextWidgetClass tc13 {
      visible 1
      ignorepointer 1
      color 0.627 0.624 0.6 1
@@ -613,7 +624,7 @@ FrameWidgetClass PaneTrdGates {
      text ""
      style Empty
      {
-      PanelWidgetClass tc25 {
+      PanelWidgetClass tc14 {
        visible 1
        ignorepointer 1
        color 0.235 0.235 0.228 1
@@ -626,7 +637,7 @@ FrameWidgetClass PaneTrdGates {
        priority 1
        style rover_sim_colorable
       }
-      PanelWidgetClass tc26 {
+      PanelWidgetClass tc15 {
        visible 1
        ignorepointer 1
        color 0.028 0.028 0.028 1
@@ -657,7 +668,7 @@ FrameWidgetClass PaneTrdGates {
        "text halign" left
        "text valign" center
       }
-      ImageWidgetClass tc27 {
+      ImageWidgetClass tc16 {
        visible 1
        ignorepointer 1
        color 0.878 0.875 0.855 1
@@ -753,7 +764,7 @@ FrameWidgetClass PaneTrdGates {
         }
        }
       }
-      PanelWidgetClass tc28 {
+      PanelWidgetClass tc17 {
        visible 1
        ignorepointer 1
        color 0.235 0.235 0.228 1
@@ -767,7 +778,7 @@ FrameWidgetClass PaneTrdGates {
        style rover_sim_colorable
        clipchildren 1
        {
-        PanelWidgetClass tc29 {
+        PanelWidgetClass tc18 {
          visible 1
          ignorepointer 1
          color 0.074 0.074 0.071 1
@@ -1024,7 +1035,7 @@ FrameWidgetClass PaneTrdGates {
         }
        }
       }
-      PanelWidgetClass tc30 {
+      PanelWidgetClass tc19 {
        visible 1
        ignorepointer 1
        color 0.235 0.235 0.228 1
@@ -1038,7 +1049,7 @@ FrameWidgetClass PaneTrdGates {
        style rover_sim_colorable
        clipchildren 1
        {
-        PanelWidgetClass tc31 {
+        PanelWidgetClass tc20 {
          visible 1
          ignorepointer 1
          color 0.074 0.074 0.071 1
@@ -1295,7 +1306,7 @@ FrameWidgetClass PaneTrdGates {
         }
        }
       }
-      PanelWidgetClass tc32 {
+      PanelWidgetClass tc21 {
        visible 1
        ignorepointer 1
        color 0.235 0.235 0.228 1
@@ -1309,7 +1320,7 @@ FrameWidgetClass PaneTrdGates {
        style rover_sim_colorable
        clipchildren 1
        {
-        PanelWidgetClass tc33 {
+        PanelWidgetClass tc22 {
          visible 1
          ignorepointer 1
          color 0.074 0.074 0.071 1
@@ -1545,7 +1556,7 @@ FrameWidgetClass PaneTrdGates {
       }
      }
     }
-    FrameWidgetClass tc34 {
+    FrameWidgetClass tc23 {
      visible 1
      ignorepointer 1
      position 980 14
@@ -1579,7 +1590,7 @@ FrameWidgetClass PaneTrdGates {
       }
      }
     }
-    FrameWidgetClass tc35 {
+    FrameWidgetClass tc24 {
      visible 1
      ignorepointer 1
      position 980 30
@@ -1615,7 +1626,7 @@ FrameWidgetClass PaneTrdGates {
     }
    }
   }
-  FrameWidgetClass tc36 {
+  FrameWidgetClass tc25 {
    visible 1
    ignorepointer 1
    position 0 137
@@ -1627,7 +1638,7 @@ FrameWidgetClass PaneTrdGates {
    priority 4
    userID 114688
    {
-    PanelWidgetClass tc37 {
+    PanelWidgetClass tc26 {
      visible 1
      ignorepointer 1
      color 0.235 0.235 0.228 1
@@ -1666,7 +1677,7 @@ FrameWidgetClass PaneTrdGates {
        priority 1
        style rover_sim_colorable
       }
-      FrameWidgetClass tc38 {
+      FrameWidgetClass tc27 {
        visible 1
        ignorepointer 1
        position 0 0
@@ -1695,7 +1706,7 @@ FrameWidgetClass PaneTrdGates {
         }
        }
       }
-      FrameWidgetClass tc39 {
+      FrameWidgetClass tc28 {
        visible 1
        ignorepointer 1
        position 95 0
@@ -1737,7 +1748,7 @@ FrameWidgetClass PaneTrdGates {
        priority 4
        style rover_sim_colorable
       }
-      FrameWidgetClass tc40 {
+      FrameWidgetClass tc29 {
        visible 1
        ignorepointer 1
        position 1 1
@@ -1766,7 +1777,7 @@ FrameWidgetClass PaneTrdGates {
         }
        }
       }
-      FrameWidgetClass tc41 {
+      FrameWidgetClass tc30 {
        visible 1
        ignorepointer 1
        position 95 1
@@ -1840,7 +1851,7 @@ FrameWidgetClass PaneTrdGates {
        priority 1
        style rover_sim_colorable
       }
-      FrameWidgetClass tc42 {
+      FrameWidgetClass tc31 {
        visible 1
        ignorepointer 1
        position 0 0
@@ -1869,7 +1880,7 @@ FrameWidgetClass PaneTrdGates {
         }
        }
       }
-      FrameWidgetClass tc43 {
+      FrameWidgetClass tc32 {
        visible 1
        ignorepointer 1
        position 53 0
@@ -1911,7 +1922,7 @@ FrameWidgetClass PaneTrdGates {
        priority 4
        style rover_sim_colorable
       }
-      FrameWidgetClass tc44 {
+      FrameWidgetClass tc33 {
        visible 1
        ignorepointer 1
        position 1 1
@@ -1940,7 +1951,7 @@ FrameWidgetClass PaneTrdGates {
         }
        }
       }
-      FrameWidgetClass tc45 {
+      FrameWidgetClass tc34 {
        visible 1
        ignorepointer 1
        position 53 1
@@ -2054,7 +2065,7 @@ FrameWidgetClass PaneTrdGates {
    "text halign" left
    "text valign" center
   }
-  FrameWidgetClass tc46 {
+  FrameWidgetClass tc35 {
    visible 1
    ignorepointer 1
    position 370 157
@@ -2113,7 +2124,7 @@ FrameWidgetClass PaneTrdGates {
      priority 1
      style rover_sim_colorable
     }
-    TextWidgetClass tc47 {
+    TextWidgetClass tc36 {
      visible 1
      ignorepointer 1
      color 0.961 0.78 0.251 1
@@ -2219,7 +2230,7 @@ FrameWidgetClass PaneTrdGates {
      userID 114688
      style rover_sim_colorable
     }
-    TextWidgetClass tc48 {
+    TextWidgetClass tc37 {
      visible 1
      ignorepointer 1
      color 0.627 0.624 0.6 1
@@ -2237,7 +2248,7 @@ FrameWidgetClass PaneTrdGates {
      "text halign" left
      "text valign" center
     }
-    FrameWidgetClass tc49 {
+    FrameWidgetClass tc38 {
      visible 1
      ignorepointer 1
      position 17 28
@@ -2307,7 +2318,7 @@ FrameWidgetClass PaneTrdGates {
        priority 2
        style rover_sim_colorable
       }
-      ImageWidgetClass tc50 {
+      ImageWidgetClass tc39 {
        visible 1
        ignorepointer 1
        color 0.627 0.624 0.6 1
@@ -2324,7 +2335,7 @@ FrameWidgetClass PaneTrdGates {
       }
      }
     }
-    TextWidgetClass tc51 {
+    TextWidgetClass tc40 {
      visible 1
      ignorepointer 1
      color 0.627 0.624 0.6 1
@@ -2342,7 +2353,7 @@ FrameWidgetClass PaneTrdGates {
      "text halign" left
      "text valign" center
     }
-    FrameWidgetClass tc52 {
+    FrameWidgetClass tc41 {
      visible 1
      ignorepointer 1
      position 113 59
@@ -2353,7 +2364,7 @@ FrameWidgetClass PaneTrdGates {
      vexactsize 1
      priority 7
      {
-      PanelWidgetClass tc53 {
+      PanelWidgetClass tc42 {
        visible 1
        ignorepointer 1
        color 0.235 0.235 0.228 1
@@ -2366,7 +2377,7 @@ FrameWidgetClass PaneTrdGates {
        priority 1
        style rover_sim_colorable
       }
-      PanelWidgetClass tc54 {
+      PanelWidgetClass tc43 {
        visible 1
        ignorepointer 1
        color 0.028 0.028 0.028 1
@@ -2434,7 +2445,7 @@ FrameWidgetClass PaneTrdGates {
        priority 2
        style rover_sim_colorable
       }
-      TextWidgetClass tc55 {
+      TextWidgetClass tc44 {
        visible 1
        ignorepointer 1
        color 0.878 0.875 0.855 1
@@ -2492,7 +2503,7 @@ FrameWidgetClass PaneTrdGates {
        priority 2
        style rover_sim_colorable
       }
-      TextWidgetClass tc56 {
+      TextWidgetClass tc45 {
        visible 1
        ignorepointer 1
        color 0.878 0.875 0.855 1
@@ -2512,7 +2523,7 @@ FrameWidgetClass PaneTrdGates {
       }
      }
     }
-    PanelWidgetClass tc57 {
+    PanelWidgetClass tc46 {
      visible 1
      ignorepointer 1
      color 0.235 0.235 0.228 1
@@ -2525,7 +2536,7 @@ FrameWidgetClass PaneTrdGates {
      priority 10
      style rover_sim_colorable
      {
-      PanelWidgetClass tc58 {
+      PanelWidgetClass tc47 {
        visible 1
        ignorepointer 1
        color 0.028 0.028 0.028 1
@@ -2538,7 +2549,7 @@ FrameWidgetClass PaneTrdGates {
        priority 1
        style rover_sim_colorable
       }
-      ImageWidgetClass tc59 {
+      ImageWidgetClass tc48 {
        visible 1
        ignorepointer 1
        color 0.627 0.624 0.6 1
@@ -2588,7 +2599,7 @@ FrameWidgetClass PaneTrdGates {
       }
      }
     }
-    FrameWidgetClass tc60 {
+    FrameWidgetClass tc49 {
      visible 1
      ignorepointer 1
      position 17 139
@@ -2620,7 +2631,7 @@ FrameWidgetClass PaneTrdGates {
       }
      }
     }
-    TextWidgetClass tc61 {
+    TextWidgetClass tc50 {
      visible 1
      ignorepointer 1
      color 0.627 0.624 0.6 1
@@ -2683,7 +2694,7 @@ FrameWidgetClass PaneTrdGates {
       }
      }
     }
-    TextWidgetClass tc62 {
+    TextWidgetClass tc51 {
      visible 1
      ignorepointer 1
      color 0.627 0.624 0.6 1
@@ -2747,7 +2758,7 @@ FrameWidgetClass PaneTrdGates {
       }
      }
     }
-    FrameWidgetClass tc63 {
+    FrameWidgetClass tc52 {
      visible 1
      ignorepointer 1
      position 139 164
@@ -2824,7 +2835,7 @@ FrameWidgetClass PaneTrdGates {
       }
      }
     }
-    FrameWidgetClass tc64 {
+    FrameWidgetClass tc53 {
      visible 1
      ignorepointer 1
      position 17 472
@@ -2836,7 +2847,7 @@ FrameWidgetClass PaneTrdGates {
      priority 18
      userID 65728
      {
-      PanelWidgetClass tc65 {
+      PanelWidgetClass tc54 {
        visible 1
        ignorepointer 1
        color 0.235 0.235 0.228 1
@@ -2849,7 +2860,7 @@ FrameWidgetClass PaneTrdGates {
        priority 1
        style rover_sim_colorable
       }
-      TextWidgetClass tc66 {
+      TextWidgetClass tc55 {
        visible 1
        ignorepointer 1
        color 0.627 0.624 0.6 1
@@ -2881,7 +2892,7 @@ FrameWidgetClass PaneTrdGates {
       }
      }
     }
-    TextWidgetClass tc67 {
+    TextWidgetClass tc56 {
      visible 1
      ignorepointer 1
      color 0.627 0.624 0.6 1
@@ -2900,7 +2911,7 @@ FrameWidgetClass PaneTrdGates {
      "text halign" left
      "text valign" center
     }
-    FrameWidgetClass tc68 {
+    FrameWidgetClass tc57 {
      visible 1
      ignorepointer 1
      position 43 568
@@ -2912,7 +2923,7 @@ FrameWidgetClass PaneTrdGates {
      priority 20
      userID 65728
      {
-      PanelWidgetClass tc69 {
+      PanelWidgetClass tc58 {
        visible 1
        ignorepointer 1
        color 0.235 0.235 0.228 1
@@ -2925,7 +2936,7 @@ FrameWidgetClass PaneTrdGates {
        priority 1
        style rover_sim_colorable
       }
-      PanelWidgetClass tc70 {
+      PanelWidgetClass tc59 {
        visible 1
        ignorepointer 1
        color 0.028 0.028 0.028 1

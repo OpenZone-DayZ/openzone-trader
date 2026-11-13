@@ -6,7 +6,7 @@ author      = "OpenZone";
 authorID    = "";
 version     = "0.1";
 
-description = "The TRADERS pane of the OpenZone tab in VPP Admin Tools: place a trader where you stand, move, turn, dress it as you are dressed, edit its categories and factors, remove, respawn. Needs OpenZone Trader, OpenZone Core, the OpenZone tab for VPP Admin Tools and VPPAdminTools. github.com/OpenZone-DayZ/openzone-trader";
+description = "The trader's module in the OpenZone window of VPP Admin Tools: points, goods, conditions and discounts, stock, licences, money, the TraderPlus import and the trader's files. Needs OpenZone Trader, OpenZone Core, the OpenZone tab for VPP Admin Tools and VPPAdminTools. github.com/OpenZone-DayZ/openzone-trader";
 
 tooltip     = "OpenZone Trader for VPP Admin Tools";
-overview    = "The TRADERS pane of the OpenZone tab in VPP Admin Tools. Needs OpenZone Trader, OpenZone Core, the OpenZone VPP tab and VPPAdminTools.";
+overview    = "The trader's pages in the OpenZone window of VPP Admin Tools. Needs OpenZone Trader, OpenZone Core, the OpenZone VPP tab and VPPAdminTools.";

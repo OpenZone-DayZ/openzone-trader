@@ -8,10 +8,12 @@ A barter trader in the manner of STALKER 2 for OpenZone servers: what you buy an
 [*]Item money: any mod's banknotes by class and value, change in the largest notes, prices always rounded in the trader's favour. A change tab turns notes into the notes you need, at face value. A bank mod plugs in with a glue pbo.
 [*]Traders at points: an object (a stall, a counter), a character dressed from a preset, or a thing that already stands on the map; one Trade action within the point's radius. The characters take no damage and cannot be looted or restrained.
 [*]Locks and discounts on the word of any mod: factions, posts and leaders through OpenZone Core, research through its own glue pbo, and any other mod can bring its own kind. A missing mod never blocks trade and never gives money away.
+[*]Stock and licences: a trader can keep a shelf whose prices follow how full it is, and licences, sold by a trader or granted by the administrator, open categories and traders.
+[*]Coming from TraderPlus: the admin window imports its files, a dry run with a report first.
 [*]A card for every thing, a price list, trying wearables on before you buy, English and Ukrainian.
 [/list]
 
-[b]Needs[/b] Community Framework and OpenZone Core. Optional: OpenZone Trader for VPP Admin Tools (the TRADERS pane), OpenZone Trader Research (the research gate), OpenZone Trader TraderPlus (the TraderPlus bank as money).
+[b]Needs[/b] Community Framework and OpenZone Core. Optional: OpenZone Trader for VPP Admin Tools (the trader's pages in the admin window), OpenZone Trader Research (the research gate), OpenZone Trader TraderPlus (the TraderPlus bank as money).
 
 [b]For administrators[/b] Three files in [i]profile/OpenZone[/i]: OZ_Trader_Settings.json (money, notes, condition factors, gate switches), OZ_Trader_Goods.json (categories and prices), OZ_Trader_Traders.json (the points). The repository's examples folder holds a working set and its notes.
 
@@ -29,10 +31,12 @@ Source: github.com/OpenZone-DayZ/openzone-trader. Licence: CC BY-NC-SA 4.0 with 
 [*]Гроші предметами: купюри будь-якого мода за класом і номіналом, решта найбільшими купюрами, ціни завжди округлені на користь торговця. Вкладка «Розмін» міняє купюри на потрібні за номіналом. Банківський мод підключається склейкою.
 [*]Торговці в точках: об'єкт (ларьок, прилавок), персонаж, одягнений за пресетом, або річ, що вже стоїть на мапі; одна дія «Торгувати» в радіусі точки. Персонажі не отримують шкоди, їх не обшукати й не зв'язати.
 [*]Замки та знижки зі слова будь-якого мода: фракції, посади й лідери через OpenZone Core, дослідження — власною склейкою, а будь-який інший мод може принести свій вид. Відсутній мод ніколи не блокує торгівлю й не роздає грошей.
+[*]Склад і ліцензії: торговець може тримати полицю, ціни якої йдуть за її наповненням, а ліцензії, які продає торговець або видає адміністратор, відкривають категорії й торговців.
+[*]Перехід з TraderPlus: адмінка імпортує його файли, спершу пробним прогоном зі звітом.
 [*]Картка кожної речі, прайс, приміряння одягу до купівлі, англійська та українська.
 [/list]
 
-[b]Потрібно[/b] Community Framework і OpenZone Core. За бажанням: OpenZone Trader for VPP Admin Tools (вкладка TRADERS), OpenZone Trader Research (замки досліджень), OpenZone Trader TraderPlus (банк TraderPlus як гроші).
+[b]Потрібно[/b] Community Framework і OpenZone Core. За бажанням: OpenZone Trader for VPP Admin Tools (сторінки торговця в адмінці), OpenZone Trader Research (замки досліджень), OpenZone Trader TraderPlus (банк TraderPlus як гроші).
 
 [b]Адміністраторам[/b] Три файли в [i]profile/OpenZone[/i]: OZ_Trader_Settings.json (гроші, купюри, коефіцієнти стану, вимикачі замків), OZ_Trader_Goods.json (категорії й ціни), OZ_Trader_Traders.json (точки). У теці examples репозиторію — робочий набір і пояснення до нього.
 

@@ -32,12 +32,18 @@ class OZT_Module : CF_ModuleWorld
         // not promised. Idempotent.
         OZ_Json.EnsureTree();
 
+        // How long the start takes with a big book: the files, the book, the
+        // shelves and the points, said in the debug log.
+        int t0 = TickCount(0);
         OZT_Config.ServerLoad();
+        int tFiles = TickCount(t0);
 
         OZT_Book.Rebuild();
+        int tBook = TickCount(t0);
         // The stock of every shelf, restocked and destocked by the settings
         // (design §11.1).
         OZT_Stock.Start();
+        int tStock = TickCount(t0);
         OZT_Money.Provide(new OZT_ItemMoney());
         // The identity kinds are this mod's own: they need the core alone.
         OZT_Gates.Provide(new OZT_FactionGate());
@@ -48,6 +54,13 @@ class OZT_Module : CF_ModuleWorld
         // the points, whose respawn sends the packet again.
         OZ_SyncExtras.OnFill().Insert(OZT_PointsFill);
         OZT_Points.Respawn();
+        int tPoints = TickCount(t0);
+        if (OZ_Log.IsDebug())
+        {
+            string said = "start: files " + OZT_Open.Ms(tFiles) + " ms, book " + OZT_Open.Ms(tBook - tFiles);
+            said = said + " ms, stock " + OZT_Open.Ms(tStock - tBook) + " ms, points " + OZT_Open.Ms(tPoints - tStock) + " ms";
+            OZT_Log.Dbg(said);
+        }
         OZ_ServiceRegistry.Register(OZT_Const.SERVICE, new OZT_Service());
 
         // The admin's side: the pane's section and the three files in the

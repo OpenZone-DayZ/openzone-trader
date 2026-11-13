@@ -25,27 +25,35 @@ class OZT_StockFile
     }
 }
 
-// One stock in memory: parallel lists, small enough to search through.
+// One stock in memory: parallel lists in the file's order, and where each class
+// in each condition stands in them. The lists alone were searched line by line,
+// and a big book's open asks the shelf several times a line: 3404 records took
+// 6 s of one server frame (measured 2026-11-13), all of it in those searches.
 class OZT_StockShelf
 {
     ref array<string> Classes;
     ref array<int> Levels;
     ref array<int> Counts;
+    protected ref map<string, int> m_At;
 
     void OZT_StockShelf()
     {
         Classes = new array<string>();
         Levels = new array<int>();
         Counts = new array<int>();
+        m_At = new map<string, int>();
+    }
+
+    protected static string Key(string type, int level)
+    {
+        return level.ToString() + ":" + type;
     }
 
     int IndexOf(string type, int level)
     {
-        for (int i = 0; i < Classes.Count(); i++)
-        {
-            if (Levels[i] == level && Classes[i] == type)
-                return i;
-        }
+        int at;
+        if (m_At.Find(Key(type, level), at))
+            return at;
         return -1;
     }
 
@@ -64,9 +72,7 @@ class OZT_StockShelf
         {
             if (delta <= 0)
                 return;
-            Classes.Insert(type);
-            Levels.Insert(level);
-            Counts.Insert(delta);
+            Append(type, level, delta);
             return;
         }
         int n = Counts[at] + delta;
@@ -75,9 +81,24 @@ class OZT_StockShelf
             Counts.Set(at, n);
             return;
         }
+        // A line sold out leaves the lists: the places after it move up.
         Classes.RemoveOrdered(at);
         Levels.RemoveOrdered(at);
         Counts.RemoveOrdered(at);
+        Reindex();
+    }
+
+    // Units into a line, which may go below zero and stays: what one deal moves
+    // (OZT_StockCursor), not a shelf's own count.
+    void Shift(string type, int level, int delta)
+    {
+        int at = IndexOf(type, level);
+        if (at < 0)
+        {
+            Append(type, level, delta);
+            return;
+        }
+        Counts.Set(at, Counts[at] + delta);
     }
 
     void Clear()
@@ -85,6 +106,22 @@ class OZT_StockShelf
         Classes.Clear();
         Levels.Clear();
         Counts.Clear();
+        m_At.Clear();
+    }
+
+    protected void Append(string type, int level, int count)
+    {
+        m_At.Set(Key(type, level), Classes.Count());
+        Classes.Insert(type);
+        Levels.Insert(level);
+        Counts.Insert(count);
+    }
+
+    protected void Reindex()
+    {
+        m_At.Clear();
+        for (int i = 0; i < Classes.Count(); i++)
+            m_At.Set(Key(Classes[i], Levels[i]), i);
     }
 }
 
@@ -141,6 +178,7 @@ class OZT_Stock
 
     static void Save(string stock)
     {
+        int t0 = TickCount(0);
         OZT_StockShelf shelf = Shelf(stock);
         OZT_StockFile file = new OZT_StockFile();
         for (int i = 0; i < shelf.Classes.Count(); i++)
@@ -156,6 +194,12 @@ class OZT_Stock
         string err;
         if (!JsonFileLoader<OZT_StockFile>.SaveFile(PathOf(stock), file, err))
             OZT_Log.Error("stock '" + stock + "': the file could not be written: " + err);
+        if (OZ_Log.IsDebug())
+        {
+            string said = "stock '" + stock + "': " + file.Lines.Count().ToString() + " line(s) written in ";
+            said = said + OZT_Open.Ms(TickCount(t0)) + " ms";
+            OZT_Log.Dbg(said);
+        }
     }
 
     // The stocks the points sell from, each once.
@@ -176,7 +220,7 @@ class OZT_Stock
     static void GoodsOf(string stock, array<OZT_BookEntry> into)
     {
         array<ref OZT_Point> points = OZT_Config.Get().Traders().Traders;
-        array<string> seen = new array<string>();
+        map<string, bool> seen = new map<string, bool>();
         for (int i = 0; i < points.Count(); i++)
         {
             OZT_Point p = points[i];
@@ -190,9 +234,9 @@ class OZT_Stock
                 for (int g = 0; g < cat.Goods.Count(); g++)
                 {
                     OZT_BookEntry e = OZT_Book.EntryFor(p, cat.Goods[g].ClassName);
-                    if (!e || e.Category != cat.Id || !e.Stocked || seen.Find(e.ClassName) > -1)
+                    if (!e || e.Category != cat.Id || !e.Stocked || seen.Contains(e.ClassName))
                         continue;
-                    seen.Insert(e.ClassName);
+                    seen.Set(e.ClassName, true);
                     into.Insert(e);
                 }
             }
@@ -238,17 +282,16 @@ class OZT_Stock
     // the stock is sold by (GoodsOf).
     protected static void Destock(OZT_StockShelf shelf, array<OZT_BookEntry> goods)
     {
+        map<string, OZT_BookEntry> byClass = new map<string, OZT_BookEntry>();
+        for (int g = 0; g < goods.Count(); g++)
+        {
+            if (!byClass.Contains(goods[g].ClassName))
+                byClass.Set(goods[g].ClassName, goods[g]);
+        }
         for (int i = shelf.Classes.Count() - 1; i >= 0; i--)
         {
             OZT_BookEntry e = null;
-            for (int g = 0; g < goods.Count(); g++)
-            {
-                if (goods[g].ClassName == shelf.Classes[i])
-                {
-                    e = goods[g];
-                    break;
-                }
-            }
+            byClass.Find(shelf.Classes[i], e);
             if (!e || e.Destock <= 0)
                 continue;
             int n = shelf.Counts[i];
@@ -301,15 +344,7 @@ class OZT_StockCursor
     // negative counts too, so it is not a shelf's Add.
     void Move(string type, int level, int delta)
     {
-        int at = m_Delta.IndexOf(type, level);
-        if (at < 0)
-        {
-            m_Delta.Classes.Insert(type);
-            m_Delta.Levels.Insert(level);
-            m_Delta.Counts.Insert(delta);
-            return;
-        }
-        m_Delta.Counts.Set(at, m_Delta.Counts[at] + delta);
+        m_Delta.Shift(type, level, delta);
     }
 
     // After a committed deal: the moves onto the shelf, the shelf to its file.

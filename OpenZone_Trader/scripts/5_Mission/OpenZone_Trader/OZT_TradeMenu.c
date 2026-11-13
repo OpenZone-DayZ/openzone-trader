@@ -104,6 +104,11 @@ class OZT_TradeMenu : UIScriptedMenu
     protected bool m_Claimed;
     protected bool m_Closing;
 
+    // When the open was asked (TickCount), and whether the shelf laid after its
+    // answer is still to be timed: the debug log says how long a big book takes.
+    protected int m_OpenT0;
+    protected bool m_TimeShelf;
+
     // What must be laid anew at the next quiet moment.
     protected bool m_DirtyShelf;
     protected bool m_DirtyOwn;
@@ -414,7 +419,15 @@ class OZT_TradeMenu : UIScriptedMenu
             if (m_ActKind != 0)
                 RunAct();
             if (m_DirtyShelf)
+            {
+                int shelfT0 = TickCount(0);
                 FillShelf();
+                if (m_TimeShelf)
+                {
+                    m_TimeShelf = false;
+                    OZT_Log.Dbg("shelf laid in " + OZT_Open.Ms(TickCount(shelfT0)) + " ms");
+                }
+            }
             if (m_DirtyOwn)
                 FillOwn();
             if (m_DirtySlots)
@@ -494,6 +507,7 @@ class OZT_TradeMenu : UIScriptedMenu
         if (!JsonFileLoader<OZT_OpenReq>.MakeData(req, json, err, false))
             return;
         m_OpenFlying = true;
+        m_OpenT0 = TickCount(0);
         OZ_Rpc.ServiceRequest(OZT_Const.SERVICE, OZT_Const.OP_OPEN, json);
     }
 
@@ -550,6 +564,8 @@ class OZT_TradeMenu : UIScriptedMenu
 
     protected void TakeOpen(string json)
     {
+        int flew = TickCount(m_OpenT0);
+        int t0 = TickCount(0);
         OZT_OpenRes res = new OZT_OpenRes();
         string err;
         if (!JsonFileLoader<OZT_OpenRes>.LoadData(json, res, err))
@@ -557,6 +573,13 @@ class OZT_TradeMenu : UIScriptedMenu
             OZT_Log.Error("the answer of open could not be read: " + err);
             SayInfo(OZT_Ui.Words(OZT_Const.NO_INTERNAL), OZT_Look.Bad());
             return;
+        }
+        if (OZ_Log.IsDebug())
+        {
+            string said = "open answered: " + json.Length().ToString() + " B, " + res.Goods.Count().ToString();
+            said = said + " record(s), " + OZT_Open.Ms(flew) + " ms after the ask, read in " + OZT_Open.Ms(TickCount(t0)) + " ms";
+            OZT_Log.Dbg(said);
+            m_TimeShelf = true;
         }
         bool first = m_Data == null;
         m_Data = res;

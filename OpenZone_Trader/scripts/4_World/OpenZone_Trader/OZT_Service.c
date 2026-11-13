@@ -154,6 +154,9 @@ class OZT_Open
         if (!money)
             return "";
 
+        // How long a big book takes (TickCount ticks at 10 MHz): the goods, the
+        // player's things, the writing of the answer, each said in the debug log.
+        int t0 = TickCount(0);
         OZT_OpenRes res = new OZT_OpenRes();
         res.Revision = OZT_Config.Get().Revision();
         res.Trader = trader.Id;
@@ -225,8 +228,10 @@ class OZT_Open
             }
         }
 
+        int tGoods = TickCount(t0);
         if (OZT_Config.Get().Settings().GroupVariants == 1)
             GroupVariants(res.Goods);
+        int tGroups = TickCount(t0);
 
         // The change tab: the server's notes at face value, when this trader
         // changes them. The screen names the tab itself.
@@ -295,6 +300,7 @@ class OZT_Open
             }
             res.Yours.Insert(wo);
         }
+        int tYours = TickCount(t0);
 
         string body;
         if (!JsonFileLoader<OZT_OpenRes>.MakeData(res, body, err, false))
@@ -302,9 +308,27 @@ class OZT_Open
             OZT_Log.Error("open: the answer could not be written: " + err);
             return "";
         }
+        if (OZ_Log.IsDebug())
+        {
+            int tAll = TickCount(t0);
+            string said = "open " + trader.Id + ": " + res.Goods.Count().ToString() + " record(s), ";
+            said = said + body.Length().ToString() + " B in " + Ms(tAll) + " ms (goods " + Ms(tGoods);
+            said = said + ", groups " + Ms(tGroups - tGoods) + ", yours " + Ms(tYours - tGroups);
+            said = said + ", json " + Ms(tAll - tYours) + ")";
+            OZT_Log.Dbg(said);
+        }
         ok = true;
         error = "";
         return body;
+    }
+
+    // TickCount ticks as milliseconds with one decimal.
+    static string Ms(int ticks)
+    {
+        int tenths = ticks / 1000;
+        int whole = tenths / 10;
+        int part = tenths - whole * 10;
+        return whole.ToString() + "." + part.ToString();
     }
 }
 
@@ -327,13 +351,22 @@ class OZT_Service : OZ_ServiceHandler
 
         if (op == OZT_Const.OP_OPEN)
             return OZT_Open.Answer(player, json, ok, error);
+        int t0 = TickCount(0);
+        string body = "";
         if (op == OZT_Const.OP_DEAL)
-            return OZT_Deal.Run(player, json, true, ok, error);
+            body = OZT_Deal.Run(player, json, true, ok, error);
         // The same request, with nothing changed and the net not compared:
         // what the screen shows before Confirm is the server's own answer.
-        if (op == OZT_Const.OP_QUOTE)
-            return OZT_Deal.Run(player, json, false, ok, error);
+        else if (op == OZT_Const.OP_QUOTE)
+            body = OZT_Deal.Run(player, json, false, ok, error);
         // -- operations of the later tasks go above this line --
-        return "";
+        else
+            return "";
+        if (OZ_Log.IsDebug())
+        {
+            string said = op + ": " + OZT_Open.Ms(TickCount(t0)) + " ms, " + body.Length().ToString() + " B";
+            OZT_Log.Dbg(said);
+        }
+        return body;
     }
 }

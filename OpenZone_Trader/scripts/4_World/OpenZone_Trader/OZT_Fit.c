@@ -14,6 +14,50 @@ class OZT_Fit
 {
     static const string MAGAZINE_SLOT = "magazine";
 
+    // What config said of each class, kept: a slot's filter asks every record of
+    // the shelf, and each answer was some ten config reads, the same host's slot
+    // list among them every time (load test, 2026-11-13: 3404 records, twice per
+    // click). Config does not change while a mission runs.
+    protected static ref map<string, ref array<string>> s_Host = new map<string, ref array<string>>();
+    protected static ref map<string, ref array<string>> s_Part = new map<string, ref array<string>>();
+    protected static ref map<string, int> s_Kind = new map<string, int>();
+    protected static const int KIND_OTHER = 0;
+    protected static const int KIND_MAGAZINE = 1;
+    protected static const int KIND_WEAPON = 2;
+
+    static void Reset()
+    {
+        s_Host.Clear();
+        s_Part.Clear();
+        s_Kind.Clear();
+        s_Mags.Clear();
+    }
+
+    protected static array<string> Kept(map<string, ref array<string>> kept, string type, string key)
+    {
+        array<string> names;
+        if (kept.Find(type, names))
+            return names;
+        names = new array<string>();
+        ReadNames(type, key, names);
+        kept.Set(type, names);
+        return names;
+    }
+
+    protected static int KindOf(string type)
+    {
+        int kind;
+        if (s_Kind.Find(type, kind))
+            return kind;
+        kind = KIND_OTHER;
+        if (GetGame().ConfigIsExisting("CfgWeapons " + type))
+            kind = KIND_WEAPON;
+        else if (GetGame().ConfigIsExisting("CfgMagazines " + type) && !GetGame().IsKindOf(type, "Ammunition_Base"))
+            kind = KIND_MAGAZINE;
+        s_Kind.Set(type, kind);
+        return kind;
+    }
+
     protected static void ReadNames(string type, string key, array<string> names)
     {
         array<string> roots = {"CfgVehicles", "CfgWeapons", "CfgMagazines"};
@@ -38,44 +82,47 @@ class OZT_Fit
     // The slots a class has for parts.
     static void HostSlots(string type, array<string> names)
     {
-        ReadNames(type, "attachments", names);
+        names.InsertAll(Kept(s_Host, type, "attachments"));
     }
 
     // The slots a class may sit in.
     static void PartSlots(string type, array<string> names)
     {
-        ReadNames(type, "inventorySlot", names);
+        names.InsertAll(Kept(s_Part, type, "inventorySlot"));
     }
 
     // A magazine, not a pile of rounds: CfgMagazines holds both, and a pile is
     // a class of the game's Ammunition_Base.
     static bool IsMagazine(string type)
     {
-        if (!GetGame().ConfigIsExisting("CfgMagazines " + type))
-            return false;
-        return !GetGame().IsKindOf(type, "Ammunition_Base");
+        return KindOf(type) == KIND_MAGAZINE;
     }
 
     static bool IsWeapon(string type)
     {
-        return GetGame().ConfigIsExisting("CfgWeapons " + type);
+        return KindOf(type) == KIND_WEAPON;
     }
 
     static bool WeaponTakes(string weapon, string magazine)
     {
-        array<string> mags = new array<string>();
-        GetGame().ConfigGetTextArray("CfgWeapons " + weapon + " magazines", mags);
+        array<string> mags;
+        if (!s_Mags.Find(weapon, mags))
+        {
+            mags = new array<string>();
+            GetGame().ConfigGetTextArray("CfgWeapons " + weapon + " magazines", mags);
+            for (int m = 0; m < mags.Count(); m++)
+            {
+                string low = mags[m];
+                low.ToLower();
+                mags.Set(m, low);
+            }
+            s_Mags.Set(weapon, mags);
+        }
         string want = magazine;
         want.ToLower();
-        for (int i = 0; i < mags.Count(); i++)
-        {
-            string have = mags[i];
-            have.ToLower();
-            if (have == want)
-                return true;
-        }
-        return false;
+        return mags.Find(want) > -1;
     }
+    protected static ref map<string, ref array<string>> s_Mags = new map<string, ref array<string>>();
 
     protected static bool Holds(array<string> names, string name)
     {
@@ -129,10 +176,6 @@ class OZT_Fit
             name.ToLower();
             return name == MAGAZINE_SLOT && WeaponTakes(host, part);
         }
-        array<string> has = new array<string>();
-        HostSlots(host, has);
-        array<string> sits = new array<string>();
-        PartSlots(part, sits);
-        return Holds(has, slot) && Holds(sits, slot);
+        return Holds(Kept(s_Part, part, "inventorySlot"), slot) && Holds(Kept(s_Host, host, "attachments"), slot);
     }
 }

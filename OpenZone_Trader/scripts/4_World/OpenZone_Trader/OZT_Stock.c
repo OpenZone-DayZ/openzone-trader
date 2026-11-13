@@ -347,6 +347,16 @@ class OZT_StockCursor
         m_Delta.Shift(type, level, delta);
     }
 
+    // The classes this deal moves on the shelf, each once.
+    void Classes(array<string> into)
+    {
+        for (int i = 0; i < m_Delta.Classes.Count(); i++)
+        {
+            if (m_Delta.Counts[i] != 0 && into.Find(m_Delta.Classes[i]) < 0)
+                into.Insert(m_Delta.Classes[i]);
+        }
+    }
+
     // After a committed deal: the moves onto the shelf, the shelf to its file.
     // True: the stock changed.
     bool Commit()
@@ -368,12 +378,18 @@ class OZT_StockCursor
 
 // After a deal that changed a stock, everybody else who stands at a point that
 // sells from it is told (the owner, 2026-11-12: two players at one trader see
-// one shelf), so an open screen asks for its shelf again. Who stands there is
-// all the server knows of an open screen; a client with no screen open lets
-// the notice go.
+// one shelf). Who stands there is all the server knows of an open screen; a
+// client with no screen open lets the news go.
+//
+// With the classes that moved, each player there is sent a part of the open of
+// that point (OZT_Const.OP_STOCK): those classes' records at that player's own
+// prices, a few hundred bytes, put in place by the screen. Before, everybody
+// asked for the whole open again: half a megabyte each for a big book (load
+// test, 2026-11-13). Without classes, or for a player the part cannot be made
+// for, the old notice: that screen asks for the whole open.
 class OZT_StockNews
 {
-    static void Tell(string stock, PlayerBase dealer)
+    static void Tell(string stock, PlayerBase dealer, array<string> classes = null)
     {
         array<OZT_Point> points = new array<OZT_Point>();
         array<ref OZT_Point> all = OZT_Config.Get().Traders().Traders;
@@ -396,10 +412,32 @@ class OZT_StockNews
                 float away = OZT_Points.Away(points[k].Id, pb);
                 if (away < 0 || away > points[k].Radius + NEAR_SLACK)
                     continue;
-                OZ_Rpc.Notice(pb.GetIdentity(), OZT_Const.NOTICE_STOCK, true, stock);
+                if (!SendPart(pb, points[k], classes))
+                    OZ_Rpc.Notice(pb.GetIdentity(), OZT_Const.NOTICE_STOCK, true, stock);
                 break;
             }
         }
+    }
+
+    // The part of the open of `point` for the classes, sent to `pb`; false when
+    // there are no classes or the part cannot be made for that player (out of
+    // reach).
+    protected static bool SendPart(PlayerBase pb, OZT_Point point, array<string> classes)
+    {
+        if (!classes || classes.Count() == 0)
+            return false;
+        OZT_OpenReq req = new OZT_OpenReq();
+        req.Trader = point.Id;
+        req.Part = 1;
+        for (int i = 0; i < classes.Count(); i++)
+            req.Only.Insert(classes[i]);
+        bool ok;
+        string error;
+        string body = OZT_Open.AnswerTo(pb, req, ok, error);
+        if (!ok)
+            return false;
+        OZ_Rpc.ServiceRespond(pb.GetIdentity(), OZT_Const.SERVICE, OZT_Const.OP_STOCK, true, body, "");
+        return true;
     }
 
     // A screen stays open a step or two past the radius.

@@ -415,7 +415,9 @@ class OZT_Admin : OZ_AdminSection
         int was = OZT_Stock.Count(stock, req.ClassName, req.Level);
         OZT_Stock.Add(stock, req.ClassName, req.Level, req.Count - was);
         OZT_Stock.Save(stock);
-        OZT_StockNews.Tell(stock, null);
+        array<string> moved = new array<string>();
+        moved.Insert(req.ClassName);
+        OZT_StockNews.Tell(stock, null, moved);
         string said = "admin: stock '" + stock + "' " + req.ClassName + " level " + req.Level.ToString();
         said = said + ": " + was.ToString() + " -> " + req.Count.ToString();
         OZT_Log.Info(said);

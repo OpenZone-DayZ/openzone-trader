@@ -104,10 +104,16 @@ class OZT_TradeMenu : UIScriptedMenu
     protected bool m_Claimed;
     protected bool m_Closing;
 
-    // When the open was asked (TickCount), and whether the shelf laid after its
-    // answer is still to be timed: the debug log says how long a big book takes.
+    // When the open was asked (TickCount): the debug log says how long a big
+    // book takes, and so it does for every lay and repaint of the shelf.
     protected int m_OpenT0;
-    protected bool m_TimeShelf;
+
+    // The rows of the shelf that have widgets now (ShelfReveal), and whether some
+    // near the view still wait for theirs.
+    protected int m_ShelfFrom = -1;
+    protected int m_ShelfTo = -1;
+    protected bool m_ShelfMore;
+    static const int SHELF_BUILDS = 40;
 
     // What must be laid anew at the next quiet moment.
     protected bool m_DirtyShelf;
@@ -420,14 +426,10 @@ class OZT_TradeMenu : UIScriptedMenu
                 RunAct();
             if (m_DirtyShelf)
             {
-                int shelfT0 = TickCount(0);
                 FillShelf();
-                if (m_TimeShelf)
-                {
-                    m_TimeShelf = false;
-                    OZT_Log.Dbg("shelf laid in " + OZT_Open.Ms(TickCount(shelfT0)) + " ms");
-                }
             }
+            int sideT0 = TickCount(0);
+            bool side = m_DirtyOwn || m_DirtySlots || m_DirtyCarts || m_DirtyParts;
             if (m_DirtyOwn)
                 FillOwn();
             if (m_DirtySlots)
@@ -436,11 +438,16 @@ class OZT_TradeMenu : UIScriptedMenu
                 FillCarts();
             if (m_DirtyParts)
                 FillParts();
+            if (side && OZ_Log.IsDebug())
+                OZT_Log.Dbg("own side, carts and parts filled in " + OZT_Open.Ms(TickCount(sideT0)) + " ms");
             if (m_PaintPickSoon)
                 RepaintPick();
             if (m_PickKind != 0 && !PickStands())
                 Unpick();
         }
+        // The shelf scrolled, or tiles near the view still wait: their widgets.
+        if (!m_DirtyShelf)
+            ShelfReveal(false);
 
         if (m_QuoteIn >= 0)
         {
@@ -500,8 +507,21 @@ class OZT_TradeMenu : UIScriptedMenu
 
     protected void AskOpen()
     {
+        AskOpenOf(null);
+    }
+
+    // The open, or a part of it: with `only` (empty too), the records of those
+    // classes and the player's side -- after the player's own deal, what it moved.
+    protected void AskOpenOf(array<string> only)
+    {
         OZT_OpenReq req = new OZT_OpenReq();
         req.Trader = m_Trader;
+        if (only)
+        {
+            req.Part = 1;
+            for (int i = 0; i < only.Count(); i++)
+                req.Only.Insert(only[i]);
+        }
         string json;
         string err;
         if (!JsonFileLoader<OZT_OpenReq>.MakeData(req, json, err, false))
@@ -549,6 +569,11 @@ class OZT_TradeMenu : UIScriptedMenu
             }
             return;
         }
+        if (op == OZT_Const.OP_STOCK)
+        {
+            TakeStock(ok, json);
+            return;
+        }
         if (op == OZT_Const.OP_QUOTE)
         {
             m_QuoteFlying = false;
@@ -562,7 +587,24 @@ class OZT_TradeMenu : UIScriptedMenu
         }
     }
 
-    protected void TakeOpen(string json)
+    // Another player's deal moved the stock this trader sells from: the server
+    // sent this screen its part of the open, put in place here. An open on its
+    // way may predate the news: the whole open is asked once it is in.
+    protected void TakeStock(bool ok, string json)
+    {
+        if (!ok || !m_Data)
+            return;
+        m_ByNews = true;
+        if (m_OpenFlying || m_DealFlying)
+        {
+            m_NewsWaits = true;
+            return;
+        }
+        m_Quote = null;
+        TakeOpen(json, true);
+    }
+
+    protected void TakeOpen(string json, bool pushed = false)
     {
         int flew = TickCount(m_OpenT0);
         int t0 = TickCount(0);
@@ -574,18 +616,47 @@ class OZT_TradeMenu : UIScriptedMenu
             SayInfo(OZT_Ui.Words(OZT_Const.NO_INTERNAL), OZT_Look.Bad());
             return;
         }
+        OZT_WireRows.Unpack(res);
+        bool part = res.Part == 1;
+        int records = res.Goods.Count();
+        // The shelf keeps its shape: its tiles are repainted where they lie.
+        bool keep = false;
+        if (part)
+        {
+            // A part of another trader's open, or nothing to put it into: the
+            // whole open instead.
+            if (!m_Data || res.Trader != m_Trader)
+            {
+                if (!m_OpenFlying)
+                    AskOpen();
+                return;
+            }
+            keep = MergeOpen(res);
+            res = m_Data;
+        }
         if (OZ_Log.IsDebug())
         {
-            string said = "open answered: " + json.Length().ToString() + " B, " + res.Goods.Count().ToString();
-            said = said + " record(s), " + OZT_Open.Ms(flew) + " ms after the ask, read in " + OZT_Open.Ms(TickCount(t0)) + " ms";
+            string kind = "open answered: ";
+            if (part && pushed)
+                kind = "open part pushed: ";
+            else if (part)
+                kind = "open part answered: ";
+            string said = kind + json.Length().ToString() + " B, " + records.ToString() + " record(s), ";
+            if (!pushed)
+                said = said + OZT_Open.Ms(flew) + " ms after the ask, ";
+            said = said + "read in " + OZT_Open.Ms(TickCount(t0)) + " ms";
+            if (part)
+                said = said + " with the merge, shape kept: " + keep.ToString();
             OZT_Log.Dbg(said);
-            m_TimeShelf = true;
         }
         bool first = m_Data == null;
         m_Data = res;
         // A licence bought opens a category, a stock sold out may close one.
         if (first || TabsSig() != m_TabSig)
+        {
             MakeTabs();
+            keep = false;
+        }
         if (first)
         {
             PaintOwnFilter();
@@ -603,7 +674,10 @@ class OZT_TradeMenu : UIScriptedMenu
         }
         if (!m_NewsWaits)
             m_ByNews = false;
-        m_DirtyShelf = true;
+        if (keep && !m_DirtyShelf)
+            RepaintShelf();
+        else
+            m_DirtyShelf = true;
         m_DirtyOwn = true;
         m_DirtySlots = true;
         m_DirtyCarts = true;
@@ -611,6 +685,161 @@ class OZT_TradeMenu : UIScriptedMenu
         if (!m_Cart.IsEmpty() && !m_Quote)
             QuoteSoon(QUOTE_AFTER);
         PaintDeal();
+    }
+
+    // A part of the open into the screen's picture: the player's side whole, and
+    // the records of the classes it names in the place of the ones the screen
+    // had (a class that was not there goes to the end). Colour groups are the
+    // whole open's: a record keeps the group its class had in that condition.
+    //
+    // True when the shelf keeps its shape: the same records in the same places,
+    // shown and grouped as they were, and the same licences. Then only numbers
+    // moved, and the tiles take them where they lie (RepaintShelf).
+    protected bool MergeOpen(OZT_OpenRes part)
+    {
+        bool same = true;
+        if (part.Licences && !SameWords(m_Data.Licences, part.Licences))
+            same = false;
+        array<ref OZT_WireGoods> before = m_Data.Goods;
+
+        m_Data.Revision = part.Revision;
+        m_Data.Balance = part.Balance;
+        m_Data.Bank = part.Bank;
+        m_Data.WearBought = part.WearBought;
+        if (part.Yours)
+            m_Data.Yours = part.Yours;
+        if (part.Licences)
+            m_Data.Licences = part.Licences;
+        if (part.Notes)
+            m_Data.Notes = part.Notes;
+        if (part.Condition)
+            m_Data.Condition = part.Condition;
+
+        map<string, bool> named = new map<string, bool>();
+        if (part.Only)
+        {
+            for (int n = 0; n < part.Only.Count(); n++)
+                named.Set(part.Only[n], true);
+        }
+        map<string, ref array<ref OZT_WireGoods>> fresh = new map<string, ref array<ref OZT_WireGoods>>();
+        for (int f = 0; f < part.Goods.Count(); f++)
+        {
+            OZT_WireGoods ng = part.Goods[f];
+            array<ref OZT_WireGoods> list = fresh.Get(ng.ClassName);
+            if (!list)
+            {
+                list = new array<ref OZT_WireGoods>();
+                fresh.Set(ng.ClassName, list);
+            }
+            list.Insert(ng);
+        }
+
+        // The groups the whole open gave each named class in each condition.
+        map<string, string> groups = new map<string, string>();
+        for (int i = 0; i < m_Data.Goods.Count(); i++)
+        {
+            OZT_WireGoods old = m_Data.Goods[i];
+            if (old.Group != "" && named.Contains(old.ClassName))
+                groups.Set(old.ClassName + "|" + old.Level.ToString(), old.Group);
+        }
+
+        // The order kept: the untouched records as they stood, a named class's
+        // new records where its first record stood.
+        array<ref OZT_WireGoods> merged = new array<ref OZT_WireGoods>();
+        map<string, bool> put = new map<string, bool>();
+        for (int k = 0; k < m_Data.Goods.Count(); k++)
+        {
+            OZT_WireGoods cur = m_Data.Goods[k];
+            if (cur.Category == OZT_Const.CATEGORY_CHANGE || !named.Contains(cur.ClassName))
+            {
+                merged.Insert(cur);
+                continue;
+            }
+            if (put.Contains(cur.ClassName))
+                continue;
+            put.Set(cur.ClassName, true);
+            PutFresh(fresh.Get(cur.ClassName), groups, merged);
+        }
+        if (part.Only)
+        {
+            for (int q = 0; q < part.Only.Count(); q++)
+            {
+                string type = part.Only[q];
+                if (put.Contains(type))
+                    continue;
+                put.Set(type, true);
+                PutFresh(fresh.Get(type), groups, merged);
+            }
+        }
+        m_Data.Goods = merged;
+
+        if (!same || merged.Count() != before.Count())
+            return false;
+        for (int s = 0; s < merged.Count(); s++)
+        {
+            if (!SameShape(before[s], merged[s]))
+                return false;
+        }
+        return true;
+    }
+
+    // Would the shelf lay these two records alike: the same class in the same
+    // condition, category, look and colour group, shown or not alike?
+    protected static bool SameShape(OZT_WireGoods a, OZT_WireGoods b)
+    {
+        if (a.ClassName != b.ClassName || a.Level != b.Level || a.Category != b.Category)
+            return false;
+        if (a.Look != b.Look || a.Group != b.Group)
+            return false;
+        bool shownA = a.Buy > 0;
+        bool shownB = b.Buy > 0;
+        return shownA == shownB;
+    }
+
+    protected static bool SameWords(array<string> a, array<string> b)
+    {
+        if (!a && !b)
+            return true;
+        if (!a || !b || a.Count() != b.Count())
+            return false;
+        for (int i = 0; i < a.Count(); i++)
+        {
+            if (a[i] != b[i])
+                return false;
+        }
+        return true;
+    }
+
+    protected void PutFresh(array<ref OZT_WireGoods> list, map<string, string> groups, array<ref OZT_WireGoods> into)
+    {
+        if (!list)
+            return;
+        for (int i = 0; i < list.Count(); i++)
+        {
+            OZT_WireGoods g = list[i];
+            string group;
+            if (groups.Find(g.ClassName + "|" + g.Level.ToString(), group))
+                g.Group = group;
+            into.Insert(g);
+        }
+    }
+
+    // Does the cart buy a licence? A licence may open categories: after such a
+    // deal the screen asks for the whole open, not a part.
+    protected bool CartBuysLicence()
+    {
+        if (!m_Data)
+            return false;
+        for (int i = 0; i < m_Cart.Buys.Count(); i++)
+        {
+            string type = m_Cart.Buys[i].Type;
+            for (int g = 0; g < m_Data.Goods.Count(); g++)
+            {
+                if (m_Data.Goods[g].ClassName == type && m_Data.Goods[g].Look != "")
+                    return true;
+            }
+        }
+        return false;
     }
 
     // The dialog asks what a part of one stack brings.
@@ -721,6 +950,14 @@ class OZT_TradeMenu : UIScriptedMenu
     {
         if (ok)
         {
+            // What the deal moved: a part of the open for those classes and the
+            // player's side, not the whole open again (half a megabyte for a big
+            // book). A licence bought may open categories: the whole open then.
+            bool whole = CartBuysLicence();
+            OZT_DealRes done = new OZT_DealRes();
+            string doneErr;
+            if (json == "" || !JsonFileLoader<OZT_DealRes>.LoadData(json, done, doneErr) || !done.Moved)
+                whole = true;
             EndTry();
             m_Cart.Clear();
             m_PruneSaid = "";
@@ -730,7 +967,10 @@ class OZT_TradeMenu : UIScriptedMenu
             m_DirtyCarts = true;
             SayInfo(OZT_Ui.Words("STR_OZT_UI_DONE"), OZT_Look.Good());
             PaintDeal();
-            AskOpen();
+            if (whole)
+                AskOpen();
+            else
+                AskOpenOf(done.Moved);
             return;
         }
         OZT_DealRes res = new OZT_DealRes();
@@ -1230,6 +1470,7 @@ class OZT_TradeMenu : UIScriptedMenu
         DropHover();
         if (!m_Data || !m_ShelfGrid.IsReady())
             return;
+        int t0 = TickCount(0);
         m_ShelfGrid.Clear();
         string cat = m_TabIds[m_ShelfTab];
 
@@ -1269,18 +1510,17 @@ class OZT_TradeMenu : UIScriptedMenu
                     continue;
                 at = group.Find(shown);
             }
-            // Drawn as it comes: with what the price book gives it, a worn
-            // stock line in its condition.
-            EntityAI e;
+            // Packed by the class's size alone: the picture and the widgets are
+            // made when the tile comes near the view (ShelfReveal).
+            string pic = g.ClassName;
             if (g.Look != "")
-                e = m_Shelf.Of(g.Look);
-            else if (g.Level > 0)
-                e = m_Shelf.LookWorn(g.ClassName, g.Level);
-            else
-                e = m_Shelf.LookOf(g.ClassName, g.With, null);
-            if (!e)
+                pic = g.Look;
+            int tw;
+            int th;
+            if (!OZT_Tile.ConfigSize(pic, tw, th))
                 continue;
-            OZT_Tile t = new OZT_Tile(OZT_Tile.SHELF, g.ClassName, e);
+            OZT_Tile t = new OZT_Tile(OZT_Tile.SHELF, g.ClassName, null);
+            t.SizeTo(tw, th);
             t.Price = g.Buy;
             t.Index = i;
             t.Level = g.Level;
@@ -1297,10 +1537,120 @@ class OZT_TradeMenu : UIScriptedMenu
                 t.SoldOut = true;
             if (g.Look != "")
                 t.Owned = HoldsLicence(g.ClassName);
-            if (m_ShelfGrid.Add(t))
-                Relight(t, true);
+            m_ShelfGrid.AddLazy(t);
         }
+        int tRecords = TickCount(t0);
         m_ShelfGrid.Arrange();
+        int tPacked = TickCount(t0);
+        ShelfReveal(true);
+        if (OZ_Log.IsDebug())
+        {
+            string said = "shelf laid: records " + OZT_Open.Ms(tRecords) + " ms, packing " + OZT_Open.Ms(tPacked - tRecords);
+            said = said + " ms, pictures " + OZT_Open.Ms(TickCount(t0) - tPacked) + " ms, ";
+            said = said + m_ShelfGrid.Count().ToString() + " tile(s)";
+            OZT_Log.Dbg(said);
+        }
+    }
+
+    // The shelf's tiles take their records' numbers again where they lie: a part
+    // of the open that left the shelf its shape (MergeOpen). Laying the shelf
+    // anew cost every viewer of a big book a third of a second for each deal
+    // anyone made there (load test, 2026-11-13).
+    protected void RepaintShelf()
+    {
+        if (!m_Data || !m_ShelfGrid)
+            return;
+        int t0 = TickCount(0);
+        int moved = 0;
+        for (int i = 0; i < m_ShelfGrid.Count(); i++)
+        {
+            OZT_Tile t = m_ShelfGrid.Get(i);
+            if (t.Index < 0 || t.Index >= m_Data.Goods.Count())
+                continue;
+            OZT_WireGoods g = m_Data.Goods[t.Index];
+            int count = 0;
+            bool soldOut = false;
+            if (g.Stock > 0)
+                count = g.Stock;
+            else if (g.Stock == 0)
+                soldOut = true;
+            // Not `owned`: that is a word of the language, and a local of that
+            // name does not compile.
+            bool held = t.Owned;
+            if (g.Look != "")
+                held = HoldsLicence(g.ClassName);
+            if (t.Price == g.Buy && t.Count == count && t.SoldOut == soldOut && t.Owned == held)
+                continue;
+            t.Price = g.Buy;
+            t.Count = count;
+            t.SoldOut = soldOut;
+            t.Owned = held;
+            moved++;
+            if (t.Root)
+                t.PaintMarks();
+            // The card and the words of the selection said the old numbers.
+            if (t == m_Hover)
+                DropHover();
+            if (IsPick(t))
+                m_PaintPickSoon = true;
+        }
+        if (OZ_Log.IsDebug())
+            OZT_Log.Dbg("shelf repainted in " + OZT_Open.Ms(TickCount(t0)) + " ms, " + moved.ToString() + " tile(s) moved");
+    }
+
+    // The picture of a shelf record: as it comes, with what the price book gives
+    // it, a worn stock line in its condition, a licence by its look.
+    protected EntityAI ShelfPicture(OZT_WireGoods g)
+    {
+        if (g.Look != "")
+            return m_Shelf.Of(g.Look);
+        if (g.Level > 0)
+            return m_Shelf.LookWorn(g.ClassName, g.Level);
+        return m_Shelf.LookOf(g.ClassName, g.With, null);
+    }
+
+    // The shelf's tiles near the view get their pictures and widgets, the ones
+    // far from it give them up; at most SHELF_BUILDS a frame, the rest on the
+    // next. A big book's shelf had all of them made in one frame: 3404 tiles,
+    // 5.3 s of a stopped game (load test, 2026-11-13).
+    protected void ShelfReveal(bool force)
+    {
+        if (!m_Data || !m_ShelfGrid || !m_ShelfGrid.IsReady())
+            return;
+        int from;
+        int to;
+        m_ShelfGrid.Band(from, to);
+        if (!force && !m_ShelfMore && from == m_ShelfFrom && to == m_ShelfTo)
+            return;
+        m_ShelfFrom = from;
+        m_ShelfTo = to;
+        m_ShelfMore = false;
+        int built = 0;
+        for (int i = 0; i < m_ShelfGrid.Count(); i++)
+        {
+            OZT_Tile t = m_ShelfGrid.Get(i);
+            bool near = t.Row + t.H > from && t.Row < to;
+            if (!near)
+            {
+                if (t.Root)
+                    m_ShelfGrid.UnbuildTile(t);
+                continue;
+            }
+            if (t.Root)
+                continue;
+            if (built >= SHELF_BUILDS)
+            {
+                m_ShelfMore = true;
+                continue;
+            }
+            if (t.Index < 0 || t.Index >= m_Data.Goods.Count())
+                continue;
+            t.Item = ShelfPicture(m_Data.Goods[t.Index]);
+            if (!t.Item || !m_ShelfGrid.BuildTile(t))
+                continue;
+            Relight(t, true);
+            built++;
+        }
     }
 
     // Goods the shelf shows in this tab (or under a slot's filter).
@@ -2025,7 +2375,11 @@ class OZT_TradeMenu : UIScriptedMenu
     // whose sum it is, the game's own description.
     protected void PaintPick(OZT_Tile t)
     {
-        string name = OZT_Ui.NameOf(t.Item);
+        // A shelf tile far from the view has no picture of its own yet.
+        EntityAI named = t.Item;
+        if (!named && t.Kind == OZT_Tile.SHELF)
+            named = m_Shelf.Of(t.Type);
+        string name = OZT_Ui.NameOf(named);
         string price = "";
         string sub = "";
         if (t.Kind == OZT_Tile.SHELF || t.Kind == OZT_Tile.BUY)

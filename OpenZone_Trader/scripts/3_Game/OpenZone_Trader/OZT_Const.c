@@ -24,6 +24,9 @@ class OZT_Const
     static const string OP_OPEN = "open";
     static const string OP_DEAL = "deal";
     static const string OP_QUOTE = "quote";
+    // Server -> client, unasked: a part of the open (OZT_OpenRes.Part) after a
+    // stock moved, for a screen open at a point that sells from that stock.
+    static const string OP_STOCK = "stock";
 
     // What the server tells a client to show (OZ_Rpc.Show): this prefix, then
     // the trader's id.

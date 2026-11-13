@@ -1543,7 +1543,15 @@ class OZT_Deal
         // The stock moves of the deal onto the shelf and into its file; the
         // others at a point of that stock hear of it.
         if (m_Cursor.Commit())
-            OZT_StockNews.Tell(m_Cursor.Stock(), m_Player);
+        {
+            // The classes moved: the dealer's screen asks for their part of the
+            // open, the others at the stock are sent theirs.
+            array<string> moved = new array<string>();
+            m_Cursor.Classes(moved);
+            for (int mv = 0; mv < moved.Count(); mv++)
+                m_Res.Moved.Insert(moved[mv]);
+            OZT_StockNews.Tell(m_Cursor.Stock(), m_Player, moved);
+        }
         // The licences bought, onto the character.
         for (int lc = 0; lc < m_Licences.Count(); lc++)
             OZT_Licences.Grant(OZT_Licences.UidOf(m_Player), m_Licences[lc]);

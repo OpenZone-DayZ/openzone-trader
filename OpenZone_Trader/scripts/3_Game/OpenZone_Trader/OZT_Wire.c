@@ -11,6 +11,16 @@
 class OZT_OpenReq
 {
     string Trader = "";
+    // 1: a part of the open (the load test of 2026-11-13: a big book's whole
+    // open is half a megabyte): the goods of the classes in Only, and the player's
+    // side whole -- the money, the things carried, the licences.
+    int Part = 0;
+    ref array<string> Only;
+
+    void OZT_OpenReq()
+    {
+        Only = new array<string>();
+    }
 }
 
 class OZT_WireCategory
@@ -98,6 +108,14 @@ class OZT_OpenRes
     ref array<string> Notes;
     // The licences the player holds (design §11.2).
     ref array<string> Licences;
+    // A part of the open (OZT_OpenReq.Part): the goods of these classes only,
+    // to be put in the place of what the screen holds of them; no categories.
+    int Part = 0;
+    ref array<string> Only;
+    // The goods as short rows (OZT_WireRows), each naming its category by its
+    // place in RowCats; Goods is empty on the wire then and filled on arrival.
+    ref array<string> Rows;
+    ref array<string> RowCats;
 
     void OZT_OpenRes()
     {
@@ -107,6 +125,132 @@ class OZT_OpenRes
         Yours = new array<ref OZT_WireOwn>();
         Notes = new array<string>();
         Licences = new array<string>();
+        Only = new array<string>();
+        Rows = new array<string>();
+        RowCats = new array<string>();
+    }
+}
+
+// The goods of an open as short rows. A record of OZT_WireGoods costs some 150
+// bytes of keys and empty fields as JSON; a row is its values alone, about 25:
+//   ClassName|cat|Buy|Sell|Stock|Level|Rule|Group|With|Name|Look
+// `cat` is the category's place in RowCats, With is comma-separated, an empty
+// field is "-", and the empty fields at the end are left off. A "|" in a name is
+// written as "/". Every field has something in it, so splitting never meets two
+// separators side by side.
+class OZT_WireRows
+{
+    static void Pack(OZT_OpenRes res)
+    {
+        map<string, int> at = new map<string, int>();
+        res.RowCats.Clear();
+        res.Rows.Clear();
+        for (int i = 0; i < res.Goods.Count(); i++)
+        {
+            OZT_WireGoods g = res.Goods[i];
+            int c;
+            if (!at.Find(g.Category, c))
+            {
+                c = res.RowCats.Count();
+                at.Set(g.Category, c);
+                res.RowCats.Insert(g.Category);
+            }
+            res.Rows.Insert(Row(g, c));
+        }
+        res.Goods.Clear();
+    }
+
+    static string Row(OZT_WireGoods g, int cat)
+    {
+        array<string> f = new array<string>();
+        f.Insert(g.ClassName);
+        f.Insert(cat.ToString());
+        f.Insert(g.Buy.ToString());
+        f.Insert(g.Sell.ToString());
+        f.Insert(g.Stock.ToString());
+        f.Insert(g.Level.ToString());
+        f.Insert(Field(g.Rule));
+        f.Insert(Field(g.Group));
+        string with = "";
+        if (g.With)
+        {
+            for (int w = 0; w < g.With.Count(); w++)
+            {
+                if (w > 0)
+                    with += ",";
+                with += g.With[w];
+            }
+        }
+        f.Insert(Field(with));
+        f.Insert(Field(g.Name));
+        f.Insert(Field(g.Look));
+        int n = f.Count();
+        while (n > 6 && f[n - 1] == "-")
+            n--;
+        string row = f[0];
+        for (int k = 1; k < n; k++)
+            row += "|" + f[k];
+        return row;
+    }
+
+    protected static string Field(string s)
+    {
+        if (s == "")
+            return "-";
+        string t = s;
+        t.Replace("|", "/");
+        return t;
+    }
+
+    protected static string Value(string s)
+    {
+        if (s == "-")
+            return "";
+        return s;
+    }
+
+    // The rows back into records, after the goods that came as records (an
+    // answer has one form or the other). The arrived lists may be absent.
+    static void Unpack(OZT_OpenRes res)
+    {
+        if (!res.Goods)
+            res.Goods = new array<ref OZT_WireGoods>();
+        if (!res.Rows || res.Rows.Count() == 0)
+            return;
+        array<string> f = new array<string>();
+        for (int i = 0; i < res.Rows.Count(); i++)
+        {
+            f.Clear();
+            string row = res.Rows[i];
+            row.Split("|", f);
+            if (f.Count() < 6)
+                continue;
+            OZT_WireGoods g = new OZT_WireGoods();
+            g.ClassName = f[0];
+            int c = f[1].ToInt();
+            if (res.RowCats && c >= 0 && c < res.RowCats.Count())
+                g.Category = res.RowCats[c];
+            g.Buy = f[2].ToInt();
+            g.Sell = f[3].ToInt();
+            g.Stock = f[4].ToInt();
+            g.Level = f[5].ToInt();
+            if (f.Count() > 6)
+                g.Rule = Value(f[6]);
+            if (f.Count() > 7)
+                g.Group = Value(f[7]);
+            if (f.Count() > 8)
+            {
+                string with = Value(f[8]);
+                if (with != "")
+                    with.Split(",", g.With);
+            }
+            if (f.Count() > 9)
+                g.Name = Value(f[9]);
+            if (f.Count() > 10)
+                g.Look = Value(f[10]);
+            res.Goods.Insert(g);
+        }
+        res.Rows.Clear();
     }
 }
 
@@ -281,9 +425,14 @@ class OZT_DealRes
     ref array<int> SellPrices;
     ref array<int> BuyPrices;
 
+    // A committed deal: the classes whose stock it moved, for the screen's part
+    // of the open that follows (OZT_OpenReq.Part).
+    ref array<string> Moved;
+
     void OZT_DealRes()
     {
         SellPrices = new array<int>();
         BuyPrices = new array<int>();
+        Moved = new array<string>();
     }
 }

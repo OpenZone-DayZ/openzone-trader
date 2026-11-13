@@ -54,13 +54,14 @@ our one file per stock costs the same order of time here.)
 
 ## Client (one player, the screen of load1, server fixed)
 
+Before the client's fixes:
+
 | step | time |
 |---|---|
 | the open's answer, 520 615 B in the core's 900-byte parts | 8.6 s after the ask (first open), 3.1-4.7 s later |
 | reading the JSON | 10-13 ms |
 | laying the shelf (ALL tab, 3404 tiles) | **5.3 s** the first time, 2.0-2.2 s again |
 
-- The transfer runs at about 60 KB/s and dominates the wait; the server is free meanwhile.
 - The shelf is laid in one client frame: the player's game stands for 5 s.
 - The ALL tab of 3404 tiles is drawn wrong: tiles over tiles, many pack items white.
 - Every change of a stock (anybody's deal at a point that sells from it) makes every client with
@@ -73,11 +74,53 @@ our one file per stock costs the same order of time here.)
   ("□нструменти й різне"): the font has no such glyph, and names from the JSON are not mapped to
   the Latin `I` the series' stringtables use.
 
+After them (same stand, same book; the debug lines `open answered`, `shelf laid: records /
+packing / pictures`, `shelf repainted`, `own side, carts and parts filled`):
+
+| step | before | after |
+|---|---|---|
+| the open's answer | 520 615 B | **123 746 B** |
+| it arrives after the ask | 8.6 s first, 3.1-4.7 s later | 3.1-3.4 s (built in 0.12-0.16 s) |
+| reading it | 10-13 ms | 12-13 ms |
+| laying the ALL tab (3362 tiles) | 5.3 s first, 2.0-2.2 s again | **131 ms** first (records 16, packing 62, pictures 54), **71 ms** again (6, 61, 4) |
+| a tab of 306 weapons | - | 9 ms |
+| another player's deal at that stock | the whole open again, 520 KB and a new shelf | **2 285 B**; read and merged 2.3 ms, shelf repainted 1.3 ms, own side 6 ms |
+| the player's own deal | the whole open again | 2 194 B, 30 ms after the ask; repainted in under 0.1 ms |
+| a slot's filter over 3404 records | not measured | 32 ms the first time, 10 ms after |
+
+What changed:
+
+1. **A record is one string** (`OZT_WireRows`, 3_Game): `ClassName|cat|Buy|Sell|Stock|Level|Rule|
+   Group|With|Name|Look`, the category by its index in `RowCats`, "-" for an empty field, empty
+   fields at the end left off. The answer is 4.2x shorter.
+2. **A part of the open.** `OZT_OpenReq.Part = 1` with `Only` (classes) answers those classes'
+   records and the player's side whole. `OZT_StockNews.Tell` sends it to everybody else at a
+   point of the stock (service op `stock`); the dealer's screen asks it for `OZT_DealRes.Moved`;
+   a licence bought asks the whole open. The screen merges it in place (`MergeOpen`, the order
+   and the colour groups kept), and when the shelf keeps its shape (the same records in the same
+   places, shown and grouped alike, the same licences) its tiles take the new numbers where they
+   lie (`RepaintShelf`) instead of a new lay.
+3. **The shelf is laid lazily.** Tiles are packed by the classes' `itemSize` from config, kept by
+   class (`OZT_Tile.ConfigSize`); widgets and local pictures are made only for the rows in view
+   and a view's height around it, at most 40 a frame, and given up far from it (`ShelfReveal`,
+   `OZT_TileGrid.Band`). The ALL tab is drawn right, and scrolling to the end of the 3362 tiles
+   builds them on the way (checked on screen down to the last tile).
+4. **Packing.** The packer looked for a tall tile from the first row with enough free cells and
+   walked the whole shelf for each one; now each tile shape starts from where the last tile of
+   that shape went (cells only fill, so it cannot fit higher). Same layout, 300 ms -> 61 ms.
+5. **The slot filter** keeps what config said of each class (`OZT_Fit`: the host's slots, the
+   part's slots, the kind, a weapon's magazines).
+
+The transfer: the core sends all parts in one frame and the client appends them as they come,
+so the wait is the engine's pace for guaranteed messages: 6.6 KB (load4, 8 parts) in 47 ms,
+27 KB (load2) in 0.5 s, 52 KB (load3) in 1.1 s, 124 KB (load1) in 3.0-3.2 s on every try. About
+45-50 KB/s; the server is free meanwhile, the player waits. Bytes are the lever.
+
 ## Left to do
 
-1. Stock news with the changed lines only, patched into the client's open, instead of a new open
-   for everybody.
-2. A shorter open: a record as one short string, the category by its index (about 4x smaller).
-3. The shelf laid by the rows in view (or per category), not all tiles in one frame; the ALL tab.
-4. Saving goods from the admin window under the core's cap (per category, or the cap).
-5. Capital `І` in names from the files.
+1. The first open of a big book still waits about 3 s on the engine's pace. A client cache of the
+   open per trader (sent again only when the book changed; the stock as a short list of numbers)
+   would spare it. A design question, not started.
+2. Packing the ALL tab of 3362 tiles takes 61 ms of one frame on every switch to it.
+3. Saving goods from the admin window under the core's cap (per category, or the cap).
+4. Capital `І` in names from the files.

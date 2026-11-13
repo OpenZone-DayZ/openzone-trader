@@ -106,6 +106,11 @@ class OZT_Tile
         int w;
         int h;
         GetGame().GetInventoryItemSize(ii, w, h);
+        SizeTo(w, h);
+    }
+
+    void SizeTo(int w, int h)
+    {
         W = w;
         H = h;
         if (W < 1)
@@ -116,6 +121,58 @@ class OZT_Tile
             W = OZT_TileGrid.COLS;
         if (H > 15)
             H = 15;
+    }
+
+    // A class's inventory size from config (`itemSize[] = {w, h}`), for a tile
+    // packed before its picture is made. False: the game has no such class.
+    //
+    // Kept by class, w * 100 + h, -1 for no class: the shelf is laid again on
+    // every tab, filter and colour, and a big book's every lay asked config
+    // some ten thousand times (load test, 2026-11-13). Config does not change
+    // while the game runs.
+    protected static ref map<string, int> s_Sizes = new map<string, int>();
+
+    static bool ConfigSize(string type, out int w, out int h)
+    {
+        w = 1;
+        h = 1;
+        int kept;
+        if (s_Sizes.Find(type, kept))
+        {
+            if (kept < 0)
+                return false;
+            w = kept / 100;
+            h = kept % 100;
+            return true;
+        }
+        bool found = ReadSize(type, w, h);
+        if (found)
+            s_Sizes.Set(type, w * 100 + h);
+        else
+            s_Sizes.Set(type, -1);
+        return found;
+    }
+
+    protected static bool ReadSize(string type, out int w, out int h)
+    {
+        w = 1;
+        h = 1;
+        array<string> roots = {"CfgVehicles", "CfgWeapons", "CfgMagazines"};
+        for (int i = 0; i < roots.Count(); i++)
+        {
+            string path = roots[i] + " " + type;
+            if (!GetGame().ConfigIsExisting(path))
+                continue;
+            array<int> size = new array<int>();
+            GetGame().ConfigGetIntArray(path + " itemSize", size);
+            if (size.Count() >= 2)
+            {
+                w = size[0];
+                h = size[1];
+            }
+            return true;
+        }
+        return false;
     }
 
     bool Build(Widget parent)
@@ -332,6 +389,9 @@ class OZT_TileGrid
     protected int m_MinRows;
     protected int m_Rows;
     protected float m_Cell;
+    // The tiles that have widgets now, by their root: what the mouse is over is
+    // found by the widget, not by a walk through every tile.
+    protected ref map<Widget, OZT_Tile> m_ByRoot;
 
     // `prefix` names the scroll, its content and its canvas in the layout:
     // <prefix>Scroll, <prefix>Content, <prefix>Lines.
@@ -341,6 +401,7 @@ class OZT_TileGrid
         m_Content = root.FindAnyWidget(prefix + "Content");
         m_Lines = CanvasWidget.Cast(root.FindAnyWidget(prefix + "Lines"));
         m_Tiles = new array<ref OZT_Tile>();
+        m_ByRoot = new map<Widget, OZT_Tile>();
         m_MinRows = minRows;
         m_Rows = minRows;
         m_Cell = Math.Floor(CELL_UNITS * OZT_Ui.Px());
@@ -389,6 +450,7 @@ class OZT_TileGrid
         for (int i = 0; i < m_Tiles.Count(); i++)
             m_Tiles[i].Unbuild();
         m_Tiles.Clear();
+        m_ByRoot.Clear();
     }
 
     // Adds a tile and makes its widgets; false when the layout did not load.
@@ -397,7 +459,50 @@ class OZT_TileGrid
         if (!m_Content || !t.Build(m_Content))
             return false;
         m_Tiles.Insert(t);
+        m_ByRoot.Set(t.Root, t);
         return true;
+    }
+
+    // Adds a tile with no widgets yet: it is packed by its size, and BuildTile
+    // makes its widgets when it comes near the view (the trader's shelf).
+    bool AddLazy(OZT_Tile t)
+    {
+        if (!m_Content)
+            return false;
+        m_Tiles.Insert(t);
+        return true;
+    }
+
+    // The widgets of a tile added lazily, at the place Arrange gave it.
+    bool BuildTile(OZT_Tile t)
+    {
+        if (!m_Content || t.Root || !t.Build(m_Content))
+            return false;
+        t.Place(m_Cell);
+        m_ByRoot.Set(t.Root, t);
+        return true;
+    }
+
+    void UnbuildTile(OZT_Tile t)
+    {
+        if (t.Root)
+            m_ByRoot.Remove(t.Root);
+        t.Unbuild();
+    }
+
+    // The rows that should have widgets now: the ones in view, and a view's
+    // height above and below it.
+    void Band(out int from, out int to)
+    {
+        float sw;
+        float sh;
+        m_Scroll.GetScreenSize(sw, sh);
+        float room = m_Rows * m_Cell - sh;
+        if (room < 0)
+            room = 0;
+        float top = m_Scroll.GetVScrollPos01() * room;
+        from = Math.Floor((top - sh) / m_Cell);
+        to = Math.Ceil((top + sh + sh) / m_Cell);
     }
 
     // The tile a widget belongs to: the widget itself or anything inside it.
@@ -405,11 +510,9 @@ class OZT_TileGrid
     {
         while (w)
         {
-            for (int i = 0; i < m_Tiles.Count(); i++)
-            {
-                if (m_Tiles[i].Root == w)
-                    return m_Tiles[i];
-            }
+            OZT_Tile t;
+            if (m_ByRoot.Find(w, t))
+                return t;
             if (w == m_Content)
                 return null;
             w = w.GetParent();
@@ -431,20 +534,43 @@ class OZT_TileGrid
 
     // Packs the tiles first fit in the order they were added, places them,
     // sizes the content to its rows and draws the cells.
+    //
+    // A row holds a bit per column. A tile W wide is looked for no higher than
+    // the first row that still has W free cells side by side: free runs only
+    // shrink as tiles go in, so that row only ever moves down (from[W]). The
+    // packing was a search from the top for every tile, with no row past the
+    // 400th: a shelf of 3404 tiles piled the ones beyond it in the corner
+    // (load test, 2026-11-13).
     void Arrange()
     {
         if (!IsReady())
             return;
 
-        // One int per row, a bit per column.
         array<int> rows = new array<int>();
+        array<int> from = new array<int>();
+        for (int fw = 0; fw <= COLS; fw++)
+            from.Insert(0);
+        // The row the last tile of each shape (W * 100 + H) went to: no tile of
+        // that shape fits above it any more, cells only fill. A tall tile looked
+        // from from[W] down, past every row with W free cells and no room below
+        // them, and a big book's shelf walked itself for each one (load test,
+        // 2026-11-13: 340 ms of 3362 tiles, the weapons alone 13 ms).
+        map<int, int> shapeFrom = new map<int, int>();
         int used = 0;
         for (int i = 0; i < m_Tiles.Count(); i++)
         {
             OZT_Tile t = m_Tiles[i];
-            bool placed = false;
             int mask = ((1 << t.W) - 1);
-            for (int y = 0; y < 400 && !placed; y++)
+            int y = from[t.W];
+            while (y < rows.Count() && FreeRun(rows[y]) < t.W)
+                y++;
+            from[t.W] = y;
+            int shape = t.W * 100 + t.H;
+            int last;
+            if (shapeFrom.Find(shape, last) && last > y)
+                y = last;
+            bool placed = false;
+            while (!placed)
             {
                 for (int x = 0; x + t.W <= COLS; x++)
                 {
@@ -475,7 +601,10 @@ class OZT_TileGrid
                         used = y + t.H;
                     break;
                 }
+                if (!placed)
+                    y++;
             }
+            shapeFrom.Set(shape, t.Row);
             t.Place(m_Cell);
         }
 
@@ -486,6 +615,27 @@ class OZT_TileGrid
         m_Content.Update();
         m_Scroll.Update();
         DrawCells();
+    }
+
+    // The longest run of free cells in a row.
+    protected static int FreeRun(int mask)
+    {
+        int best = 0;
+        int run = 0;
+        for (int b = 0; b < COLS; b++)
+        {
+            if ((mask & (1 << b)) == 0)
+            {
+                run++;
+                if (run > best)
+                    best = run;
+            }
+            else
+            {
+                run = 0;
+            }
+        }
+        return best;
     }
 
     protected void DrawCells()

@@ -150,6 +150,13 @@ class OZT_VerbOps
     {
         OZT_OpenReq req = new OZT_OpenReq();
         req.Trader = Arg(args, "trader", "stand");
+        // only=Class,Class: a part of the open, those classes and the player's side.
+        string only = Arg(args, "only", "");
+        if (only != "")
+        {
+            req.Part = 1;
+            only.Split(",", req.Only);
+        }
         string json;
         string err;
         JsonFileLoader<OZT_OpenReq>.MakeData(req, json, err, false);
@@ -171,7 +178,12 @@ class OZT_VerbOps
             detail = "open ok=yes, but the body does not parse back: " + err;
             return false;
         }
-        detail = "open ok=yes trader=" + res.Trader + " goods=" + res.Goods.Count().ToString();
+        int rows = 0;
+        if (res.Rows)
+            rows = res.Rows.Count();
+        OZT_WireRows.Unpack(res);
+        detail = "open ok=yes trader=" + res.Trader + " part=" + res.Part.ToString() + " rows=" + rows.ToString();
+        detail = detail + " goods=" + res.Goods.Count().ToString();
         detail = detail + " categories=" + res.Categories.Count().ToString() + " provider=" + res.Provider;
         detail = detail + " unit=" + res.Unit.ToString() + " balance=" + res.Balance.ToString();
         detail = detail + " bytes=" + body.Length().ToString() + " revision=" + res.Revision.ToString();
@@ -824,7 +836,9 @@ class OZT_VerbOps
         }
         OZT_Stock.Add(stock, type, level, delta);
         OZT_Stock.Save(stock);
-        OZT_StockNews.Tell(stock, null);
+        array<string> moved = new array<string>();
+        moved.Insert(type);
+        OZT_StockNews.Tell(stock, null, moved);
         int now = OZT_Stock.Count(stock, type, level);
         detail = "stock: " + stock + " " + type + " level " + level.ToString() + " now " + now.ToString() + ", news told";
         return true;

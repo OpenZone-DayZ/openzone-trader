@@ -1,16 +1,25 @@
 // The module TRADER of the OpenZone admin window (VPP rework 2026-11-12, design
-// §5.6): its pages on the window's rail, in the window's metal. This file is the
-// first of the trader's layers of OZ_VppAdminMenu: it registers the pages, routes
-// their answers and their events, and holds what the pages share -- the draft of
-// the trader's three files (OZT_VppDraft) with its bar (state, problems, discard,
-// apply), the server's problems after a load, and the gate providers' choices.
+// §5.6; its pages converted from the mockup boards 2026-11-13, guide
+// docs/specs/2026-11-13-openzone-vpp-page-guide.md). This file is the first of the
+// trader's layers of OZ_VppAdminMenu, the module's frame: it creates and registers the
+// pages, routes their answers and their events, and holds what the pages share -- the
+// draft of the trader's three files (OZT_VppDraft), the server's problems after a
+// load, the gate providers' choices, and the draft's bar.
 //
-// Every page has a layout of its own (ui/OpenZone_Trader_VPP/ozt_vpp_<key>.json,
-// built by layout_build) and a layer of its own in the file OZT_VppPane<Page>.c,
-// whose name sorts after this one: the files of a module folder compile in
-// alphabetical order, and a layer that overrides a hook must come after the layer
-// that declares it. A page's layer overrides the hooks below (TrdShown, TrdLayout,
-// TrdOnAnswer, TrdRepaint) for its own key and calls super for the rest.
+// Every page is a layout of its own, converted from its board (ui/css2layout.json:
+// ozt_vpp_<key>.layout, root PaneTrd<Key>), and a layer of its own in the file
+// OZT_VppPane<Page>.c, whose name sorts after this one: the files of a module folder
+// compile in alphabetical order, and a layer that overrides a hook must come after the
+// layer that declares it. A page's layer overrides the hooks below (TrdShown,
+// TrdLayout, TrdOnAnswer, TrdRepaint) for its own key and calls super for the rest.
+//
+// THE DRAFT'S BAR exists once (ozt_vpp_draft.layout: what is unsaved, the server's
+// problems, discard, apply). The frame lays it over the bottom of the open page, for
+// every page TrdHasBar names, TRD_BAR_H units high, from TrdBarLeft units of the
+// page's left edge; the problems panel (ozt_vpp_probs.layout) opens above it, as wide
+// as the page. A page keeps its own bottom TRD_BAR_H units free and needs no bar of
+// its own; a button of a page named Btn<Prefix>Apply or Btn<Prefix>Discard (the
+// prefixes of TrdBarClick) asks the same questions as the bar's.
 //
 // Every name this module adds to the window's class starts with Trd / m_Trd: every
 // glue mods the same OZ_VppAdminMenu, and a second declaration of one name in
@@ -28,33 +37,178 @@
 #ifdef OpenZone_VPP
 #ifndef NO_GUI
 
+// Chips: small boxes made from a row template into one frame and placed by script, each
+// as wide as its caller says, in lines (the categories of a point, the parts of a goods
+// line, the things a trader wears). The caller fills a chip's parts and gives its width;
+// Flow puts the chips in lines. What OZ_VppFlexRows is for rows as wide as their list.
+class OZT_VppChips
+{
+    protected OZ_VppFlex m_Flex;
+    protected Widget m_Host;
+    protected string m_Layout;
+    protected string m_RootName;
+    protected ref array<Widget> m_Chips;
+    protected ref array<string> m_Keys;
+    protected ref array<float> m_Widths;
+
+    void OZT_VppChips(OZ_VppFlex flex, Widget host, string layout, string rootName)
+    {
+        m_Flex = flex;
+        m_Host = host;
+        m_Layout = layout;
+        m_RootName = rootName;
+        m_Chips = new array<Widget>();
+        m_Keys = new array<string>();
+        m_Widths = new array<float>();
+    }
+
+    Widget Host()
+    {
+        return m_Host;
+    }
+
+    int Count()
+    {
+        return m_Chips.Count();
+    }
+
+    Widget Chip(int i)
+    {
+        if (i < 0 || i >= m_Chips.Count())
+            return null;
+        return m_Chips[i];
+    }
+
+    string Key(int i)
+    {
+        if (i < 0 || i >= m_Keys.Count())
+            return "";
+        return m_Keys[i];
+    }
+
+    // The chip that holds w: w itself or anything inside a chip; -1: no chip of these.
+    int IndexOf(Widget w)
+    {
+        int i;
+        while (w && w != m_Host)
+        {
+            i = m_Chips.Find(w);
+            if (i != -1)
+                return i;
+            w = w.GetParent();
+        }
+        return -1;
+    }
+
+    // A new chip at the end; null when the template did not load.
+    Widget Add(string key)
+    {
+        if (!m_Host)
+            return null;
+        Widget chip = OZ_VppFlex.Create(m_Layout, m_Host, m_RootName);
+        if (!chip)
+            return null;
+        m_Chips.Insert(chip);
+        m_Keys.Insert(key);
+        m_Widths.Insert(0);
+        return chip;
+    }
+
+    // The width Flow counts for a chip, in pixels.
+    void SetWidth(int i, float w)
+    {
+        if (i >= 0 && i < m_Widths.Count())
+            m_Widths.Set(i, w);
+    }
+
+    void Clear()
+    {
+        int i;
+        for (i = 0; i < m_Chips.Count(); i++)
+        {
+            if (m_Chips[i])
+            {
+                if (m_Flex)
+                    m_Flex.Forget(m_Chips[i]);
+                m_Chips[i].Unlink();
+            }
+        }
+        m_Chips.Clear();
+        m_Keys.Clear();
+        m_Widths.Clear();
+    }
+
+    // The chips in lines of `lineH` pixels inside `room` pixels, `gap` between chips and
+    // between lines; `tail`, when given, stands after the last chip (a button that adds
+    // one), `tailW` wide. Returns the height the lines take.
+    float Flow(float room, float gap, float lineH, Widget tail, float tailW)
+    {
+        float x = 0;
+        float y = 0;
+        float w;
+        int i;
+        for (i = 0; i < m_Chips.Count(); i++)
+        {
+            w = m_Widths[i];
+            if (x > 0 && x + w > room)
+            {
+                x = 0;
+                y = y + lineH + gap;
+            }
+            if (m_Chips[i])
+                m_Chips[i].SetPos(x, y);
+            x = x + w + gap;
+        }
+        if (tail)
+        {
+            if (x > 0 && x + tailW > room)
+            {
+                x = 0;
+                y = y + lineH + gap;
+            }
+            tail.SetPos(x, y);
+        }
+        return y + lineH;
+    }
+}
+
 modded class OZ_VppAdminMenu
 {
     static const string TRD_MOD     = "trader";
     static const string TRD_LAYOUTS = "OpenZone_Trader_VPP/gui/layouts/ozt_vpp_";
 
+    // The draft's bar and the problems panel as their layouts declare them, in layout
+    // units (TraderDraftBar.html, TraderProblems.html; a problem's row is 1312 x 44).
+    static const float TRD_BAR_H   = 61;
+    static const float TRD_PROBS_H = 230;
+
     // The pages' roots by key ("points", ...) and the key of each rail id; the
-    // content area the shell gave the panes, in pixels (OnWindowResized).
+    // content area the shell gave the panes, in pixels (OnWindowResized). Fields are
+    // declared bare and set in OnCreate: every glue derives from this class.
     protected ref map<string, Widget> m_TrdPanes;
     protected ref map<string, string> m_TrdKeys;
-    protected float m_TrdW = 0;
-    protected float m_TrdH = 0;
+    protected float m_TrdW;
+    protected float m_TrdH;
 
     // The draft of the three files; the script writing fields itself (an
     // OnChange that follows is not an edit).
     protected ref OZT_VppDraft m_TrdDraft;
-    protected bool m_TrdFill = false;
+    protected bool m_TrdFill;
 
-    // The pages with the draft's bar, by their widget prefix; the server's last
-    // `problems`, whether its panel is open, and the last apply's line.
-    protected ref array<string> m_TrdBars;
+    // The draft's bar and the problems panel over the open page; the server's last
+    // `problems`, whether its panel is open, whether the answer on its way follows an
+    // apply (then problems open the panel), and the last apply's line.
+    protected Widget m_TrdBar;
+    protected Widget m_TrdProbsPanel;
+    protected ref OZ_VppFlexRows m_TrdProbRows;
     protected ref OZT_AdminProblems m_TrdProbs;
-    protected bool m_TrdProbsOpen = false;
-    protected string m_TrdNote = "";
+    protected bool m_TrdProbsOpen;
+    protected bool m_TrdProbsAfterApply;
+    protected string m_TrdNote;
 
     // The server's last `gates`: the providers, their kinds and choices.
     protected ref OZT_AdminGates m_TrdGates;
-    protected bool m_TrdGatesAsked = false;
+    protected bool m_TrdGatesAsked;
 
     override void OnCreate(Widget RootW)
     {
@@ -65,18 +219,21 @@ modded class OZ_VppAdminMenu
         m_TrdPanes = new map<string, Widget>();
         m_TrdKeys = new map<string, string>();
         m_TrdDraft = new OZT_VppDraft();
-        m_TrdBars = new array<string>();
-        m_TrdBars.Insert("TrdPt");
-        m_TrdBars.Insert("TrdGd");
-        m_TrdBars.Insert("TrdGt");
-        m_TrdBars.Insert("TrdLc");
-        m_TrdBars.Insert("TrdMn");
+        m_TrdW = 0;
+        m_TrdH = 0;
+        m_TrdFill = false;
+        m_TrdProbsOpen = false;
+        m_TrdProbsAfterApply = false;
+        m_TrdNote = "";
+        m_TrdGatesAsked = false;
 
         array<string> keys = new array<string>();
         array<string> labels = new array<string>();
         TrdPageList(keys, labels);
         for (int i = 0; i < keys.Count(); i++)
             TrdAddPage(TRD_MOD, "#STR_OZT_VPP_MOD", TRD_MOD + "." + keys[i], keys[i], labels[i]);
+
+        TrdMakeBar();
 
         OZ_ClientState.AdminWatch().Insert(this.OnTraderAnswer);
         TrdPaintBars();
@@ -106,11 +263,35 @@ modded class OZ_VppAdminMenu
         labels.Insert("#STR_OZT_VPP_PAGE_IMPORT");
     }
 
+    // The root's name of a page's layout, as ui/css2layout.json has it: the engine
+    // has handed one path another file's widgets, and OZ_VppFlex.Create checks the
+    // name. "": a key this list does not know is created unchecked.
+    protected string TrdRootName(string key)
+    {
+        if (key == "points")
+            return "PaneTrdPoints";
+        if (key == "goods")
+            return "PaneTrdGoods";
+        if (key == "gates")
+            return "PaneTrdGates";
+        if (key == "stock")
+            return "PaneTrdStock";
+        if (key == "licences")
+            return "PaneTrdLicences";
+        if (key == "money")
+            return "PaneTrdMoney";
+        if (key == "import")
+            return "PaneTrdImport";
+        if (key == "rtrade")
+            return "PaneTrdRTrade";
+        return "";
+    }
+
     // One page: its own layout under the window, registered on the rail.
     protected Widget TrdAddPage(string module, string moduleLabel, string id, string key, string label)
     {
         string path = TRD_LAYOUTS + key + ".layout";
-        Widget pane = GetGame().GetWorkspace().CreateWidgets(path, M_SUB_WIDGET);
+        Widget pane = OZ_VppFlex.Create(path, M_SUB_WIDGET, TrdRootName(key));
         if (!pane)
         {
             OZT_Log.Error("trader vpp: a page's layout did not load: " + path);
@@ -137,50 +318,68 @@ modded class OZ_VppAdminMenu
         string key;
         if (m_TrdKeys && m_TrdKeys.Find(id, key))
             TrdShown(key);
+        // The bar follows the page: shown on a page that has it, hidden on any other,
+        // another module's too.
+        TrdPlaceBar();
     }
 
     // A page of ours came on screen. Each page's layer takes its own key; a page
     // with the draft's bar asks for the server's problems.
     protected void TrdShown(string key)
     {
+        // The line of an apply that is over is yesterday's news on the next visit.
+        if (m_TrdDraft && m_TrdDraft.Changed() == 0 && m_TrdDraft.Sending() == "")
+            m_TrdNote = "";
         TrdPaintBars();
-        if (!m_TrdProbs && TrdHasBar(key))
+        if (TrdHasBar(key))
             TrdAskProblems();
     }
 
+    // The pages the draft's bar lies on: the ones that edit the draft.
     protected bool TrdHasBar(string key)
     {
         array<string> bars = {"points", "goods", "gates", "licences", "money"};
         return bars.Find(key) != -1;
     }
 
-    // The window was resized; every page lays itself out from w x h (pixels) and
-    // reads no size back (a widget measured before the engine's first layout pass
-    // reads 0).
+    // Where the bar begins on a page, in layout units from the page's left edge: on
+    // Points it lies under the card, beside the list (the list's column is 381 wide).
+    protected float TrdBarLeft(string key)
+    {
+        if (key == "points")
+            return 381;
+        return 0;
+    }
+
+    // The window was resized: the bar follows the content area, and every page that
+    // places something by script (the rows of its lists, its chips, a chart) does it
+    // again in TrdLayout. w x h: the content area in pixels.
     override void OnWindowResized(float w, float h)
     {
         super.OnWindowResized(w, h);
         m_TrdW = w;
         m_TrdH = h;
         if (M_SUB_WIDGET && m_TrdPanes)
+        {
+            TrdPlaceBar();
             TrdLayout(w, h);
+        }
     }
 
     protected void TrdLayout(float w, float h)
     {
-        for (int i = 0; i < m_TrdBars.Count(); i++)
-            TrdLayBar(m_TrdBars[i], w);
+        if (m_TrdProbRows && m_TrdProbsOpen)
+            m_TrdProbRows.Fit();
     }
 
-    // The draft's bar and its problems panel follow the window's width.
-    protected void TrdLayBar(string prefix, float w)
+    // The confirm strip of the window stands above the draft's bar.
+    override float ConfirmLift()
     {
-        float s = UnitScale();
-        TrdSize(prefix + "Bar", w, 56 * s);
-        TrdSize(prefix + "BarLine", w, s);
-        TrdSize(prefix + "Probs", w, 150 * s);
-        TrdSize(prefix + "ProbsLine", w, s);
-        TrdSize(prefix + "ProbsList", w - 48 * s, 110 * s);
+        float lift = super.ConfirmLift();
+        string key = TrdShownKey();
+        if (m_TrdBar && key != "" && TrdHasBar(key) && lift < TRD_BAR_H)
+            lift = TRD_BAR_H;
+        return lift;
     }
 
     // A page's content changed under it (a file arrived, a discard, an apply):
@@ -215,17 +414,18 @@ modded class OZ_VppAdminMenu
         it.SetSize(w, h);
     }
 
-    protected void TrdMove(string name, float x, float y)
-    {
-        Widget it = TrdW(name);
-        if (it)
-            it.SetPos(x, y);
-    }
-
-    // A page head's rule follows the window's width.
+    // A page head's rule followed the window's width while the pages were laid out by
+    // script; a converted page has no such widget and this does nothing.
     protected void TrdLayHead(string prefix, float w)
     {
         TrdSize(prefix + "HeadRule", w, UnitScale());
+    }
+
+    protected void TrdShow(string name, bool on)
+    {
+        Widget it = TrdW(name);
+        if (it)
+            it.Show(on);
     }
 
     // A string of the trader's stringtable in the client's language. Take it into
@@ -260,9 +460,119 @@ modded class OZ_VppAdminMenu
         m_TrdFill = false;
     }
 
+    // A text's width in pixels as it is drawn. A page that is not on screen has not
+    // been laid out and measures nothing: then an estimate from the letters, `px` the
+    // text's size in layout units (the page is painted again when it is shown).
+    protected float TrdTextW(TextWidget t, string text, float px)
+    {
+        if (!t)
+            return 0;
+        float w = OZ_VppFlex.TextWidth(t);
+        if (w > 0)
+            return w;
+        float letters = text.LengthUtf8();
+        return letters * px * 0.55 * UnitScale();
+    }
+
+    // A chip as wide as its word: the box (and its ground, when given) gets the
+    // text's width and `pad` pixels on each side, the text stands `pad` in. `text` and
+    // `px` are for TrdTextW. Returns the box's new width in pixels.
+    protected float TrdHug(Widget box, Widget ground, TextWidget t, string text, float px, float pad)
+    {
+        if (!box || !t)
+            return 0;
+        float tw = TrdTextW(t, text, px);
+        float w;
+        float h;
+        float x;
+        float y;
+        box.GetSize(w, h);
+        w = tw + pad * 2;
+        box.SetSize(w, h);
+        if (ground)
+            ground.SetSize(w, h);
+        t.GetPos(x, y);
+        t.SetPos(pad, y);
+        t.GetSize(x, h);
+        t.SetSize(tw + 2, h);
+        return w;
+    }
+
+    // A sign of the window's icon set on an image widget, in a colour: "check",
+    // "cross", "dot", "ring".
+    protected void TrdSign(Widget w, string image, int color)
+    {
+        ImageWidget sign = ImageWidget.Cast(w);
+        if (!sign)
+            return;
+        sign.LoadImageFile(0, "set:ozv_ui image:" + image);
+        sign.SetImage(0);
+        sign.SetColor(color);
+    }
+
+    // The same, the sign made `size` pixels square about the middle of where it
+    // stands: the signs of the icon set are drawn at different sizes (a check larger
+    // than a dot), and one widget shows now one, now another. A widget the engine has
+    // not laid out yet keeps its size.
+    protected void TrdSignSized(Widget w, string image, int color, float size)
+    {
+        if (!w)
+            return;
+        float x;
+        float y;
+        float sw;
+        float sh;
+        w.GetPos(x, y);
+        w.GetSize(sw, sh);
+        if (sw > 0 && sh > 0)
+        {
+            w.SetPos(x + (sw - size) / 2, y + (sh - size) / 2);
+            w.SetSize(size, size);
+        }
+        TrdSign(w, image, color);
+    }
+
+    // A pill of a filter row on the page's ground: lit (the accent's soft ground,
+    // bright words) or not (a frame, muted words). Its parts are <name>Edge, <name>Bg
+    // and <name>Text.
+    protected void TrdPaintPill(string name, bool lit)
+    {
+        Widget t = TrdW(name + "Text");
+        if (lit)
+        {
+            OZ_VppFlex.Paint(M_SUB_WIDGET, name + "Edge", OZT_Metal.PICK);
+            OZ_VppFlex.Paint(M_SUB_WIDGET, name + "Bg", OZT_Metal.PICK);
+            if (t)
+                t.SetColor(OZT_Metal.TEXT);
+            return;
+        }
+        OZ_VppFlex.Paint(M_SUB_WIDGET, name + "Edge", OZT_Metal.EDGE);
+        OZ_VppFlex.Paint(M_SUB_WIDGET, name + "Bg", OZT_Metal.PANEL);
+        if (t)
+            t.SetColor(OZT_Metal.MUTED);
+    }
+
+    // A segment of a switch inside a box: lit or not. Its parts are <name>Bg and
+    // <name>Text.
+    protected void TrdPaintSeg(string name, bool lit)
+    {
+        Widget t = TrdW(name + "Text");
+        if (lit)
+        {
+            OZ_VppFlex.Paint(M_SUB_WIDGET, name + "Bg", OZT_Metal.PICK_HEAD);
+            if (t)
+                t.SetColor(OZT_Metal.TEXT);
+            return;
+        }
+        OZ_VppFlex.Paint(M_SUB_WIDGET, name + "Bg", OZT_Metal.HEAD);
+        if (t)
+            t.SetColor(OZT_Metal.MUTED);
+    }
+
     // A listbox from rows: `inks` colours rows (0: the layout's own), `picked` is
     // selected and kept in view. The core's m_Repaint swallows the selection
-    // events SelectRow may raise.
+    // events SelectRow may raise. (A converted page has row templates instead; this
+    // serves a page that still holds a TextListboxWidget.)
     protected void TrdFill(string name, array<string> rows, array<int> inks, int picked)
     {
         TextListboxWidget lb = TextListboxWidget.Cast(TrdW(name));
@@ -284,14 +594,6 @@ modded class OZ_VppAdminMenu
         m_Repaint = false;
     }
 
-    protected int TrdPickedRow(string name)
-    {
-        TextListboxWidget lb = TextListboxWidget.Cast(TrdW(name));
-        if (!lb)
-            return -1;
-        return lb.GetSelectedRow();
-    }
-
     // The verb of an op: "move:npc" -> "move".
     protected string TrdVerb(string op)
     {
@@ -299,20 +601,6 @@ modded class OZ_VppAdminMenu
         if (colon < 0)
             return op;
         return op.Substring(0, colon);
-    }
-
-    // A comma list typed by the admin, trimmed, the empty ones left out.
-    protected void TrdSplit(string text, array<string> into)
-    {
-        into.Clear();
-        array<string> parts = new array<string>();
-        text.Split(",", parts);
-        for (int i = 0; i < parts.Count(); i++)
-        {
-            string one = parts[i].Trim();
-            if (one != "")
-                into.Insert(one);
-        }
     }
 
     protected string TrdJoin(array<string> items, string sep)
@@ -337,22 +625,55 @@ modded class OZ_VppAdminMenu
         return back.ToString();
     }
 
-    // Lower-case for a filter (ASCII; Cyrillic is matched as typed).
-    protected string TrdLow(string s)
+    // An amount of money as the pages write it: digits in threes, "12 500".
+    protected string TrdMoney(int n)
     {
-        string low = s;
-        low.ToLower();
-        return low;
+        string digits = n.ToString();
+        int len = digits.Length();
+        if (n < 0 || len < 4)
+            return digits;
+        string grouped = "";
+        int left;
+        for (int i = 0; i < len; i++)
+        {
+            left = len - i;
+            if (i > 0 && left % 3 == 0)
+                grouped = grouped + " ";
+            grouped = grouped + digits.Get(i);
+        }
+        return grouped;
     }
 
-    // The kind of a point as the admin reads it.
-    protected string TrdKindWord(string kind)
+    // Lower case for a filter: the core window's OZ_VppFold, because the engine's ToLower
+    // turns every Cyrillic byte into a space (a Cyrillic word then matched any word as long).
+    protected string TrdLow(string s)
     {
-        if (kind == OZT_Const.KIND_NPC)
-            return TrdTr("#STR_OZT_VPP_KIND_NPC");
-        if (kind == OZT_Const.KIND_MAP)
-            return TrdTr("#STR_OZT_VPP_KIND_MAP");
-        return TrdTr("#STR_OZT_VPP_KIND_OBJECT");
+        return OZ_VppFold.Lower(s);
+    }
+
+    // The smallest amount that can change hands under these settings: what the
+    // server's OZT_Config.Unit() answers once it has checked the notes -- the
+    // smallest note the game knows with item money, 1 with any other provider.
+    protected int TrdUnitOf(OZT_Settings s)
+    {
+        if (!s || !s.Notes || s.Provider != OZT_Const.PROVIDER_ITEMS)
+            return 1;
+        int unit = 0;
+        for (int i = 0; i < s.Notes.Count(); i++)
+        {
+            OZT_Note n = s.Notes[i];
+            if (!n || n.Value <= 0)
+                continue;
+            if (!OZT_Config.ClassKnown(n.ClassName))
+                continue;
+            if (GetGame().ConfigIsExisting("CfgMagazines " + n.ClassName))
+                continue;
+            if (unit == 0 || n.Value < unit)
+                unit = n.Value;
+        }
+        if (unit <= 0)
+            return 1;
+        return unit;
     }
 
     // A condition kind as the admin reads it; a kind of another mod as it is.
@@ -624,7 +945,7 @@ modded class OZ_VppAdminMenu
     }
 
     // The next changed file to the server; after the last, the problems its load
-    // reported.
+    // reported: they open the panel when there are any.
     protected void TrdApplyNext()
     {
         string name = m_TrdDraft.Next();
@@ -632,7 +953,7 @@ modded class OZ_VppAdminMenu
         {
             string done = TrdTr("#STR_OZT_VPP_APPLIED");
             m_TrdNote = done + " " + OZ_VppJournal.Clock();
-            m_TrdProbsOpen = true;
+            m_TrdProbsAfterApply = true;
             TrdAskProblems();
             TrdPaintBars();
             return;
@@ -658,6 +979,7 @@ modded class OZ_VppAdminMenu
             {
                 m_TrdDraft.Refused();
                 m_TrdNote = Words(error);
+                m_TrdProbsAfterApply = true;
                 TrdAskProblems();
                 TrdPaintBars();
                 return;
@@ -682,23 +1004,84 @@ modded class OZ_VppAdminMenu
 
     // ------------------------------------------------------------------ the bar
 
+    // The bar and the problems panel: made once, kept in the window's content frame
+    // beside the pages and above them (a page's root has priority 100, the window's
+    // confirm strip 200), shown by TrdPlaceBar.
+    protected void TrdMakeBar()
+    {
+        m_TrdBar = OZ_VppFlex.Create(TRD_LAYOUTS + "draft.layout", M_SUB_WIDGET, "OZT_VppDraft");
+        if (m_TrdBar)
+        {
+            if (m_Content)
+                m_Content.AddChild(m_TrdBar);
+            m_TrdBar.Show(false);
+            m_TrdBar.SetSort(150);
+        }
+        else
+        {
+            OZT_Log.Error("trader vpp: the draft's bar did not load; apply and discard have no buttons");
+        }
+
+        m_TrdProbsPanel = OZ_VppFlex.Create(TRD_LAYOUTS + "probs.layout", M_SUB_WIDGET, "OZT_VppProbs");
+        if (m_TrdProbsPanel)
+        {
+            if (m_Content)
+                m_Content.AddChild(m_TrdProbsPanel);
+            m_TrdProbsPanel.Show(false);
+            m_TrdProbsPanel.SetSort(160);
+        }
+        else
+        {
+            OZT_Log.Error("trader vpp: the problems panel did not load");
+        }
+    }
+
+    // The bar over the bottom of the shown page, as wide as the page from TrdBarLeft
+    // on; hidden on a page without it. The problems panel above it while it is open,
+    // as wide as the page.
+    protected void TrdPlaceBar()
+    {
+        if (!m_TrdBar || !m_Flex)
+            return;
+        string key = TrdShownKey();
+        bool on = key != "" && TrdHasBar(key);
+        bool panel = on && m_TrdProbsOpen;
+        m_TrdBar.Show(on);
+        if (m_TrdProbsPanel)
+            m_TrdProbsPanel.Show(panel);
+        if (!on)
+            return;
+
+        float s = UnitScale();
+        float cw = m_WinW - (DEF_W - CONTENT_W) * s;
+        float ch = m_WinH - (DEF_H - CONTENT_H) * s;
+        float left = TrdBarLeft(key) * s;
+        float w = cw - left;
+        m_Flex.Resize(m_TrdBar, w, TRD_BAR_H * s, PAGE_W * s, TRD_BAR_H * s);
+        m_TrdBar.SetPos(left, ch - TRD_BAR_H * s);
+        if (m_TrdProbsPanel && panel)
+        {
+            // The panel is as wide as the page whatever the bar's width: a problem is a
+            // long line.
+            m_Flex.Resize(m_TrdProbsPanel, cw, TRD_PROBS_H * s, PAGE_W * s, TRD_PROBS_H * s);
+            m_TrdProbsPanel.SetPos(0, ch - (TRD_BAR_H + TRD_PROBS_H) * s);
+            if (m_TrdProbRows)
+                m_TrdProbRows.Fit();
+        }
+    }
+
     protected void TrdAskProblems()
     {
         Ask(OZT_Const.SECTION_ADMIN, "problems", "{}");
     }
 
+    // The bar's words: the draft's state with the last apply's line, and the
+    // server's problems. The pages call this after every edit of the draft.
     protected void TrdPaintBars()
     {
-        if (!m_TrdBars)
+        if (!m_TrdDraft || !m_TrdBar)
             return;
-        for (int i = 0; i < m_TrdBars.Count(); i++)
-            TrdPaintBar(m_TrdBars[i]);
-    }
 
-    protected void TrdPaintBar(string prefix)
-    {
-        if (!m_TrdDraft || !TrdW(prefix + "Bar"))
-            return;
         string state;
         int ink = OZT_Metal.MUTED;
         if (m_TrdDraft.Sending() != "")
@@ -712,12 +1095,14 @@ modded class OZ_VppAdminMenu
         }
         else
         {
-            string changed = TrdTr("#STR_OZT_VPP_CHANGED");
+            string unsaved = TrdTr("#STR_OZT_VPP_UNSAVED");
             string files = TrdChangedWords();
-            state = changed + " " + files;
+            state = unsaved + " " + files;
             ink = OZT_Metal.ALERT;
         }
-        TrdInk(prefix + "BarState", state, ink);
+        if (m_TrdNote != "")
+            state = state + "  ·  " + m_TrdNote;
+        TrdInk("TrdBarState", state, ink);
 
         string probs;
         int probInk = OZT_Metal.MUTED;
@@ -731,89 +1116,124 @@ modded class OZ_VppAdminMenu
         else
         {
             string many = TrdTr("#STR_OZT_VPP_PROBS_N");
-            probs = many + " " + m_TrdProbs.Count.ToString();
+            probs = many + " " + m_TrdProbs.Count.ToString() + " ›";
             probInk = OZT_Metal.ALERT;
         }
-        TrdInk("Btn" + prefix + "ProbsText", probs, probInk);
-        SayTrd(prefix + "BarNote", m_TrdNote);
-
-        Widget panel = TrdW(prefix + "Probs");
-        if (panel)
-            panel.Show(m_TrdProbsOpen);
-        if (m_TrdProbsOpen)
-            TrdFillProbs(prefix);
+        TrdInk("BtnTrdProbsText", probs, probInk);
+        TrdPlaceBar();
     }
 
-    protected void TrdFillProbs(string prefix)
+    // The problems panel's rows: a problem a row, then how many more the server
+    // keeps, and the ready line's counters in the panel's head.
+    protected void TrdFillProbs()
     {
-        array<string> rows = new array<string>();
-        array<int> inks = new array<int>();
+        if (!m_TrdProbsPanel || !m_Flex)
+            return;
+        if (!m_TrdProbRows)
+        {
+            Widget host = m_TrdProbsPanel.FindAnyWidget("TrdProbsRows");
+            if (!host)
+                return;
+            m_TrdProbRows = new OZ_VppFlexRows(m_Flex, host, TRD_LAYOUTS + "prob_row.layout", "OZT_ProbRow", 1312, 44);
+        }
+
+        m_TrdProbRows.Clear();
+        string counters = "";
         if (!m_TrdProbs)
         {
-            rows.Insert(TrdTr("#STR_OZT_VPP_PROBS_UNKNOWN"));
-            inks.Insert(0);
+            TrdProbRow(TrdTr("#STR_OZT_VPP_PROBS_UNKNOWN"), OZT_Metal.MUTED);
         }
         else
         {
             for (int i = 0; i < m_TrdProbs.Lines.Count(); i++)
-            {
-                rows.Insert(m_TrdProbs.Lines[i]);
-                inks.Insert(OZT_Metal.ALERT);
-            }
+                TrdProbRow(m_TrdProbs.Lines[i], OZT_Metal.ALERT);
             if (m_TrdProbs.Cut == 1)
             {
                 string more = TrdTr("#STR_OZT_VPP_PROBS_MORE");
                 int left = m_TrdProbs.Count - m_TrdProbs.Lines.Count();
-                rows.Insert(more + " " + left.ToString());
-                inks.Insert(0);
+                TrdProbRow(more + " " + left.ToString(), OZT_Metal.MUTED);
             }
-            if (rows.Count() == 0)
-            {
-                rows.Insert(TrdTr("#STR_OZT_VPP_PROBS_NONE"));
-                inks.Insert(OZT_Metal.OK);
-            }
-            rows.Insert(m_TrdProbs.Counters);
-            inks.Insert(OZT_Metal.MUTED);
+            if (m_TrdProbRows.Count() == 0)
+                TrdProbRow(TrdTr("#STR_OZT_VPP_PROBS_NONE"), OZT_Metal.OK);
+            counters = m_TrdProbs.Counters;
         }
-        TrdFill(prefix + "ProbsList", rows, inks, -1);
+        m_TrdProbRows.Fit();
+        TextWidget head = TextWidget.Cast(m_TrdProbsPanel.FindAnyWidget("TrdProbsCounters"));
+        if (head)
+            head.SetText(counters);
     }
 
-    // A click on a bar of any page: the bars' buttons are named after the page's
-    // prefix.
+    protected void TrdProbRow(string text, int color)
+    {
+        Widget row = m_TrdProbRows.Add(m_TrdProbRows.Count().ToString());
+        if (row)
+            RowText(row, "ProbText", text, color);
+    }
+
+    protected void TrdOpenProbs(bool open)
+    {
+        m_TrdProbsOpen = open;
+        TrdPlaceBar();
+        if (open)
+            TrdFillProbs();
+    }
+
+    // A click on the bar, on the problems panel, or on a page's own button of the
+    // draft: such a button is named after the page's prefix, Btn<Prefix>Apply,
+    // Btn<Prefix>Discard, Btn<Prefix>Probs (the names of the bars the pages had
+    // before the one bar).
     protected bool TrdBarClick(string nm)
     {
-        for (int i = 0; i < m_TrdBars.Count(); i++)
+        if (nm.IndexOf("BtnTrd") != 0)
+            return false;
+
+        string what = "";
+        if (nm == "BtnTrdApply" || nm == "BtnTrdDiscard" || nm == "BtnTrdProbs" || nm == "BtnTrdProbsClose")
         {
-            string b = "Btn" + m_TrdBars[i];
-            if (nm == b + "Apply")
+            what = nm.Substring(6, nm.Length() - 6);
+        }
+        else
+        {
+            array<string> pages = {"TrdPt", "TrdGd", "TrdGt", "TrdLc", "TrdMn"};
+            array<string> verbs = {"Apply", "Discard", "Probs", "ProbsClose"};
+            string full;
+            for (int i = 0; i < pages.Count(); i++)
             {
-                TrdApplyAsk();
-                return true;
-            }
-            if (nm == b + "Discard")
-            {
-                TrdDiscardAsk();
-                return true;
-            }
-            if (nm == b + "Probs")
-            {
-                if (m_TrdProbsOpen)
-                    m_TrdProbsOpen = false;
-                else
-                    m_TrdProbsOpen = true;
-                if (m_TrdProbsOpen)
-                    TrdAskProblems();
-                TrdPaintBars();
-                return true;
-            }
-            if (nm == b + "ProbsClose")
-            {
-                m_TrdProbsOpen = false;
-                TrdPaintBars();
-                return true;
+                for (int v = 0; v < verbs.Count(); v++)
+                {
+                    full = "Btn" + pages[i] + verbs[v];
+                    if (nm == full)
+                        what = verbs[v];
+                }
             }
         }
-        return false;
+        if (what == "")
+            return false;
+
+        if (what == "Apply")
+        {
+            TrdApplyAsk();
+            return true;
+        }
+        if (what == "Discard")
+        {
+            TrdDiscardAsk();
+            return true;
+        }
+        if (what == "ProbsClose")
+        {
+            TrdOpenProbs(false);
+            return true;
+        }
+        // The problems button opens the panel and asks the server again, or closes it.
+        if (m_TrdProbsOpen)
+        {
+            TrdOpenProbs(false);
+            return true;
+        }
+        TrdOpenProbs(true);
+        TrdAskProblems();
+        return true;
     }
 
     // ------------------------------------------------------------------ answers
@@ -838,13 +1258,21 @@ modded class OZ_VppAdminMenu
     protected void TrdOnAnswer(string op, bool ok, string json, string error)
     {
         string err;
-        if (op == "problems" && ok)
+        if (op == "problems")
         {
+            bool after = m_TrdProbsAfterApply;
+            m_TrdProbsAfterApply = false;
+            if (!ok)
+                return;
             OZT_AdminProblems probs = new OZT_AdminProblems();
             if (JsonFileLoader<OZT_AdminProblems>.LoadData(json, probs, err))
             {
                 m_TrdProbs = probs.Copy();
+                if (after && m_TrdProbs.Count > 0)
+                    m_TrdProbsOpen = true;
                 TrdPaintBars();
+                if (m_TrdProbsOpen)
+                    TrdFillProbs();
             }
             return;
         }
@@ -878,7 +1306,7 @@ modded class OZ_VppAdminMenu
 
     override bool OnClick(Widget w, int x, int y, int button)
     {
-        if (w && M_SUB_WIDGET && m_TrdBars && TrdBarClick(w.GetName()))
+        if (w && M_SUB_WIDGET && m_TrdDraft && TrdBarClick(w.GetName()))
             return true;
         return super.OnClick(w, x, y, button);
     }

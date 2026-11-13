@@ -1,0 +1,133 @@
+{
+  "note": "The pages of this mod in the OpenZone window of VPP, converted from the mockup (docs/specs/2026-11-12-openzone-vpp-mockup/project) by `python -m dayz_mcp.css2layout ui/css2layout.json [page] [--demo]` (the MCP repository's src). The fonts, the icons and how to mark a page: the core's ui/css2layout.json and docs/specs/2026-11-13-openzone-vpp-page-guide.md.",
+  "extends": "../../openzone-core/ui/css2layout.json",
+  "out": "../OpenZone_Trader_VPP/gui/layouts",
+  "prefix": "OpenZone_Trader_VPP/gui/layouts",
+  "report": "css2layout",
+  "runtime": null,
+  "strings": {
+    "files": [
+      "../OpenZone_Trader/stringtable.csv"
+    ],
+    "column": "original",
+    "fold": {
+      "І": "I"
+    },
+    "pending": [
+      "css2layout/strings.pending.json",
+      "css2layout/strings.t1.pending.json"
+    ]
+  },
+  "pages": {
+    "points": {
+      "page": "TraderPoints.dc.html",
+      "size": [
+        1360,
+        812
+      ],
+      "layout": "ozt_vpp_points",
+      "root": "PaneTrdPoints",
+      "auto": "tp",
+      "hidden": true
+    },
+    "goods": {
+      "page": "TraderGoods.dc.html",
+      "size": [
+        1360,
+        812
+      ],
+      "layout": "ozt_vpp_goods",
+      "root": "PaneTrdGoods",
+      "auto": "tg",
+      "hidden": true
+    },
+    "gates": {
+      "page": "TraderGates.dc.html",
+      "size": [
+        1360,
+        812
+      ],
+      "layout": "ozt_vpp_gates",
+      "root": "PaneTrdGates",
+      "auto": "tc",
+      "hidden": true
+    },
+    "stock": {
+      "page": "TraderStock.dc.html",
+      "size": [
+        1360,
+        812
+      ],
+      "layout": "ozt_vpp_stock",
+      "root": "PaneTrdStock",
+      "auto": "ts",
+      "hidden": true
+    },
+    "licences": {
+      "page": "TraderLicences.dc.html",
+      "size": [
+        1360,
+        812
+      ],
+      "layout": "ozt_vpp_licences",
+      "root": "PaneTrdLicences",
+      "auto": "tl",
+      "hidden": true
+    },
+    "money": {
+      "page": "TraderMoney.dc.html",
+      "size": [
+        1360,
+        812
+      ],
+      "layout": "ozt_vpp_money",
+      "root": "PaneTrdMoney",
+      "auto": "tm",
+      "hidden": true
+    },
+    "import": {
+      "page": "TraderImport.dc.html",
+      "size": [
+        1360,
+        812
+      ],
+      "layout": "ozt_vpp_import",
+      "root": "PaneTrdImport",
+      "auto": "ti",
+      "hidden": true
+    },
+    "rtrade": {
+      "page": "ResearchTrade.dc.html",
+      "size": [
+        1360,
+        812
+      ],
+      "layout": "ozt_vpp_rtrade",
+      "root": "PaneTrdRTrade",
+      "auto": "tr",
+      "hidden": true
+    },
+    "draft": {
+      "page": "TraderDraftBar.html",
+      "size": [
+        1360,
+        61
+      ],
+      "layout": "ozt_vpp_draft",
+      "root": "OZT_VppDraft",
+      "auto": "td",
+      "hidden": true
+    },
+    "probs": {
+      "page": "TraderProblems.html",
+      "size": [
+        1360,
+        230
+      ],
+      "layout": "ozt_vpp_probs",
+      "root": "OZT_VppProbs",
+      "auto": "tq",
+      "hidden": true
+    }
+  }
+}

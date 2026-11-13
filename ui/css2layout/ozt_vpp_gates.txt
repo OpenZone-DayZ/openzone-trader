@@ -1,0 +1,232 @@
+gates: TraderGates.dc.html -> OpenZone_Trader_VPP/gui/layouts/ozt_vpp_gates.layout
+design size 1360 x 812, measured again one, two and three steps of 240 x 160 larger
+widgets: 432; 1 of them the browser re-flows as the page grows (the rule keeps them as designed)
+
+FILES
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_gates.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_gates_group.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_gates_line.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_gates_linew.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_gates_sec.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_gates_cond.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_gates_add.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_gates_lockfoot.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_gates_disc.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_gates_inh.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_gates_discadd.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_gates_discfoot.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_gates_loop.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_gates_owner.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_gates_branch.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_gates_val.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_gates_sel.layout
+
+NAMED WIDGETS OF THE PAGE (FindAnyWidget)
+  TrdGtSub  TextWidget (filled by script)
+  TrdGtFind  EditBox
+  BtnTrdGtRefresh  ButtonWidget (parts: BtnTrdGtRefreshEdge, BtnTrdGtRefreshBg)
+  BtnTrdGtCopy  ButtonWidget (parts: BtnTrdGtCopyEdge, BtnTrdGtCopyBg)
+  BtnTrdGtPaste  ButtonWidget (parts: BtnTrdGtPasteEdge, BtnTrdGtPasteBg)
+  TrdGtFamBar  Frame (parts: TrdGtFamBarBg, TrdGtFamBarLine)
+  TrdGtPoint  ButtonWidget (a select: the script cycles or lists its options ["Стендовий торговець (stand)", "Остап (npc)", "Сидорович (tp-0)", "Кевін (tp-1)"]); its caption is TrdGtPointText
+  TrdGtFam0  Frame
+  TrdGtFam0Name  TextWidget (filled by script)
+  TrdGtFam0Word  TextWidget (filled by script)
+  BtnTrdGtFam0Srv  ButtonWidget
+  TrdGtFam0SrvText  TextWidget (filled by script)
+  BtnTrdGtFam0As  ButtonWidget (parts: BtnTrdGtFam0AsBg)
+  BtnTrdGtFam0AsText  TextWidget (a caption: recolour only)
+  BtnTrdGtFam0On  ButtonWidget (parts: BtnTrdGtFam0OnBg, BtnTrdGtFam0OnLine)
+  BtnTrdGtFam0OnText  TextWidget (a caption: recolour only)
+  BtnTrdGtFam0Off  ButtonWidget (parts: BtnTrdGtFam0OffBg, BtnTrdGtFam0OffLine)
+  BtnTrdGtFam0OffText  TextWidget (a caption: recolour only)
+  TrdGtFam1  Frame
+  TrdGtFam1Name  TextWidget (filled by script)
+  TrdGtFam1Word  TextWidget (filled by script)
+  BtnTrdGtFam1Srv  ButtonWidget
+  TrdGtFam1SrvText  TextWidget (filled by script)
+  BtnTrdGtFam1As  ButtonWidget (parts: BtnTrdGtFam1AsBg)
+  BtnTrdGtFam1AsText  TextWidget (a caption: recolour only)
+  BtnTrdGtFam1On  ButtonWidget (parts: BtnTrdGtFam1OnBg, BtnTrdGtFam1OnLine)
+  BtnTrdGtFam1OnText  TextWidget (a caption: recolour only)
+  BtnTrdGtFam1Off  ButtonWidget (parts: BtnTrdGtFam1OffBg, BtnTrdGtFam1OffLine)
+  BtnTrdGtFam1OffText  TextWidget (a caption: recolour only)
+  TrdGtFam2  Frame
+  TrdGtFam2Name  TextWidget (filled by script)
+  TrdGtFam2Word  TextWidget (filled by script)
+  BtnTrdGtFam2Srv  ButtonWidget
+  TrdGtFam2SrvText  TextWidget (filled by script)
+  BtnTrdGtFam2As  ButtonWidget (parts: BtnTrdGtFam2AsBg)
+  BtnTrdGtFam2AsText  TextWidget (a caption: recolour only)
+  BtnTrdGtFam2On  ButtonWidget (parts: BtnTrdGtFam2OnBg, BtnTrdGtFam2OnLine)
+  BtnTrdGtFam2OnText  TextWidget (a caption: recolour only)
+  BtnTrdGtFam2Off  ButtonWidget (parts: BtnTrdGtFam2OffBg, BtnTrdGtFam2OffLine)
+  BtnTrdGtFam2OffText  TextWidget (a caption: recolour only)
+  BtnTrdGtFamMore  ButtonWidget (parts: BtnTrdGtFamMoreEdge, BtnTrdGtFamMoreBg)
+  BtnTrdGtFamMoreText  TextWidget (filled by script)
+  TrdGtAnswer  TextWidget (filled by script)
+  TrdGtWarn  TextWidget (filled by script)
+  BtnTrdGtWith  ButtonWidget (parts: BtnTrdGtWithEdge, tc38, tc39, BtnTrdGtWithBg, tc40, tc41)
+  BtnTrdGtWithText  TextWidget (filled by script)
+  BtnTrdGtAll  ButtonWidget (parts: BtnTrdGtAllEdge, tc42, tc43, BtnTrdGtAllBg, tc44, tc45)
+  BtnTrdGtAllText  TextWidget (filled by script)
+  TrdGtList  Frame
+  TrdGtListRows  WrapSpacer: the list's rows go here (ozt_vpp_gates_group, ozt_vpp_gates_line, ozt_vpp_gates_linew); its ScrollWidget is TrdGtListScroll
+  TrdGtHead  TextWidget (filled by script)
+  TrdGtTargetSub  TextWidget (filled by script)
+  TrdGtChanged  Frame (parts: TrdGtChangedBg)
+  TrdGtConds  Frame
+  TrdGtCondsRows  WrapSpacer: the list's rows go here (ozt_vpp_gates_sec, ozt_vpp_gates_cond, ozt_vpp_gates_add, ozt_vpp_gates_lockfoot, ozt_vpp_gates_disc, ozt_vpp_gates_inh, ozt_vpp_gates_discadd, ozt_vpp_gates_discfoot, ozt_vpp_gates_loop); its ScrollWidget is TrdGtCondsScroll
+  TrdGtPk  Frame (parts: TrdGtPkBg, TrdGtPkLine)
+  TrdGtPkTitle  TextWidget (filled by script)
+  BtnTrdGtPkClose  ButtonWidget (parts: BtnTrdGtPkCloseEdge, BtnTrdGtPkCloseBg)
+  TrdGtKind  EditBox
+  BtnTrdGtKindPrev  ButtonWidget (parts: BtnTrdGtKindPrevEdge, BtnTrdGtKindPrevBg)
+  BtnTrdGtKindNext  ButtonWidget (parts: BtnTrdGtKindNextEdge, BtnTrdGtKindNextBg)
+  TrdGtPickFind  EditBox
+  TrdGtPickSub  TextWidget (filled by script)
+  TrdGtPkOwners  Frame
+  TrdGtPkOwnersRows  WrapSpacer: the list's rows go here (ozt_vpp_gates_owner); its ScrollWidget is TrdGtPkOwnersScroll
+  TrdGtPkBranches  Frame
+  TrdGtPkBranchesRows  WrapSpacer: the list's rows go here (ozt_vpp_gates_branch); its ScrollWidget is TrdGtPkBranchesScroll
+  TrdGtPkValsHead  TextWidget (filled by script)
+  TrdGtPick  Frame
+  TrdGtPickRows  WrapSpacer: the list's rows go here (ozt_vpp_gates_val); its ScrollWidget is TrdGtPickScroll
+  TrdGtPkSel  Frame
+  TrdGtArg  EditBox
+  BtnTrdGtPkCancel  ButtonWidget (parts: BtnTrdGtPkCancelEdge, BtnTrdGtPkCancelBg)
+  BtnTrdGtPkCancelText  TextWidget (a caption: recolour only)
+  BtnTrdGtPkDone  ButtonWidget (parts: BtnTrdGtPkDoneEdge, BtnTrdGtPkDoneBg)
+  BtnTrdGtPkDoneText  TextWidget (a caption: recolour only)
+
+ROW TEMPLATES
+  ozt_vpp_gates_group.layout  root OZT_GtGroup (Button), 6 in the sample, 279 x 28 units, list TrdGtListRows
+      OZT_GtGroup  ButtonWidget (parts: OZT_GtGroupEdge, OZT_GtGroupBg)
+      GrpName  TextWidget (filled by script)
+      GrpCount  TextWidget (filled by script)
+      GrpBadge  Frame (parts: GrpBadgeEdge, GrpBadgeBg)
+      GrpBadgeText  TextWidget (filled by script)
+  ozt_vpp_gates_line.layout  root OZT_GtLine (Button), 6 in the sample, 279 x 50 units, list TrdGtListRows
+      OZT_GtLine  ButtonWidget (parts: OZT_GtLineEdge, OZT_GtLineBg)
+      LnClass  TextWidget (filled by script)
+      LnMore  TextWidget (filled by script)
+      LnLock  Frame (parts: LnLockBg)
+      LnLockText  TextWidget (filled by script)
+      LnCut  Frame (parts: LnCutBg)
+      LnCutText  TextWidget (filled by script)
+      LnFam  TextWidget (filled by script)
+  ozt_vpp_gates_linew.layout  root OZT_GtLineW (Button), 1 in the sample, 279 x 68 units, list TrdGtListRows
+      OZT_GtLineW  ButtonWidget (parts: OZT_GtLineWEdge, OZT_GtLineWBg)
+      LnClass  TextWidget (filled by script)
+      LnMore  TextWidget (filled by script)
+      LnLock  Frame (parts: LnLockBg)
+      LnLockText  TextWidget (filled by script)
+      LnCut  Frame (parts: LnCutBg)
+      LnCutText  TextWidget (filled by script)
+      LnFam  TextWidget (filled by script)
+      LnWarn  TextWidget (filled by script)
+  ozt_vpp_gates_sec.layout  root OZT_GtSec (Frame), 2 in the sample, 604 x 35 units, list TrdGtCondsRows
+      OZT_GtSec  Frame
+      SecTitle  TextWidget (filled by script)
+      SecLine  Frame (parts: SecLineBg)
+  ozt_vpp_gates_cond.layout  root OZT_GtCond (Frame), 3 in the sample, 604 x 42 units, list TrdGtCondsRows
+      OZT_GtCond  Frame (parts: OZT_GtCondBg, OZT_GtCondLine)
+      CondBox  Frame (parts: CondBoxEdge, CondBoxBg, CondBoxBar)
+      CondKind  Frame (parts: CondKindBg)
+      CondKindText  TextWidget (filled by script)
+      BtnCondNot  ButtonWidget (parts: BtnCondNotEdge, BtnCondNotBg)
+      BtnCondNotText  TextWidget (a caption: recolour only)
+      BtnCondVals  ButtonWidget
+      CondV0  Frame (parts: CondV0Edge, CondV0Bg)
+      CondV0Name  TextWidget (filled by script)
+      CondV0Id  TextWidget (filled by script)
+      CondOr  TextWidget (filled by script)
+      CondV1  Frame (parts: CondV1Edge, CondV1Bg)
+      CondV1Name  TextWidget (filled by script)
+      CondV1Id  TextWidget (filled by script)
+      CondMore  TextWidget (filled by script)
+      BtnCondDel  ButtonWidget
+  ozt_vpp_gates_add.layout  root OZT_GtAdd (Frame), 1 in the sample, 604 x 34 units, list TrdGtCondsRows
+      OZT_GtAdd  Frame (parts: OZT_GtAddBg, OZT_GtAddLine)
+      AddCap  TextWidget (a caption: recolour only)
+      BtnAddKind0  ButtonWidget (parts: BtnAddKind0Edge, BtnAddKind0Bg)
+      BtnAddKind0Text  TextWidget (filled by script)
+      BtnAddKind1  ButtonWidget (parts: BtnAddKind1Edge, BtnAddKind1Bg)
+      BtnAddKind1Text  TextWidget (filled by script)
+      BtnAddKind2  ButtonWidget (parts: BtnAddKind2Edge, BtnAddKind2Bg)
+      BtnAddKind2Text  TextWidget (filled by script)
+      BtnAddKind3  ButtonWidget (parts: BtnAddKind3Edge, BtnAddKind3Bg)
+      BtnAddKind3Text  TextWidget (filled by script)
+      BtnAddKind4  ButtonWidget (parts: BtnAddKind4Edge, BtnAddKind4Bg)
+      BtnAddKind4Text  TextWidget (filled by script)
+      BtnAddKind5  ButtonWidget (parts: BtnAddKind5Edge, BtnAddKind5Bg)
+      BtnAddKind5Text  TextWidget (filled by script)
+  ozt_vpp_gates_lockfoot.layout  root OZT_GtLockFoot (Frame), 1 in the sample, 604 x 46 units, list TrdGtCondsRows
+      OZT_GtLockFoot  Frame (parts: OZT_GtLockFootBg, OZT_GtLockFootLine)
+      LfInherit  TextWidget (filled by script)
+  ozt_vpp_gates_disc.layout  root OZT_GtDisc (Frame), 2 in the sample, 604 x 42 units, list TrdGtCondsRows
+      OZT_GtDisc  Frame (parts: OZT_GtDiscBg, OZT_GtDiscLine)
+      DiscBox  Frame (parts: DiscBoxEdge, DiscBoxBg)
+      DiscPctBox  Frame
+      DiscSign  TextWidget (filled by script)
+      DiscPct  EditBox
+      DiscWhen  TextWidget (filled by script)
+      DiscKind  Frame (parts: DiscKindBg)
+      DiscKindText  TextWidget (filled by script)
+      BtnDiscNot  ButtonWidget (parts: BtnDiscNotEdge, BtnDiscNotBg)
+      BtnDiscNotText  TextWidget (a caption: recolour only)
+      BtnDiscVals  ButtonWidget
+      DiscV0  Frame (parts: DiscV0Edge, DiscV0Bg)
+      DiscV0Name  TextWidget (filled by script)
+      DiscV0Id  TextWidget (filled by script)
+      DiscOr  TextWidget (filled by script)
+      DiscV1  Frame (parts: DiscV1Edge, DiscV1Bg)
+      DiscV1Name  TextWidget (filled by script)
+      DiscV1Id  TextWidget (filled by script)
+      DiscMore  TextWidget (filled by script)
+      BtnDiscAnd  ButtonWidget (parts: BtnDiscAndEdge, BtnDiscAndBg)
+      BtnDiscDel  ButtonWidget
+  ozt_vpp_gates_inh.layout  root OZT_GtInh (Frame), 1 in the sample, 604 x 42 units, list TrdGtCondsRows
+      OZT_GtInh  Frame (parts: OZT_GtInhBg, OZT_GtInhLine)
+      InhPct  TextWidget (filled by script)
+      InhText  TextWidget (filled by script)
+      InhFrom  TextWidget (filled by script)
+  ozt_vpp_gates_discadd.layout  root OZT_GtDiscAdd (Frame), 1 in the sample, 604 x 34 units, list TrdGtCondsRows
+      OZT_GtDiscAdd  Frame (parts: OZT_GtDiscAddBg, OZT_GtDiscAddLine)
+      BtnDiscAddWhen  ButtonWidget (parts: BtnDiscAddWhenEdge, BtnDiscAddWhenBg)
+      BtnDiscAddBy  ButtonWidget (parts: BtnDiscAddByEdge, BtnDiscAddByBg)
+  ozt_vpp_gates_discfoot.layout  root OZT_GtDiscFoot (Frame), 1 in the sample, 604 x 28 units, list TrdGtCondsRows
+      OZT_GtDiscFoot  Frame (parts: OZT_GtDiscFootBg, OZT_GtDiscFootLine)
+  ozt_vpp_gates_loop.layout  root OZT_GtLoop (Frame), 1 in the sample, 604 x 78 units, list TrdGtCondsRows
+      OZT_GtLoop  Frame
+      LoopBox  Frame (parts: LoopBoxBg)
+      LoopSign  ImageWidget (the sign ✓: icon check)
+      LoopHead  TextWidget (filled by script)
+      LoopNote  RichText (filled by script)
+  ozt_vpp_gates_owner.layout  root OZT_GtOwner (Button), 7 in the sample, 112 x 30 units, list TrdGtPkOwnersRows
+      OZT_GtOwner  ButtonWidget (parts: OZT_GtOwnerBg, OZT_GtOwnerBar)
+      OwName  TextWidget (filled by script)
+      OwCount  TextWidget (filled by script)
+  ozt_vpp_gates_branch.layout  root OZT_GtBranch (Button), 1 in the sample, 112 x 42 units, list TrdGtPkBranchesRows
+      OZT_GtBranch  ButtonWidget (parts: OZT_GtBranchBg, OZT_GtBranchBar)
+      BrName  TextWidget (filled by script)
+      BrSub  TextWidget (filled by script)
+  ozt_vpp_gates_val.layout  root OZT_GtVal (Button), 8 in the sample, 265 x 34 units, list TrdGtPickRows
+      OZT_GtVal  ButtonWidget (parts: OZT_GtValBg)
+      PkTick  ButtonWidget (a checkbox; parts: PkTickEdge, PkTickBg); its mark is PkTickMark: show it when on
+      PkName  TextWidget (filled by script)
+      PkSub  TextWidget (filled by script)
+      PkSign  ImageWidget (the sign ✓: icon check)
+      PkState  TextWidget (filled by script)
+  ozt_vpp_gates_sel.layout  root OZT_GtSel (Frame), 2 in the sample, 154 x 26 units, placed by script
+      OZT_GtSel  Frame (parts: OZT_GtSelBg)
+      SelName  TextWidget (filled by script)
+      SelOwner  TextWidget (filled by script)
+      BtnSelDel  ButtonWidget
+
+CSS THE ENGINE HAS NO ANSWER FOR
+  border style dashed (drawn solid)  x13
+  border-radius  x52
+
+RESIZE: WHERE THE BROWSER RE-FLOWS (a text unwraps, a box changes its row); the first of them
+  Text DiscMore

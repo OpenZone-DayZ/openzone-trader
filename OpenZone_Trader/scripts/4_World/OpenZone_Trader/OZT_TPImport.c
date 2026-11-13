@@ -128,16 +128,34 @@ class OZT_TPImport
 
     // For the report.
     protected int m_Twice;
+    protected string m_TwiceNames;
     protected int m_Frozen;
+    protected string m_FrozenNames;
     protected int m_Rounded;
     protected string m_RoundedNames;
     protected int m_Fitted;
     protected string m_FittedNames;
     protected int m_SellLost;
 
+    // The report for the admin window (OZT_AdminImportItem): a thing done a row, the
+    // files looked for, the stocks an apply rewrites and the licences it puts on.
+    protected ref array<ref OZT_AdminImportItem> m_Items;
+    protected ref array<ref OZT_AdminImportFile> m_Files;
+    protected string m_Shelves;
+    protected int m_Give;
+
+    static const int NAMES_MAX = 8;
+    static const string GENERAL = "TraderPlusGeneralConfig.json";
+    static const string PRICES = "TraderPlusPriceConfig.json";
+    static const string IDS = "TraderPlusIDsConfig.json";
+    static const string DATABASE = "TraderPlusDatabase";
+    static const string BANK = "TraderPlusBankDatabase";
+
     void OZT_TPImport()
     {
         m_Report = "";
+        m_Items = new array<ref OZT_AdminImportItem>();
+        m_Files = new array<ref OZT_AdminImportFile>();
         m_CategoryIds = new map<string, string>();
         m_LicenceIds = new map<string, string>();
         m_TakenCategories = new array<string>();
@@ -152,16 +170,72 @@ class OZT_TPImport
 
     // `root`: the folder TraderPlus keeps its files in ("" for its own).
     // Returns the report; `ok` false when TraderPlus's files could not be read.
-    static string Run(string root, bool apply, out bool ok)
+    // `rep`, when given, takes the report for the admin window too.
+    static string Run(string root, bool apply, out bool ok, OZT_AdminImportReport rep = null)
     {
         OZT_TPImport imp = new OZT_TPImport();
         ok = imp.Go(root, apply);
+        if (rep)
+        {
+            int i;
+            for (i = 0; i < imp.m_Items.Count(); i++)
+                rep.Items.Insert(imp.m_Items[i]);
+            for (i = 0; i < imp.m_Files.Count(); i++)
+                rep.Files.Insert(imp.m_Files[i]);
+            rep.Shelves = imp.m_Shelves;
+            rep.Give = imp.m_Give;
+        }
         return imp.m_Report;
     }
 
     protected void Say(string line)
     {
         m_Report = m_Report + line + "\n";
+    }
+
+    // One row of the window's report; the caller fills in the rest.
+    protected OZT_AdminImportItem Item(string kind, string key, int n)
+    {
+        OZT_AdminImportItem it = new OZT_AdminImportItem();
+        it.Kind = kind;
+        it.Key = key;
+        it.N = n;
+        m_Items.Insert(it);
+        return it;
+    }
+
+    protected void Seen(string file, bool found, int n)
+    {
+        OZT_AdminImportFile f = new OZT_AdminImportFile();
+        f.File = file;
+        if (found)
+            f.Found = 1;
+        f.N = n;
+        m_Files.Insert(f);
+    }
+
+    // `names` and one more, ", " between them: the first NAMES_MAX of them, `count`
+    // the name's number among them; a name already there is not repeated (a class in
+    // two categories is two lines).
+    protected static string Plus(string names, string name, int count)
+    {
+        if (count > NAMES_MAX)
+            return names;
+        if (names == "")
+            return name;
+        string all = ", " + names + ", ";
+        if (all.Contains(", " + name + ", "))
+            return names;
+        return names + ", " + name;
+    }
+
+    protected void Unread(string file, string err)
+    {
+        Say("TraderPlus's " + file + " could not be read: " + err);
+        OZT_AdminImportItem it = Item("bad", "unread", 0);
+        it.Names = file;
+        it.More = OZT_AdminText.Cut(err);
+        Seen(file, false, 0);
     }
 
     protected bool Go(string root, bool apply)
@@ -197,7 +271,10 @@ class OZT_TPImport
             OZ_ConfigLoader<OZT_Settings>.Save(DRY_DIR + "\\OZ_Trader_Settings.json", "trader import", m_Settings, false);
             OZ_ConfigLoader<OZT_GoodsFile>.Save(DRY_DIR + "\\OZ_Trader_Goods.json", "trader import", m_Goods, false);
             OZ_ConfigLoader<OZT_TradersFile>.Save(DRY_DIR + "\\OZ_Trader_Traders.json", "trader import", m_Traders, false);
+            m_Give = GiveLicences(false);
             Say("dry run: the three files are in OpenZone\\TraderPlusImport; nothing is applied");
+            Say("an apply would put licences on characters: " + m_Give.ToString());
+            Item("ok", "dry", 0);
             WriteReport();
             return true;
         }
@@ -207,11 +284,17 @@ class OZT_TPImport
         OZ_ConfigLoader<OZT_TradersFile>.Save(OZT_Const.TRADERS, "trader points", m_Traders, true);
         OZT_Config.ReloadLive();
         PutStock();
-        int given = GiveLicences();
+        m_Give = GiveLicences(true);
+        string counters = OZT_Config.Get().Counters();
         Say("applied: our three files are written, the old ones are in the core's backup");
-        Say("licences put on characters: " + given.ToString());
-        Say("loaded again: " + OZT_Config.Get().Counters());
+        Say("licences put on characters: " + m_Give.ToString());
+        Say("loaded again: " + counters);
         Say("TraderPlus still makes its own traders: leave it the vehicles only");
+        Item("ok", "applied", 0);
+        Item("ok", "given", m_Give);
+        OZT_AdminImportItem loaded = Item("ok", "loaded", 0);
+        loaded.More = OZT_AdminText.Cut(counters);
+        Item("skip", "tp_left", 0);
         WriteReport();
         return true;
     }
@@ -234,21 +317,9 @@ class OZT_TPImport
         string cfg = m_Root + "\\TraderPlusConfig\\";
         string err;
         m_General = new OZT_TPGeneral();
-        if (!JsonFileLoader<OZT_TPGeneral>.LoadFile(cfg + "TraderPlusGeneralConfig.json", m_General, err))
+        if (!JsonFileLoader<OZT_TPGeneral>.LoadFile(cfg + GENERAL, m_General, err))
         {
-            Say("TraderPlus's general config could not be read: " + err);
-            return false;
-        }
-        m_Prices = new OZT_TPPrices();
-        if (!JsonFileLoader<OZT_TPPrices>.LoadFile(cfg + "TraderPlusPriceConfig.json", m_Prices, err))
-        {
-            Say("TraderPlus's price config could not be read: " + err);
-            return false;
-        }
-        m_Ids = new OZT_TPIds();
-        if (!JsonFileLoader<OZT_TPIds>.LoadFile(cfg + "TraderPlusIDsConfig.json", m_Ids, err))
-        {
-            Say("TraderPlus's IDs config could not be read: " + err);
+            Unread(GENERAL, err);
             return false;
         }
         if (!m_General.Licences)
@@ -257,10 +328,39 @@ class OZT_TPImport
             m_General.Currencies = new array<ref OZT_TPCurrency>();
         if (!m_General.Traders)
             m_General.Traders = new array<ref OZT_TPTrader>();
+        Seen(GENERAL, true, m_General.Traders.Count());
+
+        m_Prices = new OZT_TPPrices();
+        if (!JsonFileLoader<OZT_TPPrices>.LoadFile(cfg + PRICES, m_Prices, err))
+        {
+            Unread(PRICES, err);
+            return false;
+        }
         if (!m_Prices.TraderCategories)
             m_Prices.TraderCategories = new array<ref OZT_TPCategory>();
+        Seen(PRICES, true, m_Prices.TraderCategories.Count());
+
+        m_Ids = new OZT_TPIds();
+        if (!JsonFileLoader<OZT_TPIds>.LoadFile(cfg + IDS, m_Ids, err))
+        {
+            Unread(IDS, err);
+            return false;
+        }
         if (!m_Ids.IDs)
             m_Ids.IDs = new array<ref OZT_TPId>();
+        Seen(IDS, true, m_Ids.IDs.Count());
+
+        // The stock and the accounts are TraderPlus's to have or not: none is no error.
+        int stocked = 0;
+        for (int i = 0; i < m_Ids.IDs.Count(); i++)
+        {
+            if (m_Ids.IDs[i] && FileExist(m_Root + "\\" + DATABASE + "\\ID_" + m_Ids.IDs[i].Id.ToString()))
+                stocked++;
+        }
+        Seen(DATABASE, stocked > 0, stocked);
+        array<string> accounts = new array<string>();
+        Accounts(accounts);
+        Seen(BANK, accounts.Count() > 0, accounts.Count());
         return true;
     }
 
@@ -348,7 +448,11 @@ class OZT_TPImport
             if (m_General.Licences[i] != "")
                 LicenceFor(m_General.Licences[i]);
         }
-        Say("licences: " + m_Settings.Licences.Count().ToString());
+        int n = m_Settings.Licences.Count();
+        Say("licences: " + n.ToString());
+        OZT_AdminImportItem it = Item("ok", "licences", n);
+        for (int l = 0; l < n; l++)
+            it.Names = Plus(it.Names, m_Settings.Licences[l].Name, l + 1);
     }
 
     protected void TakeSettings()
@@ -356,6 +460,7 @@ class OZT_TPImport
         // The notes: every class of every value, ascending by value.
         array<ref OZT_Note> notes = new array<ref OZT_Note>();
         int unknown = 0;
+        string unknownNames = "";
         for (int c = 0; c < m_General.Currencies.Count(); c++)
         {
             OZT_TPCurrency cur = m_General.Currencies[c];
@@ -371,6 +476,7 @@ class OZT_TPImport
                 if (!OZT_Config.ClassKnown(cls))
                 {
                     unknown++;
+                    unknownNames = Plus(unknownNames, cls, unknown);
                     continue;
                 }
                 OZT_Note note = new OZT_Note();
@@ -382,6 +488,9 @@ class OZT_TPImport
         if (notes.Count() > 0)
             m_Settings.Notes = notes;
         Say("notes: " + notes.Count().ToString() + " class(es); unknown to the game, skipped: " + unknown.ToString());
+        OZT_AdminImportItem it = Item("ok", "notes", notes.Count());
+        it.M = unknown;
+        it.Names = unknownNames;
         if (OZT_Config.ClassKnown("TraderPlus_Wallet") && m_Settings.Holders.Find("TraderPlus_Wallet") < 0)
             m_Settings.Holders.Insert("TraderPlus_Wallet");
 
@@ -434,11 +543,13 @@ class OZT_TPImport
     protected void TakeGoods()
     {
         int lines = 0;
+        int stocked = 0;
         int vehicles = 0;
         int unknown = 0;
         int gated = 0;
         string vehicleNames = "";
         string unknownNames = "";
+        string gatedNames = "";
         string keyword = m_General.LicenceKeyWord;
         for (int c = 0; c < m_Prices.TraderCategories.Count(); c++)
         {
@@ -459,6 +570,7 @@ class OZT_TPImport
             {
                 cat.Requires.Insert(NeedLicence(tc.CategoryName));
                 gated++;
+                gatedNames = Plus(gatedNames, tc.CategoryName, gated);
             }
 
             if (!tc.Products)
@@ -481,6 +593,7 @@ class OZT_TPImport
                 if (seen.Find(low) > -1)
                 {
                     m_Twice++;
+                    m_TwiceNames = Plus(m_TwiceNames, cls, m_Twice);
                     continue;
                 }
                 seen.Insert(low);
@@ -490,42 +603,74 @@ class OZT_TPImport
                     if (IsVehicle(cls))
                     {
                         vehicles++;
-                        if (vehicles <= 8)
-                            vehicleNames = vehicleNames + " " + cls;
+                        vehicleNames = Plus(vehicleNames, cls, vehicles);
                     }
                     else
                     {
                         unknown++;
-                        if (unknown <= 8)
-                            unknownNames = unknownNames + " " + cls;
+                        unknownNames = Plus(unknownNames, cls, unknown);
                     }
                     continue;
                 }
                 cat.Goods.Insert(g);
                 lines++;
+                if (g.Stock)
+                    stocked++;
             }
             m_Goods.Categories.Insert(cat);
         }
-        Say("categories: " + m_Goods.Categories.Count().ToString() + ", behind a licence by their name: " + gated.ToString());
+        int cats = m_Goods.Categories.Count();
+        Say("categories: " + cats.ToString() + ", behind a licence by their name: " + gated.ToString());
         Say("goods lines: " + lines.ToString());
-        if (m_Twice > 0)
-            Say("a class listed twice in one category, the first line kept: " + m_Twice.ToString());
-        if (m_Frozen > 0)
-            Say("lines with MaxStock 0 (TraderPlus takes none of them from players), imported with no sell price: " + m_Frozen.ToString());
+        OZT_AdminImportItem it = Item("ok", "categories", cats);
+        it.M = gated;
+        it.Names = gatedNames;
+        it = Item("ok", "goods", lines);
+        it.M = stocked;
+        it.K = lines - stocked;
         if (m_Rounded > 0)
-            Say("piles priced by the unit, its price rounded in the trader's favour: " + m_Rounded.ToString() + " (" + m_RoundedNames + " )");
+        {
+            Say("piles priced by the unit, its price rounded in the trader's favour: " + m_Rounded.ToString() + " (" + m_RoundedNames + ")");
+            it = Item("warn", "rounded", m_Rounded);
+            it.Names = m_RoundedNames;
+        }
         if (m_Fitted > 0)
         {
-            string fit = "prices made multiples of the smallest note (" + NoteUnit().ToString() + "), buy up and sell down: ";
-            fit = fit + m_Fitted.ToString() + " (" + m_FittedNames + " )";
+            int unit = NoteUnit();
+            string fit = "prices made multiples of the smallest note (" + unit.ToString() + "), buy up and sell down: ";
+            fit = fit + m_Fitted.ToString() + " (" + m_FittedNames + ")";
             Say(fit);
+            if (m_SellLost > 0)
+                Say("of them the trader now pays nothing for: " + m_SellLost.ToString());
+            it = Item("warn", "fitted", m_Fitted);
+            it.M = unit;
+            it.K = m_SellLost;
+            it.Names = m_FittedNames;
         }
-        if (m_SellLost > 0)
-            Say("of them the trader now pays nothing for: " + m_SellLost.ToString());
+        if (m_Frozen > 0)
+        {
+            Say("lines with MaxStock 0 (TraderPlus takes none of them from players), imported with no sell price: " + m_Frozen.ToString() + " (" + m_FrozenNames + ")");
+            it = Item("warn", "frozen", m_Frozen);
+            it.Names = m_FrozenNames;
+        }
+        if (m_Twice > 0)
+        {
+            Say("a class listed twice in one category, the first line kept: " + m_Twice.ToString() + " (" + m_TwiceNames + ")");
+            it = Item("warn", "twice", m_Twice);
+            it.Names = m_TwiceNames;
+        }
         if (vehicles > 0)
-            Say("vehicles, left to TraderPlus: " + vehicles.ToString() + " (" + vehicleNames + " )");
+        {
+            Say("vehicles, left to TraderPlus: " + vehicles.ToString() + " (" + vehicleNames + ")");
+            it = Item("skip", "vehicles", vehicles);
+            it.Names = vehicleNames;
+        }
         if (unknown > 0)
-            Say("classes the game does not know, skipped: " + unknown.ToString() + " (" + unknownNames + " )");
+        {
+            Say("classes the game does not know, skipped: " + unknown.ToString() + " (" + unknownNames + ")");
+            it = Item("skip", "unknown", unknown);
+            it.Names = unknownNames;
+        }
     }
 
     // One product line of TraderPlus's to ours; null: a vehicle or a class
@@ -577,6 +722,7 @@ class OZT_TPImport
         {
             g.Sell = 0;
             m_Frozen++;
+            m_FrozenNames = Plus(m_FrozenNames, cls, m_Frozen);
         }
 
         // One trade of a pile moves so many units at once; ours prices one.
@@ -590,8 +736,7 @@ class OZT_TPImport
             if (unitBuy * per != g.Buy || unitSell * per != g.Sell)
             {
                 m_Rounded++;
-                if (m_Rounded <= 8)
-                    m_RoundedNames = m_RoundedNames + " " + cls;
+                m_RoundedNames = Plus(m_RoundedNames, cls, m_Rounded);
             }
             g.Quantity = OZT_Const.RULE_UNIT;
             g.Buy = unitBuy;
@@ -655,8 +800,7 @@ class OZT_TPImport
         if (g.Buy == buy && g.Sell == sell)
             return;
         m_Fitted++;
-        if (m_Fitted <= 8)
-            m_FittedNames = m_FittedNames + " " + g.ClassName;
+        m_FittedNames = Plus(m_FittedNames, g.ClassName, m_Fitted);
         if (sell > 0 && g.Sell == 0)
             m_SellLost++;
     }
@@ -697,6 +841,8 @@ class OZT_TPImport
         int npcs = 0;
         int objects = 0;
         int ownMoney = 0;
+        string npcNames = "";
+        string ownNames = "";
         for (int t = 0; t < m_General.Traders.Count(); t++)
         {
             OZT_TPTrader tp = m_General.Traders[t];
@@ -732,7 +878,10 @@ class OZT_TPImport
             p.Outfit.Items = new array<ref OZT_OutfitItem>();
             OZT_TPId tid = IdOf(tp.Id);
             if (tid && Fill(p, tid))
+            {
                 ownMoney++;
+                ownNames = Plus(ownNames, p.Name, ownMoney);
+            }
             if (tp.Clothes && p.Kind == OZT_Const.KIND_NPC)
             {
                 for (int k = 0; k < tp.Clothes.Count(); k++)
@@ -746,16 +895,38 @@ class OZT_TPImport
                 }
             }
             if (p.Kind == OZT_Const.KIND_NPC)
+            {
                 npcs++;
+                npcNames = Plus(npcNames, p.Name, npcs);
+            }
             else
+            {
                 objects++;
+            }
             m_Traders.Traders.Insert(p);
         }
         Say("traders: " + npcs.ToString() + " character(s), " + objects.ToString() + " object(s)");
+        OZT_AdminImportItem it = Item("ok", "traders", npcs + objects);
+        it.M = npcs;
+        it.K = objects;
+        it.Names = npcNames;
         if (ownMoney > 0)
+        {
             Say("traders with currencies of their own, now on the server's notes: " + ownMoney.ToString());
+            it = Item("skip", "own_money", ownMoney);
+            it.Names = ownNames;
+        }
         if (m_General.TraderObjects && m_General.TraderObjects.Count() > 0)
-            Say("decoration objects, not taken: " + m_General.TraderObjects.Count().ToString());
+        {
+            int decor = m_General.TraderObjects.Count();
+            Say("decoration objects, not taken: " + decor.ToString());
+            it = Item("skip", "decor", decor);
+            for (int o = 0; o < decor; o++)
+            {
+                if (m_General.TraderObjects[o])
+                    it.Names = Plus(it.Names, m_General.TraderObjects[o].ObjectName, o + 1);
+            }
+        }
     }
 
     protected OZT_TPId IdOf(int id)
@@ -856,6 +1027,37 @@ class OZT_TPImport
             }
         }
         Say("stock lines: " + lines.ToString());
+
+        // Every shelf the apply rewrites, and its lines: "tp1: 4 · tp2: 3".
+        array<string> shelves = new array<string>();
+        array<int> onShelf = new array<int>();
+        for (int s = 0; s < m_StockIds.Count(); s++)
+        {
+            int at = shelves.Find(m_StockIds[s]);
+            if (at < 0)
+            {
+                shelves.Insert(m_StockIds[s]);
+                onShelf.Insert(1);
+            }
+            else
+            {
+                onShelf[at] = onShelf[at] + 1;
+            }
+        }
+        string summary = "";
+        m_Shelves = "";
+        for (int k = 0; k < shelves.Count(); k++)
+        {
+            m_Shelves = Plus(m_Shelves, shelves[k], k + 1);
+            if (k < NAMES_MAX)
+            {
+                if (summary != "")
+                    summary = summary + " · ";
+                summary = summary + shelves[k] + ": " + onShelf[k].ToString();
+            }
+        }
+        OZT_AdminImportItem it = Item("ok", "stock", lines);
+        it.Names = summary;
     }
 
     protected void PutStock()
@@ -875,18 +1077,17 @@ class OZT_TPImport
             OZT_Stock.Save(cleared[s]);
     }
 
-    // The licences held on TraderPlus's bank accounts, onto our characters.
-    protected int GiveLicences()
+    // TraderPlus's bank accounts, a file each.
+    protected void Accounts(array<string> paths)
     {
-        int given = 0;
-        string dir = m_Root + "\\TraderPlusBankDatabase\\";
+        string dir = m_Root + "\\" + BANK + "\\";
         string name;
         FileAttr attr;
         // Every name, sorted out here: the series lists folders this way
         // (OZL_State.Scan).
         FindFileHandle fh = FindFile(dir + "*", name, attr, FindFileFlags.ALL);
         if (fh == 0)
-            return 0;
+            return;
         bool more = true;
         while (more)
         {
@@ -894,15 +1095,26 @@ class OZT_TPImport
             if (len > 13 && name.IndexOf("Account_") == 0)
             {
                 if (name.Substring(len - 5, 5) == ".json")
-                    given = given + GiveOf(dir + name);
+                    paths.Insert(dir + name);
             }
             more = FindNextFile(fh, name, attr);
         }
         CloseFindFile(fh);
+    }
+
+    // The licences held on TraderPlus's bank accounts, onto our characters; with
+    // `grant` false only counted, for the dry run.
+    protected int GiveLicences(bool grant)
+    {
+        int given = 0;
+        array<string> paths = new array<string>();
+        Accounts(paths);
+        for (int i = 0; i < paths.Count(); i++)
+            given = given + GiveOf(paths[i], grant);
         return given;
     }
 
-    protected int GiveOf(string path)
+    protected int GiveOf(string path, bool grant)
     {
         int given = 0;
         OZT_TPAccount acc = new OZT_TPAccount();
@@ -912,7 +1124,11 @@ class OZT_TPImport
         for (int i = 0; i < acc.Licences.Count(); i++)
         {
             string lid;
-            if (m_LicenceIds.Find(acc.Licences[i], lid) && OZT_Licences.Grant(acc.SteamID64, lid))
+            if (!m_LicenceIds.Find(acc.Licences[i], lid))
+                continue;
+            if (!grant)
+                given++;
+            else if (OZT_Licences.Grant(acc.SteamID64, lid))
                 given++;
         }
         return given;

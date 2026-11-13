@@ -1,0 +1,73 @@
+stock: TraderStock.dc.html -> OpenZone_Trader_VPP/gui/layouts/ozt_vpp_stock.layout
+design size 1360 x 812, measured again one, two and three steps of 240 x 160 larger
+widgets: 143; 0 of them the browser re-flows as the page grows (the rule keeps them as designed)
+
+FILES
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_stock.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_stock_point.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_stock_cat.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_stock_row.layout
+
+NAMED WIDGETS OF THE PAGE (FindAnyWidget)
+  BtnTrdSkRefresh  ButtonWidget (parts: BtnTrdSkRefreshEdge, BtnTrdSkRefreshBg)
+  TrdSkPoints  Frame
+  TrdSkPointsRows  WrapSpacer: the list's rows go here (ozt_vpp_stock_point); its ScrollWidget is TrdSkPointsScroll
+  TrdSkStockHead  TextWidget (filled by script)
+  TrdSkStockSub  TextWidget (filled by script)
+  TrdSkFind  EditBox
+  TrdSkLines  Frame
+  TrdSkLinesRows  WrapSpacer: the list's rows go here (ozt_vpp_stock_cat, ozt_vpp_stock_row); its ScrollWidget is TrdSkLinesScroll
+  TrdSkStart0  TextWidget (filled by script)
+  TrdSkStart1  TextWidget (filled by script)
+  TrdSkStart2  TextWidget (filled by script)
+  TrdSkStart3  TextWidget (filled by script)
+  TrdSkStartNote  TextWidget (filled by script)
+  TrdSkHead  TextWidget (filled by script)
+  TrdSkLnSub  TextWidget (filled by script)
+  TrdSkLnNums  TextWidget (filled by script)
+  TrdSkPlot  Frame
+  TrdSkChart  CanvasWidget (a drawing of the mockup: a script draws it)
+  TrdSkAxMax  TextWidget (filled by script)
+  TrdSkAxFloor  TextWidget (filled by script)
+  TrdSkAx0  TextWidget (filled by script)
+  TrdSkAxX0  TextWidget (filled by script)
+  TrdSkAxXMid  TextWidget (filled by script)
+  TrdSkAxXMax  TextWidget (filled by script)
+  TrdSkNow  TextWidget (filled by script)
+  TrdSkTile0Cap  TextWidget (filled by script)
+  TrdSkTile0Buy  TextWidget (filled by script)
+  TrdSkTile0Sell  TextWidget (filled by script)
+  TrdSkTile1Cap  TextWidget (filled by script)
+  TrdSkTile1Buy  TextWidget (filled by script)
+  TrdSkTile1Sell  TextWidget (filled by script)
+  TrdSkTile2Cap  TextWidget (filled by script)
+  TrdSkTile2Buy  TextWidget (filled by script)
+  TrdSkTile2Sell  TextWidget (filled by script)
+  BtnTrdSkLevel  ButtonWidget (a select: the script cycles or lists its options ["новий", "поношений", "пошкоджений", "сильно пошкоджений"]); its caption is BtnTrdSkLevelText
+  TrdSkCount  EditBox
+  BtnTrdSkSet  ButtonWidget (parts: BtnTrdSkSetBg)
+  TrdSkMaxInfo  TextWidget (filled by script)
+
+ROW TEMPLATES
+  ozt_vpp_stock_point.layout  root OZT_SkPoint (Button), 4 in the sample, 230 x 49 units, list TrdSkPointsRows
+      OZT_SkPoint  ButtonWidget (parts: OZT_SkPointBg, OZT_SkPointBar)
+      SkPointName  TextWidget (filled by script)
+      SkPointSub  TextWidget (filled by script)
+  ozt_vpp_stock_cat.layout  root OZT_SkCat (Frame), 2 in the sample, 669 x 28 units, list TrdSkLinesRows
+      OZT_SkCat  Frame (parts: OZT_SkCatBg, OZT_SkCatLine)
+      SkCatName  TextWidget (filled by script)
+  ozt_vpp_stock_row.layout  root OZT_SkRow (Frame), 4 in the sample, 669 x 39 units, list TrdSkLinesRows
+      OZT_SkRow  Frame (parts: OZT_SkRowBg, OZT_SkRowLine)
+      SkRowPick  ButtonWidget
+      SkRowCls  TextWidget (filled by script)
+      SkRowLevel  Frame (parts: SkRowLevelBg)
+      SkRowLevelText  TextWidget (filled by script)
+      SkRowMinus  ButtonWidget (parts: SkRowMinusEdge, SkRowMinusBg)
+      SkRowCount  TextWidget (filled by script)
+      SkRowPlus  ButtonWidget (parts: SkRowPlusEdge, SkRowPlusBg)
+      SkRowBuy  TextWidget (filled by script)
+      SkRowSell  TextWidget (filled by script)
+
+CSS THE ENGINE HAS NO ANSWER FOR
+  border-radius  x15
+  letter-spacing 0.5px (no tracked face for Fira Sans 500)  x5

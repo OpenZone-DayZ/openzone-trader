@@ -217,7 +217,7 @@ class OZT_Admin : OZ_AdminSection
         }
         bool apply = req.Apply == 1;
         bool done;
-        string report = OZT_TPImport.Run(req.Root, apply, done);
+        string report = OZT_TPImport.Run(req.Root, apply, done, rep);
         OZT_Log.Info("admin: TraderPlus import, apply=" + req.Apply.ToString() + "\n" + report);
         rep.Apply = req.Apply;
         if (done)

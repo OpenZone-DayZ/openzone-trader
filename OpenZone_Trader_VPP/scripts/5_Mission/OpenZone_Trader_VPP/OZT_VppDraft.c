@@ -171,7 +171,24 @@ class OZT_VppDraft
     }
 
     // A fresh parse of a file's text as read: what is in force on the server,
-    // whatever the draft holds (the research trade page reads it so).
+    // whatever the draft holds (the research trade page and the stock page read
+    // it so).
+    OZT_Settings SettingsAsRead()
+    {
+        int i = m_Names.Find(OZT_Const.CFG_SETTINGS);
+        if (m_Loaded[i] != 1)
+            return null;
+        if (m_Dirty[i] != 1)
+            return Settings;
+        OZT_Settings s = new OZT_Settings();
+        string err;
+        if (!JsonFileLoader<OZT_Settings>.LoadData(m_Text[i], s, err))
+            return null;
+        int warnings;
+        s.Validate(warnings);
+        return s;
+    }
+
     OZT_GoodsFile GoodsAsRead()
     {
         int i = m_Names.Find(OZT_Const.CFG_GOODS);

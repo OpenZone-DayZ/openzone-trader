@@ -1,0 +1,45 @@
+import: TraderImport.dc.html -> OpenZone_Trader_VPP/gui/layouts/ozt_vpp_import.layout
+design size 1360 x 812, measured again one, two and three steps of 240 x 160 larger
+widgets: 71; 0 of them the browser re-flows as the page grows (the rule keeps them as designed)
+
+FILES
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_import.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_import_file.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_import_row.layout
+
+NAMED WIDGETS OF THE PAGE (FindAnyWidget)
+  TrdImStep1  Frame (parts: TrdImStep1Bg)
+  TrdImStep1Text  TextWidget (a caption: recolour only)
+  TrdImStep1Icon  ImageWidget (the sign ✓: icon check)
+  TrdImStep2  Frame (parts: TrdImStep2Bg)
+  TrdImStep2Text  TextWidget (a caption: recolour only)
+  TrdImStep3  Frame (parts: TrdImStep3Bg)
+  TrdImStep3Text  TextWidget (a caption: recolour only)
+  TrdImRoot  EditBox
+  TrdImFiles  Frame
+  TrdImFilesRows  WrapSpacer: the list's rows go here (ozt_vpp_import_file); its ScrollWidget is TrdImFilesScroll
+  BtnTrdImDry  ButtonWidget (parts: BtnTrdImDryEdge, BtnTrdImDryBg)
+  BtnTrdImDryText  TextWidget (a caption: recolour only)
+  TrdImHead  Frame (parts: TrdImHeadLine)
+  TrdImWhen  TextWidget (filled by script)
+  TrdImOkN  TextWidget (filled by script)
+  TrdImWarnN  TextWidget (filled by script)
+  TrdImSkipN  TextWidget (filled by script)
+  TrdImReport  Frame
+  TrdImReportRows  WrapSpacer: the list's rows go here (ozt_vpp_import_row); its ScrollWidget is TrdImReportScroll
+
+ROW TEMPLATES
+  ozt_vpp_import_file.layout  root OZT_ImFile (Frame), 5 in the sample, 359 x 30 units, list TrdImFilesRows
+      OZT_ImFile  Frame (parts: OZT_ImFileBg)
+      ImFileSign  ImageWidget (the sign ✓: icon check)
+      ImFileName  TextWidget (filled by script)
+      ImFileNote  TextWidget (filled by script)
+  ozt_vpp_import_row.layout  root OZT_ImRow (Frame), 14 in the sample, 920 x 49 units, list TrdImReportRows
+      OZT_ImRow  Frame (parts: OZT_ImRowBg)
+      ImRowSign  ImageWidget (the sign ✓: icon check)
+      ImRowText  TextWidget (filled by script)
+      ImRowMore  TextWidget (filled by script)
+      ImRowCount  TextWidget (filled by script)
+
+CSS THE ENGINE HAS NO ANSWER FOR
+  border-radius  x4

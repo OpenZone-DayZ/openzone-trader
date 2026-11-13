@@ -1,0 +1,93 @@
+rtrade: ResearchTrade.dc.html -> OpenZone_Trader_VPP/gui/layouts/ozt_vpp_rtrade.layout
+design size 1360 x 812, measured again one, two and three steps of 240 x 160 larger
+widgets: 169; 1 of them the browser re-flows as the page grows (the rule keeps them as designed)
+
+FILES
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_rtrade.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_rtrade_node.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_rtrade_cardhead.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_rtrade_item.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_rtrade_cardfoot.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_rtrade_gap.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_rtrade_who.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_rtrade_chip.layout
+
+NAMED WIDGETS OF THE PAGE (FindAnyWidget)
+  TrdRsSub  TextWidget (filled by script)
+  TrdRsFind  EditBox
+  TrdRsOwner  ButtonWidget (a select: the script cycles or lists its options ["усі", "Вчені", "Чисте небо", "Долг", "Воля", "СОП", "Бандити", "Нейтрали"]); its caption is TrdRsOwnerText
+  BtnTrdRsRefresh  ButtonWidget (parts: BtnTrdRsRefreshEdge, BtnTrdRsRefreshBg)
+  TrdRsCount  TextWidget (filled by script)
+  BtnTrdRsAll  ButtonWidget (parts: BtnTrdRsAllEdge, tr29, tr30, BtnTrdRsAllBg, tr31, tr32)
+  BtnTrdRsAllText  TextWidget (filled by script)
+  BtnTrdRsAccess  ButtonWidget (parts: BtnTrdRsAccessEdge, tr33, tr34, BtnTrdRsAccessBg, tr35, tr36)
+  BtnTrdRsAccessText  TextWidget (filled by script)
+  BtnTrdRsGone  ButtonWidget (parts: BtnTrdRsGoneEdge, tr37, tr38, BtnTrdRsGoneBg, tr39, tr40)
+  BtnTrdRsGoneText  TextWidget (filled by script)
+  TrdRsNodes  Frame
+  TrdRsNodesRows  WrapSpacer: the list's rows go here (ozt_vpp_rtrade_node); its ScrollWidget is TrdRsNodesScroll
+  TrdRsGoneBox  Frame (parts: TrdRsGoneBoxEdge, TrdRsGoneBoxBg)
+  TrdRsGoneHead  TextWidget (filled by script)
+  TrdRsGoneId  TextWidget (filled by script)
+  TrdRsGoneWhere  TextWidget (filled by script)
+  TrdRsGoneHint  RichText (filled by script)
+  BtnTrdRsFix  ButtonWidget
+  TrdRsDraftNote  RichText (filled by script)
+  TrdRsRight  Frame
+  TrdRsRightBody  Frame: the scrolled content (734 units tall in the sample); its ScrollWidget is TrdRsRightScroll
+  TrdRsHead  TextWidget (filled by script)
+  TrdRsNodeSub  TextWidget (filled by script)
+  BtnTrdRsOpenGates  ButtonWidget (parts: BtnTrdRsOpenGatesEdge, BtnTrdRsOpenGatesBg)
+  BtnTrdRsOpenTree  ButtonWidget (parts: BtnTrdRsOpenTreeEdge, BtnTrdRsOpenTreeBg)
+  TrdRsColA  WrapSpacer: the rows go here (ozt_vpp_rtrade_cardhead, ozt_vpp_rtrade_item, ozt_vpp_rtrade_cardfoot, ozt_vpp_rtrade_gap); it is as tall as its rows and scrolls with what holds it
+  TrdRsColB  WrapSpacer: the rows go here (ozt_vpp_rtrade_cardhead, ozt_vpp_rtrade_item, ozt_vpp_rtrade_cardfoot, ozt_vpp_rtrade_gap, ozt_vpp_rtrade_who); it is as tall as its rows and scrolls with what holds it
+  TrdRsFam  Frame (parts: TrdRsFamEdge, TrdRsFamBg)
+  TrdRsFamCap  TextWidget (a caption: recolour only)
+  TrdRsFamSrv  TextWidget (filled by script)
+  TrdRsFamChips  Frame
+  TrdRsFamNote  Frame
+
+ROW TEMPLATES
+  ozt_vpp_rtrade_node.layout  root OZT_RsNode (Button), 7 in the sample, 367 x 48 units, list TrdRsNodesRows
+      OZT_RsNode  ButtonWidget (parts: OZT_RsNodeEdge, OZT_RsNodeBg)
+      NdName  TextWidget (filled by script)
+      NdMeta  TextWidget (filled by script)
+      NdLocks  TextWidget (filled by script)
+      NdCuts  TextWidget (filled by script)
+      NdAccess  TextWidget (filled by script)
+  ozt_vpp_rtrade_cardhead.layout  root OZT_RsCardHead (Frame), 4 in the sample, 449 x 38 units, list TrdRsColA
+      OZT_RsCardHead  Frame (parts: OZT_RsCardHeadBg, OZT_RsCardHeadLine)
+      ChTitle  TextWidget (filled by script)
+      ChCount  TextWidget (filled by script)
+  ozt_vpp_rtrade_item.layout  root OZT_RsItem (Frame), 3 in the sample, 449 x 83 units, list TrdRsColA
+      OZT_RsItem  Frame (parts: OZT_RsItemBg, OZT_RsItemLine)
+      ItTag  Frame (parts: ItTagBg)
+      ItTagText  TextWidget (filled by script)
+      ItName  TextWidget (filled by script)
+      ItSub  TextWidget (filled by script)
+      ItVal  TextWidget (filled by script)
+      ItL1  TextWidget (filled by script)
+      ItL2  TextWidget (filled by script)
+  ozt_vpp_rtrade_cardfoot.layout  root OZT_RsCardFoot (Frame), 4 in the sample, 449 x 61 units, list TrdRsColA
+      OZT_RsCardFoot  Frame (parts: OZT_RsCardFootBg, OZT_RsCardFootLine)
+      CfNote  RichText (filled by script)
+  ozt_vpp_rtrade_gap.layout  root OZT_RsGap (Frame), 2 in the sample, 449 x 14 units, list TrdRsColA
+      OZT_RsGap  Frame
+  ozt_vpp_rtrade_who.layout  root OZT_RsWho (Frame), 1 in the sample, 449 x 42 units, list TrdRsColB
+      OZT_RsWho  Frame (parts: OZT_RsWhoBg, OZT_RsWhoLine)
+      WhoDot  ImageWidget (the sign ○: icon ring)
+      WhoName  TextWidget (filled by script)
+      WhoState  TextWidget (filled by script)
+  ozt_vpp_rtrade_chip.layout  root OZT_RsChip (Frame), 4 in the sample, 259 x 30 units, placed by script
+      OZT_RsChip  Frame (parts: OZT_RsChipBg)
+      ChipDot  ImageWidget (the sign ●: icon dot)
+      ChipName  TextWidget (filled by script)
+      ChipState  TextWidget (filled by script)
+
+CSS THE ENGINE HAS NO ANSWER FOR
+  border style dashed (drawn solid)  x1
+  border-radius  x13
+  letter-spacing 0.5px (no tracked face for Fira Sans 400)  x1
+
+RESIZE: WHERE THE BROWSER RE-FLOWS (a text unwraps, a box changes its row); the first of them
+  Frame TrdRsFam

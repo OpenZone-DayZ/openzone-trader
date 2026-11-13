@@ -139,7 +139,7 @@ STR_OZT_ADMIN_TAKEN,Ця річ уже торговець,This thing is a trader
 STR_OZT_ADMIN_MAP_FIXED,"Річ мапи стоїть, як її поставила мапа: її не пересунути, не повернути й не вдягнути","A thing of the map stays as the map has it: it cannot be moved, turned or dressed"
 STR_OZT_NO_ACCESS,Цей торговець з вами не торгує,This trader does not deal with you
 # The OpenZone admin window's trader pages (VPP rework 2026-11-12, OpenZone_Trader_VPP).
-STR_OZT_VPP_MOD,ТОРГОВЕЦЬ,TRADER
+STR_OZT_VPP_MOD,Торговець,Trader
 STR_OZT_VPP_PAGE_POINTS,Точки,Points
 STR_OZT_VPP_PAGE_GOODS,Товари,Goods
 STR_OZT_VPP_PAGE_GATES,Умови й знижки,Conditions and discounts
@@ -205,18 +205,18 @@ STR_OZT_VPP_LC_REVOKE_ASK,Забрати ліцензію,Take back the licence
 STR_OZT_VPP_LC_REVOKE_FROM,у гравця,from
 STR_OZT_VPP_YES_REVOKE,"Так, забрати","Yes, take back"
 STR_OZT_VPP_IM_TITLE,Iмпорт з TraderPlus,Import from TraderPlus
-STR_OZT_VPP_IM_SUB,"Файли TraderPlus стають нашими трьома файлами, складом і ліцензіями. Техніка лишається TraderPlus.","TraderPlus's files become our three files, our stock and our licences. Vehicles stay with TraderPlus."
+STR_OZT_VPP_IM_SUB,"Файли TraderPlus стають нашими трьома файлами, складом і ліцензіями. Техніка, гараж і страховка лишаються TraderPlus.","TraderPlus's files become our three files, the stock and the licences. Vehicles, the garage and the insurance stay with TraderPlus."
 STR_OZT_VPP_IM_ROOT,Тека TraderPlus у профілі сервера (порожньо: $profile:TraderPlus),TraderPlus's folder in the server's profile (empty: $profile:TraderPlus)
 STR_OZT_VPP_IM_ROOT_H,"Лише тека під $profile:, без ..","Only a folder under $profile:, with no .."
 STR_OZT_VPP_IM_DRY,Пробний прогін,Dry run
 STR_OZT_VPP_IM_APPLY,Застосувати імпорт,Apply the import
-STR_OZT_VPP_IM_NOTE,"Пробний прогін нічого не змінює: файли й звіт лягають у OpenZone\TraderPlusImport. Застосування замінює наші три файли (старі ядро кладе в резерв), склади й ліцензії.","A dry run changes nothing: the files and the report go to OpenZone\TraderPlusImport. The apply replaces our three files (the core keeps the old ones in its backup), the stock and the licences."
+STR_OZT_VPP_IM_NOTE,Пробний прогін нічого не змінює: файли й звіт лягають у OpenZone\TraderPlusImport. Застосування замінює наші три файли — старі ядро кладе в резерв.,A dry run changes nothing: the files and the report go to OpenZone\TraderPlusImport. Applying replaces our three files; the core keeps the old ones in its backup.
 STR_OZT_VPP_IM_REPORT,Звіт,Report
 STR_OZT_VPP_IM_STEPS_NONE,1. Пробний прогін   2. Перевірте звіт   3. Застосуйте,1. Dry run   2. Read the report   3. Apply
 STR_OZT_VPP_IM_STEPS_DRY,Пробний прогін зроблено: перевірте звіт і застосуйте,"The dry run is done: read the report, then apply"
 STR_OZT_VPP_IM_STEPS_DONE,Iмпорт застосовано,The import is applied
 STR_OZT_VPP_IM_WAIT,Чекаємо на сервер...,Waiting for the server...
-STR_OZT_VPP_IM_APPLY_ASK,"Застосувати імпорт? Буде замінено наші три файли (старі ядро кладе в резерв), перезаписано склади й видано ліцензії з рахунків TraderPlus.","Apply the import? Our three files are replaced (the core keeps the old ones in its backup), the stock is written over and licences are given from TraderPlus's accounts."
+STR_OZT_VPP_IM_APPLY_ASK,"Застосувати імпорт? Буде замінено наші три файли (старі — у резерві ядра), перезаписано склади %1, видано ліцензій з рахунків TraderPlus: %2.","Apply the import? Our three files will be replaced (the old ones go to the core's backup), stocks %1 rewritten and licences from TraderPlus's accounts put on characters: %2."
 STR_OZT_VPP_YES_APPLY,"Так, застосувати","Yes, apply"
 STR_OZT_VPP_LC_HOLDERS,мають,held by
 STR_OZT_VPP_LC_PICK,"Виберіть ліцензію в списку: тут буде, де вона продається й що відкриває",Pick a licence on the list: where it is sold and what it opens shows here
@@ -455,3 +455,334 @@ STR_OZT_FACT_POINTS,Точок,Points
 STR_OZT_FACT_GOODS,Товарів,Goods
 STR_OZT_FACT_MONEY,Гроші,Money
 STR_OZT_FACT_RESPAWNED,точки зроблено заново,points made again
+STR_OZT_VPP_LC_NEW,+ Ліцензія,+ Licence
+STR_OZT_VPP_LC_COL_NAME,ЛІЦЕНЗІЯ,LICENCE
+STR_OZT_VPP_LC_COL_SOLD,ПРОДАЄТЬСЯ,SOLD IN
+STR_OZT_VPP_LC_COL_OPENS,ВІДКРИВАЄ,OPENS
+STR_OZT_VPP_LC_COL_HELD,МАЮТЬ,HELD BY
+STR_OZT_VPP_LC_ONLINE_WORD,онлайн,online
+STR_OZT_VPP_LC_ED_HINT,Id не змінюється: інший id — це нова ліцензія. Зміни йдуть у чернетку налаштувань.,An id does not change: another id is a new licence. The edits go to the draft of the settings.
+STR_OZT_VPP_LC_NOT_YET,ще не на сервері,not on the server yet
+STR_OZT_VPP_LC_NO_DEFS,Ліцензій ще немає: «+ Ліцензія» додає першу,No licences yet: «+ Licence» adds the first
+STR_OZT_VPP_LC_ID_WORD,id,id
+STR_OZT_VPP_LC_LOOK_WORD,вигляд,look
+STR_OZT_VPP_LC_NEW_HINT,"Нова ліцензія: впишіть id, назву й вигляд і натисніть «Записати»","A new licence: type its id, name and look, then press «Save»"
+STR_OZT_VPP_LC_PICK_LIC,Виберіть ліцензію,Pick a licence
+STR_OZT_VPP_LC_HELD_NOBODY,"Назвіть гравця вище: тут буде, що він має",Name a player above: what he holds shows here
+STR_OZT_VPP_MN_MODE_ITEMS,Лише готівка,Cash only
+STR_OZT_VPP_MN_MODE_BOTH,"Готівка, потім банк","Cash, then the bank"
+STR_OZT_VPP_MN_MODE_BANK,Лише банк,The bank only
+STR_OZT_VPP_MN_CODE_ITEMS,items · за замовчуванням,items · the default
+STR_OZT_VPP_MN_CODE_BOTH,items+traderplus,items+traderplus
+STR_OZT_VPP_MN_CODE_BANK,traderplus,traderplus
+STR_OZT_VPP_MN_TEXT_ITEMS,"Купюри з інвентаря. Банк, якщо стоїть, працює сам по собі (банкомати) — торговці його не чіпають.","Notes from the inventory. A bank, if there is one, works by itself (cash machines): the traders leave it alone."
+STR_OZT_VPP_MN_TEXT_BOTH,"Купюри платять першими, банк — решту. Виплата купюрами; що не влізло в сумки — на рахунок.","The notes pay first, the bank the rest. The trader pays in notes; what finds no room in the bags goes to the account."
+STR_OZT_VPP_MN_TEXT_BANK,"Рахунок TraderPlus, купюри не потрібні. Розміну купюр у торговця немає.","The TraderPlus account, no notes needed. The trader does not change notes."
+STR_OZT_VPP_MN_NOTE_ADD,+ купюра,+ note
+STR_OZT_VPP_MN_NOTES_BAD,Не діляться на найменший номінал,Not divisible by the smallest value
+STR_OZT_VPP_MN_LV_0,Новий,Pristine
+STR_OZT_VPP_MN_LV_1,Поношений,Worn
+STR_OZT_VPP_MN_LV_2,Пошкоджений,Damaged
+STR_OZT_VPP_MN_LV_3,Сильно пошкоджений,Badly damaged
+STR_OZT_VPP_MN_RUINED,Зіпсовані речі торговець не бере ніколи.,A ruined thing is never taken.
+STR_OZT_VPP_MN_REFILL,Поповнення,Restock
+STR_OZT_VPP_MN_DESTOCK,Списувати частку з повних рядків,Destock a share of full lines
+STR_OZT_VPP_MN_PRISTINE,Усе продане — у рядок нових речей,Everything sold goes to the pristine line
+STR_OZT_VPP_MN_FLOOR_NOTE,"Поріг 0 — без порогу: ціна падає із запасом, доки одиниця не стане дешевшою за купюру. Рядок товару може мати свій поріг.",Floor 0 is no floor: the price falls with the stock until a unit is cheaper than a note. A goods line may have its own floor.
+STR_OZT_VPP_MN_WEAR,Куплений одяг і зброю — одразу на вільний слот персонажа,Bought clothes and weapons go straight to a free slot of the character
+STR_OZT_VPP_MN_GROUP,Кольори однієї речі за однією ціною — на одній плитці,Colours of one thing at one price stand on one tile
+STR_OZT_VPP_RS_SUB_S,Що в торговців тримається на вузлах дерева. Тут лише перегляд: правка на сторінках торговця.,What the traders hold on the nodes of the tree. A view only: the edits are on the trader's pages.
+STR_OZT_VPP_RS_CHIP,"склейка дослідження × торговець: сторінка є, коли стоять обидва моди",research × trader glue: the page is here when both mods are
+STR_OZT_VPP_RS_FIND_PH,Вузол або клас,A node or a class
+STR_OZT_VPP_RS_OWNER,Власник,Owner
+STR_OZT_VPP_RS_OWNER_ALL,усі,all
+STR_OZT_VPP_RS_NODES_T,Вузли,Nodes
+STR_OZT_VPP_RS_COUNT,Вузлів у файлах торговця:,Nodes the trader's files name:
+STR_OZT_VPP_RS_F_ALL,Усі,All
+STR_OZT_VPP_RS_F_ACCESS,Із доступом,With access
+STR_OZT_VPP_RS_F_GONE,Немає в дереві,Not in the tree
+STR_OZT_VPP_RS_COL_NODE,ВУЗОЛ,NODE
+STR_OZT_VPP_RS_COL_LOCKS,ЗАМКИ,LOCKS
+STR_OZT_VPP_RS_COL_CUTS,ЗНИЖКИ,DISC.
+STR_OZT_VPP_RS_COL_ACCESS,ДОСТУП,ACCESS
+STR_OZT_VPP_RS_FIX,Виправити в «Умовах і знижках» ›,Fix it in «Conditions and discounts» ›
+STR_OZT_VPP_RS_OPEN_GATES,відкрити в Торговець › Умови й знижки,open in Trader › Conditions and discounts
+STR_OZT_VPP_RS_OPEN_TREE,Відкрити «Дерево»,Open «Tree»
+STR_OZT_VPP_RS_FAM_NOTE,"Де сімейство вимкнене — на сервері (GatesOff у налаштуваннях) чи на точці, — замки дослідження пропускають, а знижки не даються. Так само, коли мода досліджень немає.",Where the family is off -- on the server (GatesOff of the settings) or at a point -- research locks pass and discounts are not given. The same when the research mod is not there.
+STR_OZT_VPP_RS_TIER,тір,tier
+STR_OZT_VPP_RS_BRANCH,гілка,branch
+STR_OZT_VPP_RS_OWNER_W,власник,owner
+STR_OZT_VPP_RS_N_LINES,рядків:,lines:
+STR_OZT_VPP_RS_N_CATS,категорій:,categories:
+STR_OZT_VPP_RS_N_POINTS,точок:,points:
+STR_OZT_VPP_RS_N_CUTS,знижок:,discounts:
+STR_OZT_VPP_RS_TAG_LINE,РЯДОК,LINE
+STR_OZT_VPP_RS_TAG_CAT,КАТЕГОРІЯ,CATEGORY
+STR_OZT_VPP_RS_TAG_POINT,ТОЧКА,POINT
+STR_OZT_VPP_RS_L_POINTS,Точки:,Points:
+STR_OZT_VPP_RS_L_NO_POINTS,жодна точка не торгує цією категорією,no point deals in this category
+STR_OZT_VPP_RS_L_COND,Умова:,Condition:
+STR_OZT_VPP_RS_L_WHEN,Коли:,When:
+STR_OZT_VPP_RS_L_BY,Рахує мод:,The mod computes it:
+STR_OZT_VPP_RS_L_ACCESS,Доступ:,Access:
+STR_OZT_VPP_RS_L_HAVE,зараз мають:,held now by:
+STR_OZT_VPP_RS_L_HAVE_C,Зараз мають:,Held now by:
+STR_OZT_VPP_RS_L_GIVEN,Дається:,Given at:
+STR_OZT_VPP_RS_L_NOT_GIVEN,не дається:,not given at:
+STR_OZT_VPP_RS_L_OPEN,Діє:,Holds at:
+STR_OZT_VPP_RS_L_PASSES,пропускає:,passes at:
+STR_OZT_VPP_RS_NOBODY,ще ніхто,nobody yet
+STR_OZT_VPP_RS_NO_ANSWER,дослідження не відповідає,research does not answer
+STR_OZT_VPP_RS_OR,або,or
+STR_OZT_VPP_RS_NOT,без,without
+STR_OZT_VPP_RS_NONE,немає,none
+STR_OZT_VPP_RS_NOTE_LOCKS,Закритий товар гравець не бачить. Вузол відкриває його всій фракції разом.,A player does not see locked goods. The node opens them for the whole faction.
+STR_OZT_VPP_RS_NOTE_CUTS,Рядок бере найкращу одну знижку: свою чи категорії.,A line takes the best single discount: its own or its category's.
+STR_OZT_VPP_RS_NOTE_ACCESS,Без виконаної умови доступу гравець не відкриє торгівлю з точкою.,Without the access condition a player cannot open trade at the point.
+STR_OZT_VPP_RS_NOTE_WHO,"Вузол відкриває замки й знижки всій фракції, що його завершила.",The node opens locks and discounts for the whole faction that completed it.
+STR_OZT_VPP_RS_DONE,завершили,completed
+STR_OZT_VPP_RS_DONE_HEAD,Завершили,Completed
+STR_OZT_VPP_RS_SERVER,сервер:,server:
+STR_OZT_VPP_RS_FAM_AS,діє · як сервер,holds · as the server
+STR_OZT_VPP_RS_FAM_OFF_SRV,вимкнене на сервері,off on the server
+STR_OZT_VPP_RS_FAM_ON_HERE,увімкнене на точці,on at the point
+STR_OZT_VPP_RS_FAM_OFF_HERE,вимкнене на точці,off at the point
+STR_OZT_VPP_RS_W_LOCK_LINE,замок рядка,the lock of the line
+STR_OZT_VPP_RS_W_LOCK_CAT,замок категорії,the lock of the category
+STR_OZT_VPP_RS_W_CUT_LINE,знижка рядка,a discount of the line
+STR_OZT_VPP_RS_W_CUT_CAT,знижка категорії,a discount of the category
+STR_OZT_VPP_RS_W_ACCESS,доступ до точки,the access to the point
+STR_OZT_VPP_RS_SIMILAR,Схожий у дереві:,A similar one in the tree:
+STR_OZT_VPP_RS_MORE,ще,more
+STR_OZT_VPP_GT_CHIP,сторінка торговця · вибір вузла дерева — зі склейки дослідження × торговець,a page of the trader · the tree's nodes come from the research × trader glue
+STR_OZT_VPP_GT_FIND_PH,"Клас, вузол або умова","A class, a node or a condition"
+STR_OZT_VPP_GT_COPY,Копіювати умови,Copy conditions
+STR_OZT_VPP_GT_PASTE,Вставити сюди,Paste here
+STR_OZT_VPP_GT_COPIED,Скопійовано умов замка й знижок:,Lock conditions and discounts copied:
+STR_OZT_VPP_GT_PASTED,Вставлено умов замка й знижок:,Lock conditions and discounts pasted:
+STR_OZT_VPP_GT_CLIP_EMPTY,Спершу скопіюйте умови іншої цілі,Copy the conditions of another target first
+STR_OZT_VPP_GT_F_WITH,З умовами,With conditions
+STR_OZT_VPP_GT_F_ALL,Усі,All
+STR_OZT_VPP_GT_LIST_MORE,"ще рядків, уточніть пошук:","more lines, narrow the search:"
+STR_OZT_VPP_GT_PASSES,пропускає,passes
+STR_OZT_VPP_GT_CHANGED_W,змінено,changed
+STR_OZT_VPP_GT_CHANGED,змінено в чернетці,changed in the draft
+STR_OZT_VPP_GT_NO_VALUE,Немає такого значення:,No such value:
+STR_OZT_VPP_GT_BUY,купівля,buy
+STR_OZT_VPP_GT_SELL,скупка,sell
+STR_OZT_VPP_GT_STOCK_TO,склад до,stock up to
+STR_OZT_VPP_GT_SEC_LOCK,ЗАМОК · ХТО БАЧИТЬ ТОВАР,LOCK · WHO SEES THE GOODS
+STR_OZT_VPP_GT_SEC_DISC,ЗНИЖКИ · ЛИШЕ НА КУПІВЛЮ,DISCOUNTS · ON BUYING ONLY
+STR_OZT_VPP_GT_SEC_ACCESS,ДОСТУП · ХТО МОЖЕ ТОРГУВАТИ ТУТ,ACCESS · WHO MAY TRADE HERE
+STR_OZT_VPP_GT_K_FACTION,Фракція,Faction
+STR_OZT_VPP_GT_K_POST,Пост,Post
+STR_OZT_VPP_GT_K_LEADER,Лідер,Leader
+STR_OZT_VPP_GT_K_RESEARCH,Дослідження,Research
+STR_OZT_VPP_GT_ADD_COND,+ умова:,+ condition:
+STR_OZT_VPP_GT_KIND_MORE,інші ›,more ›
+STR_OZT_VPP_GT_RULES,Усі умови разом · «або» — досить однієї · «не» — навпаки,All conditions together · «or»: any one will do · «not»: turned round
+STR_OZT_VPP_GT_FROM_CAT,Від категорії,From the category
+STR_OZT_VPP_GT_NO_LOCKS,замків немає,no locks
+STR_OZT_VPP_GT_LOCK_OF_CAT,"Замок категорії діє на кожен її рядок, разом із замком рядка","A category's lock holds for each of its lines, together with the line's own"
+STR_OZT_VPP_GT_ACCESS_NOTE,Без виконаної умови гравець не відкриє торгівлю з цією точкою,Without the condition a player cannot open trade at this point
+STR_OZT_VPP_GT_AND_ADD,+ і,+ and
+STR_OZT_VPP_GT_DISC_ADD_WHEN,+ знижка за умовою,+ discount on a condition
+STR_OZT_VPP_GT_DISC_ADD_BY,"+ знижка, яку рахує мод",+ discount a mod computes
+STR_OZT_VPP_GT_DISC_BY_NOTE,"відсоток рахує мод умови, не більше вказаного","the condition's mod computes the percent, capped by the number"
+STR_OZT_VPP_GT_DISC_NOTE,"Найкраща одна з тих, чиї умови виконані, разом зі знижкою категорії · скупка без знижок","The best single one whose conditions hold, the category's included · selling has no discounts"
+STR_OZT_VPP_GT_INH_FROM,від категорії,from the category
+STR_OZT_VPP_GT_READ_ONLY,лише читання,read only
+STR_OZT_VPP_GT_LOOP_OK,Немає петлі: скупка,No money loop: sell
+STR_OZT_VPP_GT_LOOP_BAD,ПЕТЛЯ: скупка,MONEY LOOP: sell
+STR_OZT_VPP_GT_LOOP_NOTE,"Перевірка грошей рахує найбільшу знижку, яку рядок може дістати, навіть якщо її ще ніхто не має, і найменший множник купівлі серед точок.","The money check counts the largest discount the line can get, even if nobody has it yet, and the least buy factor among the points."
+STR_OZT_VPP_GT_LOOP_OFF,Рядок не купують або не продають: петлі бути не може,The line is not bought or not sold: there can be no loop
+STR_OZT_VPP_GT_ANSWER,Відповідають:,Answering:
+STR_OZT_VPP_GT_ANSWER_NONE,ніхто,nobody
+STR_OZT_VPP_GT_OFF_AT,Вимкнено на точках:,Switched off at points:
+STR_OZT_VPP_GT_OFF_NONE,Точки без своїх вимкнень,No point switches a family off
+STR_OZT_VPP_GT_OFF_SRV,Вимкнено на сервері:,Switched off on the server:
+STR_OZT_VPP_GT_FAMN_FACTIONS,Фракції,Factions
+STR_OZT_VPP_GT_FAMN_LICENCES,Ліцензії,Licences
+STR_OZT_VPP_GT_FAMN_RESEARCH,Дослідження,Research
+STR_OZT_VPP_GT_NO_POINTS,точок немає,no points
+STR_OZT_VPP_GT_PK_KICKER,ВИБІР ЗНАЧЕННЯ,PICK A VALUE
+STR_OZT_VPP_GT_PK_FIND_PH,Назва або id значення,A value's name or id
+STR_OZT_VPP_GT_PK_OWNER,ВЛАСНИК,OWNER
+STR_OZT_VPP_GT_PK_BRANCH,ГІЛКА,BRANCH
+STR_OZT_VPP_GT_PK_CHOSEN,ОБРАНО · ДОСИТЬ БУДЬ-ЯКОГО,CHOSEN · ANY ONE WILL DO
+STR_OZT_VPP_GT_PK_ARG,Arg,Arg
+STR_OZT_VPP_GT_PK_DONE,Готово,Done
+STR_OZT_VPP_GT_PK_VALS,ЗНАЧЕННЯ · ХТО МАЄ,VALUES · WHO HOLDS
+STR_OZT_VPP_GT_PK_NODES,ВУЗЛИ · ХТО ЗАВЕРШИВ,NODES · WHO COMPLETED
+STR_OZT_VPP_GT_PK_NODES_N,вузлів:,nodes:
+STR_OZT_VPP_GT_PK_IDLE,Виберіть умову або додайте нову,Pick a condition or add a new one
+STR_OZT_VPP_GT_PK_DISC,Знижка,Discount
+STR_OZT_VPP_GT_PK_NEW,нова умова,a new condition
+STR_OZT_VPP_GT_PK_CANCEL,Скасувати,Cancel
+STR_OZT_VPP_GT_PK_NOBODY,"Цей вид ніхто не відповідає: замок пропускає, знижки немає","Nobody answers this kind: a lock passes, no discount"
+STR_OZT_VPP_GT_FAML_FACTIONS,фракції,factions
+STR_OZT_VPP_GT_FAML_LICENCES,ліцензії,licences
+STR_OZT_VPP_GT_FAML_RESEARCH,дослідження,research
+STR_OZ_VPP_MARK_TRADER,ТР,TR
+STR_OZT_VPP_SAVE_RELOAD,Зберегти й перезавантажити,Save and reload
+STR_OZT_VPP_UNSAVED,Незбережені зміни:,Unsaved changes:
+STR_OZT_VPP_LIST_CUT,Показано перші,Shown: the first
+STR_OZT_VPP_M,м,m
+STR_OZT_VPP_KM,км,km
+STR_OZT_VPP_ID,Id,Id
+STR_OZT_VPP_PT_PLACE_NEW,+ Нова точка на моєму місці,+ New point where I stand
+STR_OZT_VPP_PT_ADOPT_L,"Зробити торговцем те, на що дивлюся",Make what I look at a trader
+STR_OZT_VPP_PT_FIND,Знайти точку,Find a point
+STR_OZT_VPP_PT_FIND_PH,"Імʼя, id або клас","Name, id or class"
+STR_OZT_VPP_PT_F_ALL,Усі,All
+STR_OZT_VPP_PT_F_OBJ,Обʼєкти,Objects
+STR_OZT_VPP_PT_F_MAP,Обʼєкти карти,Map objects
+STR_OZT_VPP_PT_CHIP_NPC,NPC,NPC
+STR_OZT_VPP_PT_CHIP_OBJ,ОБʼЄКТ,OBJECT
+STR_OZT_VPP_PT_CHIP_MAP,КАРТА,MAP
+STR_OZT_VPP_PT_ACCESS_W,доступ:,access:
+STR_OZT_VPP_PT_SEC_NEW,НОВА ТОЧКА,NEW POINT
+STR_OZT_VPP_PT_ID_PH,напр. bar-1,e.g. bar-1
+STR_OZT_VPP_PT_CLASS_PH,SurvivorM_Boris,SurvivorM_Boris
+STR_OZT_VPP_PT_NEED_ID,Впишіть id нової точки в поле «Id» під списком,Type the new point's id into the Id field under the list
+STR_OZT_VPP_PT_K_OBJ,Обʼєкт,Object
+STR_OZT_VPP_PT_K_MAP,Обʼєкт карти,Map object
+STR_OZT_VPP_PT_MAP_HOW,"Точку карти роблять із речі, на яку дивишся: кнопка «Зробити торговцем те, на що дивлюся»",A map point is made of the thing you look at: the button «Make what I look at a trader»
+STR_OZT_VPP_PT_NAME_L,Імʼя для гравців,Name the players read
+STR_OZT_VPP_PT_STOCK_OWN,свій,its own
+STR_OZT_VPP_PT_STOCK_SHARED,спільний:,shared:
+STR_OZT_VPP_PT_STOCK_NAME,Назва спільного складу,Shared stock name
+STR_OZT_VPP_PT_STOCK_PH,порожньо: свій,empty: its own
+STR_OZT_VPP_PT_X,X,X
+STR_OZT_VPP_PT_Y,Y,Y
+STR_OZT_VPP_PT_Z,Z,Z
+STR_OZT_VPP_PT_YAW,"Поворот, °","Facing, °"
+STR_OZT_VPP_PT_MOVE_L,Поставити на моє місце,Move to where I stand
+STR_OZT_VPP_PT_TURN_L,"Повернути, як стою я",Turn to face as I do
+STR_OZT_VPP_PT_PROVIDER,Id провайдера грошей,Money provider id
+STR_OZT_VPP_PT_NO_CHANGE,Не міняє купюри (без вкладки «Розмін»),Does not change notes (no Change tab)
+STR_OZT_VPP_PT_SEC_CATS,ЧИМ ТОРГУЄ,DEALS IN
+STR_OZT_VPP_PT_CAT_ADD,+ категорія,+ category
+STR_OZT_VPP_PT_CATS_NOTE,Категорії задає адмін на сторінці «Товари». Закриті для гравця категорії він не бачить.,Categories are made on the Goods page. A player does not see the categories locked for him.
+STR_OZT_VPP_PT_SEC_ACCESS,ХТО МОЖЕ ТОРГУВАТИ,WHO MAY TRADE
+STR_OZT_VPP_PT_MUST,має бути,must hold
+STR_OZT_VPP_PT_MUST_NOT,не має бути,must not hold
+STR_OZT_VPP_PT_COND_ADD,+ умова,+ condition
+STR_OZT_VPP_PT_COND_NONE,немає списку,no list
+STR_OZT_VPP_PT_COND_NO_LIST,Значення цього виду умови не мають списку: додайте умову на сторінці «Умови й знижки»,The values of this kind of condition come with no list: add the condition on the Conditions and discounts page
+STR_OZT_VPP_PT_COND_HAS,Така умова в точки вже є,The point has this condition already
+STR_OZT_VPP_PT_ACCESS_NOTE,"Усі умови разом. Умова мода, якого немає на сервері, пропускає — це видно в «Проблемах».",All the conditions together. A condition of a mod the server does not run passes: the problems say so.
+STR_OZT_VPP_PT_SEC_OUTFIT,ОДЯГ NPC,OUTFIT
+STR_OZT_VPP_PT_OUTFIT_L,Одягти як на мені,Dress as I am
+STR_OZT_VPP_PT_WEAR_NONE,У файлі цієї точки одягу немає,The file dresses this point in nothing
+STR_OZT_VPP_GD_FIND_PH,Клас або назва,Class or name
+STR_OZT_VPP_GD_SAVE,Перевірити й зберегти,Check and save
+STR_OZT_VPP_GD_COND,умова,cond.
+STR_OZT_VPP_GD_CONDS,умов:,cond.:
+STR_OZT_VPP_GD_CUT_UPTO,знижка до,discount up to
+STR_OZT_VPP_GD_WARN_N,Зауважень:,Remarks:
+STR_OZT_VPP_GD_CAT_ID_L,Id категорії,Category id
+STR_OZT_VPP_GD_CAT_DEL_L,Прибрати категорію,Remove category
+STR_OZT_VPP_GD_LOCK_NOTE,"«умова» — категорія має умову (ліцензія, фракція…). Гравцю, що їй не відповідає, вона на полиці не видна, а продати її речі він може.","«cond.»: the category has a condition (a licence, a faction…). A player who does not meet it does not see it on the shelf, yet may sell its things."
+STR_OZT_VPP_GD_COL_SELL,СКУПКА,SELL
+STR_OZT_VPP_GD_COL_RULE,ПРАВИЛО,RULE
+STR_OZT_VPP_GD_COL_STOCK,СКЛАД · КОЕФ · СПИСАННЯ · ПОРІГ,STOCK · COEF · DESTOCK · FLOOR
+STR_OZT_VPP_GD_COL_REQ,УМОВИ,CONDITIONS
+STR_OZT_VPP_GD_RULE_EACH_S,шт,pc
+STR_OZT_VPP_GD_RULE_UNIT_S,од.,unit
+STR_OZT_VPP_GD_RULE_FRACTION_S,повна,full
+STR_OZT_VPP_GD_UNLIMITED,безліміт,unlimited
+STR_OZT_VPP_GD_W_CLASS,немає такого класу,no such class
+STR_OZT_VPP_GD_W_LOOP,петля: скупка,loop: sell
+STR_OZT_VPP_GD_W_UNIT,ціна не кратна купюрі,price off the note
+STR_OZT_VPP_GD_LINE_IN,рядок у,a line of
+STR_OZT_VPP_GD_BUY_L,Купівля,Buy
+STR_OZT_VPP_GD_SELL_L,Скупка,Sell
+STR_OZT_VPP_GD_STOCK_CHECK,Скінченний запас (без цього — безліміт),Finite stock (without it: unlimited)
+STR_OZT_VPP_GD_COEF_L,Коефіцієнт,Coefficient
+STR_OZT_VPP_GD_DEST_L,Списання на старті,Destock at a start
+STR_OZT_VPP_GD_FLOOR_L,Поріг ціни,Price floor
+STR_OZT_VPP_GD_AT_STOCK,запас,stock
+STR_OZT_VPP_GD_WITH_L,У комплекті (кожна частина за своєю ціною),Comes with (each part at its own price)
+STR_OZT_VPP_GD_WITH_NONE,нічого,nothing
+STR_OZT_VPP_GD_PART_PH,клас частини,part class
+STR_OZT_VPP_GD_PART_ADD,+ частина,+ part
+STR_OZT_VPP_GD_PART_TYPE,Впишіть клас частини в поле поруч,Type the part's class into the field beside the button
+STR_OZT_VPP_GD_PART_HAS,Ця частина вже є в комплекті (або це сам товар),The line comes with this part already (or it is the goods themselves)
+STR_OZT_VPP_GD_BAD_CLASS,Немає такого класу: рядок пропустять,No such class: the line is skipped
+STR_OZT_VPP_GD_OK_UNIT,Ціни кратні найменшій купюрі,Prices fit the smallest note
+STR_OZT_VPP_GD_BAD_UNIT,Ціна не кратна найменшій купюрі,A price is off the smallest note
+STR_OZT_VPP_GD_OK_LOOP,Петлі немає: скупка,No money loop: sell
+STR_OZT_VPP_GD_BAD_LOOP,Петля: скупка,Money loop: sell
+STR_OZT_VPP_SK_SHELF_NOTE,Точки з однаковим «Склад» продають з однієї полиці — як ID у TraderPlus.,"Points with the same Stock sell from one shelf, as an ID does in TraderPlus."
+STR_OZT_VPP_SK_SHARED,спільний,shared
+STR_OZT_VPP_SK_SELLS,продає,sold by
+STR_OZT_VPP_SK_FIND_PH,Знайти товар,Find goods
+STR_OZT_VPP_SK_COL_LEVEL,СТАН,CONDITION
+STR_OZT_VPP_SK_COL_STOCK,ЗАПАС,STOCK
+STR_OZT_VPP_SK_COL_BUY,ПРОДАЄ ЗА,SELLS FOR
+STR_OZT_VPP_SK_COL_SELL,СКУПОВУЄ ЗА,BUYS FOR
+STR_OZT_VPP_SK_PER_UNIT,/ од.,/ unit
+STR_OZT_VPP_SK_CURVE,ціна від запасу,price by stock
+STR_OZT_VPP_SK_BUY_W,купівля,buy
+STR_OZT_VPP_SK_SELL_W,скупка,sell
+STR_OZT_VPP_SK_COEF_W,коеф.,coef.
+STR_OZT_VPP_SK_FLOOR_W,поріг,floor
+STR_OZT_VPP_SK_NOW,зараз,now
+STR_OZT_VPP_SK_FLOOR_FROM,поріг від,floor from
+STR_OZT_VPP_SK_LEG_BUY,продає за,sells for
+STR_OZT_VPP_SK_LEG_SELL,скуповує за,buys for
+STR_OZT_VPP_SK_LEG_FLOOR,пунктир — поріг,dashes: the floor
+STR_OZT_VPP_SK_FLOOR_NOTE,"Без порогу торговець перестає скуповувати, коли одиниця коштує менше за найменшу купюру. З порогом скуповує завжди — за пороговою ціною.","With no floor the trader stops buying once a unit is worth less than the smallest note. With a floor he always buys, at the floor price."
+STR_OZT_VPP_IM_STEP1,1 · Пробний прогін,1 · Dry run
+STR_OZT_VPP_IM_STEP2,2 · Перевірити звіт,2 · Read the report
+STR_OZT_VPP_IM_STEP3,3 · Застосувати,3 · Apply
+STR_OZT_VPP_IM_ROOT_L,Тека TraderPlus у профілі сервера,TraderPlus's folder in the server's profile
+STR_OZT_VPP_IM_ROOT_PH,$profile:TraderPlus,$profile:TraderPlus
+STR_OZT_VPP_IM_N_OK,%1 перенесено,%1 taken over
+STR_OZT_VPP_IM_N_WARN,%1 змінено,%1 changed
+STR_OZT_VPP_IM_N_SKIP,%1 не взято,%1 left out
+STR_OZT_VPP_IM_FOUND,ЗНАЙДЕНО,FOUND
+STR_OZT_VPP_IM_DRY_AGAIN,Пробний прогін ще раз,Dry run again
+STR_OZT_VPP_IM_NO_SHELF,жодні,none
+STR_OZT_VPP_IM_F_GENERAL,торговців: %1,traders: %1
+STR_OZT_VPP_IM_F_PRICES,категорій: %1,categories: %1
+STR_OZT_VPP_IM_F_IDS,ID: %1,IDs: %1
+STR_OZT_VPP_IM_F_DATABASE,склад %1 ID,stock of %1 IDs
+STR_OZT_VPP_IM_F_BANK,рахунків: %1,accounts: %1
+STR_OZT_VPP_IM_F_NONE,немає,missing
+STR_OZT_VPP_IM_T_LICENCES,Ліцензії,Licences
+STR_OZT_VPP_IM_T_NOTES,Купюри,Notes
+STR_OZT_VPP_IM_M_NOTES,класів: %1,classes: %1
+STR_OZT_VPP_IM_M_NOTES_SKIP,класів: %1; невідомих грі пропущено: %2 (%3),"classes: %1; unknown to the game, skipped: %2 (%3)"
+STR_OZT_VPP_IM_T_CATEGORIES,Категорії,Categories
+STR_OZT_VPP_IM_M_CATEGORIES,закрито ліцензією за назвою: %1 (%2),behind a licence by their name: %1 (%2)
+STR_OZT_VPP_IM_M_CATEGORIES_0,жодної не закрито ліцензією,none behind a licence
+STR_OZT_VPP_IM_T_GOODS,Рядки товарів,Goods lines
+STR_OZT_VPP_IM_M_GOODS,"зі складом: %1, зі своїм Max і коефіцієнтом; без складу (MaxStock -1): %2, безлімітні","with a stock: %1, each with its Max and coefficient; without one (MaxStock -1): %2, unlimited"
+STR_OZT_VPP_IM_T_TRADERS,Торговці,Traders
+STR_OZT_VPP_IM_M_TRADERS,"NPC: %1 (%2), обʼєктів: %3; точки одного ID ділять склад","NPCs: %1 (%2), objects: %3; points of one ID share a stock"
+STR_OZT_VPP_IM_M_TRADERS_0,"NPC: %1, обʼєктів: %2; точки одного ID ділять склад","NPCs: %1, objects: %2; points of one ID share a stock"
+STR_OZT_VPP_IM_T_STOCK,Рядки складу,Stock lines
+STR_OZT_VPP_IM_T_ROUNDED,Набої й купи тепер за штуку,Ammo and piles now by the unit
+STR_OZT_VPP_IM_M_ROUNDED,ціну поділено на штуку й округлено на користь торговця (%1),the price split per unit and rounded in the trader's favour (%1)
+STR_OZT_VPP_IM_T_FITTED,Ціни підігнано під купюру %1,Prices fitted to the %1 note
+STR_OZT_VPP_IM_M_FITTED,"купівля вгору, скупка вниз (%1)","buying up, selling down (%1)"
+STR_OZT_VPP_IM_M_FITTED_LOST,"купівля вгору, скупка вниз; за %2 з них торговець тепер не платить нічого (%1)","buying up, selling down; for %2 of them the trader now pays nothing (%1)"
+STR_OZT_VPP_IM_T_FROZEN,MaxStock 0 — без скупки,"MaxStock 0, not bought back"
+STR_OZT_VPP_IM_M_FROZEN,TraderPlus такі речі в гравців не брав (%1),TraderPlus took none of these from players (%1)
+STR_OZT_VPP_IM_T_TWICE,Клас двічі в одній категорії,A class twice in one category
+STR_OZT_VPP_IM_M_TWICE,лишився перший рядок (%1),the first line kept (%1)
+STR_OZT_VPP_IM_T_VEHICLES,Техніка лишається TraderPlus,Vehicles stay with TraderPlus
+STR_OZT_VPP_IM_T_UNKNOWN,Невідомі грі класи пропущено,"Classes the game does not know, skipped"
+STR_OZT_VPP_IM_T_OWN_MONEY,Свої валюти торговців не взято,Traders' own currencies not taken
+STR_OZT_VPP_IM_M_OWN_MONEY,тепер на купюрах сервера: %1,now on the server's notes: %1
+STR_OZT_VPP_IM_T_DECOR,Декоративні обʼєкти не взято,Decoration objects not taken
+STR_OZT_VPP_IM_T_APPLIED,Застосовано,Applied
+STR_OZT_VPP_IM_M_APPLIED,"наші три файли записано, старі — у резерві ядра","our three files written, the old ones in the core's backup"
+STR_OZT_VPP_IM_T_GIVEN,Ліцензії на персонажах,Licences put on characters
+STR_OZT_VPP_IM_M_GIVEN,з рахунків TraderPlus,from TraderPlus's accounts
+STR_OZT_VPP_IM_T_LOADED,Завантажено знову,Loaded again
+STR_OZT_VPP_IM_T_TP_LEFT,TraderPlus і далі ставить своїх торговців,TraderPlus still makes its own traders
+STR_OZT_VPP_IM_M_TP_LEFT,лиште йому лише техніку,leave it the vehicles only
+STR_OZT_VPP_IM_T_UNREAD,Не прочитано: %1,Not read: %1

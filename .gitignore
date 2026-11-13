@@ -16,3 +16,10 @@ desktop.ini
 
 # the machine half of the MCP profile: this machine's paths, never committed
 dayz-mcp.local.toml
+
+# css2layout: previews and measurements, never packed or committed
+_demo_*.layout
+ui/css2layout/*.measure.json
+ui/css2layout/icons.json
+ui/css2layout/icons.png
+ui/css2layout/chrome_profile*/

@@ -1,0 +1,21 @@
+probs: TraderProblems.html -> OpenZone_Trader_VPP/gui/layouts/ozt_vpp_probs.layout
+design size 1360 x 230, measured again one, two and three steps of 240 x 160 larger
+widgets: 18; 0 of them the browser re-flows as the page grows (the rule keeps them as designed)
+
+FILES
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_probs.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_prob_row.layout
+
+NAMED WIDGETS OF THE PAGE (FindAnyWidget)
+  TrdProbsCounters  TextWidget (filled by script)
+  BtnTrdProbsClose  ButtonWidget (parts: BtnTrdProbsCloseEdge, BtnTrdProbsCloseBg)
+  TrdProbs  Frame
+  TrdProbsRows  WrapSpacer: the list's rows go here (ozt_vpp_prob_row); its ScrollWidget is TrdProbsScroll
+
+ROW TEMPLATES
+  ozt_vpp_prob_row.layout  root OZT_ProbRow (Frame), 2 in the sample, 1312 x 44 units, list TrdProbsRows
+      OZT_ProbRow  Frame (parts: OZT_ProbRowBg)
+      ProbText  RichText (filled by script)
+
+CSS THE ENGINE HAS NO ANSWER FOR
+  border-radius  x2

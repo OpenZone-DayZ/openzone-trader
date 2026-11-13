@@ -1,0 +1,16 @@
+draft: TraderDraftBar.html -> OpenZone_Trader_VPP/gui/layouts/ozt_vpp_draft.layout
+design size 1360 x 61, measured again one, two and three steps of 240 x 160 larger
+widgets: 16; 0 of them the browser re-flows as the page grows (the rule keeps them as designed)
+
+FILES
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_draft.layout
+
+NAMED WIDGETS OF THE PAGE (FindAnyWidget)
+  TrdBarState  TextWidget (filled by script)
+  BtnTrdProbs  ButtonWidget (parts: BtnTrdProbsEdge, BtnTrdProbsBg)
+  BtnTrdProbsText  TextWidget (filled by script)
+  BtnTrdDiscard  ButtonWidget (parts: BtnTrdDiscardEdge, BtnTrdDiscardBg)
+  BtnTrdApply  ButtonWidget (parts: BtnTrdApplyBg)
+
+CSS THE ENGINE HAS NO ANSWER FOR
+  border-radius  x3

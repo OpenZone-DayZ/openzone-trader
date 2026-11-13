@@ -377,17 +377,72 @@ class OZT_AdminLicenceList
     }
 }
 
+// One thing the TraderPlus import did, for the admin window to word in the admin's
+// language (the Lines are the server's English, for its log): Kind "ok" (taken
+// over), "warn" (taken over changed), "skip" (left out) or "bad" (could not be
+// read); Key what it is about (OZT_TPImport); N, M and K its numbers; Names the
+// classes or names it is about, More the engine's own words.
+class OZT_AdminImportItem
+{
+    string Kind = "ok";
+    string Key = "";
+    int N = 0;
+    int M = 0;
+    int K = 0;
+    string Names = "";
+    string More = "";
+
+    OZT_AdminImportItem Copy()
+    {
+        OZT_AdminImportItem c = new OZT_AdminImportItem();
+        c.Kind = Kind;
+        c.Key = Key;
+        c.N = N;
+        c.M = M;
+        c.K = K;
+        c.Names = Names;
+        c.More = More;
+        return c;
+    }
+}
+
+// One of TraderPlus's files or folders the import reads: whether it was there, and
+// how much it holds -- traders, categories, IDs, IDs with a stock, accounts.
+class OZT_AdminImportFile
+{
+    string File = "";
+    int Found = 0;
+    int N = 0;
+
+    OZT_AdminImportFile Copy()
+    {
+        OZT_AdminImportFile c = new OZT_AdminImportFile();
+        c.File = File;
+        c.Found = Found;
+        c.N = N;
+        return c;
+    }
+}
+
 // `import_traderplus`: the report a line a row; Done 0 when TraderPlus's files
-// could not be read (the op fails then, and still carries the report).
+// could not be read (the op fails then, and still carries the report). Items and
+// Files say the same for the window; Shelves are the stocks an apply rewrites, Give
+// the licences it puts on characters (after an apply: put).
 class OZT_AdminImportReport
 {
     int Apply = 0;
     int Done = 0;
     ref array<string> Lines;
+    ref array<ref OZT_AdminImportItem> Items;
+    ref array<ref OZT_AdminImportFile> Files;
+    string Shelves = "";
+    int Give = 0;
 
     void OZT_AdminImportReport()
     {
         Lines = new array<string>();
+        Items = new array<ref OZT_AdminImportItem>();
+        Files = new array<ref OZT_AdminImportFile>();
     }
 
     OZT_AdminImportReport Copy()
@@ -396,6 +451,25 @@ class OZT_AdminImportReport
         c.Apply = Apply;
         c.Done = Done;
         OZT_AdminText.CopyAll(Lines, c.Lines);
+        int i;
+        if (Items)
+        {
+            for (i = 0; i < Items.Count(); i++)
+            {
+                if (Items[i])
+                    c.Items.Insert(Items[i].Copy());
+            }
+        }
+        if (Files)
+        {
+            for (i = 0; i < Files.Count(); i++)
+            {
+                if (Files[i])
+                    c.Files.Insert(Files[i].Copy());
+            }
+        }
+        c.Shelves = Shelves;
+        c.Give = Give;
         return c;
     }
 }

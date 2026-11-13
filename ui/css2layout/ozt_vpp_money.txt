@@ -1,0 +1,71 @@
+money: TraderMoney.dc.html -> OpenZone_Trader_VPP/gui/layouts/ozt_vpp_money.layout
+design size 1360 x 812, measured again one, two and three steps of 240 x 160 larger
+widgets: 182; 6 of them the browser re-flows as the page grows (the rule keeps them as designed)
+
+FILES
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_money.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_money_note.layout
+
+NAMED WIDGETS OF THE PAGE (FindAnyWidget)
+  TrdMnSub  TextWidget (filled by script)
+  BtnTrdMnApply  ButtonWidget (parts: BtnTrdMnApplyBg)
+  TrdMnBody  Frame
+  TrdMnBodyBody  Frame: the scrolled content (828 units tall in the sample); its ScrollWidget is TrdMnBodyScroll
+  BtnTrdMnItems  ButtonWidget (parts: BtnTrdMnItemsEdge, BtnTrdMnItemsBg)
+  BtnTrdMnItemsDot  Frame (parts: BtnTrdMnItemsDotEdge, BtnTrdMnItemsDotBg)
+  BtnTrdMnBoth  ButtonWidget (parts: BtnTrdMnBothEdge, BtnTrdMnBothBg)
+  BtnTrdMnBothDot  Frame (parts: BtnTrdMnBothDotEdge, BtnTrdMnBothDotBg)
+  BtnTrdMnBank  ButtonWidget (parts: BtnTrdMnBankEdge, BtnTrdMnBankBg)
+  BtnTrdMnBankDot  Frame (parts: BtnTrdMnBankDotEdge, BtnTrdMnBankDotBg)
+  TrdMnProv  EditBox
+  TrdMnNotes  Frame
+  TrdMnNotesRows  WrapSpacer: the list's rows go here (ozt_vpp_money_note); its ScrollWidget is TrdMnNotesScroll
+  TrdMnNoteCls  EditBox
+  TrdMnNoteVal  EditBox
+  BtnTrdMnNoteSet  ButtonWidget (parts: BtnTrdMnNoteSetEdge, BtnTrdMnNoteSetBg)
+  TrdMnHolders  EditBox
+  TrdMnNotesHint  RichText (filled by script)
+  TrdMnCond0  Frame (a slider 0..100): TrdMnCond0Track, TrdMnCond0Fill and the button TrdMnCond0Knob -- the script moves the knob and sizes the fill
+  TrdMnCond0Val  TextWidget (filled by script)
+  TrdMnCond1  Frame (a slider 0..100): TrdMnCond1Track, TrdMnCond1Fill and the button TrdMnCond1Knob -- the script moves the knob and sizes the fill
+  TrdMnCond1Val  TextWidget (filled by script)
+  TrdMnCond2  Frame (a slider 0..100): TrdMnCond2Track, TrdMnCond2Fill and the button TrdMnCond2Knob -- the script moves the knob and sizes the fill
+  TrdMnCond2Val  TextWidget (filled by script)
+  TrdMnCond3  Frame (a slider 0..100): TrdMnCond3Track, TrdMnCond3Fill and the button TrdMnCond3Knob -- the script moves the knob and sizes the fill
+  TrdMnCond3Val  TextWidget (filled by script)
+  BtnTrdMnStart0  ButtonWidget (parts: BtnTrdMnStart0Bg)
+  BtnTrdMnStart0Text  TextWidget (a caption: recolour only)
+  BtnTrdMnStart1  ButtonWidget (parts: BtnTrdMnStart1Bg, BtnTrdMnStart1Line)
+  BtnTrdMnStart1Text  TextWidget (a caption: recolour only)
+  BtnTrdMnStart2  ButtonWidget (parts: BtnTrdMnStart2Bg, BtnTrdMnStart2Line)
+  BtnTrdMnStart2Text  TextWidget (a caption: recolour only)
+  BtnTrdMnDestock  ButtonWidget
+  TrdMnDestockTick  ButtonWidget (a checkbox; parts: TrdMnDestockTickEdge, TrdMnDestockTickBg); its mark is TrdMnDestockTickMark: show it when on
+  BtnTrdMnPristine  ButtonWidget
+  TrdMnPristineTick  ButtonWidget (a checkbox; parts: TrdMnPristineTickEdge, TrdMnPristineTickBg); its mark is TrdMnPristineTickMark: show it when on
+  TrdMnFloor  EditBox
+  TrdMnCooldown  EditBox
+  BtnTrdMnWear  ButtonWidget
+  TrdMnWearTick  ButtonWidget (a checkbox; parts: TrdMnWearTickEdge, TrdMnWearTickBg); its mark is TrdMnWearTickMark: show it when on
+  BtnTrdMnGroup  ButtonWidget
+  TrdMnGroupTick  ButtonWidget (a checkbox; parts: TrdMnGroupTickEdge, TrdMnGroupTickBg); its mark is TrdMnGroupTickMark: show it when on
+
+ROW TEMPLATES
+  ozt_vpp_money_note.layout  root OZT_MnNote (Frame), 6 in the sample, 614 x 28 units, list TrdMnNotesRows
+      OZT_MnNote  Frame (parts: OZT_MnNoteBg, OZT_MnNoteLine)
+      BtnNotePick  ButtonWidget
+      NoteCls  TextWidget (filled by script)
+      NoteVal  TextWidget (filled by script)
+      BtnNoteDel  ButtonWidget
+
+CSS THE ENGINE HAS NO ANSWER FOR
+  border style dashed (drawn solid)  x1
+  border-radius  x20
+
+RESIZE: WHERE THE BROWSER RE-FLOWS (a text unwraps, a box changes its row); the first of them
+  Frame TrdMnBodyBody
+  Frame tm5
+  Frame tm24
+  Frame tm42
+  Frame tm56
+  Frame tm66

@@ -1,0 +1,114 @@
+points: TraderPoints.dc.html -> OpenZone_Trader_VPP/gui/layouts/ozt_vpp_points.layout
+design size 1360 x 812, measured again one, two and three steps of 240 x 160 larger
+widgets: 309; 3 of them the browser re-flows as the page grows (the rule keeps them as designed)
+
+FILES
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_points.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_point_row.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_point_cat.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_point_cond.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_point_wear.layout
+
+NAMED WIDGETS OF THE PAGE (FindAnyWidget)
+  BtnTrdRefresh  ButtonWidget (parts: BtnTrdRefreshEdge, BtnTrdRefreshBg)
+  BtnTrdAdopt  ButtonWidget (parts: BtnTrdAdoptEdge, BtnTrdAdoptBg)
+  BtnTrdRespawn  ButtonWidget (parts: BtnTrdRespawnEdge, BtnTrdRespawnBg)
+  BtnTrdPlace  ButtonWidget (parts: BtnTrdPlaceBg)
+  TrdPtFind  EditBox
+  BtnTrdPtAll  ButtonWidget (parts: BtnTrdPtAllEdge, tp15, tp16, BtnTrdPtAllBg, tp17, tp18)
+  BtnTrdPtAllText  TextWidget (filled by script)
+  BtnTrdPtNpc  ButtonWidget (parts: BtnTrdPtNpcEdge, tp19, tp20, BtnTrdPtNpcBg, tp21, tp22)
+  BtnTrdPtNpcText  TextWidget (filled by script)
+  BtnTrdPtObj  ButtonWidget (parts: BtnTrdPtObjEdge, tp23, tp24, BtnTrdPtObjBg, tp25, tp26)
+  BtnTrdPtObjText  TextWidget (filled by script)
+  BtnTrdPtMap  ButtonWidget (parts: BtnTrdPtMapEdge, tp27, tp28, BtnTrdPtMapBg, tp29, tp30)
+  BtnTrdPtMapText  TextWidget (filled by script)
+  TrdList  Frame
+  TrdListRows  WrapSpacer: the list's rows go here (ozt_vpp_point_row); its ScrollWidget is TrdListScroll
+  TrdId  EditBox
+  TrdNewClass  EditBox
+  BtnTrdNewNpc  ButtonWidget (parts: BtnTrdNewNpcBg)
+  BtnTrdNewNpcText  TextWidget (a caption: recolour only)
+  BtnTrdNewObj  ButtonWidget (parts: BtnTrdNewObjBg, BtnTrdNewObjLine)
+  BtnTrdNewObjText  TextWidget (a caption: recolour only)
+  TrdPtCard  Frame
+  TrdPtCardBody  Frame: the scrolled content (673 units tall in the sample); its ScrollWidget is TrdPtCardScroll
+  TrdPtHead  TextWidget (filled by script)
+  TrdPtHeadChip  Frame (parts: TrdPtHeadChipBg)
+  TrdPtHeadSub  TextWidget (filled by script)
+  TrdPtStateDot  ImageWidget (the sign ●: icon dot)
+  TrdPtState  TextWidget (filled by script)
+  BtnTrdRemove  ButtonWidget (parts: BtnTrdRemoveEdge, BtnTrdRemoveBg)
+  TrdPtForm  Frame
+  TrdPtIdBox  Frame (parts: TrdPtIdBoxEdge, TrdPtIdBoxBg)
+  TrdPtIdText  TextWidget (filled by script)
+  TrdName  EditBox
+  BtnTrdKindNpc  ButtonWidget (parts: BtnTrdKindNpcBg)
+  BtnTrdKindNpcText  TextWidget (a caption: recolour only)
+  BtnTrdKindObj  ButtonWidget (parts: BtnTrdKindObjBg, BtnTrdKindObjLine)
+  BtnTrdKindObjText  TextWidget (a caption: recolour only)
+  BtnTrdKindMap  ButtonWidget (parts: BtnTrdKindMapBg, BtnTrdKindMapLine)
+  BtnTrdKindMapText  TextWidget (a caption: recolour only)
+  TrdClass  EditBox
+  TrdRadius  EditBox
+  TrdBuy  EditBox
+  TrdSell  EditBox
+  BtnTrdPtStockPick  ButtonWidget (a select: the script cycles or lists its options ["свій (npc)", "спільний: stand"]); its caption is BtnTrdPtStockPickText
+  TrdPtStock  EditBox
+  TrdPtX  EditBox
+  TrdPtY  EditBox
+  TrdPtZ  EditBox
+  TrdPtYaw  EditBox
+  BtnTrdMove  ButtonWidget (parts: BtnTrdMoveEdge, BtnTrdMoveBg)
+  BtnTrdTurn  ButtonWidget (parts: BtnTrdTurnEdge, BtnTrdTurnBg)
+  BtnTrdPtMoney  ButtonWidget (a select: the script cycles or lists its options ["як на сервері", "готівка", "готівка, потім банк", "банк TraderPlus"]); its caption is BtnTrdPtMoneyText
+  TrdProvider  EditBox
+  BtnTrdChange  ButtonWidget (a checkbox; parts: BtnTrdChangeEdge, BtnTrdChangeBg); its mark is BtnTrdChangeMark: show it when on
+  TrdPtCats  Frame
+  TrdPtCatsBody  Frame: the scrolled content (172 units tall in the sample); its ScrollWidget is TrdPtCatsScroll
+  BtnTrdPtCatAdd  ButtonWidget (parts: BtnTrdPtCatAddEdge, BtnTrdPtCatAddBg)
+  BtnTrdPtCatAddText  TextWidget (a caption: recolour only)
+  TrdPtAccess  Frame
+  TrdPtAccessRows  WrapSpacer: the list's rows go here (ozt_vpp_point_cond); its ScrollWidget is TrdPtAccessScroll
+  BtnTrdPtCondKind  ButtonWidget (a select: the script cycles or lists its options ["ліцензія", "фракція", "пост", "лідер", "дослідження"]); its caption is BtnTrdPtCondKindText
+  BtnTrdPtCondNot  ButtonWidget (a select: the script cycles or lists its options ["має бути", "не має бути"]); its caption is BtnTrdPtCondNotText
+  BtnTrdPtCondArg  ButtonWidget (a select: the script cycles or lists its options ["Weapon Licence (weapon_licence)", "Car Licence (car_licence)"]); its caption is BtnTrdPtCondArgText
+  BtnTrdPtCondAdd  ButtonWidget (parts: BtnTrdPtCondAddEdge, BtnTrdPtCondAddBg)
+  TrdPtWear  Frame
+  TrdPtWearBody  Frame: the scrolled content (168 units tall in the sample); its ScrollWidget is TrdPtWearScroll
+  TrdPtWearNone  TextWidget (filled by script)
+  BtnTrdOutfit  ButtonWidget (parts: BtnTrdOutfitEdge, BtnTrdOutfitBg)
+
+ROW TEMPLATES
+  ozt_vpp_point_row.layout  root OZT_PtRow (Button), 4 in the sample, 364 x 76 units, list TrdListRows
+      OZT_PtRow  ButtonWidget (parts: OZT_PtRowEdge, OZT_PtRowBg)
+      PtRowDot  ImageWidget (the sign ●: icon dot)
+      PtRowName  TextWidget (filled by script)
+      PtRowKind  Frame (parts: PtRowKindBg)
+      PtRowKindText  TextWidget (filled by script)
+      PtRowAway  TextWidget (filled by script)
+      PtRowFacts  TextWidget (filled by script)
+      PtRowNote  TextWidget (filled by script)
+  ozt_vpp_point_cat.layout  root OZT_PtCat (Frame), 3 in the sample, 125 x 28 units, placed by script
+      OZT_PtCat  Frame (parts: OZT_PtCatEdge, OZT_PtCatBg)
+      PtCatName  TextWidget (filled by script)
+      PtCatDel  ButtonWidget
+      PtCatDelText  TextWidget (filled by script)
+  ozt_vpp_point_cond.layout  root OZT_PtCond (Frame), 1 in the sample, 265 x 34 units, list TrdPtAccessRows
+      OZT_PtCond  Frame (parts: OZT_PtCondBg)
+      PtCondText  TextWidget (filled by script)
+      PtCondDel  ButtonWidget
+  ozt_vpp_point_wear.layout  root OZT_PtWear (Frame), 4 in the sample, 256 x 28 units, placed by script
+      OZT_PtWear  Frame (parts: OZT_PtWearBg)
+      PtWearSlot  TextWidget (filled by script)
+      PtWearCls  TextWidget (filled by script)
+
+CSS THE ENGINE HAS NO ANSWER FOR
+  border style dashed (drawn solid)  x2
+  border-radius  x43
+  letter-spacing 0.5px (no tracked face for Fira Sans 400)  x2
+
+RESIZE: WHERE THE BROWSER RE-FLOWS (a text unwraps, a box changes its row); the first of them
+  Frame TrdPtForm
+  Button BtnTrdPtCatAdd
+  Text PtCondText

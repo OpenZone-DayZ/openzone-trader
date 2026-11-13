@@ -1,0 +1,83 @@
+goods: TraderGoods.dc.html -> OpenZone_Trader_VPP/gui/layouts/ozt_vpp_goods.layout
+design size 1360 x 812, measured again one, two and three steps of 240 x 160 larger
+widgets: 175; 1 of them the browser re-flows as the page grows (the rule keeps them as designed)
+
+FILES
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_goods.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_goods_cat.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_goods_row.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_goods_part.layout
+
+NAMED WIDGETS OF THE PAGE (FindAnyWidget)
+  TrdGdSub  TextWidget (filled by script)
+  TrdGdFind  EditBox
+  BtnTrdGdCatAdd  ButtonWidget (parts: BtnTrdGdCatAddEdge, BtnTrdGdCatAddBg)
+  BtnTrdGdLnAdd  ButtonWidget (parts: BtnTrdGdLnAddEdge, BtnTrdGdLnAddBg)
+  BtnTrdGdApply  ButtonWidget (parts: BtnTrdGdApplyBg)
+  TrdGdCats  Frame
+  TrdGdCatsRows  WrapSpacer: the list's rows go here (ozt_vpp_goods_cat); its ScrollWidget is TrdGdCatsScroll
+  TrdGdCatName  EditBox
+  TrdGdCatId  EditBox
+  BtnTrdGdCatDel  ButtonWidget (parts: BtnTrdGdCatDelEdge, BtnTrdGdCatDelBg)
+  TrdGdCatHead  TextWidget (filled by script)
+  TrdGdCatSub  TextWidget (filled by script)
+  TrdGdWarnN  TextWidget (filled by script)
+  TrdGdLines  Frame
+  TrdGdLinesRows  WrapSpacer: the list's rows go here (ozt_vpp_goods_row); its ScrollWidget is TrdGdLinesScroll
+  TrdGdForm  Frame
+  TrdGdFormBody  Frame: the scrolled content (762 units tall in the sample); its ScrollWidget is TrdGdFormScroll
+  TrdGdLnHead  TextWidget (filled by script)
+  TrdGdLnSub  TextWidget (filled by script)
+  TrdGdLnBox  Frame
+  TrdGdCls  EditBox
+  TrdGdBuy  EditBox
+  TrdGdSell  EditBox
+  BtnTrdGdRule  ButtonWidget (a select: the script cycles or lists its options ["за штуку", "за одиницю (набої, цвяхи)", "за повну (фляга, бинт)"]); its caption is BtnTrdGdRuleText
+  BtnTrdGdStk  ButtonWidget (a checkbox; parts: BtnTrdGdStkEdge, BtnTrdGdStkBg); its mark is BtnTrdGdStkMark: show it when on
+  TrdGdMax  EditBox
+  TrdGdCoef  EditBox
+  TrdGdDest  EditBox
+  TrdGdFloor  EditBox
+  TrdGdCurve0  TextWidget (filled by script)
+  TrdGdCurve1  TextWidget (filled by script)
+  TrdGdWith  Frame
+  TrdGdWithBody  Frame: the scrolled content (58 units tall in the sample); its ScrollWidget is TrdGdWithScroll
+  TrdGdWithNone  TextWidget (filled by script)
+  TrdGdWithNew  EditBox
+  BtnTrdGdWithAdd  ButtonWidget (parts: BtnTrdGdWithAddEdge, BtnTrdGdWithAddBg)
+  TrdGdChk0Icon  ImageWidget (the sign ✓: icon check)
+  TrdGdChk0  TextWidget (filled by script)
+  TrdGdChk1Icon  ImageWidget (the sign ✓: icon check)
+  TrdGdChk1  TextWidget (filled by script)
+  TrdGdChk2Icon  ImageWidget (the sign ✓: icon check)
+  TrdGdChk2  TextWidget (filled by script)
+  BtnTrdGdLnDel  ButtonWidget (parts: BtnTrdGdLnDelEdge, BtnTrdGdLnDelBg)
+
+ROW TEMPLATES
+  ozt_vpp_goods_cat.layout  root OZT_GdCat (Button), 6 in the sample, 230 x 36 units, list TrdGdCatsRows
+      OZT_GdCat  ButtonWidget (parts: OZT_GdCatBg, OZT_GdCatBar)
+      GdCatName  TextWidget (filled by script)
+      GdCatLock  TextWidget (filled by script)
+      GdCatCount  TextWidget (filled by script)
+  ozt_vpp_goods_row.layout  root OZT_GdRow (Button), 8 in the sample, 779 x 52 units, list TrdGdLinesRows
+      OZT_GdRow  ButtonWidget (parts: OZT_GdRowBg, OZT_GdRowLine)
+      GdRowName  TextWidget (filled by script)
+      GdRowCls  TextWidget (filled by script)
+      GdRowBuy  TextWidget (filled by script)
+      GdRowSell  TextWidget (filled by script)
+      GdRowRule  TextWidget (filled by script)
+      GdRowStock  TextWidget (filled by script)
+      GdRowReq  TextWidget (filled by script)
+  ozt_vpp_goods_part.layout  root OZT_GdPart (Frame), 1 in the sample, 127 x 26 units, placed by script
+      OZT_GdPart  Frame (parts: OZT_GdPartBg)
+      GdPartName  TextWidget (filled by script)
+      GdPartDel  ButtonWidget
+
+CSS THE ENGINE HAS NO ANSWER FOR
+  border style dashed (drawn solid)  x1
+  border-radius  x23
+  letter-spacing 0.5px (no tracked face for Fira Sans 500)  x5
+  letter-spacing 1px (no tracked face for Fira Sans 400)  x1
+
+RESIZE: WHERE THE BROWSER RE-FLOWS (a text unwraps, a box changes its row); the first of them
+  Frame TrdGdFormBody

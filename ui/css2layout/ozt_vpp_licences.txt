@@ -1,0 +1,58 @@
+licences: TraderLicences.dc.html -> OpenZone_Trader_VPP/gui/layouts/ozt_vpp_licences.layout
+design size 1360 x 812, measured again one, two and three steps of 240 x 160 larger
+widgets: 112; 2 of them the browser re-flows as the page grows (the rule keeps them as designed)
+
+FILES
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_licences.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_licence_row.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_licence_online.layout
+  OpenZone_Trader_VPP/gui/layouts/ozt_vpp_licence_held.layout
+
+NAMED WIDGETS OF THE PAGE (FindAnyWidget)
+  BtnTrdLcRefresh  ButtonWidget (parts: BtnTrdLcRefreshEdge, BtnTrdLcRefreshBg)
+  BtnTrdLcNew  ButtonWidget (parts: BtnTrdLcNewBg)
+  TrdLcLeft  Frame
+  TrdLcLeftBody  Frame: the scrolled content (673 units tall in the sample); its ScrollWidget is TrdLcLeftScroll
+  TrdLcDefs  WrapSpacer: the rows go here (ozt_vpp_licence_row); it is as tall as its rows and scrolls with what holds it
+  TrdLcNote  Frame (parts: TrdLcNoteBg)
+  TrdLcEd  Frame
+  TrdLcDefId  EditBox
+  TrdLcDefName  EditBox
+  TrdLcDefLook  EditBox
+  BtnTrdLcDefAdd  ButtonWidget (parts: BtnTrdLcDefAddEdge, BtnTrdLcDefAddBg)
+  BtnTrdLcDefDel  ButtonWidget (parts: BtnTrdLcDefDelEdge, BtnTrdLcDefDelBg)
+  TrdLcDefInfo  TextWidget (filled by script)
+  TrdLcWho  EditBox
+  TrdLcOnline  Frame (parts: TrdLcOnlineEdge, TrdLcOnlineBg)
+  TrdLcOnlineRows  WrapSpacer: the list's rows go here (ozt_vpp_licence_online); its ScrollWidget is TrdLcOnlineScroll
+  TrdLcLic  ButtonWidget (a select: the script cycles or lists its options ["Car Licence (car_licence)", "Дозвіл на зброю (weapons)", "Weapon Licence (weapon_licence)"]); its caption is TrdLcLicText
+  BtnTrdLcGrant  ButtonWidget (parts: BtnTrdLcGrantBg)
+  BtnTrdLcRevoke  ButtonWidget (parts: BtnTrdLcRevokeEdge, BtnTrdLcRevokeBg)
+  TrdLcHeldHead  TextWidget (filled by script)
+  TrdLcHeld  Frame
+  TrdLcHeldRows  WrapSpacer: the list's rows go here (ozt_vpp_licence_held); its ScrollWidget is TrdLcHeldScroll
+
+ROW TEMPLATES
+  ozt_vpp_licence_row.layout  root OZT_LcRow (Button), 3 in the sample, 852 x 52 units, list TrdLcDefs
+      OZT_LcRow  ButtonWidget (parts: OZT_LcRowBg, OZT_LcRowLine)
+      LcName  TextWidget (filled by script)
+      LcSub  TextWidget (filled by script)
+      LcSold  TextWidget (filled by script)
+      LcOpens  TextWidget (filled by script)
+      LcHeld  TextWidget (filled by script)
+  ozt_vpp_licence_online.layout  root OZT_LcOnRow (Button), 3 in the sample, 417 x 34 units, list TrdLcOnlineRows
+      OZT_LcOnRow  ButtonWidget (parts: OZT_LcOnRowBg)
+      OnName  TextWidget (filled by script)
+  ozt_vpp_licence_held.layout  root OZT_LcHeldRow (Frame), 2 in the sample, 427 x 47 units, list TrdLcHeldRows
+      OZT_LcHeldRow  Frame (parts: OZT_LcHeldRowBg)
+      HeldName  TextWidget (filled by script)
+      HeldSub  TextWidget (filled by script)
+      BtnHeldTake  ButtonWidget (parts: BtnHeldTakeEdge, BtnHeldTakeBg)
+
+CSS THE ENGINE HAS NO ANSWER FOR
+  border-radius  x17
+  letter-spacing 0.5px (no tracked face for Fira Sans 500)  x4
+
+RESIZE: WHERE THE BROWSER RE-FLOWS (a text unwraps, a box changes its row); the first of them
+  Frame TrdLcNote
+  Frame TrdLcEd

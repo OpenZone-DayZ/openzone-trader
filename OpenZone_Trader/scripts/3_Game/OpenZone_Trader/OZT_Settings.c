@@ -94,8 +94,8 @@ class OZT_Settings : OZ_ConfigBase
     // (decision 4 of the design); 0: everything goes to the bags.
     int WearBought = 1;
 
-    // 1: colours of one thing at one price stand on the shelf as one tile, its
-    // arrows switching the colour (design §3.8); 0: a tile each.
+    // 1: colours of one thing stand on the shelf as one tile, its arrows
+    // switching the colour and the price with it (design §3.8); 0: a tile each.
     int GroupVariants = 1;
 
     // Stock at a server start (design §11.1, TraderPlus's switches): 0 keeps

@@ -11,11 +11,27 @@ class OZT_Open
     // count the stock holds. Locked goods are not shown to this player (design
     // §8.2): nothing to buy, and the shelf shows nothing it cannot sell. Null:
     // nothing to show.
-    // Colour variants (design §3.8): records of one category with the same
-    // price, rule, condition and stock kind and what comes with them, whose
-    // classes share their parent in the game's config and the name the game
-    // shows (vanilla's colours are children of one *_ColorBase), form a group
-    // the shelf draws as one tile. Each record keeps its class and its stock.
+    // Colour variants (design §3.8): records of one category that differ only in
+    // their look form a group the shelf draws as one tile. Each record keeps its
+    // class, its price and its stock: the tile shows the colour on view at that
+    // colour's price (the owner, 2026-11-13: "things that differ only by texture
+    // collapse into one entry even at different prices, the price just
+    // follows").
+    //
+    // Two records are colours of one thing when they share the quantity rule,
+    // the condition, the kind of stock and what comes with them, and their
+    // classes share their family, their model, their description and what
+    // they do in the game's config (ClassKey); never by the name (the owner,
+    // 2026-11-13). The model alone is not enough: the game makes other things
+    // by a new texture on one mesh too, and the description is what tells them
+    // apart. Vanilla 1.30 holds 242 families of one parent and one model, 32 of
+    // them mixed: eleven kinds of meat on one steak mesh, dog food beside crab
+    // in one can, ball beside tracer rounds in one box, epinephrine beside the
+    // PO-X antidote in one pen. A mod's colours name themselves ("MMG
+    // CombatPants Black") and take the model and the description from their
+    // base. Colours whose description names the colour (vanilla's Hunter
+    // Pants, one text a season) stay a tile each, as before the groups. A class
+    // with no description groups with nothing: nothing tells what it is.
     //
     // The ids are "v" and a number from `first` on (a shelf built a category at
     // a time numbers its groups on); the number after the last one is returned.
@@ -34,6 +50,8 @@ class OZT_Open
             sizes.Set(key, had + 1);
         }
 
+        // Every key two or more records share is a group, numbered in the order
+        // its first record stands.
         map<string, string> ids = new map<string, string>();
         for (int k = 0; k < goods.Count(); k++)
         {
@@ -51,18 +69,25 @@ class OZT_Open
         return first + ids.Count();
     }
 
-    // What config says of a class for its colour group: its parent and the name
-    // the game shows, "" when it has no group. Kept by class: config does not
-    // change while the mission runs, and a big book's open asked it three to
-    // five times a record (load test, 2026-11-13: 19 ms of 120).
+    // What config says of a class for its colour group: its parent, its model
+    // (lower case, no leading backslash) and its description, as a short id
+    // the classes of one look share; "" when it has no group. Kept by class:
+    // config does not change while the mission runs, and a big book's open
+    // asked it three to five times a record (load test, 2026-11-13: 19 ms of
+    // 120). An id and not the text: a description is a long string to join and
+    // hash for every record of every shelf built.
     protected static ref map<string, string> s_ClassKey = new map<string, string>();
+    protected static ref map<string, string> s_LookIds = new map<string, string>();
 
     static void Reset()
     {
         s_ClassKey.Clear();
+        s_LookIds.Clear();
     }
 
-    protected static string ClassKey(string type)
+    // Public for the shelf build, which asks it as it reads each line, inside
+    // its budget: the first build after a start reads config for every class.
+    static string ClassKey(string type)
     {
         string kept;
         if (s_ClassKey.Find(type, kept))
@@ -71,25 +96,99 @@ class OZT_Open
         string root = ConfigRootOf(type);
         if (root != "")
         {
-            string parent;
-            if (GetGame().ConfigGetBaseName(root + " " + type, parent) && parent != "")
+            string model;
+            string told;
+            LookAt(root + " " + type, model, told);
+            if (model != "" && told != "")
             {
-                string shown;
-                GetGame().ConfigGetText(root + " " + type + " displayName", shown);
-                if (shown != "")
-                    kept = parent + "|" + shown;
+                // The family: the first class up the parents that looks
+                // different. Colours are children of one base most of the time,
+                // but the first colour can be the parent of the others
+                // (vanilla's AKS74U_Bttstck of AKS74U_Bttstck_Black and _Green,
+                // Mosin9130 of its five colours, its own parent Inventory_Base),
+                // and a base can look different from all of its colours (one
+                // without a description, the colours each with the same one).
+                string family = "";
+                string at = type;
+                for (int up = 0; up < 16; up++)
+                {
+                    string parent;
+                    if (!GetGame().ConfigGetBaseName(root + " " + at, parent) || parent == "")
+                        break;
+                    family = parent;
+                    string upModel;
+                    string upTold;
+                    LookAt(root + " " + parent, upModel, upTold);
+                    if (upModel != model || upTold != told)
+                        break;
+                    at = parent;
+                }
+                string works = Works(root + " " + type);
+                string lookKey = family + "|" + model + "|" + told;
+                lookKey += "|" + works;
+                if (!s_LookIds.Find(lookKey, kept))
+                {
+                    kept = s_LookIds.Count().ToString();
+                    s_LookIds.Set(lookKey, kept);
+                }
             }
         }
         s_ClassKey.Set(type, kept);
         return kept;
     }
 
+    // A class's model (lower case, no leading backslash) and description as
+    // config writes it: the string key, not the text. One text under two keys
+    // is two things (vanilla's Pipsi and Nota Cola: one sentence, two keys),
+    // and the groups do not change with the server's language.
+    protected static void LookAt(string path, out string model, out string told)
+    {
+        model = "";
+        told = "";
+        GetGame().ConfigGetText(path + " model", model);
+        GetGame().ConfigGetTextRaw(path + " descriptionShort", told);
+        model.ToLower();
+        if (model.IndexOf("\\") == 0)
+            model = model.Substring(1, model.Length() - 1);
+    }
+
+    // What a class does that its look does not show: what it fires, what it
+    // holds, where it fits. One mesh and one text can still be two guns for
+    // two calibres (SNAFU's Vector in 9 mm and .45; vanilla's FX-45 and the one
+    // that shoots arrows) or a scope for two rails (SNAFU's Leupold).
+    protected static string Works(string path)
+    {
+        string works = "";
+        array<string> fires = new array<string>();
+        GetGame().ConfigGetTextArray(path + " chamberableFrom", fires);
+        for (int f = 0; f < fires.Count(); f++)
+            works += fires[f] + ",";
+        string rounds;
+        GetGame().ConfigGetText(path + " ammo", rounds);
+        works += "|" + rounds + "|";
+        array<string> slots = new array<string>();
+        GetGame().ConfigGetTextArray(path + " inventorySlot", slots);
+        if (slots.Count() == 0)
+        {
+            // Some configs write one slot as a plain string.
+            string slot;
+            GetGame().ConfigGetText(path + " inventorySlot", slot);
+            slots.Insert(slot);
+        }
+        for (int s = 0; s < slots.Count(); s++)
+            works += slots[s] + ",";
+        return works;
+    }
+
+    // The key a record's colours share: "" for one that is never a colour of
+    // anything (a licence, a note, goods not for sale, a class config cannot
+    // tell).
     protected static string VariantKey(OZT_WireGoods g)
     {
         if (g.Look != "" || g.Buy <= 0 || g.Category == OZT_Const.CATEGORY_CHANGE)
             return "";
-        string named = ClassKey(g.ClassName);
-        if (named == "")
+        string looks = ClassKey(g.ClassName);
+        if (looks == "")
             return "";
         string stocked = "u";
         if (g.Stock >= 0)
@@ -97,8 +196,7 @@ class OZT_Open
         string parts = "";
         for (int w = 0; w < g.With.Count(); w++)
             parts += g.With[w] + ",";
-        string key = g.Category + "|" + named;
-        key += "|" + g.Buy.ToString() + "|" + g.Sell.ToString() + "|" + g.Rule;
+        string key = g.Category + "|" + looks + "|" + g.Rule;
         key += "|" + g.Level.ToString() + "|" + stocked + "|" + parts;
         return key;
     }

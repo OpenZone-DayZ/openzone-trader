@@ -162,6 +162,35 @@ put in place after the last one (one tile repainted, the shelf kept its shape); 
 screen (quote 3 ms, deal 12 ms, its part 27 ms after the ask); the kept shelf mended by that deal
 (the apple 3 on the next open, built nothing).
 
+## Colour groups by config, not by name (evening)
+
+The owner, the same day: no grouping by the name; the class's family, model and description in
+config. The rule as built (design §3.8): the first class up the parents that looks different,
+the model, the description's string key, and what the class fires, holds and where it fits.
+`oz_trader {"op":"groups","trader":"load1"}` writes every group of a trader's shelf to
+`trader_last.json`, one line a group.
+
+| what | 3404 lines of `load1` |
+|---|---|
+| groups | 400 of 2007 lines (first build by name and parent: 374 of 1844) |
+| shelf build, class config read for the first time (first open after a start) | 293 ms over 88 frames, colour groups 16.5 ms, the most in one frame 2.5 ms |
+| shelf build, class config kept | 121 ms over 36 frames, colour groups 11.5 ms, the most in one frame 1.7 ms |
+| kept shelf | no grouping at all; 12 ms of server work for the whole open, as before |
+| one-shot answer (bridge, partial opens) | groups 7.4 ms; 49 ms the first time after a start |
+
+What config says of a class is read once per class while the mission runs, by the shelf build as
+it reads each line, inside the 3 ms of a frame; a category's grouping then runs on short ids, the
+description's text joined and hashed once per class, not per line. The old rule took 17-31 ms in
+the one-shot answer.
+
+Against the first build (parent, model, description text) the groups lost are what the owner and
+the rule meant to part: SNAFU's Vector and PDW in 9 mm and .45, SNAFU's Leupold for two rails,
+Pipsi and Nota Cola (one sentence under two string keys), Windstride's cloak worn up and down.
+130 groups grew or came: the first colour that is the parent of the others (`AKS74U_Bttstck`,
+`Mosin9130`, the AK and M4 parts, the plate carrier and its pouches). One mistake left is the
+game's own: `SarmaCan_Opened` names `$STR_HalvaCan1`, the halva's description, so the two opened
+cans stay one group.
+
 ## Left to do
 
 1. Packing the ALL tab of 3362 tiles takes 61 ms of one frame on every switch to it.

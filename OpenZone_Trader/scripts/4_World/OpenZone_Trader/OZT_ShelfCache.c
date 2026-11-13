@@ -185,6 +185,10 @@ class OZT_ShelfCache
     int Records;
     int WorkTicks;
     int Frames;
+    // What the colour groups took of the build, and the most of it one
+    // category took: that much is done in one frame, on top of the budget.
+    int GroupTicks;
+    int GroupPeak;
     protected ref map<string, int> m_At;
     protected ref map<string, int> m_CatAt;
     protected ref map<string, bool> m_Moved;
@@ -260,6 +264,11 @@ class OZT_ShelfCache
                     continue;
                 OZT_ShelfBlock b = new OZT_ShelfBlock(type);
                 OZT_Open.AddRecords(player, trader, e, unit, b.Goods);
+                // What config says of the class for its colour group, read here
+                // inside the budget and kept: the close of a big category would
+                // read it for all of its classes in one frame.
+                if (grouped)
+                    OZT_Open.ClassKey(type);
                 m_At.Set(type, Blocks.Count());
                 Blocks.Insert(b);
             }
@@ -285,6 +294,7 @@ class OZT_ShelfCache
         {
             // One by one: InsertAll between two arrays of `ref` does not compile
             // ("array<@T> and array<T> are unrelated").
+            int t0 = TickCount(0);
             array<ref OZT_WireGoods> goods = new array<ref OZT_WireGoods>();
             for (int i = m_Open; i < Blocks.Count(); i++)
             {
@@ -293,6 +303,10 @@ class OZT_ShelfCache
                     goods.Insert(held[j]);
             }
             m_Groups = OZT_Open.GroupVariants(goods, m_Groups);
+            int spent = TickCount(t0);
+            GroupTicks = GroupTicks + spent;
+            if (spent > GroupPeak)
+                GroupPeak = spent;
         }
         for (int k = m_Open; k < Blocks.Count(); k++)
             WriteRows(Blocks[k]);
@@ -548,7 +562,10 @@ class OZT_OpenStream
         if (Warm)
             said = said + "kept";
         else
+        {
             said = said + "built in " + OZT_Open.Ms(Shelf.WorkTicks) + " ms over " + Shelf.Frames.ToString() + " frame(s)";
+            said = said + ", colour groups " + OZT_Open.Ms(Shelf.GroupTicks) + " ms, the most in one frame " + OZT_Open.Ms(Shelf.GroupPeak) + " ms";
+        }
         OZT_Log.Dbg(said);
     }
 }

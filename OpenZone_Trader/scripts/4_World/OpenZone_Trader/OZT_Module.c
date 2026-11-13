@@ -110,7 +110,6 @@ class OZT_Module : CF_ModuleWorld
         OZT_Stock.Reset();
         OZT_Licences.Reset();
         OZT_Fit.Reset();
-        OZT_Open.Reset();
         OZT_OpenStreams.Reset();
         OZT_ShelfCaches.Reset();
 

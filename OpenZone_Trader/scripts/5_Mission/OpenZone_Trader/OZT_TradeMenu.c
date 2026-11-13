@@ -69,10 +69,6 @@ class OZT_TradeMenu : UIScriptedMenu
     protected string m_Trader;
     protected ref OZT_OpenRes m_Data;
     protected ref OZT_Shelf m_Shelf;
-
-    // The colour each group of variants shows on the shelf (design §3.8), by
-    // class: kept while the screen is open, across new answers of `open`.
-    protected ref map<string, string> m_VariantPick;
     protected ref OZT_Cart m_Cart;
 
     protected ref OZT_TileGrid m_ShelfGrid;
@@ -222,9 +218,6 @@ class OZT_TradeMenu : UIScriptedMenu
     protected Widget m_Load;
     protected Widget m_LoadTrack;
     protected Widget m_LoadBar;
-    // The tile each colour group stands on, for goods of a group that come
-    // after its first.
-    protected ref map<string, OZT_Tile> m_GroupTiles;
     // The categories with anything to buy, and with anything to sell: one walk
     // over the goods (it was a walk per category and side at every answer).
     protected ref map<string, bool> m_CatBuy;
@@ -268,7 +261,6 @@ class OZT_TradeMenu : UIScriptedMenu
     void OZT_TradeMenu()
     {
         m_Shelf = new OZT_Shelf();
-        m_VariantPick = new map<string, string>();
         m_Cart = new OZT_Cart();
         m_TabIds = new array<string>();
         m_OwnIds = new array<string>();
@@ -281,7 +273,6 @@ class OZT_TradeMenu : UIScriptedMenu
         m_QuoteIn = -1;
         m_RowCats = new array<string>();
         m_Pending = new array<string>();
-        m_GroupTiles = new map<string, OZT_Tile>();
         m_CatBuy = new map<string, bool>();
         m_CatSell = new map<string, bool>();
     }
@@ -1043,15 +1034,6 @@ class OZT_TradeMenu : UIScriptedMenu
             list.Insert(ng);
         }
 
-        // The groups the whole open gave each named class in each condition.
-        map<string, string> groups = new map<string, string>();
-        for (int i = 0; i < m_Data.Goods.Count(); i++)
-        {
-            OZT_WireGoods old = m_Data.Goods[i];
-            if (old.Group != "" && named.Contains(old.ClassName))
-                groups.Set(old.ClassName + "|" + old.Level.ToString(), old.Group);
-        }
-
         // The order kept: the untouched records as they stood, a named class's
         // new records where its first record stood.
         array<ref OZT_WireGoods> merged = new array<ref OZT_WireGoods>();
@@ -1067,7 +1049,7 @@ class OZT_TradeMenu : UIScriptedMenu
             if (put.Contains(cur.ClassName))
                 continue;
             put.Set(cur.ClassName, true);
-            PutFresh(fresh.Get(cur.ClassName), groups, merged);
+            PutFresh(fresh.Get(cur.ClassName), merged);
         }
         if (part.Only)
         {
@@ -1077,7 +1059,7 @@ class OZT_TradeMenu : UIScriptedMenu
                 if (put.Contains(type))
                     continue;
                 put.Set(type, true);
-                PutFresh(fresh.Get(type), groups, merged);
+                PutFresh(fresh.Get(type), merged);
             }
         }
         m_Data.Goods = merged;
@@ -1093,12 +1075,12 @@ class OZT_TradeMenu : UIScriptedMenu
     }
 
     // Would the shelf lay these two records alike: the same class in the same
-    // condition, category, look and colour group, shown or not alike?
+    // condition, category and look, shown or not alike?
     protected static bool SameShape(OZT_WireGoods a, OZT_WireGoods b)
     {
         if (a.ClassName != b.ClassName || a.Level != b.Level || a.Category != b.Category)
             return false;
-        if (a.Look != b.Look || a.Group != b.Group)
+        if (a.Look != b.Look)
             return false;
         bool shownA = a.Buy > 0;
         bool shownB = b.Buy > 0;
@@ -1119,18 +1101,12 @@ class OZT_TradeMenu : UIScriptedMenu
         return true;
     }
 
-    protected void PutFresh(array<ref OZT_WireGoods> list, map<string, string> groups, array<ref OZT_WireGoods> into)
+    protected void PutFresh(array<ref OZT_WireGoods> list, array<ref OZT_WireGoods> into)
     {
         if (!list)
             return;
         for (int i = 0; i < list.Count(); i++)
-        {
-            OZT_WireGoods g = list[i];
-            string group;
-            if (groups.Find(g.ClassName + "|" + g.Level.ToString(), group))
-                g.Group = group;
-            into.Insert(g);
-        }
+            into.Insert(list[i]);
     }
 
     // Does the cart buy a licence? A licence may open categories: after such a
@@ -1880,60 +1856,18 @@ class OZT_TradeMenu : UIScriptedMenu
             return;
         int t0 = TickCount(0);
         m_ShelfGrid.Clear();
-        m_GroupTiles.Clear();
         string cat = m_TabIds[m_ShelfTab];
 
-        // What the shelf shows, asked once a record (under a slot's filter the
-        // question asks the engine), and the colours of each group it shows
-        // (design §3.8).
-        array<bool> shows = new array<bool>();
-        map<string, ref array<string>> colours = new map<string, ref array<string>>();
-        for (int v = 0; v < m_Data.Goods.Count(); v++)
-        {
-            OZT_WireGoods vg = m_Data.Goods[v];
-            bool shown = ShelfShows(vg, cat);
-            shows.Insert(shown);
-            if (vg.Group == "" || !shown)
-                continue;
-            array<string> members = colours.Get(vg.Group);
-            if (!members)
-            {
-                members = new array<string>();
-                colours.Set(vg.Group, members);
-            }
-            if (members.Find(vg.ClassName) < 0)
-                members.Insert(vg.ClassName);
-        }
-
+        // What the shelf shows is asked once a record (under a slot's filter
+        // the question asks the engine).
         for (int i = 0; i < m_Data.Goods.Count(); i++)
         {
-            if (!shows[i])
-                continue;
             OZT_WireGoods g = m_Data.Goods[i];
-            // One tile per group: the colour picked last, else the first.
-            array<string> group = null;
-            int at = 0;
-            if (g.Group != "")
-                group = colours.Get(g.Group);
-            if (group && group.Count() > 1)
-            {
-                string picked;
-                if (!m_VariantPick.Find(g.Group, picked) || group.Find(picked) < 0)
-                    picked = group[0];
-                if (g.ClassName != picked)
-                    continue;
-                at = group.Find(picked);
-            }
+            if (!ShelfShows(g, cat))
+                continue;
             OZT_Tile t = ShelfTile(g, i);
             if (!t)
                 continue;
-            if (group)
-            {
-                t.Group = g.Group;
-                t.VarTypes = group;
-                t.VarAt = at;
-                m_GroupTiles.Set(g.Group, t);
-            }
             m_ShelfGrid.AddLazy(t);
         }
         int tRecords = TickCount(t0);
@@ -1979,8 +1913,7 @@ class OZT_TradeMenu : UIScriptedMenu
     }
 
     // Goods that came after the shelf was laid (a page of the open): their
-    // tiles after the ones there, packed where the packing stopped. A colour
-    // of a group already on the shelf joins its tile's colours.
+    // tiles after the ones there, packed where the packing stopped.
     protected void ShelfAppend(int from)
     {
         if (!m_Data || !m_ShelfGrid.IsReady())
@@ -1992,31 +1925,9 @@ class OZT_TradeMenu : UIScriptedMenu
             OZT_WireGoods g = m_Data.Goods[i];
             if (!ShelfShows(g, cat))
                 continue;
-            if (g.Group != "")
-            {
-                OZT_Tile head;
-                if (m_GroupTiles.Find(g.Group, head) && head)
-                {
-                    if (head.VarTypes.Find(g.ClassName) < 0)
-                    {
-                        head.VarTypes.Insert(g.ClassName);
-                        if (head.Root)
-                            head.PaintMarks();
-                    }
-                    continue;
-                }
-            }
             OZT_Tile t = ShelfTile(g, i);
             if (!t)
                 continue;
-            if (g.Group != "")
-            {
-                t.Group = g.Group;
-                t.VarTypes = new array<string>();
-                t.VarTypes.Insert(g.ClassName);
-                t.VarAt = 0;
-                m_GroupTiles.Set(g.Group, t);
-            }
             m_ShelfGrid.AddLazy(t);
             added++;
         }
@@ -2144,21 +2055,6 @@ class OZT_TradeMenu : UIScriptedMenu
             return g.Category == cat;
         // Money is not goods: the notes stand only in their own tab.
         return g.Category != OZT_Const.CATEGORY_CHANGE;
-    }
-
-    // An arrow of a tile of colour variants: the next or the previous colour
-    // of its group, and the shelf drawn again (design §3.8).
-    protected void StepVariant(OZT_Tile t, bool forward)
-    {
-        if (!t || !t.VarTypes || t.VarTypes.Count() < 2)
-            return;
-        int n = t.VarTypes.Count();
-        int at = t.VarAt + 1;
-        if (!forward)
-            at = t.VarAt - 1 + n;
-        at = at % n;
-        m_VariantPick.Set(t.Group, t.VarTypes[at]);
-        FillShelf();
     }
 
     // Everything the player carries, one tile each: what the trader pays for
@@ -3551,20 +3447,6 @@ class OZT_TradeMenu : UIScriptedMenu
             bool ownCard = m_PartsAt && m_PartsAt.Kind == OZT_Tile.OWN;
             if (slot && ownCard && slot.What == OZT_PartsEntry.PART && slot.Host)
                 AimFilter(slot, cell, false);
-        }
-
-        // A colour arrow takes the press itself: it switches the colour and
-        // neither picks nor drags the tile (design §3.8).
-        if (w)
-        {
-            string arrow = w.GetName();
-            if (arrow.IndexOf("TileVarPrev") == 0 || arrow.IndexOf("TileVarNext") == 0)
-            {
-                OZT_Tile vt = m_ShelfGrid.Of(w);
-                if (vt)
-                    StepVariant(vt, arrow.IndexOf("TileVarNext") == 0);
-                return true;
-            }
         }
 
         OZT_Tile t = TileOf(w);

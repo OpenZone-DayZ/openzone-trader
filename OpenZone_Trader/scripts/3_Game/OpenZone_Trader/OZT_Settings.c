@@ -94,10 +94,6 @@ class OZT_Settings : OZ_ConfigBase
     // (decision 4 of the design); 0: everything goes to the bags.
     int WearBought = 1;
 
-    // 1: colours of one thing stand on the shelf as one tile, its arrows
-    // switching the colour and the price with it (design §3.8); 0: a tile each.
-    int GroupVariants = 1;
-
     // Stock at a server start (design §11.1, TraderPlus's switches): 0 keeps
     // the stock files as they are, 1 fills every line with a Max above 0 to Max
     // and drops the rest, 2 the same with a random count up to Max.
@@ -129,7 +125,6 @@ class OZT_Settings : OZ_ConfigBase
         Condition = new OZT_ConditionFactors();
         CooldownMs = 1000;
         WearBought = 1;
-        GroupVariants = 1;
         Licences = new array<ref OZT_LicenceDef>();
     }
 

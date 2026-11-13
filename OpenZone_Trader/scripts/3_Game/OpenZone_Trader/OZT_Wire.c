@@ -54,9 +54,6 @@ class OZT_WireGoods
     // What comes attached to one at this trader, each charged at its own
     // price: Buy is the sum.
     ref array<string> With;
-    // Colour variants (design §3.8): records of one group stand on the shelf
-    // as one tile. Empty: the record stands alone.
-    string Group = "";
 
     void OZT_WireGoods()
     {
@@ -159,7 +156,7 @@ class OZT_OpenPage
 
 // The goods of an open as short rows. A record of OZT_WireGoods costs some 150
 // bytes of keys and empty fields as JSON; a row is its values alone, about 25:
-//   ClassName|cat|Buy|Sell|Stock|Level|Rule|Group|With|Name|Look
+//   ClassName|cat|Buy|Sell|Stock|Level|Rule|With|Name|Look
 // `cat` is the category's place in RowCats, With is comma-separated, an empty
 // field is "-", and the empty fields at the end are left off. A "|" in a name is
 // written as "/". Every field has something in it, so splitting never meets two
@@ -196,7 +193,6 @@ class OZT_WireRows
         f.Insert(g.Stock.ToString());
         f.Insert(g.Level.ToString());
         f.Insert(Field(g.Rule));
-        f.Insert(Field(g.Group));
         string with = "";
         if (g.With)
         {
@@ -273,17 +269,15 @@ class OZT_WireRows
             if (f.Count() > 6)
                 g.Rule = Value(f[6]);
             if (f.Count() > 7)
-                g.Group = Value(f[7]);
-            if (f.Count() > 8)
             {
-                string with = Value(f[8]);
+                string with = Value(f[7]);
                 if (with != "")
                     with.Split(",", g.With);
             }
+            if (f.Count() > 8)
+                g.Name = Value(f[8]);
             if (f.Count() > 9)
-                g.Name = Value(f[9]);
-            if (f.Count() > 10)
-                g.Look = Value(f[10]);
+                g.Look = Value(f[9]);
             into.Insert(g);
         }
     }

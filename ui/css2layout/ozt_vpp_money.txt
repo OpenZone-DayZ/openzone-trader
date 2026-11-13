@@ -47,8 +47,6 @@ NAMED WIDGETS OF THE PAGE (FindAnyWidget)
   TrdMnCooldown  EditBox
   BtnTrdMnWear  ButtonWidget
   TrdMnWearTick  ButtonWidget (a checkbox; parts: TrdMnWearTickEdge, TrdMnWearTickBg); its mark is TrdMnWearTickMark: show it when on
-  BtnTrdMnGroup  ButtonWidget
-  TrdMnGroupTick  ButtonWidget (a checkbox; parts: TrdMnGroupTickEdge, TrdMnGroupTickBg); its mark is TrdMnGroupTickMark: show it when on
 
 ROW TEMPLATES
   ozt_vpp_money_note.layout  root OZT_MnNote (Frame), 6 in the sample, 614 x 28 units, list TrdMnNotesRows

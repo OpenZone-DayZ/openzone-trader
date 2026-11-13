@@ -150,17 +150,6 @@ class OZT_ShelfBlock
         Goods = new array<ref OZT_WireGoods>();
         Rows = new array<string>();
     }
-
-    // The colour group a record of this condition had.
-    string GroupAt(int level)
-    {
-        for (int i = 0; i < Goods.Count(); i++)
-        {
-            if (Goods[i].Level == level)
-                return Goods[i].Group;
-        }
-        return "";
-    }
 }
 
 // The goods of one trader for one set of gate answers, built a slice at a time,
@@ -176,8 +165,8 @@ class OZT_ShelfCache
     // place here (OZT_WireRows).
     ref array<string> Cats;
     ref array<ref OZT_ShelfBlock> Blocks;
-    // The blocks whose rows are written: whole categories, with their colour
-    // groups. A stream sends nothing past this.
+    // The blocks whose rows are written: whole categories. A stream sends
+    // nothing past this.
     int Closed;
     bool Ready;
     float UsedAt;
@@ -185,17 +174,12 @@ class OZT_ShelfCache
     int Records;
     int WorkTicks;
     int Frames;
-    // What the colour groups took of the build, and the most of it one
-    // category took: that much is done in one frame, on top of the budget.
-    int GroupTicks;
-    int GroupPeak;
     protected ref map<string, int> m_At;
     protected ref map<string, int> m_CatAt;
     protected ref map<string, bool> m_Moved;
     protected int m_Cat;
     protected int m_Good;
     protected int m_Open;
-    protected int m_Groups;
 
     void OZT_ShelfCache(string id, OZT_Point trader, int lines)
     {
@@ -219,16 +203,15 @@ class OZT_ShelfCache
         UsedAt = GetGame().GetTickTime();
     }
 
-    // Reads lines of the book until `budget` ticks are spent, a category's
-    // colour groups and rows when it is whole; true when the shelf is built.
-    // `player` is any player whose gates answer as this shelf's print says.
+    // Reads lines of the book until `budget` ticks are spent, a category's rows
+    // when it is whole; true when the shelf is built. `player` is any player
+    // whose gates answer as this shelf's print says.
     bool BuildSlice(PlayerBase player, OZT_Point trader, int budget)
     {
         if (Ready)
             return true;
         int t0 = TickCount(0);
         int unit = OZT_Config.Get().Unit();
-        bool grouped = OZT_Config.Get().Settings().GroupVariants == 1;
         while (!Ready)
         {
             if (m_Cat >= trader.Categories.Count())
@@ -242,7 +225,7 @@ class OZT_ShelfCache
                     nb.Goods.Insert(notes[n]);
                     Blocks.Insert(nb);
                 }
-                CloseCategory(false);
+                CloseCategory();
                 Ready = true;
                 break;
             }
@@ -264,17 +247,12 @@ class OZT_ShelfCache
                     continue;
                 OZT_ShelfBlock b = new OZT_ShelfBlock(type);
                 OZT_Open.AddRecords(player, trader, e, unit, b.Goods);
-                // What config says of the class for its colour group, read here
-                // inside the budget and kept: the close of a big category would
-                // read it for all of its classes in one frame.
-                if (grouped)
-                    OZT_Open.ClassKey(type);
                 m_At.Set(type, Blocks.Count());
                 Blocks.Insert(b);
             }
             else
             {
-                CloseCategory(grouped);
+                CloseCategory();
                 m_Cat++;
                 m_Good = 0;
             }
@@ -286,28 +264,9 @@ class OZT_ShelfCache
         return Ready;
     }
 
-    // The blocks read since the last close are a whole category: its colour
-    // groups (they never cross a category), then its rows.
-    protected void CloseCategory(bool grouped)
+    // The blocks read since the last close are a whole category: its rows.
+    protected void CloseCategory()
     {
-        if (grouped)
-        {
-            // One by one: InsertAll between two arrays of `ref` does not compile
-            // ("array<@T> and array<T> are unrelated").
-            int t0 = TickCount(0);
-            array<ref OZT_WireGoods> goods = new array<ref OZT_WireGoods>();
-            for (int i = m_Open; i < Blocks.Count(); i++)
-            {
-                array<ref OZT_WireGoods> held = Blocks[i].Goods;
-                for (int j = 0; j < held.Count(); j++)
-                    goods.Insert(held[j]);
-            }
-            m_Groups = OZT_Open.GroupVariants(goods, m_Groups);
-            int spent = TickCount(t0);
-            GroupTicks = GroupTicks + spent;
-            if (spent > GroupPeak)
-                GroupPeak = spent;
-        }
         for (int k = m_Open; k < Blocks.Count(); k++)
             WriteRows(Blocks[k]);
         m_Open = Blocks.Count();
@@ -341,8 +300,7 @@ class OZT_ShelfCache
 
     // The moved classes' blocks read again for `player`, whose gates answer as
     // this shelf's print says. A class not read yet is read as it is now by the
-    // build; one in the category being read waits for its close. The colour
-    // groups stay as they were: the screen keeps them the same way (MergeOpen).
+    // build; one in the category being read waits for its close.
     void MendMoved(PlayerBase player, OZT_Point trader)
     {
         if (m_Moved.Count() == 0)
@@ -365,8 +323,6 @@ class OZT_ShelfCache
             OZT_BookEntry e = OZT_Book.EntryFor(trader, type);
             if (e)
                 OZT_Open.AddRecords(player, trader, e, unit, b.Goods);
-            for (int g = 0; g < b.Goods.Count(); g++)
-                b.Goods[g].Group = old.GroupAt(b.Goods[g].Level);
             Records = Records - old.Rows.Count();
             Blocks.Set(at, b);
             WriteRows(b);
@@ -562,10 +518,7 @@ class OZT_OpenStream
         if (Warm)
             said = said + "kept";
         else
-        {
             said = said + "built in " + OZT_Open.Ms(Shelf.WorkTicks) + " ms over " + Shelf.Frames.ToString() + " frame(s)";
-            said = said + ", colour groups " + OZT_Open.Ms(Shelf.GroupTicks) + " ms, the most in one frame " + OZT_Open.Ms(Shelf.GroupPeak) + " ms";
-        }
         OZT_Log.Dbg(said);
     }
 }

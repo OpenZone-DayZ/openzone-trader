@@ -376,7 +376,6 @@ modded class OZ_VppAdminMenu
         OZT_VppKit.TickMark(M_SUB_WIDGET, "TrdMnDestockTick", st.DestockAtStart == 1);
         OZT_VppKit.TickMark(M_SUB_WIDGET, "TrdMnPristineTick", st.StockOnlyPristine == 1);
         OZT_VppKit.TickMark(M_SUB_WIDGET, "TrdMnWearTick", st.WearBought == 1);
-        OZT_VppKit.TickMark(M_SUB_WIDGET, "TrdMnGroupTick", st.GroupVariants == 1);
     }
 
     // ------------------------------------------------------------------ edits
@@ -527,13 +526,6 @@ modded class OZ_VppAdminMenu
             else
                 st.WearBought = 1;
         }
-        else if (what == "group")
-        {
-            if (st.GroupVariants == 1)
-                st.GroupVariants = 0;
-            else
-                st.GroupVariants = 1;
-        }
         TrdMnPaintSwitches();
         TrdMnTouched();
     }
@@ -641,11 +633,6 @@ modded class OZ_VppAdminMenu
         if (nm == "BtnTrdMnWear" || nm == "TrdMnWearTick")
         {
             TrdMnFlip("wear");
-            return true;
-        }
-        if (nm == "BtnTrdMnGroup" || nm == "TrdMnGroupTick")
-        {
-            TrdMnFlip("group");
             return true;
         }
         // A slider's knob: the pointer is followed frame by frame, the click itself is nothing.

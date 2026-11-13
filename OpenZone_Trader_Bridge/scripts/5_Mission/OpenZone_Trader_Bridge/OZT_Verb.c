@@ -69,8 +69,6 @@ class OZT_VerbOps
             return OZT_VerbNpc.OpAdmin(player, args, detail);
         if (op == "flag")
             return OZT_StandGate.OpFlag(player, args, detail);
-        if (op == "groups")
-            return OpGroups(player, args, detail);
         // -- ops of the later tasks go above this line --
         detail = "unknown op '" + op + "'; known: " + KnownOps();
         return false;
@@ -78,7 +76,7 @@ class OZT_VerbOps
 
     static string KnownOps()
     {
-        return "status, reload, fps, recur, import, stock, pace, balance, price, pay, damage, open, fit, quote, deal, licence, show, tree, load, fits, hurt, admin, flag, groups";
+        return "status, reload, fps, recur, import, stock, pace, balance, price, pay, damage, open, fit, quote, deal, licence, show, tree, load, fits, hurt, admin, flag";
     }
 
     // The pace of the open by pages, for a measurement: rate= bytes a second,
@@ -217,57 +215,6 @@ class OZT_VerbOps
         }
         int full = res.Yours.Count() - sells;
         detail = detail + " yours=" + res.Yours.Count().ToString() + " (sells " + sells.ToString() + ", not empty " + full.ToString() + ")";
-        return true;
-    }
-
-    // groups [trader=<id>]: the colour groups of the shelf this player gets,
-    // one line a group with its classes in shelf order. The list goes to
-    // OZT_Const.LAST_ANSWER, the counts to the answer.
-    static bool OpGroups(PlayerBase player, map<string, string> args, out string detail)
-    {
-        OZT_OpenReq req = new OZT_OpenReq();
-        req.Trader = Arg(args, "trader", "stand");
-        string json;
-        string err;
-        JsonFileLoader<OZT_OpenReq>.MakeData(req, json, err, false);
-        bool ok;
-        string why;
-        string body = Ask(player, OZT_Const.OP_OPEN, json, ok, why);
-        if (!ok)
-        {
-            detail = "groups: open ok=no why=" + why;
-            return true;
-        }
-        OZT_OpenRes res = new OZT_OpenRes();
-        if (!JsonFileLoader<OZT_OpenRes>.LoadData(body, res, err))
-        {
-            detail = "groups: the open does not parse back: " + err;
-            return false;
-        }
-        OZT_WireRows.Unpack(res);
-        map<string, string> lines = new map<string, string>();
-        array<string> order = new array<string>();
-        int grouped = 0;
-        for (int i = 0; i < res.Goods.Count(); i++)
-        {
-            OZT_WireGoods g = res.Goods[i];
-            if (g.Group == "")
-                continue;
-            grouped++;
-            string line;
-            if (!lines.Find(g.Group, line))
-            {
-                order.Insert(g.Group);
-                line = g.Category + " " + g.Group + ":";
-            }
-            lines.Set(g.Group, line + " " + g.ClassName);
-        }
-        string listing = "";
-        for (int k = 0; k < order.Count(); k++)
-            listing = listing + lines.Get(order[k]) + "\n";
-        SaveAnswer(listing);
-        detail = "groups: " + order.Count().ToString() + " group(s) of " + grouped.ToString() + " record(s)";
-        detail = detail + " among " + res.Goods.Count().ToString() + " goods";
         return true;
     }
 

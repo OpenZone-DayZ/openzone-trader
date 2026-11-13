@@ -164,6 +164,10 @@ screen (quote 3 ms, deal 12 ms, its part 27 ms after the ask); the kept shelf me
 
 ## Colour groups by config, not by name (evening)
 
+Taken out of the mod later the same evening by the owner's word, "too big a risk of breaking
+something" (design §3.8): every class is its own tile again, and the open of `load1` is 126 KB
+instead of 139. What follows is what the last rule measured.
+
 The owner, the same day: no grouping by the name; the class's family, model and description in
 config. The rule as built (design §3.8): the first class up the parents that looks different,
 the model, the description's string key, and what the class fires, holds and where it fits.

@@ -21,8 +21,10 @@ Four mods ship: `OpenZone_Trader`, and three glues that each hard-require anothe
 `OpenZone_Trader_TraderPlus` (the TraderPlus bank as money; needs TraderPlus). The stand tools
 (`OpenZone_Trader_Bridge`, `OpenZone_TraderProbe`, `OpenZone_TraderProbe_Bridge`) never ship.
 
-None of them has a Workshop item yet, so there is no `meta.cpp`: the first
-`workshop_publish` creates the item and its id goes into `meta.cpp` here.
+All four have had Workshop items since 2026-11-13: OpenZone_Trader 3838849089,
+OpenZone_Trader_VPP 3838849242, OpenZone_Trader_Research 3838849326,
+OpenZone_Trader_TraderPlus 3838849413. Each id lives in `packaging/<Mod>/meta.cpp`;
+`package.ps1` puts it into the `@Mod` folder, so the next upload updates the item.
 
 Publishing, in order, and only on the owner's word: `mod_build` (packs and signs; the
 series key goes into the ignored `keys/` first) -> `.\package.ps1` (puts the rest in place;

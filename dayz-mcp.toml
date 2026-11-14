@@ -37,6 +37,12 @@ mods = ["OpenZone_Trader", "OpenZone_Trader_VPP", "OpenZone_Trader_TraderPlus", 
 # The trader's own file is laid over it: the few colours and sizes a trade
 # screen has and the PDA does not.
 tokens = ["../openzone-core/ui/tokens.json", "ui/tokens.json"]
+# The css2layout demos (`_demo_*.layout`, ignored by git) are written beside the pages they
+# show, inside OpenZone_Trader_VPP; the game never loads them, so they stay out of the pbo.
+# `exclude` replaces the MCP's default list, which is repeated here; `stage` packs a copy
+# without them instead of refusing the build.
+exclude = [".git", "*.blend", "*.blend1", ".gitignore", ".gitattributes", "README.md", "*.ps1", "_demo_*.layout"]
+stage = true
 
 [expect]
 # Printed by OZT_Module one tick after the mission starts.

@@ -11,17 +11,19 @@ modded class OZ_VppAdminMenu
     override void ClassFields(OZ_ClassPick pick)
     {
         super.ClassFields(pick);
-        // Goods: the line's class and what comes with it (classes, comma between).
+        // Goods: the line's class, and one part's class that the button beside it adds to
+        // what comes with the line.
         pick.Bind("TrdGdCls", OZ_ClassIndex.ITEM);
-        pick.Bind("TrdGdWithNew", OZ_ClassIndex.ITEM, true);
+        pick.Bind("TrdGdWithNew", OZ_ClassIndex.ITEM);
         // Money: a banknote's class and the wallets filled first (classes, comma between).
         pick.Bind("TrdMnNoteCls", OZ_ClassIndex.ITEM);
         pick.Bind("TrdMnHolders", OZ_ClassIndex.ITEM, true);
         // Licences: the class the shelf draws for a licence.
         pick.Bind("TrdLcDefLook", OZ_ClassIndex.ITEM);
-        // Points: what stands at a point, a building or a character.
-        pick.Bind("TrdClass", OZ_ClassIndex.OBJECT);
-        pick.Bind("TrdNewClass", OZ_ClassIndex.OBJECT);
+        // Points: what stands at a point, a building or a character, or a stall a mod made as
+        // an item (a static of the series is one: Inventory_Base by config).
+        pick.Bind("TrdClass", OZ_ClassIndex.ITEM + OZ_ClassIndex.OBJECT);
+        pick.Bind("TrdNewClass", OZ_ClassIndex.ITEM + OZ_ClassIndex.OBJECT);
     }
 }
 

@@ -247,6 +247,10 @@ class OZT_TradeMenu : UIScriptedMenu
     protected OZT_Tile m_Hover;
     protected float m_HoverFor;
 
+    // The columns drawn closer on a screen narrower than the body
+    // (OZT_TradeFit.c).
+    protected ref OZT_TradeFit m_Fit;
+
     // The quantity dialog, and what it wants the server to price: a part of
     // one stack, asked as a quote of that one line when no other is on its way.
     protected ref OZT_QtyDialog m_Qty;
@@ -328,6 +332,8 @@ class OZT_TradeMenu : UIScriptedMenu
         m_LoadBar = layoutRoot.FindAnyWidget("ShelfLoadBar");
         if (m_Load)
             m_Load.Show(false);
+        m_Fit = new OZT_TradeFit(layoutRoot.FindAnyWidget("TradeBody"));
+        m_Fit.WatchScreen();
         return layoutRoot;
     }
 
@@ -433,6 +439,8 @@ class OZT_TradeMenu : UIScriptedMenu
         super.Update(timeslice);
         if (!layoutRoot || m_Closing)
             return;
+        if (m_Fit)
+            m_Fit.WatchScreen();
         if (GetUApi().GetInputByID(UAUIBack).LocalPress())
         {
             if (m_Qty && m_Qty.IsOpen())
